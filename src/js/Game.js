@@ -134,13 +134,34 @@ class Game {
   }
 
   // 方块旋转
-  // TODO: 修改旋转方块后，方块越界
   rotatePiece() {
+    let tempRotation = this.piece.rotation;
+
     this.cleanPiece();
+
     this.piece.rotation += 1;
-    if (this.piece.rotation === this.piece.shape.length) {
-      this.piece.rotation = 0;
+    this.piece.rotation = this.piece.rotation % this.piece.shape.length;
+
+    let piece = this.generatePiece();
+
+    for (let r = 0; r < piece.length; r++) {
+      for (let c = 0; c < piece[r].length; c++) {
+        let x = this.piece.xOffset + c;
+        let y = this.piece.yOffset + r;
+        if (piece[r][c]) {
+          if (
+            this.map[y] === undefined ||
+            this.map[y][x] === undefined ||
+            this.map[y][x] === 1
+          ) {
+            this.piece.rotation = tempRotation;
+            this.drawPiece();
+            return;
+          }
+        }
+      }
     }
+
     this.drawPiece();
   }
   // 方块下移

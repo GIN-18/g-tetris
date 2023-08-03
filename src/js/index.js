@@ -42,7 +42,7 @@ function testMove() {
 }
 
 // 更新动画
-function updateAnimation(){
-  game.moveToBottom()
+function updateAnimation(timer){
+  console.log(timer)
   window.requestAnimationFrame(updateAnimation)
 }
