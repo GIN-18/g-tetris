@@ -13,15 +13,38 @@
         background-color: #292c3c;
         color: #c6d0f5;
       }
-      #canvas{
+      #game-body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #canvas {
+        margin-right: 10px;
         padding: 1px 0 0 1px;
+        /* border: 2px solid #c6d0f5; */
+        /* border-radius: 2px; */
+      }
+      .game-info {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 3px;
         border: 2px solid #c6d0f5;
+        border-radius: 2px;
       }
     </style>
   </head>
 
   <body>
     <h1>tetris</h1>
-    <canvas id="canvas"></canvas>
+    <main id="game-body">
+      <canvas id="canvas"></canvas>
+      <div class="game-info">
+        <div class="game-info-item">
+          <label>score</label>
+          <div class="score">0</div>
+        </div>
+      </div>
+    </main>
   </body>
 </html>

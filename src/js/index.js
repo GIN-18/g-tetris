@@ -12,8 +12,6 @@ game.drawMap();
 
 game.drawPiece()
 
-// console.table(game.map)
-
 // 测试移动
 testMove();
 
@@ -28,21 +26,31 @@ function testMove() {
     }
     // 下移
     if (e.keyCode === 74) {
-      game.moveToBottom();
+      game.movePiece('bottom');
     }
     // 左移
     if (e.keyCode === 72) {
-      game.moveToLeft();
+      game.movePiece('left');
     }
     // 右移
     if (e.keyCode === 76) {
-      game.moveToRight();
+      game.movePiece('right');
     }
   });
 }
 
+let lastTime = 0
+let intervalTime = 0
+let level = 1
+
 // 更新动画
-function updateAnimation(timer){
-  console.log(timer)
-  window.requestAnimationFrame(updateAnimation)
+function updateAnimation(time){
+  if(!time) time = lastTime
+  intervalTime += level * (time - lastTime)
+  if(intervalTime > 1000){
+    intervalTime = 0
+    game.movePiece('bottom')
+  }
+  lastTime = time
+  requestAnimationFrame(updateAnimation)
 }
