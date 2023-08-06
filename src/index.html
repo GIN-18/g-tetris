@@ -19,16 +19,9 @@
         align-items: center;
       }
       #canvas {
+        box-sizing: border-box;
         margin-right: 10px;
         padding: 1px 0 0 1px;
-        /* border: 2px solid #c6d0f5; */
-        /* border-radius: 2px; */
-      }
-      .game-info {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 3px;
         border: 2px solid #c6d0f5;
         border-radius: 2px;
       }
@@ -38,11 +31,26 @@
   <body>
     <h1>tetris</h1>
     <main id="game-body">
-      <canvas id="canvas"></canvas>
-      <div class="game-info">
+      <div id="game-info">
+        <!-- 分数 -->
         <div class="game-info-item">
-          <label>score</label>
-          <div class="score">0</div>
+          <label>score:</label>
+          <div id="score">0</div>
+        </div>
+        <!-- 最高分 -->
+        <div class="game-info-item">
+          <label>highest score:</label>
+          <div id="highest-score">0</div>
+        </div>
+        <!-- 方块预览 -->
+        <div class="game-info-item">
+          <label>next piece:</label>
+          <div id="piece-preview"></div>
+        </div>
+        <!-- 游戏等级 -->
+        <div class="game-info-item">
+          <label>level:</label>
+          <div id="level">0</div>
         </div>
       </div>
     </main>

@@ -1,21 +1,19 @@
 const Game = require("./Game.js")
 
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-
-const game = new Game(ctx);
-
-canvas.width = game.block * game.map[0].length;
-canvas.height = game.block * game.map.length;
+const game = new Game();
 
 game.drawMap();
 
 game.drawPiece()
 
+game.updateLevel()
+
 // 测试移动
 testMove();
 
-// updateAnimation()
+if(!game.gameOver){
+  // updateAnimation()
+}
 
 function testMove() {
   document.body.addEventListener("keydown", (e) => {
@@ -41,13 +39,13 @@ function testMove() {
 
 let lastTime = 0
 let intervalTime = 0
-let level = 1
+let level = game.level
 
 // 更新动画
-function updateAnimation(time){
-  if(!time) time = lastTime
+function updateAnimation(time) {
+  if (!time) time = lastTime
   intervalTime += level * (time - lastTime)
-  if(intervalTime > 1000){
+  if (intervalTime > 1000) {
     intervalTime = 0
     game.movePiece('bottom')
   }
