@@ -7,6 +7,7 @@ class Operator{
     this.bottomKey = "KeyJ";
     this.dropKey = "KeyK";
     this.startKey = "KeyS"
+    this.pausedKey = "KeyP"
     this.buttomMovePiece()
     this.keyMovePiece()
   }
@@ -17,10 +18,10 @@ class Operator{
       this.game.rotatePiece();
     });
     document.getElementById("left-btn").addEventListener("click", () => {
-      this.game.movePiece("left");
+      this.game.movePiece(-1, 0, "left");
     });
     document.getElementById("right-btn").addEventListener("click", () => {
-      this.game.movePiece("right");
+      this.game.movePiece(1, 0, "right");
     });
     document.getElementById("bottom-btn").addEventListener("click", () => {
       this.game.movePiece("bottom");
@@ -35,17 +36,21 @@ class Operator{
           this.game.gameStart = true
           this.game.init();
           break;
+        case this.pausedKey:
+          this.game.isAnimationPaused = !this.game.isAnimationPaused
+          break;
         case this.rotateKey:
           this.game.rotatePiece();
           break;
         case this.leftKey:
-          this.game.movePiece("left");
+          this.game.movePiece(-1, 0, "left");
           break;
         case this.rightKey:
-          this.game.movePiece("right");
+          this.game.movePiece(1, 0, "right");
           break;
         case this.bottomKey:
           this.game.dropTime = 100
+          this.game.updateAnimation()
           break;
       }
     });

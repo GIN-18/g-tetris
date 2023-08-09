@@ -8,42 +8,56 @@ class Game {
   constructor() {
     this.mapHeight = 20;
     this.mapWidth = 10;
+
     this.previewAreaHeight = 2;
     this.previewAreaWidth = 4;
+
     this.block = 18;
     this.blockRounded = 2;
+
     this.direction = "";
+
     this.level = 1;
+
     this.time = 0;
-    this.isUpdateAnimation = false;
-    this.gameStart = false;
-    this.gameOver = false;
+
+    this.isAnimationPaused = false,
+
+    this.gameStart = true;
+
     this.pageBackgroundColor = "#292c3c";
     this.mapBackgroundColor = "#303446";
     this.previewBoxBackgroundColor = "#414559";
+
     this.map = [...new Array(this.mapHeight)].map(() =>
       new Array(this.mapWidth).fill(0)
     );
-    this.previewArea = new Application({
-      width: this.previewAreaWidth * this.block,
-      height: this.previewAreaHeight * this.block,
-      backgroundColor: this.previewBoxBackgroundColor,
-    });
+
     this.mapArea = new Application({
       width: this.mapWidth * this.block,
       height: this.mapHeight * this.block,
       backgroundColor: this.pageBackgroundColor,
     });
+
+    this.previewArea = new Application({
+      width: this.previewAreaWidth * this.block,
+      height: this.previewAreaHeight * this.block,
+      backgroundColor: this.previewBoxBackgroundColor,
+    });
+
     this.mapGraphics = new Graphics();
     this.previewGraphics = new Graphics();
+
     this.piece = new Piece();
     this.nextPiece = this.generateNextPiece();
     this.score = new Score();
     this.operator = new Operator(this);
+
     this.setGameData();
     this.drawMap()
     this.drawPiece()
     this.previewPiece();
+    this.updateAnimation();
   }
   init() {
     this.updateAnimation();
@@ -210,12 +224,19 @@ class Game {
 
         if (piece[r][c]) {
           if (this.map[y - 1] === undefined && this.map[y + 1][x] > 0) {
-            this.gameOver = true;
-            alert("game over");
-            return;
+            return true
           }
         }
       }
+    }
+
+    return false
+  }
+
+  // 游戏结束
+  gameOver(){
+    if(this.checkGameOver()){
+      alert("game over")
     }
   }
 
@@ -249,6 +270,13 @@ class Game {
             this.direction === "bottom"
           ) {
             this.setPieceInMap();
+            this.cleanPieceInMap();
+            this.piece = this.nextPiece;
+            this.nextPiece = this.generateNextPiece();
+            this.cleanPreviewPiece()
+            this.previewPiece();
+            this.drawPiece()
+            this.gameOver()
             return true;
           }
         }
@@ -262,7 +290,7 @@ class Game {
     this.mapArea.ticker.add((delta) => {
       this.time += delta * this.level;
       if (this.time > 60) {
-        this.movePiece("bottom");
+        this.movePiece(0, 1, "bottom");
         this.time = 0;
       }
     });
@@ -270,7 +298,7 @@ class Game {
 
   // 方块旋转
   rotatePiece() {
-    if(!this.gameStart) return
+    if (!this.gameStart || this.checkGameOver()) return
 
     let tempRotation = this.piece.rotation;
 
@@ -304,37 +332,16 @@ class Game {
 
   // 移动方块
   // TODO: 判断失败仍会产生一个新的方块
-  movePiece(direction) {
-    if (!this.gameOver) {
-      this.direction = direction;
+  movePiece(x, y, direction) {
+    if(!this.gameStart || this.checkGameOver()) return
 
-      if (!this.checkCollision()) {
-        this.cleanPiece();
-        if (direction === "left") {
-          this.piece.xOffset -= 1;
-        } else if (direction === "right") {
-          this.piece.xOffset += 1;
-        }
-        this.drawPiece();
-      }
+    this.direction = direction;
 
-      if (direction === "bottom") {
-        if (!this.checkCollision()) {
-          this.cleanPiece();
-          this.piece.yOffset += 1;
-          this.drawPiece();
-          return;
-        }
-        this.cleanPieceInMap();
-        this.piece = this.nextPiece;
-        this.nextPiece = this.generateNextPiece();
-        this.cleanPreviewPiece()
-        this.previewPiece();
-        this.checkGameOver();
-        this.cleanPiece();
-        this.piece.yOffset = 0;
-        this.drawPiece();
-      }
+    if (!this.checkCollision()) {
+      this.cleanPiece();
+        this.piece.xOffset += x;
+        this.piece.yOffset += y;
+      this.drawPiece();
     }
   }
 
@@ -366,6 +373,7 @@ class Game {
   addScore(filledRows, level) {
     this.score.updateScore(filledRows, level);
     document.getElementById("score").innerText = this.score.score;
+
     this.score.updateHighScore();
   }
 
