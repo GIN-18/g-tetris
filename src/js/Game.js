@@ -2,6 +2,7 @@ const { Application, Graphics } = require("pixi.js");
 
 const Piece = require("./Piece.js");
 const Score = require("./Score.js");
+const Operator = require("./Operator.js");
 
 class Game {
   constructor() {
@@ -10,8 +11,12 @@ class Game {
     this.previewAreaHeight = 2;
     this.previewAreaWidth = 4;
     this.block = 18;
+    this.blockRounded = 2;
     this.direction = "";
     this.level = 1;
+    this.time = 0;
+    this.isUpdateAnimation = false;
+    this.gameStart = false;
     this.gameOver = false;
     this.pageBackgroundColor = "#292c3c";
     this.mapBackgroundColor = "#303446";
@@ -19,7 +24,7 @@ class Game {
     this.map = [...new Array(this.mapHeight)].map(() =>
       new Array(this.mapWidth).fill(0)
     );
-    this.previewArea =  new Application({
+    this.previewArea = new Application({
       width: this.previewAreaWidth * this.block,
       height: this.previewAreaHeight * this.block,
       backgroundColor: this.previewBoxBackgroundColor,
@@ -31,33 +36,44 @@ class Game {
     });
     this.mapGraphics = new Graphics();
     this.previewGraphics = new Graphics();
-    this.score = new Score();
     this.piece = new Piece();
     this.nextPiece = this.generateNextPiece();
-    this.init();
-  }
-  init() {
-    this.setArea();
-    // this.setGameInfo()
+    this.score = new Score();
+    this.operator = new Operator(this);
+    this.setGameData();
+    this.drawMap()
+    this.drawPiece()
     this.previewPiece();
   }
+  init() {
+    this.updateAnimation();
+  }
+
   // 设置游戏场地
-  setArea() {
+  setGameData() {
+    // 绘制游戏画布
     document.getElementById("game-body").appendChild(this.mapArea.view);
+
+    // 绘制预览方块画布
     document.getElementById("piece-preview").appendChild(this.previewArea.view);
+
+    // 设置游戏数据
+    document.getElementById("level").innerText = this.level;
+    document.getElementById("highest-score").innerText = this.score.highScore;
+
+    document.getElementById("game-info").style.height = this.mapHeight;
   }
-  // 设置游戏信息
-  setGameInfo() {
-    document.getElementById("game-body").appendChild("div");
-  }
+
   // 生成形状
   generatePiece() {
     return this.piece.shape[this.piece.rotation];
   }
+
   // 下一个方块
   generateNextPiece() {
     return new Piece();
   }
+
   // 渲染地图
   drawMap() {
     for (let r = 0; r < this.map.length; r++) {
@@ -65,11 +81,12 @@ class Game {
         let fillColor = this.setColor(this.map[r][c]);
 
         this.mapGraphics.beginFill(fillColor, 1);
-        this.mapGraphics.drawRect(
+        this.mapGraphics.drawRoundedRect(
           c * this.block,
           r * this.block,
           this.block - 1,
-          this.block - 1
+          this.block - 1,
+          this.blockRounded
         );
         this.mapGraphics.endFill();
       }
@@ -86,11 +103,12 @@ class Game {
       for (let c = 0; c < tempNextPiece[r].length; c++) {
         if (tempNextPiece[r][c]) {
           this.previewGraphics.beginFill(pieceColor, 1);
-          this.previewGraphics.drawRect(
+          this.previewGraphics.drawRoundedRect(
             c * this.block,
             r * this.block,
             this.block - 1,
-            this.block - 1
+            this.block - 1,
+            this.blockRounded
           );
         }
         this.previewGraphics.endFill();
@@ -103,13 +121,14 @@ class Game {
   cleanPreviewPiece() {
     for (let r = 0; r < this.previewAreaHeight; r++) {
       for (let c = 0; c < this.previewAreaWidth; c++) {
-          this.previewGraphics.beginFill(this.previewBoxBackgroundColor, 1);
-          this.previewGraphics.drawRect(
-            c * this.block,
-            r * this.block,
-            this.block - 1,
-            this.block - 1
-          );
+        this.previewGraphics.beginFill(this.previewBoxBackgroundColor, 1);
+        this.previewGraphics.drawRoundedRect(
+          c * this.block,
+          r * this.block,
+          this.block - 1,
+          this.block - 1,
+          this.blockRounded
+        );
         this.previewGraphics.endFill();
       }
     }
@@ -127,11 +146,12 @@ class Game {
       for (let c = 0; c < piece[r].length; c++) {
         if (piece[r][c]) {
           this.mapGraphics.beginFill(pieceColor, 1);
-          this.mapGraphics.drawRect(
+          this.mapGraphics.drawRoundedRect(
             c * this.block + x * this.block,
             r * this.block + y * this.block,
             this.block - 1,
-            this.block - 1
+            this.block - 1,
+            this.blockRounded
           );
           this.mapGraphics.endFill();
         }
@@ -139,6 +159,7 @@ class Game {
     }
     this.mapArea.stage.addChild(this.mapGraphics);
   }
+
   // 清除方块
   cleanPiece() {
     let piece = this.generatePiece();
@@ -149,11 +170,12 @@ class Game {
       for (let c = 0; c < piece[r].length; c++) {
         if (piece[r][c]) {
           this.mapGraphics.beginFill(this.mapBackgroundColor, 1);
-          this.mapGraphics.drawRect(
+          this.mapGraphics.drawRoundedRect(
             c * this.block + x * this.block,
             r * this.block + y * this.block,
             this.block - 1,
-            this.block - 1
+            this.block - 1,
+            this.blockRounded
           );
           this.mapGraphics.endFill();
         }
@@ -161,6 +183,7 @@ class Game {
     }
     this.mapArea.stage.addChild(this.mapGraphics);
   }
+
   // 在地图上设置方块
   setPieceInMap() {
     let piece = this.generatePiece();
@@ -175,6 +198,7 @@ class Game {
       }
     }
   }
+
   // 判断游戏结束
   checkGameOver() {
     let piece = this.generatePiece();
@@ -194,6 +218,7 @@ class Game {
       }
     }
   }
+
   // 碰撞检测
   checkCollision() {
     let piece = this.generatePiece();
@@ -231,39 +256,52 @@ class Game {
     }
     return false;
   }
+
+  // 自动下移
+  updateAnimation() {
+    this.mapArea.ticker.add((delta) => {
+      this.time += delta * this.level;
+      if (this.time > 60) {
+        this.movePiece("bottom");
+        this.time = 0;
+      }
+    });
+  }
+
   // 方块旋转
   rotatePiece() {
-    if (!this.gameOver) {
-      let tempRotation = this.piece.rotation;
+    if(!this.gameStart) return
 
-      this.cleanPiece();
+    let tempRotation = this.piece.rotation;
 
-      this.piece.rotation += 1;
-      this.piece.rotation = this.piece.rotation % this.piece.shape.length;
+    this.cleanPiece();
 
-      let piece = this.generatePiece();
+    this.piece.rotation += 1;
+    this.piece.rotation = this.piece.rotation % this.piece.shape.length;
 
-      for (let r = 0; r < piece.length; r++) {
-        for (let c = 0; c < piece[r].length; c++) {
-          let x = this.piece.xOffset + c;
-          let y = this.piece.yOffset + r;
-          if (piece[r][c]) {
-            if (
-              this.map[y] === undefined ||
-              this.map[y][x] === undefined ||
-              this.map[y][x] > 0
-            ) {
-              this.piece.rotation = tempRotation;
-              this.drawPiece();
-              return;
-            }
+    let piece = this.generatePiece();
+
+    for (let r = 0; r < piece.length; r++) {
+      for (let c = 0; c < piece[r].length; c++) {
+        let x = this.piece.xOffset + c;
+        let y = this.piece.yOffset + r;
+        if (piece[r][c]) {
+          if (
+            this.map[y] === undefined ||
+            this.map[y][x] === undefined ||
+            this.map[y][x] > 0
+          ) {
+            this.piece.rotation = tempRotation;
+            this.drawPiece();
+            return;
           }
         }
       }
-
-      this.drawPiece();
     }
+
+    this.drawPiece();
   }
+
   // 移动方块
   // TODO: 判断失败仍会产生一个新的方块
   movePiece(direction) {
@@ -299,6 +337,7 @@ class Game {
       }
     }
   }
+
   // 在地图上清除方块
   cleanPieceInMap() {
     let filledRows = [];
@@ -322,20 +361,24 @@ class Game {
       }
     }
   }
+
   // 添加分数
   addScore(filledRows, level) {
     this.score.updateScore(filledRows, level);
     document.getElementById("score").innerText = this.score.score;
+    this.score.updateHighScore();
   }
+
   // 更新游戏等级
   updateLevel() {
-    const nextLevelScore = this.level * 1000;
+    const nextLevelScore = this.level * 300;
     if (this.score.score >= nextLevelScore) {
       this.level += 1;
       this.updateLevel();
     }
     document.getElementById("level").innerText = this.level;
   }
+
   // 设置颜色
   setColor(number) {
     switch (number) {

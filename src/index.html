@@ -1,58 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>tetris</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-      body {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background-color: #292c3c;
-        color: #c6d0f5;
-      }
-      #game-body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      #canvas {
-        box-sizing: border-box;
-        margin-right: 10px;
-        padding: 1px 0 0 1px;
-        border: 2px solid #c6d0f5;
-        border-radius: 2px;
-      }
-    </style>
-  </head>
 
-  <body>
-    <h1>tetris</h1>
-    <main id="game-body">
-      <div id="game-info">
-        <!-- 分数 -->
-        <div class="game-info-item">
-          <label>score:</label>
-          <div id="score">0</div>
-        </div>
-        <!-- 最高分 -->
-        <div class="game-info-item">
-          <label>highest score:</label>
-          <div id="highest-score">0</div>
-        </div>
-        <!-- 方块预览 -->
-        <div class="game-info-item">
-          <label>next piece:</label>
-          <div id="piece-preview"></div>
-        </div>
-        <!-- 游戏等级 -->
-        <div class="game-info-item">
-          <label>level:</label>
-          <div id="level">0</div>
-        </div>
+<head>
+  <title>tetris</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #292c3c;
+      color: #c6d0f5;
+    }
+
+    main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    canvas {
+      padding: 1px 0 0 1px;
+      border: 2px solid #c6d0f5;
+      border-radius: 2px;
+    }
+
+    #game-info {
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: space-between;
+      margin-left: 10px;
+      height: 365px;
+    }
+
+    .game-info-item {
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 6px;
+      border: 2px solid #c6d0f5;
+      border-radius: 2px;
+    }
+
+    .game-info-item label {
+      margin-bottom: 6px;
+    }
+
+    button {
+      outline: none;
+      border: 2px solid #c6d0f5;
+      border-radius: 50%;
+      background-color: #292c3c;
+      color: #c6d0f5;
+      touch-action: manipulation;
+    }
+
+    #operate {
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 300px;
+      margin-top: 10px;
+      padding: 6px;
+      border: 2px solid #c6d0f5;
+      border-radius: 2px;
+      touch-action: manipulation;
+    }
+
+    #operate-btn {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #direction-btn {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 50%;
+    }
+
+    #h-btn {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    #rotation-btn {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      width: 50%;
+    }
+
+    #r-btn {
+      width: 100px;
+      height: 100px;
+    }
+
+    .d-btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 50px;
+      height: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>tetris</h1>
+  <main>
+    <div id="game-body"></div>
+    <!-- 游戏信息 -->
+    <div id="game-info">
+      <!-- 分数 -->
+      <div class="game-info-item">
+        <label>SCORE</label>
+        <div id="score">0</div>
       </div>
-    </main>
-  </body>
+      <!-- 最高分 -->
+      <div class="game-info-item">
+        <label>HI-SCORE</label>
+        <div id="highest-score">0</div>
+      </div>
+      <!-- 方块预览 -->
+      <div class="game-info-item">
+        <label>NEXT PIECE</label>
+        <div id="piece-preview"></div>
+      </div>
+      <!-- 游戏等级 -->
+      <div class="game-info-item">
+        <label>LEVEL</label>
+        <div id="level">0</div>
+      </div>
+    </div>
+  </main>
+  <!-- 操作 -->
+  <div id="operate">
+    <!-- <div id="feature-btn"> -->
+    <!--   <button type="button">paused</button> -->
+    <!--   <button type="button">restart</button> -->
+    <!--   <button type="button">voice</button> -->
+    <!-- </div> -->
+    <div id="operate-btn">
+      <div id="direction-btn">
+        <button class="d-btn" type="button">
+          <svg t="1691484788276" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+            p-id="8507" width="28" height="28">
+            <path
+              d="M774.273 649.915H576V128.216c0-35.346-28.654-64-64-64-35.346 0-64 28.654-64 64v521.699H249.727c-21.202 0-31.82 25.634-16.828 40.626l262.273 262.273c9.294 9.294 24.362 9.294 33.655 0L791.101 690.54c14.992-14.992 4.374-40.625-16.828-40.625z"
+              p-id="8508" fill="#c6d0f5"></path>
+          </svg>
+        </button>
+        <div id="h-btn">
+          <button id="left-btn" class="d-btn" type="button">
+            <svg t="1691484349984" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+              p-id="7505" width="28" height="28">
+              <path
+                d="M634.9 512V282.9c0-30.3-38.2-43.6-57.1-19.9l-70.3 88.6L396 492.1c-9.3 11.7-9.3 28.1 0 39.8l111.6 140.5 70.3 88.6c18.8 23.7 57.1 10.4 57.1-19.9l-0.1-229.1z"
+                fill="#c6d0f5" p-id="7506"></path>
+            </svg>
+          </button>
+          <button id="right-btn" class="d-btn" type="button">
+            <svg t="1691484297267" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+              p-id="7255" width="28" height="28">
+              <path
+                d="M628 492.1L516.4 351.6 446.1 263c-18.8-23.7-57.1-10.4-57.1 19.9v458.2c0 30.3 38.2 43.6 57.1 19.9l70.3-88.6L628 531.9c9.3-11.7 9.3-28.1 0-39.8z"
+                fill="#c6d0f5" p-id="7256"></path>
+            </svg>
+          </button>
+        </div>
+        <button id="bottom-btn" class="d-btn" type="button">
+          <svg t="1691484373616" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+            p-id="7755" width="28" height="28">
+            <path
+              d="M740.4 420.1H282.3c-30.3 0-43.6 38.2-19.9 57.1l88.6 70.3 140.5 111.6c11.7 9.3 28.1 9.3 39.8 0l140.5-111.6 88.6-70.3c23.6-18.9 10.3-57.1-20-57.1z"
+              fill="#c6d0f5" p-id="7756"></path>
+          </svg>
+        </button>
+      </div>
+      <div id="rotation-btn">
+        <button id="r-btn" type="button">
+          <svg t="1691484230116" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+            p-id="7005" width="38" height="38">
+            <path
+              d="M955.679 194.521c-0.549-28.52-35.056-42.426-55.227-22.256l-91.415 91.415a387.86 387.86 0 0 0-21.05-26.387c-32.974-37.774-72.523-68.537-117.547-91.433-45.023-22.897-93.179-36.735-143.128-41.131-51.83-4.56-103.214 1.303-152.72 17.431-50.827 16.559-96.912 42.931-136.977 78.384s-71.848 77.987-94.468 126.421c-7.561 16.191-0.566 35.445 15.624 43.006 16.19 7.562 35.444 0.566 43.006-15.624 37.747-80.825 108.041-143.028 192.858-170.66 140.117-45.647 289.325 9.941 368.097 126.298L662.415 410.303c-20.171 20.171-6.265 54.678 22.256 55.227l242.707 4.669c18.354 0.353 33.324-14.617 32.971-32.971l-4.67-242.707zM865.794 653.511c-16.192-7.56-35.445-0.566-43.006 15.624-37.747 80.826-108.041 143.029-192.858 170.661-81.537 26.563-169.067 19.511-246.472-19.852-49.799-25.325-91.239-61.93-121.551-106.52l100.245-100.245c20.171-20.171 6.265-54.678-22.256-55.227l-242.707-4.669c-18.354-0.353-33.324 14.617-32.971 32.971l4.669 242.707c0.549 28.52 35.056 42.426 55.227 22.256l91.415-91.415a387.583 387.583 0 0 0 21.051 26.388c32.974 37.773 72.522 68.536 117.546 91.433 45.024 22.896 93.178 36.735 143.127 41.131a387.878 387.878 0 0 0 33.993 1.498c40.264 0 80.072-6.336 118.727-18.93 50.826-16.557 96.912-42.929 136.977-78.383 40.064-35.453 71.848-77.987 94.468-126.421 7.562-16.191 0.566-35.445-15.624-43.007z"
+              p-id="7006" fill="#c6d0f5"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+
 </html>
