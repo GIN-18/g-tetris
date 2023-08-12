@@ -1,4 +1,4 @@
-const { Application, Graphics } = require("pixi.js");
+const { Application, Graphics, Ticker } = require("pixi.js");
 
 const Piece = require("./Piece.js");
 const Score = require("./Score.js");
@@ -15,15 +15,15 @@ class Game {
     this.block = 18;
     this.blockRounded = 2;
 
-    this.direction = "";
-
     this.level = 1;
 
     this.time = 0;
+    this.speed = 1;
+    this.isUpdateAnimation = true
+    this.ticker = Ticker.shared
 
-    this.isAnimationPaused = false,
-
-    this.gameStart = true;
+    this.gameStart = false;
+    this.gameOver = false;
 
     this.pageBackgroundColor = "#292c3c";
     this.mapBackgroundColor = "#303446";
@@ -53,13 +53,13 @@ class Game {
     this.score = new Score();
     this.operator = new Operator(this);
 
-    this.setGameData();
-    this.drawMap()
-    this.drawPiece()
-    this.previewPiece();
-    this.updateAnimation();
+    this.init();
   }
   init() {
+    this.setGameData();
+    this.drawMap();
+    this.drawPiece();
+    this.previewPiece();
     this.updateAnimation();
   }
 
@@ -74,8 +74,6 @@ class Game {
     // 设置游戏数据
     document.getElementById("level").innerText = this.level;
     document.getElementById("highest-score").innerText = this.score.highScore;
-
-    document.getElementById("game-info").style.height = this.mapHeight;
   }
 
   // 生成形状
@@ -90,8 +88,8 @@ class Game {
 
   // 渲染地图
   drawMap() {
-    for (let r = 0; r < this.map.length; r++) {
-      for (let c = 0; c < this.map[r].length; c++) {
+    for (let r = 0; r < this.mapHeight; r++) {
+      for (let c = 0; c < this.mapWidth; c++) {
         let fillColor = this.setColor(this.map[r][c]);
 
         this.mapGraphics.beginFill(fillColor, 1);
@@ -213,92 +211,20 @@ class Game {
     }
   }
 
-  // 判断游戏结束
-  checkGameOver() {
-    let piece = this.generatePiece();
-
-    for (let r = 0; r < piece.length; r++) {
-      for (let c = 0; c < piece[r].length; c++) {
-        let x = this.piece.xOffset + c;
-        let y = this.piece.yOffset + r;
-
-        if (piece[r][c]) {
-          if (this.map[y - 1] === undefined && this.map[y + 1][x] > 0) {
-            return true
-          }
-        }
-      }
-    }
-
-    return false
-  }
-
-  // 游戏结束
-  gameOver(){
-    if(this.checkGameOver()){
-      alert("game over")
-    }
-  }
-
-  // 碰撞检测
-  checkCollision() {
-    let piece = this.generatePiece();
-
-    for (let r = 0; r < piece.length; r++) {
-      for (let c = 0; c < piece[r].length; c++) {
-        let x = this.piece.xOffset + c;
-        let y = this.piece.yOffset + r;
-
-        if (piece[r][c]) {
-          // 左边缘检测
-          if (
-            (this.map[y][x - 1] === undefined || this.map[y][x - 1] > 0) &&
-            this.direction === "left"
-          ) {
-            return true;
-          }
-          // 右边缘检测
-          if (
-            (this.map[y][x + 1] === undefined || this.map[y][x + 1] > 0) &&
-            this.direction === "right"
-          ) {
-            return true;
-          }
-          // 下边缘检测
-          if (
-            (this.map[y + 1] === undefined || this.map[y + 1][x] > 0) &&
-            this.direction === "bottom"
-          ) {
-            this.setPieceInMap();
-            this.cleanPieceInMap();
-            this.piece = this.nextPiece;
-            this.nextPiece = this.generateNextPiece();
-            this.cleanPreviewPiece()
-            this.previewPiece();
-            this.drawPiece()
-            this.gameOver()
-            return true;
-          }
-        }
-      }
-    }
-    return false;
-  }
-
   // 自动下移
   updateAnimation() {
-    this.mapArea.ticker.add((delta) => {
+    this.ticker.add((delta)=>{
       this.time += delta * this.level;
-      if (this.time > 60) {
-        this.movePiece(0, 1, "bottom");
+      if (this.time > 60 && this.gameStart && this.isUpdateAnimation) {
+        this.movePiece(0, 1);
         this.time = 0;
       }
-    });
+    })
   }
 
   // 方块旋转
   rotatePiece() {
-    if (!this.gameStart || this.checkGameOver()) return
+    if (!this.gameStart) return;
 
     let tempRotation = this.piece.rotation;
 
@@ -332,15 +258,52 @@ class Game {
 
   // 移动方块
   // TODO: 判断失败仍会产生一个新的方块
-  movePiece(x, y, direction) {
-    if(!this.gameStart || this.checkGameOver()) return
+  movePiece(xStep, yStep) {
+    if (!this.gameStart) return;
 
-    this.direction = direction;
+    if(this.gameOver) return
 
-    if (!this.checkCollision()) {
+    let canMove = true;
+
+    let piece = this.generatePiece();
+
+    for (let r = 0; r < piece.length; r++) {
+      for (let c = 0; c < piece[r].length; c++) {
+        let x = this.piece.xOffset + c;
+        let y = this.piece.yOffset + r;
+
+        if (piece[r][c]) {
+          // 游戏结束
+          if (this.map[y - 1] === undefined && this.map[y + 1][x]) {
+            this.gameOver = true
+            alert("game over")
+            return;
+          }
+          // 左右碰撞检测
+          if (this.map[y][x + xStep] === undefined || this.map[y][x + xStep]) {
+            canMove = false;
+            return;
+          }
+          // 下边缘检测
+          if (this.map[y + yStep] === undefined || this.map[y + yStep][x]) {
+            this.setPieceInMap();
+            this.cleanPieceInMap();
+            this.piece = this.nextPiece;
+            this.nextPiece = this.generateNextPiece();
+            this.cleanPreviewPiece();
+            this.previewPiece();
+            this.drawPiece();
+            canMove = false;
+            return;
+          }
+        }
+      }
+    }
+
+    if (canMove) {
       this.cleanPiece();
-        this.piece.xOffset += x;
-        this.piece.yOffset += y;
+      this.piece.xOffset += xStep;
+      this.piece.yOffset += yStep;
       this.drawPiece();
     }
   }

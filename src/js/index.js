@@ -1,6 +1,6 @@
 const Game = require("./Game.js")
 
-const game = new Game();
+new Game();
 
 // game.drawMap();
 //
