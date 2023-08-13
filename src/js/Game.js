@@ -6,42 +6,35 @@ const Operator = require("./Operator.js");
 
 class Game {
   constructor() {
-    this.mapHeight = 20;
-    this.mapWidth = 10;
-
-    this.previewAreaHeight = 2;
-    this.previewAreaWidth = 4;
-
     this.block = 18;
     this.blockRounded = 2;
 
     this.level = 1;
 
     this.time = 0;
-    this.speed = 1;
     this.isUpdateAnimation = true
+    this.speed = 1
     this.ticker = Ticker.shared
 
-    this.gameStart = false;
-    this.gameOver = false;
+    this.gameStatus = 0;
 
     this.pageBackgroundColor = "#292c3c";
     this.mapBackgroundColor = "#303446";
     this.previewBoxBackgroundColor = "#414559";
 
-    this.map = [...new Array(this.mapHeight)].map(() =>
-      new Array(this.mapWidth).fill(0)
+    this.map = [...new Array(20)].map(() =>
+      new Array(10).fill(0)
     );
 
     this.mapArea = new Application({
-      width: this.mapWidth * this.block,
-      height: this.mapHeight * this.block,
+      width: 10 * this.block,
+      height: 20 * this.block,
       backgroundColor: this.pageBackgroundColor,
     });
 
     this.previewArea = new Application({
-      width: this.previewAreaWidth * this.block,
-      height: this.previewAreaHeight * this.block,
+      width: 4 * this.block,
+      height: 2 * this.block,
       backgroundColor: this.previewBoxBackgroundColor,
     });
 
@@ -60,7 +53,7 @@ class Game {
     this.drawMap();
     this.drawPiece();
     this.previewPiece();
-    this.updateAnimation();
+    this.gameLoop();
   }
 
   // 设置游戏场地
@@ -88,8 +81,9 @@ class Game {
 
   // 渲染地图
   drawMap() {
-    for (let r = 0; r < this.mapHeight; r++) {
-      for (let c = 0; c < this.mapWidth; c++) {
+    const map = this.map
+    for (let r = 0; r < map.length; r++) {
+      for (let c = 0; c < map[r].length; c++) {
         let fillColor = this.setColor(this.map[r][c]);
 
         this.mapGraphics.beginFill(fillColor, 1);
@@ -131,8 +125,8 @@ class Game {
 
   // 清除预览方块
   cleanPreviewPiece() {
-    for (let r = 0; r < this.previewAreaHeight; r++) {
-      for (let c = 0; c < this.previewAreaWidth; c++) {
+    for (let r = 0; r < 2; r++) {
+      for (let c = 0; c < 4; c++) {
         this.previewGraphics.beginFill(this.previewBoxBackgroundColor, 1);
         this.previewGraphics.drawRoundedRect(
           c * this.block,
@@ -212,19 +206,20 @@ class Game {
   }
 
   // 自动下移
-  updateAnimation() {
-    this.ticker.add((delta)=>{
-      this.time += delta * this.level;
-      if (this.time > 60 && this.gameStart && this.isUpdateAnimation) {
+  gameLoop() {
+    let distance = 0
+    this.ticker.add((delta) => {
+      distance += delta * this.level
+      if (distance > 60) {
         this.movePiece(0, 1);
-        this.time = 0;
+        distance = 0
       }
     })
   }
 
   // 方块旋转
   rotatePiece() {
-    if (!this.gameStart) return;
+    if (!this.gameStatus) return;
 
     let tempRotation = this.piece.rotation;
 
@@ -259,9 +254,7 @@ class Game {
   // 移动方块
   // TODO: 判断失败仍会产生一个新的方块
   movePiece(xStep, yStep) {
-    if (!this.gameStart) return;
-
-    if(this.gameOver) return
+    if (!this.gameStatus) return;
 
     let canMove = true;
 
@@ -275,7 +268,7 @@ class Game {
         if (piece[r][c]) {
           // 游戏结束
           if (this.map[y - 1] === undefined && this.map[y + 1][x]) {
-            this.gameOver = true
+            this.gameStatus = 0
             alert("game over")
             return;
           }
@@ -286,6 +279,7 @@ class Game {
           }
           // 下边缘检测
           if (this.map[y + yStep] === undefined || this.map[y + yStep][x]) {
+            this.ticker.speed = 1
             this.setPieceInMap();
             this.cleanPieceInMap();
             this.piece = this.nextPiece;

@@ -18,19 +18,24 @@ class Operator {
 
     document.getElementById("r-btn").addEventListener("touchstart", () => {
       event.preventDefault();
-      this.game.rotatePiece();
+      // this.game.rotatePiece();
+      this.game.movePiece(0, 0, 1)
     });
     document.getElementById("left-btn").addEventListener("touchstart", () => {
       event.preventDefault();
-      this.game.movePiece(-1, 0, "left");
+      this.game.movePiece(-1, 0, 0);
     });
     document.getElementById("right-btn").addEventListener("touchstart", () => {
       event.preventDefault();
-      this.game.movePiece(1, 0, "right");
+      this.game.movePiece(1, 0, 0);
     });
     document.getElementById("bottom-btn").addEventListener("touchstart", () => {
       event.preventDefault();
-      this.game.ticker.speed = 16
+      this.game.ticker.speed = 18
+    });
+    document.getElementById("drop-btn").addEventListener("touchstart", () => {
+      event.preventDefault();
+      this.game.ticker.speed = 100
     });
     document.getElementById("bottom-btn").addEventListener("touchend", () => {
       event.preventDefault();
@@ -40,12 +45,7 @@ class Operator {
     // 开始暂停按钮
     let startButton = document.getElementById("start-btn")
     startButton.addEventListener("touchstart", () => {
-      this.game.gameStart = !this.game.gameStart
-      if (this.game.gameStart) {
-        startButton.innerHTML = pauseIcon
-        return
-      }
-      startButton.innerHTML = startIcon
+      this.game.gameStatus = !this.game.gameStatus
     })
 
     // 重新开始按钮
@@ -59,19 +59,19 @@ class Operator {
     document.body.addEventListener("keydown", (e) => {
       switch (e.code) {
         case this.startKey:
-          this.game.gameStart = !this.game.gameStart
+          this.game.gameStatus = !this.game.gameStatus
           break;
         case this.rotateKey:
           this.game.rotatePiece();
           break;
         case this.leftKey:
-          this.game.movePiece(-1, 0);
+          this.game.movePiece(-1, 0, 0);
           break;
         case this.rightKey:
-          this.game.movePiece(1, 0);
+          this.game.movePiece(1, 0, 0);
           break;
         case this.bottomKey:
-          this.game.ticker.speed = 16
+          this.game.ticker.speed = 18
           break;
       }
     });
