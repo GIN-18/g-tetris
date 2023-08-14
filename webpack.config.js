@@ -16,6 +16,10 @@ module.exports = {
         include: path.join(__dirname, "src", "js"),
         exclude: /node_modules/,
       },
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"],
+      },
     ],
   },
   plugins: [

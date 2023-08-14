@@ -18,16 +18,15 @@ class Operator {
 
     document.getElementById("r-btn").addEventListener("touchstart", () => {
       event.preventDefault();
-      // this.game.rotatePiece();
-      this.game.movePiece(0, 0, 1)
+      this.game.rotatePiece();
     });
     document.getElementById("left-btn").addEventListener("touchstart", () => {
       event.preventDefault();
-      this.game.movePiece(-1, 0, 0);
+      this.game.movePiece(-1, 0);
     });
     document.getElementById("right-btn").addEventListener("touchstart", () => {
       event.preventDefault();
-      this.game.movePiece(1, 0, 0);
+      this.game.movePiece(1, 0);
     });
     document.getElementById("bottom-btn").addEventListener("touchstart", () => {
       event.preventDefault();
@@ -65,10 +64,10 @@ class Operator {
           this.game.rotatePiece();
           break;
         case this.leftKey:
-          this.game.movePiece(-1, 0, 0);
+          this.game.movePiece(-1, 0);
           break;
         case this.rightKey:
-          this.game.movePiece(1, 0, 0);
+          this.game.movePiece(1, 0);
           break;
         case this.bottomKey:
           this.game.ticker.speed = 18

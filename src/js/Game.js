@@ -6,15 +6,15 @@ const Operator = require("./Operator.js");
 
 class Game {
   constructor() {
-    this.block = 18;
+    this.block = 20;
     this.blockRounded = 2;
 
     this.level = 1;
 
     this.time = 0;
-    this.isUpdateAnimation = true
-    this.speed = 1
-    this.ticker = Ticker.shared
+    this.isUpdateAnimation = true;
+    this.speed = 1;
+    this.ticker = Ticker.shared;
 
     this.gameStatus = 0;
 
@@ -22,9 +22,7 @@ class Game {
     this.mapBackgroundColor = "#303446";
     this.previewBoxBackgroundColor = "#414559";
 
-    this.map = [...new Array(20)].map(() =>
-      new Array(10).fill(0)
-    );
+    this.map = [...new Array(20)].map(() => new Array(10).fill(0));
 
     this.mapArea = new Application({
       width: 10 * this.block,
@@ -65,8 +63,9 @@ class Game {
     document.getElementById("piece-preview").appendChild(this.previewArea.view);
 
     // 设置游戏数据
-    document.getElementById("level").innerText = this.level;
+    document.getElementById("score").innerText = this.score.score;
     document.getElementById("highest-score").innerText = this.score.highScore;
+    document.getElementById("level").innerText = this.level;
   }
 
   // 生成形状
@@ -81,7 +80,7 @@ class Game {
 
   // 渲染地图
   drawMap() {
-    const map = this.map
+    const map = this.map;
     for (let r = 0; r < map.length; r++) {
       for (let c = 0; c < map[r].length; c++) {
         let fillColor = this.setColor(this.map[r][c]);
@@ -166,30 +165,6 @@ class Game {
     this.mapArea.stage.addChild(this.mapGraphics);
   }
 
-  // 清除方块
-  cleanPiece() {
-    let piece = this.generatePiece();
-    let x = this.piece.xOffset;
-    let y = this.piece.yOffset;
-
-    for (let r = 0; r < piece.length; r++) {
-      for (let c = 0; c < piece[r].length; c++) {
-        if (piece[r][c]) {
-          this.mapGraphics.beginFill(this.mapBackgroundColor, 1);
-          this.mapGraphics.drawRoundedRect(
-            c * this.block + x * this.block,
-            r * this.block + y * this.block,
-            this.block - 1,
-            this.block - 1,
-            this.blockRounded
-          );
-          this.mapGraphics.endFill();
-        }
-      }
-    }
-    this.mapArea.stage.addChild(this.mapGraphics);
-  }
-
   // 在地图上设置方块
   setPieceInMap() {
     let piece = this.generatePiece();
@@ -207,14 +182,14 @@ class Game {
 
   // 自动下移
   gameLoop() {
-    let distance = 0
+    let distance = 0;
     this.ticker.add((delta) => {
-      distance += delta * this.level
+      distance += delta * this.level;
       if (distance > 60) {
         this.movePiece(0, 1);
-        distance = 0
+        distance = 0;
       }
-    })
+    });
   }
 
   // 方块旋转
@@ -223,7 +198,7 @@ class Game {
 
     let tempRotation = this.piece.rotation;
 
-    this.cleanPiece();
+    this.drawMap();
 
     this.piece.rotation += 1;
     this.piece.rotation = this.piece.rotation % this.piece.shape.length;
@@ -268,8 +243,9 @@ class Game {
         if (piece[r][c]) {
           // 游戏结束
           if (this.map[y - 1] === undefined && this.map[y + 1][x]) {
-            this.gameStatus = 0
-            alert("game over")
+            this.gameStatus = 0;
+            this.ticker.destroy()
+            alert("game over");
             return;
           }
           // 左右碰撞检测
@@ -279,7 +255,7 @@ class Game {
           }
           // 下边缘检测
           if (this.map[y + yStep] === undefined || this.map[y + yStep][x]) {
-            this.ticker.speed = 1
+            this.ticker.speed = 1;
             this.setPieceInMap();
             this.cleanPieceInMap();
             this.piece = this.nextPiece;
@@ -295,7 +271,7 @@ class Game {
     }
 
     if (canMove) {
-      this.cleanPiece();
+      this.drawMap();
       this.piece.xOffset += xStep;
       this.piece.yOffset += yStep;
       this.drawPiece();
