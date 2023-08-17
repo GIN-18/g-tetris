@@ -22,14 +22,8 @@ class Game {
   init() {
     this.map = [...this.generateMap(10, 20)];
     this.nextShape = this.generateShape();
-    this.setMap();
+    this.addShape();
   }
-
-  // 渲染地图
-  setMap() {}
-
-  // 绘制
-  draw() {}
 
   // 生成地图
   generateMap(width, height) {
@@ -51,17 +45,15 @@ class Game {
     this.shape = this.nextShape;
     this.nextShape = this.generateShape();
 
-    for (let i = 0, length = this.shape.blocks.length; i < length; i++) {
-      let x = this.shape.blocks[i][1] + this.shape.xOffset,
-        y = this.shape.blocks[i][0] + this.shape.yOffset;
-
-      // 游戏结束判断
+    this.shape.blocks.forEach((item) => {
+      let x = this.shape.xOffset + item[1],
+        y = this.shape.yOffset + item[0];
       if (y >= 0 && this.map[y][x]) {
         this.shape = null;
         console.log("game over");
         return;
       }
-    }
+    });
   }
 
   // 自动下移
@@ -71,14 +63,64 @@ class Game {
   rotateShape(rStep) {
     let shape = this.shape;
 
+    let tempRotation = shape.rotation;
+
     shape.rotation += rStep;
 
     let r =
       shape.rotation % shape.shapeTable[shape.shapeType[shape.type]].length;
 
-      shape.rotation = r;
+    shape.rotation = r;
 
-      this.setupBlocks(shape);
+    this.setupBlocks(shape);
+
+    shape.blocks.forEach((item) => {
+      let x = shape.xOffset + item[1],
+        y = shape.yOffset + item[0];
+      if (this.map[y] === undefined || this.map[y][x] === undefined) {
+        shape.rotation = tempRotation;
+      }
+    });
+
+    this.setupBlocks(shape);
+  }
+
+  // 移动方块
+  moveShape(xStep, yStep) {
+    const width = this.map[0].length;
+    const height = this.map.length;
+    const map = this.map;
+
+    const shape = this.shape;
+
+    let canMove = true;
+
+    shape.blocks.forEach((item) => {
+      let x = shape.xOffset + item[1] + xStep,
+        y = shape.yOffset + item[0] + yStep;
+      if (x < 0 || x >= width || y >= height || (map[y] && map[y][x])) {
+        canMove = false;
+        return canMove;
+      }
+    });
+
+    if (canMove) {
+      shape.xOffset += xStep;
+      shape.yOffset += yStep;
+    }
+    return canMove;
+  }
+
+  // 方块触底
+  setShapeInMap() {
+    const shape = this.shape;
+    const map = this.map;
+
+    shape.blocks.forEach((item) => {
+      let x = shape.xOffset + item[1],
+        y = shape.yOffset + item[0];
+      map[y][x] = 1;
+    });
   }
 
   // 获取方块的坐标
@@ -95,42 +137,6 @@ class Game {
           shape.blocks.push([r, c]);
         }
       }
-    }
-  }
-
-  // 移动方块
-  moveShape(xStep, yStep, rStep) {
-    const width = this.map[0].length;
-    const height = this.map.length;
-
-    const shape = this.shape;
-
-    let canMove = true;
-
-    this.rotateShape(rStep);
-
-    for (let i = 0, length = shape.blocks.length; i < length; i++) {
-
-      let x = shape.xOffset + shape.blocks[i][1] + xStep,
-        y = shape.yOffset + shape.blocks[i][0] + yStep;
-
-      if (
-        x < 0 ||
-        x >= width ||
-        y >= height ||
-        (this.map[x] && this.map[x][y])
-      ) {
-        canMove = false;
-        // return true
-        // console.log("can not move");
-      }
-    }
-
-    if (canMove) {
-      shape.xOffset += xStep;
-      shape.yOffset += yStep;
-    } else {
-      this.rotateShape(-rStep);
     }
   }
 }
