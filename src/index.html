@@ -1,251 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>tetris</title>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-    />
-  </head>
 
-  <body
-    class="frappe flex flex-col justify-between items-center w-screen h-screen p-2 bg-mantle text-text"
-  >
+<head>
+  <title>tetris</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+</head>
+
+<body class="frappe flex flex-col justify-between items-center w-screen h-screen p-2 bg-mantle text-text">
+  <header>
     <h1>tetris</h1>
-    <main class="flex justify-around items-center w-full">
-      <div id="game-body"></div>
-      <!-- 游戏信息 -->
-      <div
-        id="game-info"
-        class="flex flex-col justify-between items-center h-full"
-      >
-        <!-- 分数 -->
-        <div
-          class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded"
-        >
-          <label>SCORE</label>
-          <div id="score"></div>
-        </div>
-        <!-- 最高分 -->
-        <div
-          class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded"
-        >
-          <label>HI-SCORE</label>
-          <div id="highest-score"></div>
-        </div>
-        <!-- 方块预览 -->
-        <div
-          class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded"
-        >
-          <label>NEXT</label>
-          <div id="piece-preview"></div>
-        </div>
-        <!-- 游戏等级 -->
-        <div
-          class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded"
-        >
-          <label>LEVEL</label>
-          <div id="level"></div>
-        </div>
+  </header>
+  <main class="flex justify-around items-center w-full">
+      <!-- 游戏地图 -->
+    <canvas id="map-canvas" class="border-2 border-text rounded" width="200" height="400"></canvas>
+    <!-- 游戏信息 -->
+    <div id="game-info" class="flex flex-col justify-between items-center h-full">
+      <!-- 分数 -->
+      <div class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded">
+        <label>SCORE</label>
+        <span id="score"></span>
       </div>
-    </main>
-    <hr class="w-full pt-2 border-t-2 border-dashed border-text" />
-    <div id="feature-btn" class="flex justify-end items-center w-full pb-2">
-      <button
-        id="start-btn"
-        class="mr-2 p-2 border-2 border-text rounded"
-        type="button"
-      >
-        <svg
-          t="1691818593863"
-          class="fill-text"
-          viewBox="0 0 1024 1024"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          p-id="9438"
-          width="14"
-          height="14"
-        >
-          <path
-            d="M256 278.72L644.810667 512 256 745.28V278.72M170.666667 128v768l640-384-640-384z"
-            p-id="9439"
-          ></path>
-        </svg>
-      </button>
-      <button
-        id="voice-btn"
-        class="mr-2 p-2 border-2 border-text rounded"
-        type="button"
-      >
-        <svg
-          t="1691818614653"
-          class="fill-text"
-          viewBox="0 0 1024 1024"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          p-id="9688"
-          width="14"
-          height="14"
-        >
-          <path
-            d="M170.666667 341.333333C99.946667 341.333333 42.666667 400.394667 42.666667 471.114667V554.666667c0 70.72 57.28 128 128 128h85.333333l213.333333 213.333333V128L256 341.333333h-85.333333z m145.664 60.341334l67.658666-69.333334L384 330.666667v359.338666l-67.658667-67.68L291.328 597.333333H170.666667c-23.530667 0-42.666667-19.136-42.666667-42.666666v-83.552C128 447.018667 147.541333 426.666667 170.666667 426.666667h120.661333l25.002667-24.992z m609.834666 208.16a42.666667 42.666667 0 0 1-59.274666 61.376c-0.362667-0.330667-0.704-0.682667-1.056-1.045334L768 572.341333l-97.834667 97.824C661.834667 678.496 650.912 682.666667 640 682.666667s-21.834667-4.170667-30.165333-12.501334a42.666667 42.666667 0 0 1 0-60.330666L707.658667 512l-97.824-97.834667a42.666667 42.666667 0 0 1 59.274666-61.376c0.362667 0.341333 0.704 0.693333 1.056 1.045334L768 451.658667l97.834667-97.824a42.666667 42.666667 0 1 1 60.330666 60.341333L828.341333 512l97.824 97.834667z"
-            p-id="9689"
-          ></path>
-        </svg>
-      </button>
-      <button
-        id="restart-btn"
-        class="p-2 border-2 border-text rounded"
-        type="button"
-      >
-        <svg
-          t="1691818438047"
-          class="fill-text"
-          viewBox="0 0 1024 1024"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          p-id="9116"
-          width="14"
-          height="14"
-        >
-          <path
-            d="M981.333333 170.666667v256a42.666667 42.666667 0 0 1-42.666666 42.666666H682.666667a42.666667 42.666667 0 0 1 0-85.333333h143.872c-57.856-56.405333-103.456-100.981333-115.84-113.354667A340.202667 340.202667 0 0 0 469.333333 170.666667a340.202667 340.202667 0 0 0-241.365333 99.978666A340.192 340.192 0 0 0 128 512a340.170667 340.170667 0 0 0 99.968 241.354667A340.16 340.16 0 0 0 469.333333 853.333333a340.16 340.16 0 0 0 241.365334-99.978666 344.64 344.64 0 0 0 48.117333-60.309334 339.221333 339.221333 0 0 0 32.416-67.232 42.656 42.656 0 0 1 54.442667-26.037333 42.656 42.656 0 0 1 26.037333 54.432 424.746667 424.746667 0 0 1-100.672 159.509333 423.861333 423.861333 0 0 1-141.162667 93.706667 424.576 424.576 0 0 1-79.072 23.434667 429.28 429.28 0 0 1-162.922666 0 425.621333 425.621333 0 0 1-79.072-23.434667 423.893333 423.893333 0 0 1-141.162667-93.706667 423.808 423.808 0 0 1-93.717333-141.173333A426.965333 426.965333 0 0 1 42.666667 512a426.848 426.848 0 0 1 31.242666-160.533333 423.925333 423.925333 0 0 1 93.717334-141.162667 424.042667 424.042667 0 0 1 141.162666-93.717333 424.576 424.576 0 0 1 79.072-23.434667 428.693333 428.693333 0 0 1 162.933334-0.010667 425.952 425.952 0 0 1 79.072 23.434667 423.893333 423.893333 0 0 1 141.162666 93.717333c12.736 12.746667 62.645333 61.482667 124.970667 122.24V170.666667a42.666667 42.666667 0 0 1 85.333333 0z"
-            p-id="9117"
-          ></path>
-        </svg>
-      </button>
+      <!-- 最高分 -->
+      <div class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded">
+        <label>HI-SCORE</label>
+        <span id="highest-score"></span>
+      </div>
+      <!-- 方块预览 -->
+      <div class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded">
+        <label>NEXT</label>
+        <span id="piece-preview"></span>
+      </div>
+      <!-- 游戏等级 -->
+      <div class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded">
+        <label>LEVEL</label>
+        <span id="level"></span>
+      </div>
     </div>
-    <!-- 操作 -->
-    <div class="w-full">
-      <div id="operate" class="flex justify-between items-center w-full">
-        <div
-          id="direction-btn"
-          class="flex flex-col justify-center items-center w-1/2 h-full"
-        >
-          <button
-            id="drop-btn"
-            class="flex justify-center items-center w-16 h-16 border-2 border-text rounded-full"
-            type="button"
-          >
-            <svg
-              t="1691818811644"
-              class="fill-text"
-              viewBox="0 0 1024 1024"
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              p-id="10760"
-              width="22"
-              height="22"
-            >
-              <path
-                d="M469.333333 128v665.002667L243.498667 567.168a42.666667 42.666667 0 0 0-61.002667 59.669333l0.672 0.672 298.666667 298.666667a42.666667 42.666667 0 0 0 60.330666 0l298.666667-298.666667a42.656 42.656 0 1 0-60.330667-60.341333L554.666667 793.002667V128a42.666667 42.666667 0 0 0-85.333334 0z"
-                p-id="10761"
-              ></path></svg
-            ><svg
-              t="1691818811644"
-              class="fill-text"
-              viewBox="0 0 1024 1024"
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              p-id="10760"
-              width="22"
-              height="22"
-            >
-              <path
-                d="M469.333333 128v665.002667L243.498667 567.168a42.666667 42.666667 0 0 0-61.002667 59.669333l0.672 0.672 298.666667 298.666667a42.666667 42.666667 0 0 0 60.330666 0l298.666667-298.666667a42.656 42.656 0 1 0-60.330667-60.341333L554.666667 793.002667V128a42.666667 42.666667 0 0 0-85.333334 0z"
-                p-id="10761"
-              ></path>
-            </svg>
+  </main>
+  <!-- 分割线 -->
+  <hr class="w-full pt-2 border-t-2 border-dashed border-text" />
+  <!-- 功能键 -->
+  <div id="feature-btn" class="flex justify-end items-center w-full pb-2">
+    <button id="start-btn" class="flex justify-center items-center mr-2 p-2 border-2 border-text rounded" type="button">
+      <span class="material-icons-round !text-sm !leading-3">pause</span>
+    </button>
+    <button id="voice-btn" class="flex justify-center items-center mr-2 p-2 border-2 border-text rounded" type="button">
+      <span class="material-icons-round !text-sm !leading-3">volume_up</span>
+    </button>
+    <button id="restart-btn" class="flex justify-center items-center p-2 border-2 border-text rounded" type="button">
+      <span class="material-icons-round !text-sm !leading-3">sync</span>
+    </button>
+  </div>
+  <!-- 操作 -->
+  <div class="w-full">
+    <div id="operate" class="flex justify-between items-center w-full">
+      <div id="direction-btn" class="flex flex-col justify-center items-center w-1/2 h-full">
+        <button id="drop-btn"
+          class="flex flex-col justify-center items-center w-16 h-16 border-2 border-text rounded-full" type="button">
+          <span class="material-icons-round !text-3xl !leading-3">arrow_drop_down</span>
+          <span class="material-icons-round !text-3xl !leading-3">arrow_drop_down</span>
+        </button>
+        <div id="h-btn" class="flex justify-between items-center w-full">
+          <button id="left-btn" class="flex justify-center items-center w-16 h-16 border-2 border-text rounded-full"
+            type="button">
+            <span class="material-icons-round !text-3xl">arrow_left</span>
           </button>
-          <div id="h-btn" class="flex justify-between items-center w-full">
-            <button
-              id="left-btn"
-              class="flex justify-center items-center w-16 h-16 border-2 border-text rounded-full"
-              type="button"
-            >
-              <svg
-                t="1691818792133"
-                class="fill-text"
-                viewBox="0 0 1024 1024"
-                version="1.1"
-                xmlns="http://www.w3.org/2000/svg"
-                p-id="10546"
-                width="22"
-                height="22"
-              >
-                <path
-                  d="M895.989333 469.322667H230.997333l225.834667-225.834667a42.677333 42.677333 0 0 0-60.341333-60.341333l-298.666667 298.666666a42.666667 42.666667 0 0 0-0.010667 60.330667l298.666667 298.666667a42.56 42.56 0 0 0 30.176 12.501333 42.645333 42.645333 0 0 0 30.176-72.832L230.986667 554.656h665.002666a42.666667 42.666667 0 0 0 0-85.333333z"
-                  p-id="10547"
-                ></path>
-              </svg>
-            </button>
-            <button
-              id="right-btn"
-              class="flex justify-center items-center w-16 h-16 border-2 border-text rounded-full"
-              type="button"
-            >
-              <svg
-                t="1691818734074"
-                class="fill-text"
-                viewBox="0 0 1024 1024"
-                version="1.1"
-                xmlns="http://www.w3.org/2000/svg"
-                p-id="10260"
-                width="22"
-                height="22"
-              >
-                <path
-                  d="M128 554.666667h665.002667L567.168 780.501333a42.666667 42.666667 0 1 0 60.341333 60.330667l298.666667-298.666667a42.666667 42.666667 0 0 0 0-60.330666l-298.666667-298.666667a42.666667 42.666667 0 1 0-60.341333 60.330667L793.002667 469.333333H128a42.666667 42.666667 0 0 0 0 85.333334z"
-                  p-id="10261"
-                ></path>
-              </svg>
-            </button>
-          </div>
-          <button
-            id="bottom-btn"
-            class="flex justify-center items-center w-16 h-16 border-2 border-text rounded-full"
-            type="button"
-          >
-            <svg
-              t="1691818811644"
-              class="fill-text"
-              viewBox="0 0 1024 1024"
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              p-id="10760"
-              width="22"
-              height="22"
-            >
-              <path
-                d="M469.333333 128v665.002667L243.498667 567.168a42.666667 42.666667 0 0 0-61.002667 59.669333l0.672 0.672 298.666667 298.666667a42.666667 42.666667 0 0 0 60.330666 0l298.666667-298.666667a42.656 42.656 0 1 0-60.330667-60.341333L554.666667 793.002667V128a42.666667 42.666667 0 0 0-85.333334 0z"
-                p-id="10761"
-              ></path>
-            </svg>
+          <button id="right-btn" class="flex justify-center items-center w-16 h-16 border-2 border-text rounded-full"
+            type="button">
+            <span class="material-icons-round !text-3xl">arrow_right</span>
           </button>
         </div>
-        <button
-          id="r-btn"
-          class="flex justify-center items-center w-32 h-32 border-2 border-text rounded-full"
-          type="button"
-        >
-          <svg
-            t="1691484230116"
-            class="fill-text"
-            viewBox="0 0 1024 1024"
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            p-id="7005"
-            width="46"
-            height="46"
-          >
-            <path
-              d="M955.679 194.521c-0.549-28.52-35.056-42.426-55.227-22.256l-91.415 91.415a387.86 387.86 0 0 0-21.05-26.387c-32.974-37.774-72.523-68.537-117.547-91.433-45.023-22.897-93.179-36.735-143.128-41.131-51.83-4.56-103.214 1.303-152.72 17.431-50.827 16.559-96.912 42.931-136.977 78.384s-71.848 77.987-94.468 126.421c-7.561 16.191-0.566 35.445 15.624 43.006 16.19 7.562 35.444 0.566 43.006-15.624 37.747-80.825 108.041-143.028 192.858-170.66 140.117-45.647 289.325 9.941 368.097 126.298L662.415 410.303c-20.171 20.171-6.265 54.678 22.256 55.227l242.707 4.669c18.354 0.353 33.324-14.617 32.971-32.971l-4.67-242.707zM865.794 653.511c-16.192-7.56-35.445-0.566-43.006 15.624-37.747 80.826-108.041 143.029-192.858 170.661-81.537 26.563-169.067 19.511-246.472-19.852-49.799-25.325-91.239-61.93-121.551-106.52l100.245-100.245c20.171-20.171 6.265-54.678-22.256-55.227l-242.707-4.669c-18.354-0.353-33.324 14.617-32.971 32.971l4.669 242.707c0.549 28.52 35.056 42.426 55.227 22.256l91.415-91.415a387.583 387.583 0 0 0 21.051 26.388c32.974 37.773 72.522 68.536 117.546 91.433 45.024 22.896 93.178 36.735 143.127 41.131a387.878 387.878 0 0 0 33.993 1.498c40.264 0 80.072-6.336 118.727-18.93 50.826-16.557 96.912-42.929 136.977-78.383 40.064-35.453 71.848-77.987 94.468-126.421 7.562-16.191 0.566-35.445-15.624-43.007z"
-              p-id="7006"
-            ></path>
-          </svg>
+        <button id="bottom-btn" class="flex justify-center items-center w-16 h-16 border-2 border-text rounded-full"
+          type="button">
+          <span class="material-icons-round !text-3xl">arrow_drop_down</span>
         </button>
       </div>
+      <button id="r-btn" class="flex justify-center items-center w-32 h-32 border-2 border-text rounded-full"
+        type="button">
+        <span class="material-icons-round !text-5xl">rotate_right</span>
+      </button>
     </div>
-  </body>
+  </div>
+</body>
+
 </html>

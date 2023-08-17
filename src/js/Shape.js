@@ -1,6 +1,6 @@
-class Piece {
-  constructor() {
-    this.shapes = {
+class Shape {
+  constructor(type, x, y) {
+    this.shapeTable = {
       O: [
         [
           [0, 1, 1, 0],
@@ -130,22 +130,13 @@ class Piece {
         ],
       ],
     };
-    this.shapeColor = [
-      "#f2d5cf",
-      "#ca9ee6",
-      "#ea999c",
-      "#e5c890",
-      "#81c8be",
-      "#85c1dc",
-      "#babbf1",
-    ];
     this.shapeType = ["O", "I", "S", "Z", "T", "L", "J"];
-    this.type = Math.floor(Math.random() * this.shapeType.length);
-    this.xOffset = 3;
-    this.yOffset = 0;
+    this.type = type;
     this.rotation = 0;
-    this.shape = this.shapes[this.shapeType[this.type]];
+    this.xOffset =  x || 3;
+    this.yOffset = y || 0;
+    this.blocks = []
   }
 }
 
-module.exports = Piece;
+module.exports = Shape;
