@@ -11,6 +11,11 @@ class Game {
     this.shape = null;
     this.nextShape = null;
 
+    this.fastForward = false
+    this.dropTimer = null;
+
+    this.paused = false
+
     this.level = 1;
 
     this.gameStatus = 0;
@@ -85,6 +90,32 @@ class Game {
     this.setupBlocks(shape);
   }
 
+  // 左移
+  moveLeft(){
+    this.moveShape(-1, 0)
+  }
+
+  // 右移
+  moveRight(){
+    this.moveShape(1, 0)
+  }
+
+  // 下移
+  moveDown(enable){
+    if(this.fastForward === enable) return
+    if(enable && !this.moveShape(0, 1)) return
+    this.fastForward = enable
+    this.setDropTime()
+  }
+
+  // 下坠
+  dropShape(){
+    if(this.shape){
+      while (this.moveShape(0, 1)){}
+      this.fallTimeOut()
+    }
+  }
+
   // 移动方块
   moveShape(xStep, yStep) {
     const width = this.map[0].length;
@@ -109,6 +140,31 @@ class Game {
       shape.yOffset += yStep;
     }
     return canMove;
+  }
+
+  setDropTime() {
+    let timestep = Math.round(80 + 800 * Math.pow(0.75, this.level - 1));
+    timestep = Math.max(10, timestep)
+
+    if(this.fastForward){
+      timestep = 80
+    }
+
+    if (this.dropTimer) {
+      clearInterval(this.dropTimer);
+      this.dropTimer = null;
+    }
+
+    if (!this.paused) {
+    this.dropTimer = setInterval(()=>{this.fallTimeOut()}, timestep)
+    }
+  }
+
+  fallTimeOut() {
+    if (!this.moveShape(0, 1)) {
+      this.setShapeInMap();
+      this.addShape();
+    }
   }
 
   // 方块触底

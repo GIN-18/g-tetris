@@ -11,6 +11,8 @@ const game = new Game();
 
 gameLoop();
 
+// game.setDropTime()
+
 function gameLoop() {
   draw("#303446", "#c6d0f5");
   requestAnimationFrame(gameLoop);
@@ -18,8 +20,6 @@ function gameLoop() {
 
 // 绘制方块
 function draw(mapBackgroundColor, shapeColor) {
-  ctx.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
-
   ctx.fillStyle = mapBackgroundColor;
   ctx.fillRect(0, 0, mapCanvas.width, mapCanvas.height);
 
@@ -45,21 +45,28 @@ function draw(mapBackgroundColor, shapeColor) {
 
 document.body.addEventListener("keydown", (e) => {
   switch (e.code) {
-    case "Space":
-      // game.moveShape(0, 0, 1);
+    case "KeyK":
       game.rotateShape(1);
       break;
     case "KeyH":
-      game.moveShape(-1, 0);
+      game.moveLeft()
       break;
     case "KeyL":
-      game.moveShape(1, 0);
+      game.moveRight()
       break;
     case "KeyJ":
-      if (!game.moveShape(0, 1)) {
-        game.setShapeInMap()
-        game.addShape();
-      }
+      game.moveDown(true)
+      break;
+    case "Space":
+      game.dropShape()
+      break;
+  }
+});
+
+document.body.addEventListener("keyup", (e) => {
+  switch (e.code) {
+    case "KeyJ":
+      game.moveDown(false)
       break;
   }
 });
