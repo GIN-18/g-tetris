@@ -4,45 +4,64 @@ const Operator = require("./Operator.js");
 
 class Game {
   constructor() {
-    this.block = 20;
-
-    this.map = null;
+    this.map = [...new Array(20)].map(() => new Array(10).fill(0));
 
     this.shape = null;
     this.nextShape = null;
 
-    this.fastForward = false
     this.dropTimer = null;
+    this.fastForward = false;
 
-    this.paused = false
+    this.paused = false;
 
     this.level = 1;
 
+    this.gameOver = false;
     this.gameStatus = 0;
+
+    this.score = 0;
+    this.highScore = localStorage.getItem("highScore") || 0;
 
     this.init();
   }
 
   // 初始化
   init() {
-    this.map = [...this.generateMap(10, 20)];
     this.nextShape = this.generateShape();
     this.addShape();
+    this.setGameData();
   }
 
-  // 生成地图
-  generateMap(width, height) {
-    return [...new Array(height)].map(() => new Array(width).fill(0));
+  // 设置游戏信息
+  setGameData() {
+    document.getElementById("score").innerText = this.score;
+    document.getElementById("highest-score").innerText = this.highScore;
+    document.getElementById("level").innerText = this.level;
   }
 
   // 生成形状
   generateShape() {
     const type = Math.floor(Math.random() * 7);
-    const shape = new Shape(type);
 
-    this.setupBlocks(shape);
+    return new Shape(type);
+  }
 
-    return shape;
+  // 生成当前方块
+  generatePiece() {
+    if(this.gameOver) return
+
+    return this.shape.shapeTable[this.shape.shapeType[this.shape.type]][
+      this.shape.rotation
+    ];
+  }
+
+  // 生成下一个方块
+  generateNextPiece() {
+    if(this.gameOver) return
+
+    return this.nextShape.shapeTable[this.nextShape.shapeType[this.nextShape.type]][
+      this.nextShape.rotation
+    ];
   }
 
   // 添加方块
@@ -50,104 +69,118 @@ class Game {
     this.shape = this.nextShape;
     this.nextShape = this.generateShape();
 
-    this.shape.blocks.forEach((item) => {
+    let piece = this.generatePiece();
+
+    piece.forEach((item) => {
       let x = this.shape.xOffset + item[1],
         y = this.shape.yOffset + item[0];
+
       if (y >= 0 && this.map[y][x]) {
+        if (this.dropTimer) {
+          clearInterval(this.dropTimer);
+          this.dropTimer = null;
+        }
+
         this.shape = null;
+
+        this.gameOver = true;
+
         console.log("game over");
+
+        alert("game over");
+
         return;
       }
     });
   }
 
-  // 自动下移
-  gameLoop() {}
-
   // 方块旋转
   rotateShape(rStep) {
-    let shape = this.shape;
+    let tempRotation = this.shape.rotation;
 
-    let tempRotation = shape.rotation;
-
-    shape.rotation += rStep;
+    this.shape.rotation += rStep;
 
     let r =
-      shape.rotation % shape.shapeTable[shape.shapeType[shape.type]].length;
+      this.shape.rotation %
+      this.shape.shapeTable[this.shape.shapeType[this.shape.type]].length;
 
-    shape.rotation = r;
+    this.shape.rotation = r;
 
-    this.setupBlocks(shape);
+    let piece = this.generatePiece();
 
-    shape.blocks.forEach((item) => {
-      let x = shape.xOffset + item[1],
-        y = shape.yOffset + item[0];
+    piece.forEach((item) => {
+      let x = this.shape.xOffset + item[1],
+        y = this.shape.yOffset + item[0];
       if (this.map[y] === undefined || this.map[y][x] === undefined) {
-        shape.rotation = tempRotation;
+        this.shape.rotation = tempRotation;
       }
     });
-
-    this.setupBlocks(shape);
   }
 
   // 左移
-  moveLeft(){
-    this.moveShape(-1, 0)
+  moveLeft() {
+    this.moveShape(-1, 0);
   }
 
   // 右移
-  moveRight(){
-    this.moveShape(1, 0)
+  moveRight() {
+    this.moveShape(1, 0);
   }
 
   // 下移
-  moveDown(enable){
-    if(this.fastForward === enable) return
-    if(enable && !this.moveShape(0, 1)) return
-    this.fastForward = enable
-    this.setDropTime()
+  moveDown(enable) {
+    if (this.fastForward === enable || this.gameOver) return;
+    if (enable && !this.moveShape(0, 1)) return;
+    this.fastForward = enable;
+    this.setDropTime();
   }
 
   // 下坠
-  dropShape(){
-    if(this.shape){
-      while (this.moveShape(0, 1)){}
-      this.fallTimeOut()
+  dropShape() {
+    if (this.shape) {
+      while (this.moveShape(0, 1)) {}
+      this.fallTimeOut();
     }
   }
 
   // 移动方块
   moveShape(xStep, yStep) {
+    if(this.gameOver) return
+
     const width = this.map[0].length;
     const height = this.map.length;
-    const map = this.map;
-
-    const shape = this.shape;
 
     let canMove = true;
 
-    shape.blocks.forEach((item) => {
-      let x = shape.xOffset + item[1] + xStep,
-        y = shape.yOffset + item[0] + yStep;
-      if (x < 0 || x >= width || y >= height || (map[y] && map[y][x])) {
+    let piece = this.generatePiece();
+
+    piece.forEach((item) => {
+      let x = this.shape.xOffset + item[1] + xStep,
+        y = this.shape.yOffset + item[0] + yStep;
+      if (
+        x < 0 ||
+        x >= width ||
+        y >= height ||
+        (this.map[y] && this.map[y][x])
+      ) {
         canMove = false;
         return canMove;
       }
     });
 
     if (canMove) {
-      shape.xOffset += xStep;
-      shape.yOffset += yStep;
+      this.shape.xOffset += xStep;
+      this.shape.yOffset += yStep;
     }
     return canMove;
   }
 
   setDropTime() {
     let timestep = Math.round(80 + 800 * Math.pow(0.75, this.level - 1));
-    timestep = Math.max(10, timestep)
+    timestep = Math.max(10, timestep);
 
-    if(this.fastForward){
-      timestep = 80
+    if (this.fastForward) {
+      timestep = 80;
     }
 
     if (this.dropTimer) {
@@ -156,43 +189,101 @@ class Game {
     }
 
     if (!this.paused) {
-    this.dropTimer = setInterval(()=>{this.fallTimeOut()}, timestep)
+      this.dropTimer = setInterval(() => {
+        this.fallTimeOut();
+      }, timestep);
     }
   }
 
   fallTimeOut() {
     if (!this.moveShape(0, 1)) {
-      this.setShapeInMap();
+      this.landShape();
       this.addShape();
     }
   }
 
-  // 方块触底
-  setShapeInMap() {
-    const shape = this.shape;
-    const map = this.map;
+  // 方块触底后将方块合并到地图数组中
+  landShape() {
+    let piece = this.generatePiece();
 
-    shape.blocks.forEach((item) => {
-      let x = shape.xOffset + item[1],
-        y = shape.yOffset + item[0];
-      map[y][x] = 1;
+    let isFilled = false,
+      filledRows = [];
+
+    piece.forEach((item) => {
+      let x = this.shape.xOffset + item[1],
+        y = this.shape.yOffset + item[0];
+      this.map[y][x] = this.shape.type + 1;
     });
+
+    // 判断是否有满行
+    this.map.forEach((element, index) => {
+      isFilled = element.every((item) => !!item);
+
+      if (isFilled) {
+        filledRows.push(index);
+
+        console.log(filledRows)
+      }
+    });
+
+    // 在行首添加空行
+    filledRows.forEach((row) => {
+      this.map.splice(row, 1);
+      this.map.unshift(new Array(10).fill(0));
+    });
+
+    if (filledRows.length) {
+      this.updateScore(filledRows.length, this.level);
+      this.updateLevel();
+    }
   }
 
-  // 获取方块的坐标
-  setupBlocks(shape) {
-    if (shape.blocks.length) {
-      shape.blocks.splice(0, shape.blocks.length);
+  // 更新分数
+  updateScore(filledRows, level) {
+    this.score += filledRows * level * 10;
+    document.getElementById("score").innerText = this.score;
+  }
+
+  // 更新最高分数
+  updateHighScore() {
+    if (this.score > this.highScore) {
+      localStorage.setItem("highScore", this.score);
+    }
+  }
+
+  // 更新等级
+  updateLevel() {
+    const nextLevelScore = (this.level + 1) * 100;
+
+    if (this.score >= nextLevelScore) {
+      this.level += 1;
+      this.updateLevel();
     }
 
-    const piece = shape.shapeTable[shape.shapeType[shape.type]][shape.rotation];
+    document.getElementById("level").innerText = this.level;
+  }
 
-    for (let r = 0; r < piece.length; r++) {
-      for (let c = 0; c < piece[r].length; c++) {
-        if (piece[r][c]) {
-          shape.blocks.push([r, c]);
-        }
-      }
+  // 设置颜色
+  setShapeColor(type) {
+    const shape = this.shape;
+
+    let colorIndex = type - 1;
+
+    switch (type) {
+      case 1:
+        return shape.shapeColor[colorIndex];
+      case 2:
+        return shape.shapeColor[colorIndex];
+      case 3:
+        return shape.shapeColor[colorIndex];
+      case 4:
+        return shape.shapeColor[colorIndex];
+      case 5:
+        return shape.shapeColor[colorIndex];
+      case 6:
+        return shape.shapeColor[colorIndex];
+      case 7:
+        return shape.shapeColor[colorIndex];
     }
   }
 }

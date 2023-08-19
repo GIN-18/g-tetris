@@ -6,7 +6,7 @@ class Score {
 
   // 更新分数
   updateScore(filledRows, level){
-    this.score += filledRows * level * 10;
+    return filledRows * level * 10;
   }
 
   // 更新最高分

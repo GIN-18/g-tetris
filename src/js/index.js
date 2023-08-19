@@ -1,47 +1,106 @@
 import "../../dist/style.css";
 import "material-icons/iconfont/material-icons.css";
 
+// 添加logo
+import imageUrl from '../static/logo/logo-frappe-inline.webp';
+
+document.getElementById("logo-image").src = imageUrl
+
 const Game = require("./Game.js");
 
 const mapCanvas = document.getElementById("map-canvas");
+const previewCanvas = document.getElementById("preview-canvas");
 
-const ctx = mapCanvas.getContext("2d", { alpha: false });
+const mapCtx = mapCanvas.getContext("2d", { alpha: false });
+const previewCtx = previewCanvas.getContext("2d", { alpha: false });
+
+previewCtx.fillStyle = "#303446";
+previewCtx.fillRect(0, 0, 20, 20);
 
 const game = new Game();
 
-gameLoop();
-
 // game.setDropTime()
 
+gameLoop();
+
 function gameLoop() {
-  draw("#303446", "#c6d0f5");
+  drawMap();
+  drawNextShape();
   requestAnimationFrame(gameLoop);
 }
 
-// 绘制方块
-function draw(mapBackgroundColor, shapeColor) {
-  ctx.fillStyle = mapBackgroundColor;
-  ctx.fillRect(0, 0, mapCanvas.width, mapCanvas.height);
+function drawMap() {
+  if(game.gameOver) return
 
-  ctx.fillStyle = 'red';
+  let piece = game.generatePiece();
+
+  // 清空画布
+  mapCtx.fillStyle = "#303446";
+  mapCtx.fillRect(0, 0, 200, 400);
+
+  // 绘制地图中的方块
   for (let i = 0; i < game.map.length; i++) {
     for (let j = 0; j < game.map[i].length; j++) {
-      if(game.map[i][j]){
-        ctx.fillRect(j * game.block, i * game.block, game.block, game.block);
+      if (game.map[i][j]) {
+        mapCtx.fillStyle = game.setShapeColor(game.map[i][j]);
+        mapCtx.fillRect(j * 20, i * 20, 20, 20);
       }
     }
   }
-  //
-  ctx.fillStyle = shapeColor;
 
-  for (let i = 0, length = game.shape.blocks.length; i < length; i++) {
-    let x = game.shape.blocks[i][1] + game.shape.xOffset;
-    let y = game.shape.blocks[i][0] + game.shape.yOffset;
+  // 绘制方块
+  mapCtx.fillStyle = game.setShapeColor(game.shape.type + 1);
+  for (let i = 0, length = piece.length; i < length; i++) {
+    let x = piece[i][1] + game.shape.xOffset;
+    let y = piece[i][0] + game.shape.yOffset;
 
-    // ctx.strokeRect(x * game.block, y * game.block, game.block, game.block);
-    ctx.fillRect(x * game.block, y * game.block, game.block, game.block);
+    mapCtx.fillRect(x * 20, y * 20, 20, 20);
   }
 }
+
+function drawNextShape() {
+  if(game.gameOver) return
+
+  previewCtx.fillStyle = "#303446";
+  previewCtx.fillRect(0, 0, 80, 40);
+
+  let nextPiece = game.generateNextPiece();
+
+  previewCtx.fillStyle = game.setShapeColor(game.nextShape.type + 1);
+  for (let i = 0, length = nextPiece.length; i < length; i++) {
+    let x = nextPiece[i][1];
+    let y = nextPiece[i][0];
+
+    previewCtx.fillRect(x * 20, y * 20, 20, 20);
+  }
+}
+
+document.getElementById("rotate-btn").addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  game.rotateShape(1);
+});
+
+document.getElementById("drop-btn").addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  game.dropShape();
+});
+document.getElementById("left-btn").addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  game.moveLeft();
+});
+document.getElementById("right-btn").addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  game.moveRight();
+});
+document.getElementById("down-btn").addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  game.moveDown(true);
+});
+
+document.getElementById("down-btn").addEventListener("touchend", (e) => {
+  e.preventDefault();
+  game.moveDown(false);
+});
 
 document.body.addEventListener("keydown", (e) => {
   switch (e.code) {
@@ -49,16 +108,16 @@ document.body.addEventListener("keydown", (e) => {
       game.rotateShape(1);
       break;
     case "KeyH":
-      game.moveLeft()
+      game.moveLeft();
       break;
     case "KeyL":
-      game.moveRight()
+      game.moveRight();
       break;
     case "KeyJ":
-      game.moveDown(true)
+      game.moveDown(true);
       break;
     case "Space":
-      game.dropShape()
+      game.dropShape();
       break;
   }
 });
@@ -66,7 +125,7 @@ document.body.addEventListener("keydown", (e) => {
 document.body.addEventListener("keyup", (e) => {
   switch (e.code) {
     case "KeyJ":
-      game.moveDown(false)
+      game.moveDown(false);
       break;
   }
 });

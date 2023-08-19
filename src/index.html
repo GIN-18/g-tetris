@@ -8,11 +8,17 @@
 </head>
 
 <body class="frappe flex flex-col justify-between items-center w-screen h-screen p-2 bg-mantle text-text">
-  <header>
-    <h1>tetris</h1>
+  <header class="flex justify-between items-center w-full">
+    <h1 id="logo">
+        <img id="logo-image" class="h-6">
+      </h1>
+    <button id="menu-btn" class="flex justify-center items-center"
+      type="button">
+      <span class="material-icons-round !text-3xl">menu</span>
+    </button>
   </header>
   <main class="flex justify-around items-center w-full">
-      <!-- 游戏地图 -->
+    <!-- 游戏地图 -->
     <canvas id="map-canvas" class="border-2 border-text rounded" width="200" height="400"></canvas>
     <!-- 游戏信息 -->
     <div id="game-info" class="flex flex-col justify-between items-center h-full">
@@ -29,7 +35,7 @@
       <!-- 方块预览 -->
       <div class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded">
         <label>NEXT</label>
-        <span id="piece-preview"></span>
+        <canvas id="preview-canvas" width="80" height="40"></canvas>
       </div>
       <!-- 游戏等级 -->
       <div class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded">
@@ -40,22 +46,10 @@
   </main>
   <!-- 分割线 -->
   <hr class="w-full pt-2 border-t-2 border-dashed border-text" />
-  <!-- 功能键 -->
-  <div id="feature-btn" class="flex justify-end items-center w-full pb-2">
-    <button id="start-btn" class="flex justify-center items-center mr-2 p-2 border-2 border-text rounded" type="button">
-      <span class="material-icons-round !text-sm !leading-3">pause</span>
-    </button>
-    <button id="voice-btn" class="flex justify-center items-center mr-2 p-2 border-2 border-text rounded" type="button">
-      <span class="material-icons-round !text-sm !leading-3">volume_up</span>
-    </button>
-    <button id="restart-btn" class="flex justify-center items-center p-2 border-2 border-text rounded" type="button">
-      <span class="material-icons-round !text-sm !leading-3">sync</span>
-    </button>
-  </div>
   <!-- 操作 -->
   <div class="w-full">
     <div id="operate" class="flex justify-between items-center w-full">
-      <div id="direction-btn" class="flex flex-col justify-center items-center w-1/2 h-full">
+      <div id="direction-btn" class="flex flex-col justify-center items-center w-1/2">
         <button id="drop-btn"
           class="flex flex-col justify-center items-center w-16 h-16 border-2 border-text rounded-full" type="button">
           <span class="material-icons-round !text-3xl !leading-3">arrow_drop_down</span>
@@ -71,15 +65,33 @@
             <span class="material-icons-round !text-3xl">arrow_right</span>
           </button>
         </div>
-        <button id="bottom-btn" class="flex justify-center items-center w-16 h-16 border-2 border-text rounded-full"
+        <button id="down-btn" class="flex justify-center items-center w-16 h-16 border-2 border-text rounded-full"
           type="button">
           <span class="material-icons-round !text-3xl">arrow_drop_down</span>
         </button>
       </div>
-      <button id="r-btn" class="flex justify-center items-center w-32 h-32 border-2 border-text rounded-full"
-        type="button">
-        <span class="material-icons-round !text-5xl">rotate_right</span>
-      </button>
+      <div class="flex flex-col justify-between w-1/2 h-48">
+        <!-- 功能键 -->
+        <div id="feature-btn" class="flex justify-end items-center w-full">
+          <button id="start-btn" class="flex justify-center items-center mr-2 p-2 border-2 border-text rounded"
+            type="button">
+            <span class="material-icons-round !text-sm !leading-3">pause</span>
+          </button>
+          <button id="voice-btn" class="flex justify-center items-center mr-2 p-2 border-2 border-text rounded"
+            type="button">
+            <span class="material-icons-round !text-sm !leading-3">volume_up</span>
+          </button>
+          <button id="restart-btn" class="flex justify-center items-center p-2 border-2 border-text rounded"
+            type="button">
+            <span class="material-icons-round !text-sm !leading-3">sync</span>
+          </button>
+        </div>
+          <!-- 旋转键 -->
+        <button id="rotate-btn" class="self-end flex justify-center items-center w-32 h-32 border-2 border-text rounded-full"
+          type="button">
+          <span class="material-icons-round !text-5xl">rotate_right</span>
+        </button>
+      </div>
     </div>
   </div>
 </body>
