@@ -4,6 +4,10 @@ const Operator = require("./Operator.js");
 
 class Game {
   constructor() {
+    this.gameStart = false;
+    this.gamePaused = false;
+    this.gameOver = false;
+
     this.map = [...new Array(20)].map(() => new Array(10).fill(0));
 
     this.shape = null;
@@ -13,10 +17,6 @@ class Game {
     this.fastForward = false;
 
     this.level = 1;
-
-    this.gameStart = false;
-    this.gamePaused = false;
-    this.gameOver = false;
 
     this.score = 0;
     this.highScore = localStorage.getItem("highScore") || 0;
@@ -38,10 +38,10 @@ class Game {
   }
 
   // 开始游戏
-  startGame(){
-    this.gameStart = true
-    this.addShape()
-    this.setDropTimer()
+  startGame() {
+    this.gameStart = true;
+    this.addShape();
+    this.setDropTimer();
   }
 
   // 生成形状
@@ -148,6 +148,7 @@ class Game {
 
   // 移动方块
   moveShape(xStep, yStep) {
+    if(!this.gameStart) return
     if (this.shape) {
       const width = this.map[0].length;
       const height = this.map.length;
@@ -186,7 +187,7 @@ class Game {
       timestep = 80;
     }
 
-    if (this.dropTimer) {
+    if (this.dropTimer || this.gamePaused) {
       clearInterval(this.dropTimer);
       this.dropTimer = null;
     }
@@ -220,8 +221,8 @@ class Game {
     });
 
     // 判断是否有满行
-    this.map.forEach((element, index) => {
-      isFilled = element.every((item) => !!item);
+    this.map.forEach((row, index) => {
+      isFilled = row.every((item) => !!item);
 
       if (isFilled) {
         filledRows.push(index);
@@ -242,6 +243,13 @@ class Game {
     if (oldLevel !== this.level) {
       this.setDropTimer();
     }
+  }
+
+  // 闪烁满行
+  flickeringFilledRows(filledRows) {
+    filledRows.forEach((element) => {
+      this.map[element].fill(8);
+    });
   }
 
   // 更新分数

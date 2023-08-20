@@ -8,6 +8,8 @@ document.getElementById("logo-image").src = imageUrl;
 
 const Game = require("./Game.js");
 
+const game = new Game();
+
 const mapCanvas = document.getElementById("map-canvas");
 const previewCanvas = document.getElementById("preview-canvas");
 
@@ -22,12 +24,10 @@ mapCtx.fillRect(0, 0, 200, 400);
 previewCtx.fillStyle = "#232634";
 previewCtx.fillRect(0, 0, 82, 42);
 
-const game = new Game();
-
 gameLoop();
 
 function gameLoop() {
-  if (game.gameStart) {
+  if (game.gameStart && !game.gameOver || game.gamePaused) {
     drawMap();
     drawNextShape();
   }
@@ -44,7 +44,6 @@ function drawMap() {
   // 绘制地图中的方块
   for (let i = 0; i < game.map.length; i++) {
     for (let j = 0; j < game.map[i].length; j++) {
-
       if (game.map[i][j]) {
         mapCtx.fillStyle = game.setShapeColor(game.map[i][j]);
         mapCtx.fillRect(j * 20, i * 20, 20, 20);
@@ -83,6 +82,23 @@ function drawNextShape() {
   }
 }
 
+document.getElementById("start-btn").addEventListener("touchend", (e) => {
+  e.preventDefault();
+  if (!game.gameStart) {
+    game.gameStart = true;
+    game.startGame();
+    return
+  }
+  game.gamePaused = !game.gamePaused
+  console.log(game.gamePaused)
+  game.setDropTimer()
+});
+
+document.getElementById("restart-btn").addEventListener("touchend", (e) => {
+  e.preventDefault();
+  location.reload()
+});
+
 document.getElementById("rotate-btn").addEventListener("touchstart", (e) => {
   e.preventDefault();
   game.rotateShape(1);
@@ -119,7 +135,8 @@ document.body.addEventListener("keydown", (e) => {
       }
       break;
     case "KeyP":
-      game.gamePaused = !game.gamePaused;
+      game.gamePaused = !game.gamePaused
+      game.setDropTimer()
       break;
     case "KeyK":
       game.rotateShape(1);
