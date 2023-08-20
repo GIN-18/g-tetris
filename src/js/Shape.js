@@ -1,5 +1,5 @@
 class Shape {
-  constructor(type, x, y) {
+  constructor() {
     this.shapeTable = {
       O: [
         [
@@ -130,12 +130,20 @@ class Shape {
         ],
       ],
     };
-    this.shapeColor = ['#8caaee', '#99d1db', '#a6d189', '#ef9f76', '#e78284', '#f4b8e4', '#f2d5cf']
+    this.shapeColor = [
+      "#8caaee",
+      "#99d1db",
+      "#a6d189",
+      "#ef9f76",
+      "#e78284",
+      "#f4b8e4",
+      "#f2d5cf",
+    ];
     this.shapeType = ["O", "I", "S", "Z", "T", "L", "J"];
-    this.type = type;
+    this.type = Math.floor(Math.random() * 7);
     this.rotation = 0;
-    this.xOffset = x || 3;
-    this.yOffset = y || 0;
+    this.xOffset = 3;
+    this.yOffset = 0;
   }
 }
 

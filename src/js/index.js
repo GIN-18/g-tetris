@@ -2,9 +2,9 @@ import "../../dist/style.css";
 import "material-icons/iconfont/material-icons.css";
 
 // 添加logo
-import imageUrl from '../static/logo/logo-frappe-inline.webp';
+import imageUrl from "../static/logo/logo-frappe-inline.webp";
 
-document.getElementById("logo-image").src = imageUrl
+document.getElementById("logo-image").src = imageUrl;
 
 const Game = require("./Game.js");
 
@@ -14,24 +14,27 @@ const previewCanvas = document.getElementById("preview-canvas");
 const mapCtx = mapCanvas.getContext("2d", { alpha: false });
 const previewCtx = previewCanvas.getContext("2d", { alpha: false });
 
-previewCtx.fillStyle = "#303446";
-previewCtx.fillRect(0, 0, 20, 20);
+// 初始化地图颜色
+mapCtx.fillStyle = "#303446";
+mapCtx.fillRect(0, 0, 200, 400);
+
+// 初始化预览框颜色
+previewCtx.fillStyle = "#232634";
+previewCtx.fillRect(0, 0, 82, 42);
 
 const game = new Game();
-
-// game.setDropTime()
 
 gameLoop();
 
 function gameLoop() {
-  drawMap();
-  drawNextShape();
+  if (game.gameStart) {
+    drawMap();
+    drawNextShape();
+  }
   requestAnimationFrame(gameLoop);
 }
 
 function drawMap() {
-  if(game.gameOver) return
-
   let piece = game.generatePiece();
 
   // 清空画布
@@ -41,6 +44,7 @@ function drawMap() {
   // 绘制地图中的方块
   for (let i = 0; i < game.map.length; i++) {
     for (let j = 0; j < game.map[i].length; j++) {
+
       if (game.map[i][j]) {
         mapCtx.fillStyle = game.setShapeColor(game.map[i][j]);
         mapCtx.fillRect(j * 20, i * 20, 20, 20);
@@ -59,9 +63,7 @@ function drawMap() {
 }
 
 function drawNextShape() {
-  if(game.gameOver) return
-
-  previewCtx.fillStyle = "#303446";
+  previewCtx.fillStyle = "#232634";
   previewCtx.fillRect(0, 0, 80, 40);
 
   let nextPiece = game.generateNextPiece();
@@ -71,7 +73,13 @@ function drawNextShape() {
     let x = nextPiece[i][1];
     let y = nextPiece[i][0];
 
-    previewCtx.fillRect(x * 20, y * 20, 20, 20);
+    if (game.nextShape.type === 0) {
+      previewCtx.fillRect(x * 20, y * 20, 20, 20);
+    } else if (game.nextShape.type === 1) {
+      previewCtx.fillRect(x * 20, y * 20 + 10, 20, 20);
+    } else {
+      previewCtx.fillRect(x * 20 + 10, y * 20, 20, 20);
+    }
   }
 }
 
@@ -104,6 +112,15 @@ document.getElementById("down-btn").addEventListener("touchend", (e) => {
 
 document.body.addEventListener("keydown", (e) => {
   switch (e.code) {
+    case "KeyS":
+      if (!game.gameStart) {
+        game.startGame();
+        game.gameStart = true;
+      }
+      break;
+    case "KeyP":
+      game.gamePaused = !game.gamePaused;
+      break;
     case "KeyK":
       game.rotateShape(1);
       break;
