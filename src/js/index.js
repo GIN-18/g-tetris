@@ -24,17 +24,21 @@ mapCtx.fillRect(0, 0, 200, 400);
 previewCtx.fillStyle = "#232634";
 previewCtx.fillRect(0, 0, 82, 42);
 
+let id = null;
+
 gameLoop();
 
 function gameLoop() {
-  if (game.gameStart && !game.gameOver || game.gamePaused) {
+  if (game.gameStart) {
     drawMap();
     drawNextShape();
   }
-  requestAnimationFrame(gameLoop);
+  id = requestAnimationFrame(gameLoop);
 }
 
 function drawMap() {
+  if (game.gameOver) return;
+
   let piece = game.generatePiece();
 
   // 清空画布
@@ -45,8 +49,7 @@ function drawMap() {
   for (let i = 0; i < game.map.length; i++) {
     for (let j = 0; j < game.map[i].length; j++) {
       if (game.map[i][j]) {
-        mapCtx.fillStyle = game.setShapeColor(game.map[i][j]);
-        mapCtx.fillRect(j * 20, i * 20, 20, 20);
+        game.drawBlock(mapCtx, j, i, game.setShapeColor(game.map[i][j]));
       }
     }
   }
@@ -57,11 +60,13 @@ function drawMap() {
     let x = piece[i][1] + game.shape.xOffset;
     let y = piece[i][0] + game.shape.yOffset;
 
-    mapCtx.fillRect(x * 20, y * 20, 20, 20);
+    game.drawBlock(mapCtx, x, y);
   }
 }
 
 function drawNextShape() {
+  if (game.gameOver) return;
+
   previewCtx.fillStyle = "#232634";
   previewCtx.fillRect(0, 0, 80, 40);
 
@@ -87,16 +92,20 @@ document.getElementById("start-btn").addEventListener("touchend", (e) => {
   if (!game.gameStart) {
     game.gameStart = true;
     game.startGame();
-    return
+    return;
   }
-  game.gamePaused = !game.gamePaused
-  console.log(game.gamePaused)
-  game.setDropTimer()
+  if (id) {
+    cancelAnimationFrame(id);
+    game.gamePaused = !game.gamePaused;
+    game.setDropTimer();
+    id = null;
+  }
+  gameLoop();
 });
 
 document.getElementById("restart-btn").addEventListener("touchend", (e) => {
   e.preventDefault();
-  location.reload()
+  location.reload();
 });
 
 document.getElementById("rotate-btn").addEventListener("touchstart", (e) => {
@@ -135,8 +144,13 @@ document.body.addEventListener("keydown", (e) => {
       }
       break;
     case "KeyP":
-      game.gamePaused = !game.gamePaused
-      game.setDropTimer()
+      if (id) {
+        cancelAnimationFrame(id);
+        game.gamePaused = !game.gamePaused;
+        game.setDropTimer();
+        id = null;
+      }
+      gameLoop();
       break;
     case "KeyK":
       game.rotateShape(1);

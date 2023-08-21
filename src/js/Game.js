@@ -4,6 +4,8 @@ const Operator = require("./Operator.js");
 
 class Game {
   constructor() {
+    this.blockSize = 20;
+
     this.gameStart = false;
     this.gamePaused = false;
     this.gameOver = false;
@@ -84,9 +86,9 @@ class Game {
           this.dropTimer = null;
         }
 
-        this.shape = null;
-
         this.gameOver = true;
+
+        this.shape = null;
 
         console.log("game over");
 
@@ -99,6 +101,8 @@ class Game {
 
   // 方块旋转
   rotateShape(rStep) {
+    if (!this.gameStart || this.gamePaused) return;
+
     let tempRotation = this.shape.rotation;
 
     this.shape.rotation += rStep;
@@ -140,7 +144,7 @@ class Game {
 
   // 下坠
   dropShape() {
-    if (this.shape) {
+    if (this.shape && !this.gamePaused) {
       while (this.moveShape(0, 1)) {}
       this.fallToLand();
     }
@@ -148,35 +152,34 @@ class Game {
 
   // 移动方块
   moveShape(xStep, yStep) {
-    if(!this.gameStart) return
-    if (this.shape) {
-      const width = this.map[0].length;
-      const height = this.map.length;
+    if (!this.gameStart || this.gamePaused) return;
 
-      let canMove = true;
+    const width = this.map[0].length;
+    const height = this.map.length;
 
-      let piece = this.generatePiece();
+    let canMove = true;
 
-      piece.forEach((item) => {
-        let x = this.shape.xOffset + item[1] + xStep,
-          y = this.shape.yOffset + item[0] + yStep;
-        if (
-          x < 0 ||
-          x >= width ||
-          y >= height ||
-          (this.map[y] && this.map[y][x])
-        ) {
-          canMove = false;
-          return canMove;
-        }
-      });
+    let piece = this.generatePiece();
 
-      if (canMove) {
-        this.shape.xOffset += xStep;
-        this.shape.yOffset += yStep;
+    piece.forEach((item) => {
+      let x = this.shape.xOffset + item[1] + xStep,
+        y = this.shape.yOffset + item[0] + yStep;
+      if (
+        x < 0 ||
+        x >= width ||
+        y >= height ||
+        (this.map[y] && this.map[y][x])
+      ) {
+        canMove = false;
+        return canMove;
       }
-      return canMove;
+    });
+
+    if (canMove) {
+      this.shape.xOffset += xStep;
+      this.shape.yOffset += yStep;
     }
+    return canMove;
   }
 
   setDropTimer() {
@@ -208,6 +211,8 @@ class Game {
 
   // 方块触底后将方块合并到地图数组中
   landShape() {
+    if(this.gameOver) return
+
     let piece = this.generatePiece();
 
     let isFilled = false,
@@ -274,6 +279,17 @@ class Game {
       this.updateLevel();
       document.getElementById("level").innerText = this.level;
     }
+  }
+
+  // 绘制方块
+  drawBlock(ctx, x, y, color) {
+    if (color) ctx.fillStyle = color;
+    ctx.fillRect(
+      x * this.blockSize,
+      y * this.blockSize,
+      this.blockSize,
+      this.blockSize
+    );
   }
 
   // 设置颜色
