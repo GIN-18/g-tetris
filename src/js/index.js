@@ -4,11 +4,15 @@ import "material-icons/iconfont/material-icons.css";
 // 添加logo
 import imageUrl from "../static/logo/logo-frappe-inline.webp";
 
+// 添加游戏结束图片
+import gameOverUrl from "../static/game-over/game-over-frappe.webp"
+
 document.getElementById("logo-image").src = imageUrl;
+// document.getElementById("game-over-image").src = gameOverUrl;
 
 const Game = require("./Game.js");
 
-const game = new Game();
+const game = new Game(gameOverUrl);
 
 const mapCanvas = document.getElementById("map-canvas");
 const previewCanvas = document.getElementById("preview-canvas");
@@ -20,90 +24,63 @@ const previewCtx = previewCanvas.getContext("2d", { alpha: false });
 mapCtx.fillStyle = "#303446";
 mapCtx.fillRect(0, 0, 200, 400);
 
+mapCtx.fillStyle = "#c6d0f5";
+for (let i = 0; i < game.map.length; i++) {
+  for (let j = 0; j < game.map[i].length; j++) {
+    mapCtx.beginPath();
+    mapCtx.arc(j * 20 + 10, i * 20 + 10, 1, 0, 2 * Math.PI);
+    mapCtx.fill();
+  }
+}
+
 // 初始化预览框颜色
 previewCtx.fillStyle = "#232634";
 previewCtx.fillRect(0, 0, 82, 42);
 
-let id = null;
+const stopIcon = `<span class="material-icons-round !text-sm !leading-3">pause</span>`;
+const startIcon = `<span class="material-icons-round !text-sm !leading-3">play_arrow</span>`;
 
-gameLoop();
+const volumeOff = `<span class="material-icons-round !text-sm !leading-3">volume_off</span>`;
+const volumeUp = `<span class="material-icons-round !text-sm !leading-3">volume_up</span>`;
+
+let id = null;
 
 function gameLoop() {
   if (game.gameStart) {
-    drawMap();
-    drawNextShape();
+    game.drawMap(mapCtx);
+    game.drawNextShape(previewCtx);
   }
   id = requestAnimationFrame(gameLoop);
-}
-
-function drawMap() {
-  if (game.gameOver) return;
-
-  let piece = game.generatePiece();
-
-  // 清空画布
-  mapCtx.fillStyle = "#303446";
-  mapCtx.fillRect(0, 0, 200, 400);
-
-  // 绘制地图中的方块
-  for (let i = 0; i < game.map.length; i++) {
-    for (let j = 0; j < game.map[i].length; j++) {
-      if (game.map[i][j]) {
-        game.drawBlock(mapCtx, j, i, game.setShapeColor(game.map[i][j]));
-      }
-    }
-  }
-
-  // 绘制方块
-  mapCtx.fillStyle = game.setShapeColor(game.shape.type + 1);
-  for (let i = 0, length = piece.length; i < length; i++) {
-    let x = piece[i][1] + game.shape.xOffset;
-    let y = piece[i][0] + game.shape.yOffset;
-
-    game.drawBlock(mapCtx, x, y);
-  }
-}
-
-function drawNextShape() {
-  if (game.gameOver) return;
-
-  previewCtx.fillStyle = "#232634";
-  previewCtx.fillRect(0, 0, 80, 40);
-
-  let nextPiece = game.generateNextPiece();
-
-  previewCtx.fillStyle = game.setShapeColor(game.nextShape.type + 1);
-  for (let i = 0, length = nextPiece.length; i < length; i++) {
-    let x = nextPiece[i][1];
-    let y = nextPiece[i][0];
-
-    if (game.nextShape.type === 0) {
-      previewCtx.fillRect(x * 20, y * 20, 20, 20);
-    } else if (game.nextShape.type === 1) {
-      previewCtx.fillRect(x * 20, y * 20 + 10, 20, 20);
-    } else {
-      previewCtx.fillRect(x * 20 + 10, y * 20, 20, 20);
-    }
-  }
 }
 
 document.getElementById("start-btn").addEventListener("touchend", (e) => {
   e.preventDefault();
   if (!game.gameStart) {
     game.gameStart = true;
+    changeIcon("start-btn", game.gameStart, stopIcon, startIcon);
     game.startGame();
+    gameLoop();
     return;
   }
+
+  if (!game.gameOver) gameLoop();
+
   if (id) {
     cancelAnimationFrame(id);
     game.gamePaused = !game.gamePaused;
+    changeIcon("start-btn", !game.gamePaused, stopIcon, startIcon);
     game.setDropTimer();
     id = null;
   }
-  gameLoop();
 });
 
-document.getElementById("restart-btn").addEventListener("touchend", (e) => {
+document.getElementById("volume-btn").addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  game.volumeUp = !game.volumeUp;
+  changeIcon("volume-btn", game.volumeUp, volumeUp, volumeOff);
+});
+
+document.getElementById("restart-btn").addEventListener("touchstart", (e) => {
   e.preventDefault();
   location.reload();
 });
@@ -177,3 +154,14 @@ document.body.addEventListener("keyup", (e) => {
       break;
   }
 });
+
+// changeIcon("start-btn", true, trueIcon, falseIcon);
+
+function changeIcon(elementId, status, trueIcon, falseIcon) {
+  const parentElement = document.getElementById(elementId);
+  if (status) {
+    parentElement.innerHTML = trueIcon;
+  } else {
+    parentElement.innerHTML = falseIcon;
+  }
+}
