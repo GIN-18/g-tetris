@@ -9,7 +9,7 @@ class Game {
     this.gamePaused = false;
     this.gameOver = false;
 
-    this.gameOverUrl = gameOverUrl
+    this.gameOverUrl = gameOverUrl;
 
     this.volumeUp = true;
 
@@ -57,15 +57,15 @@ class Game {
       <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-screen h-screen bg-crust bg-opacity-95"></div>
       <div id="game-over-info"
         class="z-10 flex flex-col justify-around items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 p-6 border-2 border-text rounded bg-surface0">
-        <img id="game-over-image" src="${ this.gameOverUrl }" alt="game over" />
+        <img id="game-over-image" src="${this.gameOverUrl}" alt="game over" />
         <div class="my-6 text-xs">
           <div>
             <label>YOUR SCORE:</label>
-            <span id="your-score-info">${ this.score }</span>
+            <span id="your-score-info">${this.score}</span>
           </div>
           <div>
             <label>HIGHEST SCORE:</label>
-            <span id="highest-score-info">${ this.highScore }</span>
+            <span id="highest-score-info">${this.highScore}</span>
           </div>
         </div>
         <div class="text-xs font-semibold">
@@ -79,15 +79,15 @@ class Game {
       </div>
     `;
 
-    const gameOverContainer = document.createElement("div")
+    const gameOverContainer = document.createElement("div");
 
-    gameOverContainer.innerHTML = gameOverInfoTemplate
+    gameOverContainer.innerHTML = gameOverInfoTemplate;
 
-    document.body.appendChild(gameOverContainer)
+    document.body.appendChild(gameOverContainer);
 
-    document.getElementById("again-btn").addEventListener("touchstart", ()=>{
-      location.reload()
-    })
+    document.getElementById("again-btn").addEventListener("touchstart", () => {
+      location.reload();
+    });
   }
 
   // 生成形状
@@ -343,70 +343,91 @@ class Game {
     }
   }
   drawMap(ctx) {
-    if (this.thisOver) return;
+    const piece = this.generatePiece();
 
-    let piece = this.generatePiece();
+    let shapeType = this.shape.type
+    let xOffset = this.shape.xOffset;
+    let yOffset = this.shape.yOffset;
 
-    // 清空画布
-    ctx.fillStyle = "#303446";
-    ctx.fillRect(0, 0, 200, 400);
+    this.drawArea(
+      ctx,
+      "#303446",
+      0,
+      0,
+      200,
+      400,
+      piece,
+      shapeType,
+      xOffset,
+      yOffset
+    );
+  }
 
-    ctx.fillStyle = "#c6d0f5";
-    for (let i = 0; i < this.map.length; i++) {
-      for (let j = 0; j < this.map[i].length; j++) {
-        ctx.beginPath();
-        ctx.arc(j * 20 + 10, i * 20 + 10, 1, 0, 2 * Math.PI);
-        ctx.fill();
-      }
-    }
+  drawNextShape(ctx) {
+    const piece = this.generateNextPiece();
 
-    // 绘制地图中的方块
-    for (let i = 0; i < this.map.length; i++) {
-      for (let j = 0; j < this.map[i].length; j++) {
-        if (this.map[i][j]) {
-          ctx.fillStyle = this.setShapeColor(this.map[i][j]);
-          this.drawBlock(ctx, j, i);
+    let shapeType = this.nextShape.type
+
+    this.drawArea(ctx, "#232634", 0, 0, 80, 40, piece, shapeType, 0, 0);
+  }
+
+  // 绘制画布区域
+  drawArea(
+    ctx,
+    backgroundColor,
+    canvasX,
+    canvasY,
+    canvasWidth,
+    canvasHeight,
+    piece,
+    shapeType,
+    xOffset,
+    yOffset
+  ) {
+    let colorIndex = shapeType + 1
+    // console.log(ctx.canvas.id);
+
+    // 清空预览画布
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(canvasX, canvasY, canvasWidth, canvasHeight);
+
+    if (ctx.canvas.id === "map-canvas") {
+      // 绘制地图方格
+      for (let i = 0; i < this.map.length; i++) {
+        for (let j = 0; j < this.map[i].length; j++) {
+          if (this.map[i][j]) {
+            ctx.fillStyle = this.setShapeColor(this.map[i][j]);
+            this.drawBlock(ctx, j, i);
+          }
         }
       }
     }
 
-    // 绘制方块
-    ctx.fillStyle = this.setShapeColor(this.shape.type + 1);
+    // 在画布上绘制方块
+    ctx.fillStyle = this.setShapeColor(colorIndex);
 
     for (let i = 0, length = piece.length; i < length; i++) {
-      let x = piece[i][1] + this.shape.xOffset;
-      let y = piece[i][0] + this.shape.yOffset;
+      let x = piece[i][1] + xOffset;
+      let y = piece[i][0] + yOffset;
 
-      this.drawBlock(ctx, x, y);
-    }
-  }
-
-  drawNextShape(ctx) {
-    if (this.gameOver) return;
-
-    ctx.fillStyle = "#232634";
-    ctx.fillRect(0, 0, 80, 40);
-
-    let nextPiece = this.generateNextPiece();
-
-    ctx.fillStyle = this.setShapeColor(this.nextShape.type + 1);
-    for (let i = 0, length = nextPiece.length; i < length; i++) {
-      let x = nextPiece[i][1];
-      let y = nextPiece[i][0];
-
-      switch (this.nextShape.type) {
-        case 0:
-          this.drawBlock(ctx, x, y);
-          break;
-        case 1:
-          this.drawBlock(ctx, x, y, 0, 10);
-          break;
-        default:
-          this.drawBlock(ctx, x, y, 10, 0);
-          break;
+      if (ctx.canvas.id === "map-canvas") {
+        this.drawBlock(ctx, x, y);
+      } else {
+        switch (shapeType) {
+          case 0:
+            this.drawBlock(ctx, x, y);
+            break;
+          case 1:
+            this.drawBlock(ctx, x, y, 0, 10);
+            break;
+          default:
+            this.drawBlock(ctx, x, y, 10, 0);
+            break;
+        }
       }
     }
   }
+
   // 绘制方块
   drawBlock(ctx, x = 1, y = 1, xOffset = 0, yOffset = 0) {
     ctx.fillRect(

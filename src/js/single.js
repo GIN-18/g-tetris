@@ -2,12 +2,12 @@ import "../../dist/style.css";
 import "material-icons/iconfont/material-icons.css";
 
 // 添加logo
-import imageUrl from "../static/logo/logo-frappe-inline.webp";
+import logoImageUrl from "../static/logo/logo-frappe-inline.webp";
 
 // 添加游戏结束图片
 import gameOverUrl from "../static/game-over/game-over-frappe.webp"
 
-document.getElementById("logo-image").src = imageUrl;
+document.getElementById("logo-image").src = logoImageUrl;
 // document.getElementById("game-over-image").src = gameOverUrl;
 
 const Game = require("./Game.js");
@@ -23,15 +23,6 @@ const previewCtx = previewCanvas.getContext("2d", { alpha: false });
 // 初始化地图颜色
 mapCtx.fillStyle = "#303446";
 mapCtx.fillRect(0, 0, 200, 400);
-
-mapCtx.fillStyle = "#c6d0f5";
-for (let i = 0; i < game.map.length; i++) {
-  for (let j = 0; j < game.map[i].length; j++) {
-    mapCtx.beginPath();
-    mapCtx.arc(j * 20 + 10, i * 20 + 10, 1, 0, 2 * Math.PI);
-    mapCtx.fill();
-  }
-}
 
 // 初始化预览框颜色
 previewCtx.fillStyle = "#232634";
