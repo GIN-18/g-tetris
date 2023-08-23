@@ -4,17 +4,20 @@ const ImageminWebpWebpackPlugin = require("imagemin-webp-webpack-plugin");
 
 module.exports = {
   mode: "development",
-  entry: path.join(__dirname, "src", "js", "index.js"),
+  entry: {
+    index: path.resolve(__dirname, 'src', 'js', 'index.js'),
+    single: path.resolve(__dirname, "src", "js", "single.js"),
+  },
   output: {
-    path: path.join(__dirname, "dist"),
-    filename: "bundle.js",
+    filename: "[name].bundle.js",
+    path: path.resolve(__dirname, "dist"),
   },
   module: {
     rules: [
       {
         test: /\.js$/,
         loader: "babel-loader",
-        include: path.join(__dirname, "src", "js"),
+        include: path.resolve(__dirname, "src", "js"),
         exclude: /node_modules/,
       },
       {
@@ -37,8 +40,14 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "src", "index.html"),
       filename: "index.html",
+      template: path.resolve(__dirname, "src", "index.html"),
+      chunks: ['index'],
+    }),
+    new HtmlWebpackPlugin({
+      filename: "single.html",
+      template: path.resolve(__dirname, "src", "single.html"),
+      chunks: ['single'],
     }),
     new ImageminWebpWebpackPlugin({
       config: [
@@ -54,6 +63,6 @@ module.exports = {
   ],
   devServer: {
     port: 8000,
-    static: path.join(__dirname, "dist"),
+    static: path.resolve(__dirname, "dist"),
   },
 };
