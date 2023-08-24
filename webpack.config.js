@@ -5,7 +5,7 @@ const ImageminWebpWebpackPlugin = require("imagemin-webp-webpack-plugin");
 module.exports = {
   mode: "development",
   entry: {
-    index: path.resolve(__dirname, 'src', 'js', 'index.js'),
+    index: path.resolve(__dirname, "src", "js", "index.js"),
     single: path.resolve(__dirname, "src", "js", "single.js"),
   },
   output: {
@@ -42,12 +42,12 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: "index.html",
       template: path.resolve(__dirname, "src", "index.html"),
-      chunks: ['index'],
+      chunks: ["index"],
     }),
     new HtmlWebpackPlugin({
       filename: "single.html",
       template: path.resolve(__dirname, "src", "single.html"),
-      chunks: ['single'],
+      chunks: ["single"],
     }),
     new ImageminWebpWebpackPlugin({
       config: [

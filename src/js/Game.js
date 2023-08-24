@@ -2,8 +2,22 @@ const Shape = require("./Shape.js");
 const { base } = require("./options.js");
 
 class Game {
-  constructor(gameOverUrl) {
+  constructor(mapCtx, previewCtx, gameOverUrl) {
     this.blockSize = base.blockSize;
+
+    this.mapCtx = mapCtx
+    this.mapWidth = 10;
+    this.mapHeight = 20;
+    this.map = [...new Array(this.mapHeight)].map(() =>
+      new Array(this.mapWidth).fill(0)
+    );
+
+    this.previewCtx = previewCtx
+    this.previewWidth = 4;
+    this.previewHeight = 2;
+    this.previewMap = [...new Array(this.previewHeight)].map(() =>
+      new Array(this.previewWidth).fill(0)
+    );
 
     this.gameStart = false;
     this.gamePaused = false;
@@ -12,8 +26,6 @@ class Game {
     this.gameOverUrl = gameOverUrl;
 
     this.volumeUp = true;
-
-    this.map = [...new Array(20)].map(() => new Array(10).fill(0));
 
     this.shape = null;
     this.nextShape = null;
@@ -37,6 +49,12 @@ class Game {
 
   // 设置游戏信息
   setGameData() {
+    this.mapCtx.fillStyle = "#303446"
+    this.mapCtx.fillRect(0, 0, 200, 400)
+
+    this.previewCtx.fillStyle = "#232634";
+    this.previewCtx.fillRect(0, 0, 82, 42);
+
     document.getElementById("score").innerText = this.score;
     document.getElementById("highest-score").innerText = this.highScore;
     document.getElementById("level").innerText = this.level;
@@ -50,6 +68,7 @@ class Game {
   }
 
   // 结束游戏
+  // XXX: again按钮和quit按钮的功能
   overGame() {
     this.updateHighScore();
 
@@ -72,7 +91,7 @@ class Game {
           <button id="again-btn" class="w-20 py-1 border-2 border-text rounded" type="button">
             AGAIN
           </button>
-          <button class="w-20 py-1 border-2 border-text rounded" type="button">
+          <button id="quit-btn" class="w-20 py-1 border-2 border-text rounded" type="button">
             QUIT
           </button>
         </div>
@@ -87,6 +106,10 @@ class Game {
 
     document.getElementById("again-btn").addEventListener("touchstart", () => {
       location.reload();
+    });
+
+    document.getElementById("quit-btn").addEventListener("touchstart", () => {
+      location.replace("../index.html");
     });
   }
 
@@ -110,6 +133,7 @@ class Game {
   }
 
   // 添加方块
+  // BUG: 游戏结束仍会有 this.shape 为 null 的情况
   addShape() {
     this.shape = this.nextShape;
     this.nextShape = this.generateShape();
@@ -142,6 +166,7 @@ class Game {
   }
 
   // 方块旋转
+  // BUG: 快触底时，仍可以旋转并且会覆盖已有的方块
   rotateShape(rStep) {
     if (!this.gameStart || this.gamePaused || this.gameOver) return;
 
@@ -295,7 +320,7 @@ class Game {
   }
 
   // 闪烁满行
-  // FIX: 行数越多闪烁的时间越短
+  // BUG: 行数越多闪烁的时间越短
   flickeringFilledRows(filledRows) {
     return new Promise((resolve, reject) => {
       let count = 0,
@@ -342,20 +367,23 @@ class Game {
       document.getElementById("level").innerText = this.level;
     }
   }
-  drawMap(ctx) {
+  drawMap() {
+    const mapCtx = this.mapCtx
+    const map = this.map;
     const piece = this.generatePiece();
 
-    let shapeType = this.shape.type
+    let shapeType = this.shape.type;
     let xOffset = this.shape.xOffset;
     let yOffset = this.shape.yOffset;
 
     this.drawArea(
-      ctx,
+      mapCtx,
       "#303446",
       0,
       0,
       200,
       400,
+      map,
       piece,
       shapeType,
       xOffset,
@@ -363,12 +391,14 @@ class Game {
     );
   }
 
-  drawNextShape(ctx) {
+  drawNextShape() {
+    const previewCtx = this.previewCtx
+    const previewMap = this.previewMap
     const piece = this.generateNextPiece();
 
-    let shapeType = this.nextShape.type
+    let shapeType = this.nextShape.type;
 
-    this.drawArea(ctx, "#232634", 0, 0, 80, 40, piece, shapeType, 0, 0);
+    this.drawArea(previewCtx, "#232634", 0, 0, 80, 40, previewMap, piece, shapeType, 0, 0);
   }
 
   // 绘制画布区域
@@ -379,26 +409,25 @@ class Game {
     canvasY,
     canvasWidth,
     canvasHeight,
+    area,
     piece,
     shapeType,
     xOffset,
     yOffset
   ) {
-    let colorIndex = shapeType + 1
+    let colorIndex = shapeType + 1;
     // console.log(ctx.canvas.id);
 
     // 清空预览画布
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(canvasX, canvasY, canvasWidth, canvasHeight);
 
-    if (ctx.canvas.id === "map-canvas") {
-      // 绘制地图方格
-      for (let i = 0; i < this.map.length; i++) {
-        for (let j = 0; j < this.map[i].length; j++) {
-          if (this.map[i][j]) {
-            ctx.fillStyle = this.setShapeColor(this.map[i][j]);
-            this.drawBlock(ctx, j, i);
-          }
+    // 绘制游戏地图方格
+    for (let i = 0; i < area.length; i++) {
+      for (let j = 0; j < area[i].length; j++) {
+        if (area[i][j]) {
+          ctx.fillStyle = this.setShapeColor(area[i][j]);
+          this.drawBlock(ctx, j, i);
         }
       }
     }
