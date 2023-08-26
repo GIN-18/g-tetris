@@ -1,5 +1,5 @@
 const Shape = require("./Shape.js");
-const { base } = require("./options.js");
+const { base } = require("../options.js");
 
 class Game {
   constructor(mapCtx, previewCtx, gameOverUrl) {
@@ -162,7 +162,7 @@ class Game {
           return;
         }
       });
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // 方块旋转
@@ -212,7 +212,7 @@ class Game {
   // 下坠
   dropShape() {
     if (this.shape && !this.gamePaused) {
-      while (this.moveShape(0, 1)) {}
+      while (this.moveShape(0, 1)) { }
       this.fallToLand();
     }
   }

@@ -1,6 +1,7 @@
 class Operator {
-  constructor(game) {
+  constructor(game, music) {
     this.game = game;
+    this.music = music
     this.stopIcon = `<span class="material-icons-round !text-sm !leading-3">pause</span>`;
     this.startIcon = `<span class="material-icons-round !text-sm !leading-3">play_arrow</span>`;
 
@@ -10,7 +11,7 @@ class Operator {
 
   // 按钮操作
   buttomMovePiece() {
-    document.getElementById("start-btn").addEventListener("touchend", (e) => {
+    document.getElementById("start-btn").addEventListener("touchstart", (e) => {
       e.preventDefault();
       if (!this.game.gameStart) {
         this.game.gameStart = true;
@@ -20,6 +21,11 @@ class Operator {
           this.stopIcon,
           this.startIcon
         );
+
+        if (this.game.volumeUp) {
+          this.music.audioSource.start()
+        }
+
         this.game.startGame();
         return;
       }
@@ -31,6 +37,11 @@ class Operator {
         this.stopIcon,
         this.startIcon
       );
+
+      if (this.game.volumeUp) {
+        this.music.audioSource.move()
+      }
+
       this.game.setDropTimer();
     });
     document
@@ -58,19 +69,35 @@ class Operator {
       .addEventListener("touchstart", (e) => {
         e.preventDefault();
         this.game.rotateShape(1);
+
+        if (this.game.volumeUp) {
+          this.music.audioSource.rotate()
+        }
       });
 
     document.getElementById("drop-btn").addEventListener("touchstart", (e) => {
       e.preventDefault();
       this.game.dropShape();
+
+      if (this.game.volumeUp) {
+        this.music.audioSource.fall()
+      }
     });
     document.getElementById("left-btn").addEventListener("touchstart", (e) => {
       e.preventDefault();
       this.game.moveLeft();
+
+      if (this.game.volumeUp) {
+        this.music.audioSource.move()
+      }
     });
     document.getElementById("right-btn").addEventListener("touchstart", (e) => {
       e.preventDefault();
       this.game.moveRight();
+
+      if (this.game.volumeUp) {
+        this.music.audioSource.move()
+      }
     });
     document.getElementById("down-btn").addEventListener("touchstart", (e) => {
       e.preventDefault();
