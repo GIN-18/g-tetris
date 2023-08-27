@@ -22,24 +22,14 @@ class Music {
                     return source;
                 }
 
-                // 游戏开始
-                this.audioSource.start = () => {
-                    getSource().start(0, 3.7202, 3.6224);
-                }
-
-                // 方块下落
-                this.audioSource.fall = () => {
-                    getSource().start(0, 1.2558, 0.3546);
-                }
-
-                // 旋转方块
-                this.audioSource.rotate = () => {
-                    getSource().start(0, 2.2471, 0.0807);
+                // 清除方块
+                this.audioSource.clear = () => {
+                    getSource().start(0, 0.2000, 0.6000);
                 }
 
                 // 移动方块
-                this.audioSource.move = () => {
-                    getSource().start(0, 2.9088, 0.1437);
+                this.audioSource.button = () => {
+                    getSource().start(0, 0, 0.2000);
                 }
             }
             )

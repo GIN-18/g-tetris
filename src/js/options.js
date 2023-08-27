@@ -1,12 +1,9 @@
 module.exports = {
-  base: {
-    blockSize: 20,
-  },
   palette: {
-    latte:{
+    latte: {
       mapBackgroundColor: "#eff1f5"
     },
-    frappe:{
+    frappe: {
       mapBackgroundColor: "#eff1f5"
     }
   }

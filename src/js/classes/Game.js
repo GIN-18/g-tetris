@@ -1,9 +1,8 @@
 const Shape = require("./Shape.js");
-const { base } = require("../options.js");
 
 class Game {
-  constructor(mapCtx, previewCtx, gameOverUrl) {
-    this.blockSize = base.blockSize;
+  constructor(mapCtx, previewCtx, gameOverUrl, music) {
+    this.blockSize = 20;
 
     this.mapCtx = mapCtx
     this.mapWidth = 10;
@@ -25,6 +24,7 @@ class Game {
 
     this.gameOverUrl = gameOverUrl;
 
+    this.music = music
     this.volumeUp = true;
 
     this.shape = null;
@@ -297,16 +297,20 @@ class Game {
 
       if (isFilled) {
         filledRows.push(index);
+
+        // 满行后，将该行所有方块置0
+        row.fill(8);
+
+        setTimeout(() => {
+          this.map.splice(index, 1);
+          this.map.unshift(new Array(10).fill(0));
+        }, 300)
+
+
+        if (this.volumeUp) {
+          this.music.audioSource.clear()
+        }
       }
-    });
-
-    // 闪烁满行
-    // await this.flickeringFilledRows(filledRows);
-
-    // 在行首添加空行
-    filledRows.forEach((row) => {
-      this.map.splice(row, 1);
-      this.map.unshift(new Array(10).fill(0));
     });
 
     if (filledRows.length) {
@@ -317,31 +321,6 @@ class Game {
     if (oldLevel !== this.level) {
       this.setDropTimer();
     }
-  }
-
-  // 闪烁满行
-  // BUG: 行数越多闪烁的时间越短
-  flickeringFilledRows(filledRows) {
-    return new Promise((resolve, reject) => {
-      let count = 0,
-        maxCount = 3;
-
-      let intervalId = setInterval(() => {
-        if (count >= maxCount) {
-          clearInterval(intervalId);
-          resolve("clear interval");
-          return;
-        }
-        filledRows.forEach((row) => {
-          this.map[row].fill(0);
-
-          setTimeout(() => {
-            this.map[row].fill(8);
-            count++;
-          }, 100);
-        });
-      }, 300);
-    });
   }
 
   // 更新分数
@@ -416,7 +395,6 @@ class Game {
     yOffset
   ) {
     let colorIndex = shapeType + 1;
-    // console.log(ctx.canvas.id);
 
     // 清空预览画布
     ctx.fillStyle = backgroundColor;
@@ -489,7 +467,7 @@ class Game {
       case 7:
         return shape.shapeColor[colorIndex];
       case 8:
-        return "#babbf1";
+        return "#b5bfe2";
     }
   }
 }

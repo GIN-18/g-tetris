@@ -22,10 +22,6 @@ class Operator {
           this.startIcon
         );
 
-        if (this.game.volumeUp) {
-          this.music.audioSource.start()
-        }
-
         this.game.startGame();
         return;
       }
@@ -39,7 +35,7 @@ class Operator {
       );
 
       if (this.game.volumeUp) {
-        this.music.audioSource.move()
+        this.music.audioSource.button()
       }
 
       this.game.setDropTimer();
@@ -71,7 +67,7 @@ class Operator {
         this.game.rotateShape(1);
 
         if (this.game.volumeUp) {
-          this.music.audioSource.rotate()
+          this.music.audioSource.button()
         }
       });
 
@@ -80,7 +76,7 @@ class Operator {
       this.game.dropShape();
 
       if (this.game.volumeUp) {
-        this.music.audioSource.fall()
+        this.music.audioSource.button()
       }
     });
     document.getElementById("left-btn").addEventListener("touchstart", (e) => {
@@ -88,7 +84,7 @@ class Operator {
       this.game.moveLeft();
 
       if (this.game.volumeUp) {
-        this.music.audioSource.move()
+        this.music.audioSource.button()
       }
     });
     document.getElementById("right-btn").addEventListener("touchstart", (e) => {
@@ -96,12 +92,16 @@ class Operator {
       this.game.moveRight();
 
       if (this.game.volumeUp) {
-        this.music.audioSource.move()
+        this.music.audioSource.button()
       }
     });
     document.getElementById("down-btn").addEventListener("touchstart", (e) => {
       e.preventDefault();
       this.game.moveDown(true);
+
+      if (this.game.volumeUp) {
+        this.music.audioSource.button()
+      }
     });
 
     document.getElementById("down-btn").addEventListener("touchend", (e) => {
