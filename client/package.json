@@ -37,6 +37,8 @@
     "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
-    "material-icons": "^1.13.9"
+    "animate.css": "^4.1.1",
+    "material-icons": "^1.13.9",
+    "socket.io-client": "^4.7.2"
   }
 }

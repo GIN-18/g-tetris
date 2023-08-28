@@ -7,6 +7,7 @@ class Game {
     this.mapCtx = mapCtx
     this.mapWidth = 10;
     this.mapHeight = 20;
+    this.mapBackgroundColor = "#1e1e2e";
     this.map = [...new Array(this.mapHeight)].map(() =>
       new Array(this.mapWidth).fill(0)
     );
@@ -14,6 +15,7 @@ class Game {
     this.previewCtx = previewCtx
     this.previewWidth = 4;
     this.previewHeight = 2;
+    this.previewBackgroundColor = "#313244";
     this.previewMap = [...new Array(this.previewHeight)].map(() =>
       new Array(this.previewWidth).fill(0)
     );
@@ -49,10 +51,10 @@ class Game {
 
   // 设置游戏信息
   setGameData() {
-    this.mapCtx.fillStyle = "#303446"
+    this.mapCtx.fillStyle = this.mapBackgroundColor
     this.mapCtx.fillRect(0, 0, 200, 400)
 
-    this.previewCtx.fillStyle = "#232634";
+    this.previewCtx.fillStyle = this.previewBackgroundColor;
     this.previewCtx.fillRect(0, 0, 82, 42);
 
     document.getElementById("score").innerText = this.score;
@@ -348,6 +350,7 @@ class Game {
   }
   drawMap() {
     const mapCtx = this.mapCtx
+    const mapBackgroundColor = this.mapBackgroundColor
     const map = this.map;
     const piece = this.generatePiece();
 
@@ -357,7 +360,7 @@ class Game {
 
     this.drawArea(
       mapCtx,
-      "#303446",
+      mapBackgroundColor,
       0,
       0,
       200,
@@ -372,12 +375,13 @@ class Game {
 
   drawNextShape() {
     const previewCtx = this.previewCtx
+    const previewBackgroundColor = this.previewBackgroundColor
     const previewMap = this.previewMap
     const piece = this.generateNextPiece();
 
     let shapeType = this.nextShape.type;
 
-    this.drawArea(previewCtx, "#232634", 0, 0, 80, 40, previewMap, piece, shapeType, 0, 0);
+    this.drawArea(previewCtx, previewBackgroundColor, 0, 0, 80, 40, previewMap, piece, shapeType, 0, 0);
   }
 
   // 绘制画布区域
@@ -435,6 +439,11 @@ class Game {
     }
   }
 
+  resetArea(ctx, backgroundColor, canvasX, canvasY, canvasWidth, canvasHeight) {
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(canvasX, canvasY, canvasWidth, canvasHeight);
+  }
+
   // 绘制方块
   drawBlock(ctx, x = 1, y = 1, xOffset = 0, yOffset = 0) {
     ctx.fillRect(
@@ -467,7 +476,7 @@ class Game {
       case 7:
         return shape.shapeColor[colorIndex];
       case 8:
-        return "#b5bfe2";
+        return shape.shapeColor[colorIndex];
     }
   }
 }

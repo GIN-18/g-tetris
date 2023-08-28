@@ -7,6 +7,7 @@ module.exports = {
   entry: {
     index: path.resolve(__dirname, "src", "js", "index.js"),
     single: path.resolve(__dirname, "src", "js", "single.js"),
+    double_ready: path.resolve(__dirname, "src", "js", "double-ready.js"),
   },
   output: {
     filename: "[name].bundle.js",
@@ -61,6 +62,11 @@ module.exports = {
       template: path.resolve(__dirname, "src", "single.html"),
       chunks: ["single"],
     }),
+    new HtmlWebpackPlugin({
+      filename: "double-ready.html",
+      template: path.resolve(__dirname, "src", "double-ready.html"),
+      chunks: ["double_ready"],
+    }),
     new ImageminWebpWebpackPlugin({
       config: [
         {
@@ -76,5 +82,12 @@ module.exports = {
   devServer: {
     port: 8000,
     static: path.resolve(__dirname, "dist"),
+    proxy: {
+      '/socket.io':{
+        target: 'http://localhost:3000',
+        ws: true,
+        changeOrigin: true
+      }
+    }
   },
 };
