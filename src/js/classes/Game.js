@@ -73,7 +73,7 @@ class Game {
     this.updateHighScore();
 
     const gameOverInfoTemplate = `
-      <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-screen h-screen bg-crust bg-opacity-95"></div>
+      <div class="absolute top-0 left-0 w-screen h-screen bg-crust bg-opacity-95">
       <div id="game-over-info"
         class="z-10 flex flex-col justify-around items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 p-6 border-2 border-text rounded bg-surface0">
         <img id="game-over-image" src="${this.gameOverUrl}" alt="game over" />

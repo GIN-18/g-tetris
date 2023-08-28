@@ -35,3 +35,22 @@ function gameLoop() {
 gameLoop();
 
 operator.buttomMovePiece();
+
+// 菜单
+const bodyElement = document.body;
+
+document.getElementById("menu-btn").addEventListener("touchstart", () => {
+  document.getElementById("menu").classList.replace("hidden", "block")
+});
+
+document.getElementById("close-btn").addEventListener("touchstart", () => {
+  document.getElementById("menu").classList.replace("block", "hidden")
+});
+
+document.querySelectorAll(".paltte-btn").forEach(item => {
+  item.addEventListener("touchstart", () => {
+    const oldFlavor = bodyElement.classList[0];
+    const flavor = item.innerText.toLowerCase();
+    bodyElement.classList.replace(oldFlavor, flavor)
+  })
+})
