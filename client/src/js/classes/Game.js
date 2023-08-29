@@ -1,10 +1,10 @@
 const Shape = require("./Shape.js");
 
 class Game {
-  constructor(mapCtx, previewCtx, gameOverUrl, music) {
+  constructor(mapCtx, previewCtx, gameOverImage, music) {
     this.blockSize = 20;
 
-    this.mapCtx = mapCtx
+    this.mapCtx = mapCtx;
     this.mapWidth = 10;
     this.mapHeight = 20;
     this.mapBackgroundColor = "#1e1e2e";
@@ -12,7 +12,7 @@ class Game {
       new Array(this.mapWidth).fill(0)
     );
 
-    this.previewCtx = previewCtx
+    this.previewCtx = previewCtx;
     this.previewWidth = 4;
     this.previewHeight = 2;
     this.previewBackgroundColor = "#313244";
@@ -24,13 +24,23 @@ class Game {
     this.gamePaused = false;
     this.gameOver = false;
 
-    this.gameOverUrl = gameOverUrl;
+    this.gameOverImage = gameOverImage;
 
-    this.music = music
+    this.music = music;
     this.volumeUp = true;
 
     this.shape = null;
     this.nextShape = null;
+    this.shapeColor = [
+      "#89b4fa",
+      "#89dceb",
+      "#a6e3a1",
+      "#fab387",
+      "#f38ba8",
+      "#f5c2e7",
+      "#f5e0dc",
+      "#b4befe",
+    ];
 
     this.dropTimer = null;
     this.fastForward = false;
@@ -51,11 +61,9 @@ class Game {
 
   // 设置游戏信息
   setGameData() {
-    this.mapCtx.fillStyle = this.mapBackgroundColor
-    this.mapCtx.fillRect(0, 0, 200, 400)
+    this.resetArea(this.mapCtx, this.mapBackgroundColor, 0, 0, 200, 400);
 
-    this.previewCtx.fillStyle = this.previewBackgroundColor;
-    this.previewCtx.fillRect(0, 0, 82, 42);
+    this.resetArea(this.previewCtx, this.previewBackgroundColor, 0, 0, 82, 42);
 
     document.getElementById("score").innerText = this.score;
     document.getElementById("highest-score").innerText = this.highScore;
@@ -78,7 +86,7 @@ class Game {
       <div class="absolute top-0 left-0 w-screen h-screen bg-crust bg-opacity-95">
       <div id="game-over-info"
         class="z-10 flex flex-col justify-around items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 p-6 border-2 border-text rounded bg-surface0">
-        <img id="game-over-image" src="${this.gameOverUrl}" alt="game over" />
+        <img id="game-over-image" src="${this.gameOverImage}" alt="game over" />
         <div class="my-6 text-xs">
           <div>
             <label>YOUR SCORE:</label>
@@ -306,11 +314,10 @@ class Game {
         setTimeout(() => {
           this.map.splice(index, 1);
           this.map.unshift(new Array(10).fill(0));
-        }, 300)
-
+        }, 300);
 
         if (this.volumeUp) {
-          this.music.audioSource.clear()
+          this.music.audioSource.clear();
         }
       }
     });
@@ -349,8 +356,8 @@ class Game {
     }
   }
   drawMap() {
-    const mapCtx = this.mapCtx
-    const mapBackgroundColor = this.mapBackgroundColor
+    const mapCtx = this.mapCtx;
+    const mapBackgroundColor = this.mapBackgroundColor;
     const map = this.map;
     const piece = this.generatePiece();
 
@@ -374,14 +381,26 @@ class Game {
   }
 
   drawNextShape() {
-    const previewCtx = this.previewCtx
-    const previewBackgroundColor = this.previewBackgroundColor
-    const previewMap = this.previewMap
+    const previewCtx = this.previewCtx;
+    const previewBackgroundColor = this.previewBackgroundColor;
+    const previewMap = this.previewMap;
     const piece = this.generateNextPiece();
 
     let shapeType = this.nextShape.type;
 
-    this.drawArea(previewCtx, previewBackgroundColor, 0, 0, 80, 40, previewMap, piece, shapeType, 0, 0);
+    this.drawArea(
+      previewCtx,
+      previewBackgroundColor,
+      0,
+      0,
+      80,
+      40,
+      previewMap,
+      piece,
+      shapeType,
+      0,
+      0
+    );
   }
 
   // 绘制画布区域
@@ -401,8 +420,14 @@ class Game {
     let colorIndex = shapeType + 1;
 
     // 清空预览画布
-    ctx.fillStyle = backgroundColor;
-    ctx.fillRect(canvasX, canvasY, canvasWidth, canvasHeight);
+    this.resetArea(
+      ctx,
+      backgroundColor,
+      canvasX,
+      canvasY,
+      canvasWidth,
+      canvasHeight
+    );
 
     // 绘制游戏地图方格
     for (let i = 0; i < area.length; i++) {
@@ -462,21 +487,21 @@ class Game {
 
     switch (type) {
       case 1:
-        return shape.shapeColor[colorIndex];
+        return this.shapeColor[colorIndex];
       case 2:
-        return shape.shapeColor[colorIndex];
+        return this.shapeColor[colorIndex];
       case 3:
-        return shape.shapeColor[colorIndex];
+        return this.shapeColor[colorIndex];
       case 4:
-        return shape.shapeColor[colorIndex];
+        return this.shapeColor[colorIndex];
       case 5:
-        return shape.shapeColor[colorIndex];
+        return this.shapeColor[colorIndex];
       case 6:
-        return shape.shapeColor[colorIndex];
+        return this.shapeColor[colorIndex];
       case 7:
-        return shape.shapeColor[colorIndex];
+        return this.shapeColor[colorIndex];
       case 8:
-        return shape.shapeColor[colorIndex];
+        return this.shapeColor[colorIndex];
     }
   }
 }

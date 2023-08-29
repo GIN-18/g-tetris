@@ -130,16 +130,6 @@ class Shape {
         ],
       ],
     };
-    this.shapeColor = [
-      "#89b4fa",
-      "#89dceb",
-      "#a6e3a1",
-      "#fab387",
-      "#f38ba8",
-      "#f5c2e7",
-      "#f5e0dc",
-      "#b4befe",
-    ];
     this.shapeType = ["O", "I", "S", "Z", "T", "L", "J"];
     this.type = Math.floor(Math.random() * 7);
     this.rotation = 0;

@@ -1,4 +1,5 @@
 const utils = require("../utils.js");
+const options = require("../options.js");
 
 class Operator {
   constructor(game, music) {
@@ -155,6 +156,37 @@ class Operator {
       item.addEventListener("touchend", (e) => {
         console.log(e.currentTarget);
         utils.changeButtonColor(e.currentTarget, "bg-mantle");
+      });
+    });
+
+    document.querySelectorAll(".flavor-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const bodyElement = document.body;
+
+        const oldFlavor = bodyElement.classList[0];
+        const flavor = e.currentTarget.innerText.toLowerCase();
+
+        const mapBackgroundColor = options.palette[flavor].mapBackgroundColor;
+        const previewBackgroundColor =
+          options.palette[flavor].previewBackgroundColor;
+        const shapeColor = options.palette[flavor].shapeColor;
+
+        const logoImage = options.palette[flavor].logoImage;
+        const gameOverImage = options.palette[flavor].gameOverImage;
+
+        this.game.resetArea(this.game.mapCtx, mapBackgroundColor, 0, 0, 200, 400);
+        this.game.resetArea(this.game.previewCtx, previewBackgroundColor, 0, 0, 82, 42);
+
+        this.game.mapBackgroundColor = mapBackgroundColor;
+        this.game.previewBackgroundColor = previewBackgroundColor;
+
+        this.game.shapeColor = shapeColor;
+
+        bodyElement.classList.replace(oldFlavor, flavor);
+
+        this.game.gameOverImage = gameOverImage;
+
+        utils.setImage("logo-image", logoImage);
       });
     });
   }

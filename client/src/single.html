@@ -1,116 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <title>TETRIS</title>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+  </head>
 
-<head>
-  <title>TETRIS</title>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-</head>
-
-<body class="mocha flex flex-col justify-between items-center relative w-screen h-screen p-2 bg-mantle text-text">
-  <header class="flex justify-between items-center w-full">
-    <h1 id="logo">
-      <a href="./index.html">
-        <img id="logo-image" class="h-7" />
-      </a>
-    </h1>
-    <button id="menu-btn" class="flex justify-center items-center" type="button">
-      <span class="material-icons-round !text-3xl">menu</span>
-    </button>
-  </header>
-  <main class="flex justify-around items-center w-full">
-    <!-- 游戏地图 -->
-    <canvas id="map-canvas" class="border-2 border-text rounded" width="200" height="400"></canvas>
-    <!-- 游戏信息 -->
-    <div id="game-info" class="flex flex-col justify-between items-center h-full">
-      <!-- 分数 -->
-      <div class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded">
-        <label>SCORE</label>
-        <span id="score"></span>
+  <body
+    class="mocha flex flex-col justify-between items-center relative w-screen h-screen p-2 bg-mantle text-text"
+  >
+    <header class="flex justify-between items-center w-full">
+      <h1 id="logo">
+        <a href="./index.html">
+          <img id="logo-image" class="h-7" />
+        </a>
+      </h1>
+      <button
+        id="menu-btn"
+        class="flex justify-center items-center"
+        type="button"
+      >
+        <span class="material-icons-round !text-3xl">menu</span>
+      </button>
+    </header>
+    <main class="flex justify-around items-center w-full">
+      <!-- 游戏地图 -->
+      <canvas
+        id="map-canvas"
+        class="border-2 border-text rounded"
+        width="200"
+        height="400"
+      ></canvas>
+      <!-- 游戏信息 -->
+      <div
+        id="game-info"
+        class="flex flex-col justify-between items-center h-full"
+      >
+        <!-- 分数 -->
+        <div
+          class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded"
+        >
+          <label>SCORE</label>
+          <span id="score"></span>
+        </div>
+        <!-- 最高分 -->
+        <div
+          class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded"
+        >
+          <label>HI-SCORE</label>
+          <span id="highest-score"></span>
+        </div>
+        <!-- 方块预览 -->
+        <div
+          class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded"
+        >
+          <label>NEXT</label>
+          <canvas id="preview-canvas" width="80" height="40"></canvas>
+        </div>
+        <!-- 游戏等级 -->
+        <div
+          class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded"
+        >
+          <label>LEVEL</label>
+          <span id="level"></span>
+        </div>
       </div>
-      <!-- 最高分 -->
-      <div class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded">
-        <label>HI-SCORE</label>
-        <span id="highest-score"></span>
-      </div>
-      <!-- 方块预览 -->
-      <div class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded">
-        <label>NEXT</label>
-        <canvas id="preview-canvas" width="80" height="40"></canvas>
-      </div>
-      <!-- 游戏等级 -->
-      <div class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded">
-        <label>LEVEL</label>
-        <span id="level"></span>
-      </div>
-    </div>
-  </main>
-  <!-- 分割线 -->
-  <hr class="w-full pt-2 border-t-2 border-dashed border-text" />
-  <!-- 操作 -->
-  <div class="w-full">
-    <div id="operate" class="flex justify-between items-center w-full">
-      <div id="direction-btn" class="flex flex-col justify-center items-center w-1/2">
-        <button id="drop-btn"
-          class="o-btn flex flex-col justify-center items-center w-16 h-16 border-2 border-text rounded-full bg-mantle"
-          type="button">
-          <span class="material-icons-round !text-3xl !leading-3">arrow_drop_down</span>
-          <span class="material-icons-round !text-3xl !leading-3">arrow_drop_down</span>
-        </button>
-        <div id="h-btn" class="flex justify-between items-center w-full">
-          <button id="left-btn"
-            class="o-btn flex justify-center items-center w-16 h-16 border-2 border-text rounded-full bg-mantle"
-            type="button">
-            <span class="material-icons-round !text-3xl">arrow_left</span>
+    </main>
+    <!-- 分割线 -->
+    <hr class="w-full pt-2 border-t-2 border-dashed border-text" />
+    <!-- 操作 -->
+    <div class="w-full">
+      <div id="operate" class="flex justify-between items-center w-full">
+        <div
+          id="direction-btn"
+          class="flex flex-col justify-center items-center w-1/2"
+        >
+          <button
+            id="drop-btn"
+            class="o-btn flex flex-col justify-center items-center w-16 h-16 border-2 border-text rounded-full bg-mantle"
+            type="button"
+          >
+            <span class="material-icons-round !text-3xl !leading-3"
+              >arrow_drop_down</span
+            >
+            <span class="material-icons-round !text-3xl !leading-3"
+              >arrow_drop_down</span
+            >
           </button>
-          <button id="right-btn"
+          <div id="h-btn" class="flex justify-between items-center w-full">
+            <button
+              id="left-btn"
+              class="o-btn flex justify-center items-center w-16 h-16 border-2 border-text rounded-full bg-mantle"
+              type="button"
+            >
+              <span class="material-icons-round !text-3xl">arrow_left</span>
+            </button>
+            <button
+              id="right-btn"
+              class="o-btn flex justify-center items-center w-16 h-16 border-2 border-text rounded-full bg-mantle"
+              type="button"
+            >
+              <span class="material-icons-round !text-3xl">arrow_right</span>
+            </button>
+          </div>
+          <button
+            id="down-btn"
             class="o-btn flex justify-center items-center w-16 h-16 border-2 border-text rounded-full bg-mantle"
-            type="button">
-            <span class="material-icons-round !text-3xl">arrow_right</span>
+            type="button"
+          >
+            <span class="material-icons-round !text-3xl">arrow_drop_down</span>
           </button>
         </div>
-        <button id="down-btn"
-          class="o-btn flex justify-center items-center w-16 h-16 border-2 border-text rounded-full bg-mantle" type="button">
-          <span class="material-icons-round !text-3xl">arrow_drop_down</span>
-        </button>
-      </div>
-      <div class="flex flex-col justify-between w-1/2 h-48">
-        <!-- 功能键 -->
-        <div id="feature-btn" class="flex justify-end items-center w-full">
-          <button id="start-btn"
-            class="flex justify-center items-center mr-2 p-2 border-2 border-text rounded bg-mantle" type="button">
-            <span class="material-icons-round !text-sm !leading-3">play_arrow</span>
-          </button>
-          <button id="volume-btn"
-            class="flex justify-center items-center mr-2 p-2 border-2 border-text rounded bg-mantle" type="button">
-            <span class="material-icons-round !text-sm !leading-3">volume_up</span>
-          </button>
-          <button id="restart-btn" class="flex justify-center items-center p-2 border-2 border-text rounded bg-mantle"
-            type="button">
-            <span class="material-icons-round !text-sm !leading-3">sync</span>
+        <div class="flex flex-col justify-between w-1/2 h-48">
+          <!-- 功能键 -->
+          <div id="feature-btn" class="flex justify-end items-center w-full">
+            <button
+              id="start-btn"
+              class="flex justify-center items-center mr-2 p-2 border-2 border-text rounded bg-mantle"
+              type="button"
+            >
+              <span class="material-icons-round !text-sm !leading-3"
+                >play_arrow</span
+              >
+            </button>
+            <button
+              id="volume-btn"
+              class="flex justify-center items-center mr-2 p-2 border-2 border-text rounded bg-mantle"
+              type="button"
+            >
+              <span class="material-icons-round !text-sm !leading-3"
+                >volume_up</span
+              >
+            </button>
+            <button
+              id="restart-btn"
+              class="flex justify-center items-center p-2 border-2 border-text rounded bg-mantle"
+              type="button"
+            >
+              <span class="material-icons-round !text-sm !leading-3">sync</span>
+            </button>
+          </div>
+          <!-- 旋转键 -->
+          <button
+            id="rotate-btn"
+            class="o-btn self-end flex justify-center items-center w-32 h-32 border-2 border-text rounded-full bg-mantle"
+            type="button"
+          >
+            <span class="material-icons-round !text-5xl">rotate_right</span>
           </button>
         </div>
-        <!-- 旋转键 -->
-        <button id="rotate-btn"
-          class="o-btn self-end flex justify-center items-center w-32 h-32 border-2 border-text rounded-full bg-mantle"
-          type="button">
-          <span class="material-icons-round !text-5xl">rotate_right</span>
-        </button>
       </div>
     </div>
-  </div>
-  <!-- 菜单 -->
-  <div id="menu" class="hidden">
-    <div class=" absolute top-0 left-0 w-screen h-screen bg-crust bg-opacity-95"></div>
-    <aside class="absolute top-0 right-0 w-1/2 h-screen p-3 bg-surface0">
-      <header class="flex justify-between items-center">
-        <h2 class="text-lg font-semibold">OPTIONS</h2>
-        <button id="close-btn" class="flex justify-center items-center">
-          <span class="material-icons-round !text-2xl !leading-3">close</span>
-        </button>
-      </header>
-    </aside>
-  </div>
-</body>
-
+    <!-- 菜单 -->
+    <div id="menu" class="hidden">
+      <div
+        class="absolute top-0 left-0 w-screen h-screen bg-crust bg-opacity-95"
+      ></div>
+      <aside class="absolute top-0 right-0 w-2/3 h-screen p-3 bg-surface0">
+        <header class="flex justify-between items-center">
+          <h2 class="text-lg font-semibold">OPTIONS</h2>
+          <button id="close-btn" class="flex justify-center items-center">
+            <span class="material-icons-round !text-2xl !leading-3">close</span>
+          </button>
+        </header>
+        <div class="mt-3">
+          <div class="flex justify-start items-center">
+            <span class="material-icons-round mr-2 !text-xl">color_lens</span>
+            <span class="font-semibold">Paltte</span>
+          </div>
+          <ul>
+            <li><button class="flavor-btn flex justify-start items-center w-full mt-2 ml-7 text-sm">Latte</button></li>
+            <li><button class="flavor-btn flex justify-start items-center w-full mt-2 ml-7 text-sm">Frappe</button></li>
+            <li><button class="flavor-btn flex justify-start items-center w-full mt-2 ml-7 text-sm">Macchiato</button></li>
+            <li><button class="flavor-btn flex justify-start items-center w-full mt-2 ml-7 text-sm">Mocha</button></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </body>
 </html>
