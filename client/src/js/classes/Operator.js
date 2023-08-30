@@ -10,6 +10,8 @@ class Operator {
 
     this.volumeOff = `<span class="material-icons-round !text-sm !leading-3">volume_off</span>`;
     this.volumeUp = `<span class="material-icons-round !text-sm !leading-3">volume_up</span>`;
+
+    this.oldPreviousElementSibling = null
   }
 
   // 按钮操作
@@ -187,6 +189,21 @@ class Operator {
         this.game.gameOverImage = gameOverImage;
 
         utils.setImage("logo-image", logoImage);
+
+        document.querySelectorAll(".menu-item").forEach((item) => {
+          item.classList.remove("text-green");
+          item.firstElementChild.classList.add("!text-surface0");
+        })
+
+        if (this.oldPreviousElementSibling) {
+          this.oldPreviousElementSibling.classList.add("!text-surface0")
+        }
+
+        this.oldPreviousElementSibling = e.currentTarget.previousElementSibling;
+
+        e.currentTarget.parentElement.classList.add("text-green");
+
+        e.currentTarget.previousElementSibling.classList.remove("!text-surface0");
       });
     });
   }
