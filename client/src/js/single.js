@@ -3,7 +3,6 @@ import "animate.css";
 import "material-icons/iconfont/material-icons.css";
 
 const Game = require("./classes/Game.js");
-const Music = require("./classes/Music.js");
 const Operator = require("./classes/Operator.js");
 const utils = require("./utils.js");
 const options = require("./options.js");
@@ -41,9 +40,8 @@ const previewCanvas = document.getElementById("preview-canvas");
 const mapCtx = mapCanvas.getContext("2d", { alpha: false });
 const previewCtx = previewCanvas.getContext("2d", { alpha: false });
 
-const music = new Music(audioUrl);
-const game = new Game(mapCtx, previewCtx, mochaGameOverImage, music);
-const operator = new Operator(game, music);
+const game = new Game(mapCtx, previewCtx, mochaGameOverImage, audioUrl);
+const operator = new Operator(game, audioUrl);
 
 function gameLoop() {
   if (game.gameStart) {
@@ -56,4 +54,3 @@ function gameLoop() {
 gameLoop();
 
 operator.buttomMovePiece();
-

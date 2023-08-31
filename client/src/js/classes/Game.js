@@ -1,7 +1,8 @@
 const Shape = require("./Shape.js");
+const utils = require("../utils.js");
 
 class Game {
-  constructor(mapCtx, previewCtx, gameOverImage, music) {
+  constructor(mapCtx, previewCtx, gameOverImage, audioUrl) {
     this.blockSize = 20;
 
     this.mapCtx = mapCtx;
@@ -26,7 +27,7 @@ class Game {
 
     this.gameOverImage = gameOverImage;
 
-    this.music = music;
+    this.audioUrl = audioUrl;
     this.volumeUp = true;
 
     this.shape = null;
@@ -316,9 +317,7 @@ class Game {
           this.map.unshift(new Array(10).fill(0));
         }, 300);
 
-        if (this.volumeUp) {
-          this.music.audioSource.clear();
-        }
+        utils.fetchAudio(this.volumeUp, this.audioUrl, 0.2000, 0.6000)
       }
     });
 

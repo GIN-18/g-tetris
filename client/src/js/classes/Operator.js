@@ -2,16 +2,15 @@ const utils = require("../utils.js");
 const options = require("../options.js");
 
 class Operator {
-  constructor(game, music) {
+  constructor(game, audioUrl) {
     this.game = game;
-    this.music = music;
+    this.audioUrl = audioUrl;
+
     this.stopIcon = `<span class="material-icons-round !text-sm !leading-3">pause</span>`;
     this.startIcon = `<span class="material-icons-round !text-sm !leading-3">play_arrow</span>`;
 
     this.volumeOff = `<span class="material-icons-round !text-sm !leading-3">volume_off</span>`;
     this.volumeUp = `<span class="material-icons-round !text-sm !leading-3">volume_up</span>`;
-
-    this.oldPreviousElementSibling = null
   }
 
   // 按钮操作
@@ -52,9 +51,7 @@ class Operator {
         this.startIcon
       );
 
-      if (this.game.volumeUp) {
-        this.music.audioSource.button();
-      }
+      utils.fetchAudio(this.game.volumeUp, this.audioUrl, 0, 0.2000)
 
       this.game.setDropTimer();
     });
@@ -73,6 +70,8 @@ class Operator {
           this.volumeUp,
           this.volumeOff
         );
+
+        utils.fetchAudio(this.game.volumeUp, this.audioUrl, 0, 0.2000)
       });
 
     // 重新开始
@@ -92,9 +91,7 @@ class Operator {
 
         this.game.rotateShape(1);
 
-        if (this.game.volumeUp) {
-          this.music.audioSource.button();
-        }
+        utils.fetchAudio(this.game.volumeUp, this.audioUrl, 0, 0.2000)
 
         utils.changeButtonColor(e.currentTarget, "bg-surface0");
       });
@@ -104,9 +101,7 @@ class Operator {
       e.preventDefault();
       this.game.dropShape();
 
-      if (this.game.volumeUp) {
-        this.music.audioSource.button();
-      }
+      utils.fetchAudio(this.game.volumeUp, this.audioUrl, 0, 0.2000)
 
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
@@ -116,9 +111,7 @@ class Operator {
       e.preventDefault();
       this.game.moveLeft();
 
-      if (this.game.volumeUp) {
-        this.music.audioSource.button();
-      }
+      utils.fetchAudio(this.game.volumeUp, this.audioUrl, 0, 0.2000)
 
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
@@ -128,9 +121,7 @@ class Operator {
       e.preventDefault();
       this.game.moveRight();
 
-      if (this.game.volumeUp) {
-        this.music.audioSource.button();
-      }
+      utils.fetchAudio(this.game.volumeUp, this.audioUrl, 0, 0.2000)
 
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
@@ -140,9 +131,7 @@ class Operator {
       e.preventDefault();
       this.game.moveDown(true);
 
-      if (this.game.volumeUp) {
-        this.music.audioSource.button();
-      }
+      utils.fetchAudio(this.game.volumeUp, this.audioUrl, 0, 0.2000)
 
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
@@ -156,7 +145,6 @@ class Operator {
     // 将按钮颜色改为背景色
     document.querySelectorAll(".o-btn").forEach((item) => {
       item.addEventListener("touchend", (e) => {
-        console.log(e.currentTarget);
         utils.changeButtonColor(e.currentTarget, "bg-mantle");
       });
     });
@@ -190,16 +178,11 @@ class Operator {
 
         utils.setImage("logo-image", logoImage);
 
+        // 高亮已选择的菜单项
         document.querySelectorAll(".menu-item").forEach((item) => {
           item.classList.remove("text-green");
           item.firstElementChild.classList.add("!text-surface0");
         })
-
-        if (this.oldPreviousElementSibling) {
-          this.oldPreviousElementSibling.classList.add("!text-surface0")
-        }
-
-        this.oldPreviousElementSibling = e.currentTarget.previousElementSibling;
 
         e.currentTarget.parentElement.classList.add("text-green");
 
