@@ -1,3 +1,5 @@
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
 module.exports = {
   // 更改图标
   changeIcon(elementId, status, trueIcon, falseIcon) {
@@ -25,8 +27,6 @@ module.exports = {
   // 请求音频
   fetchAudio(volumeUp, audioUrl, start, end) {
     if (!volumeUp) return
-
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     fetch(audioUrl)
       .then(response => response.arrayBuffer()).then(buffer =>
