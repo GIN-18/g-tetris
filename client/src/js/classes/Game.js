@@ -317,7 +317,7 @@ class Game {
           this.map.unshift(new Array(10).fill(0));
         }, 300);
 
-        utils.fetchAudio(this.volumeUp, this.audioUrl, 0.2000, 0.6000)
+        utils.fetchAudio(this.volumeUp, this.audioUrl, 0.1900, 0.7000)
       }
     });
 
