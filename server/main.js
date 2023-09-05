@@ -2,25 +2,28 @@ const express = require("express");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 
+const Shape = require('./src/Shape.js')
+
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer);
-
-class Player {
-  constructor(name, id) {
-    this.name = name;
-    this.id = id
-    this.state = false;
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
   }
-}
+});
+
+const shape = new Shape();
 
 app.use(express.static(__dirname + "/public"));
 
 io.on("connection", (socket) => {
-  // console.log(socket.id);
 
-  socket.on("readyUpdate", (msg) => {
-    console.log(msg);
+  socket.emit("start", shape);
+
+  socket.on('drop', (data) => {
+    if (data) {
+      socket.emit("newShape", new Shape());
+    }
   });
 
   socket.on("disconnect", () => {

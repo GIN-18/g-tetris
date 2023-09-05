@@ -2,7 +2,7 @@ const Shape = require("./Shape.js");
 const utils = require("../utils.js");
 
 class Game {
-  constructor(mapCtx, previewCtx, gameOverImage, audioUrl) {
+  constructor(mapCtx, previewCtx, gameMode, gameOverImage, audioUrl) {
     this.blockSize = 20;
 
     this.mapCtx = mapCtx;
@@ -21,6 +21,7 @@ class Game {
       new Array(this.previewWidth).fill(0)
     );
 
+    this.gameMode = gameMode;
     this.gameStart = false;
     this.gamePaused = false;
     this.gameOver = false;

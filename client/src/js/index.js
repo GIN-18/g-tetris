@@ -9,3 +9,16 @@ import macchiatoLogoImage from "../static/logo/logo-macchiato.webp";
 import mochaLogoImage from "../static/logo/logo-mocha.webp";
 
 utils.setImage("logo-image", mochaLogoImage);
+
+document.querySelectorAll(".select-btn").forEach(element => {
+  element.addEventListener("touchstart", (e) => {
+    const gameMode = e.currentTarget.getAttribute("data-mode");
+    sessionStorage.setItem("gameMode", gameMode);
+
+    if (gameMode === "single") {
+      location.replace("game.html")
+    } else {
+      location.replace("room.html")
+    }
+  });
+});

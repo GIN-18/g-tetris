@@ -34,13 +34,15 @@ options.palette.mocha.gameOverImage = mochaGameOverImage;
 
 utils.setImage("logo-image", mochaLogoImage);
 
+const gameMode = sessionStorage.getItem("gameMode")
+
 const mapCanvas = document.getElementById("map-canvas");
 const previewCanvas = document.getElementById("preview-canvas");
 
 const mapCtx = mapCanvas.getContext("2d", { alpha: false });
 const previewCtx = previewCanvas.getContext("2d", { alpha: false });
 
-const game = new Game(mapCtx, previewCtx, mochaGameOverImage, audioUrl);
+const game = new Game(mapCtx, previewCtx, gameMode, mochaGameOverImage, audioUrl);
 const operator = new Operator(game, audioUrl);
 
 function gameLoop() {

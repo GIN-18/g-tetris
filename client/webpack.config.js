@@ -6,8 +6,8 @@ module.exports = {
   mode: "development",
   entry: {
     index: path.resolve(__dirname, "src", "js", "index.js"),
-    single: path.resolve(__dirname, "src", "js", "single.js"),
-    double_ready: path.resolve(__dirname, "src", "js", "double-ready.js"),
+    game: path.resolve(__dirname, "src", "js", "game.js"),
+    room: path.resolve(__dirname, "src", "js", "room.js"),
   },
   output: {
     filename: "[name].bundle.js",
@@ -58,14 +58,14 @@ module.exports = {
       chunks: ["index"],
     }),
     new HtmlWebpackPlugin({
-      filename: "single.html",
-      template: path.resolve(__dirname, "src", "single.html"),
-      chunks: ["single"],
+      filename: "game.html",
+      template: path.resolve(__dirname, "src", "game.html"),
+      chunks: ["game"],
     }),
     new HtmlWebpackPlugin({
-      filename: "double-ready.html",
-      template: path.resolve(__dirname, "src", "double-ready.html"),
-      chunks: ["double_ready"],
+      filename: "room.html",
+      template: path.resolve(__dirname, "src", "room.html"),
+      chunks: ["room"],
     }),
     new ImageminWebpWebpackPlugin({
       config: [
