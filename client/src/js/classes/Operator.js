@@ -28,6 +28,7 @@ class Operator {
     // 开始和暂停按钮
     document.getElementById("start-btn").addEventListener("touchstart", (e) => {
       e.preventDefault();
+
       if (!this.game.gameStart) {
         this.game.gameStart = true;
         utils.changeIcon(

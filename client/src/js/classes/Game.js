@@ -1,5 +1,6 @@
 const Shape = require("./Shape.js");
 const utils = require("../utils.js");
+const socket = require("../socket.js");
 
 class Game {
   constructor(mapCtx, previewCtx, gameMode, gameOverImage, audioUrl) {
@@ -22,6 +23,7 @@ class Game {
     );
 
     this.gameMode = gameMode;
+
     this.gameStart = false;
     this.gamePaused = false;
     this.gameOver = false;
@@ -52,6 +54,8 @@ class Game {
     this.score = 0;
     this.highScore = localStorage.getItem("highScore") || 0;
 
+    this.animateId = null
+
     this.init();
   }
 
@@ -59,6 +63,16 @@ class Game {
   init() {
     this.nextShape = this.generateShape();
     this.setGameData();
+  }
+
+  // 游戏动画
+  gameLoop() {
+    if (this.gameStart) {
+      this.drawMap()
+      this.drawNextShape()
+    }
+
+    this.animateId = requestAnimationFrame(this.gameLoop.bind(this))
   }
 
   // 设置游戏信息
@@ -77,6 +91,7 @@ class Game {
     this.gameStart = true;
     this.addShape();
     this.setDropTimer();
+    this.gameLoop()
   }
 
   // 结束游戏
@@ -147,8 +162,10 @@ class Game {
   // 添加方块
   // BUG: 游戏结束仍会有 this.shape 为 null 的情况
   addShape() {
-    this.shape = this.nextShape;
-    this.nextShape = this.generateShape();
+    if (this.gameMode === 'single') {
+      this.shape = this.nextShape;
+      this.nextShape = this.generateShape();
+    }
 
     try {
       let piece = this.generatePiece();
@@ -329,6 +346,12 @@ class Game {
 
     if (oldLevel !== this.level) {
       this.setDropTimer();
+    }
+
+    if (this.gameMode === 'double') {
+      socket.emit('landShape', {
+        score: this.score
+      })
     }
   }
 

@@ -6,6 +6,7 @@ const Game = require("./classes/Game.js");
 const Operator = require("./classes/Operator.js");
 const utils = require("./utils.js");
 const options = require("./options.js");
+const socket = require("./socket.js")
 
 // 导入音频文件
 import audioUrl from "../static/audio/music.mp3";
@@ -45,14 +46,11 @@ const previewCtx = previewCanvas.getContext("2d", { alpha: false });
 const game = new Game(mapCtx, previewCtx, gameMode, mochaGameOverImage, audioUrl);
 const operator = new Operator(game, audioUrl);
 
-function gameLoop() {
-  if (game.gameStart) {
-    game.drawMap();
-    game.drawNextShape();
-  }
-  requestAnimationFrame(gameLoop);
+if (gameMode === "double") {
+  socket.on('addShape', (data) => {
+    game.shape = data.shape;
+    game.nextShape = data.nextShape
+  })
 }
-
-gameLoop();
 
 operator.buttomMovePiece();

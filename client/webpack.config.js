@@ -55,16 +55,19 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: "index.html",
       template: path.resolve(__dirname, "src", "index.html"),
+      favicon: path.resolve(__dirname, "src", "static", "favicon.ico"),
       chunks: ["index"],
     }),
     new HtmlWebpackPlugin({
       filename: "game.html",
       template: path.resolve(__dirname, "src", "game.html"),
+      favicon: path.resolve(__dirname, "src", "static", "favicon.ico"),
       chunks: ["game"],
     }),
     new HtmlWebpackPlugin({
       filename: "room.html",
       template: path.resolve(__dirname, "src", "room.html"),
+      favicon: path.resolve(__dirname, "src", "static", "favicon.ico"),
       chunks: ["room"],
     }),
     new ImageminWebpWebpackPlugin({
