@@ -46,6 +46,8 @@ const previewCtx = previewCanvas.getContext("2d", { alpha: false });
 const game = new Game(mapCtx, previewCtx, gameMode, mochaGameOverImage, audioUrl);
 const operator = new Operator(game, audioUrl);
 
+console.log("gameMode: " + gameMode)
+
 if (gameMode === "double") {
   socket.on('addShape', (data) => {
     game.shape = data.shape;

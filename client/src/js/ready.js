@@ -1,6 +1,7 @@
 import "../../dist/style.css";
 import "material-icons/iconfont/material-icons.css";
 
+const Clipboard = require('clipboard');
 const utils = require("./utils.js");
 const socket = require("./socket.js");
 
@@ -11,6 +12,12 @@ import mochaLogoImage from "../static/logo/logo-mocha.webp";
 
 utils.setImage("logo-image", mochaLogoImage);
 
-document.getElementById('create-room').addEventListener('touchstart', () => {
-  location.replace('../ready.html')
+new Clipboard('#copy-button');
+
+const roomId = document.getElementById('room-id');
+
+socket.emit('createRoom')
+
+socket.on('roomCreated', (room) => {
+  roomId.innerText = room
 })

@@ -8,6 +8,7 @@ module.exports = {
     index: path.resolve(__dirname, "src", "js", "index.js"),
     game: path.resolve(__dirname, "src", "js", "game.js"),
     room: path.resolve(__dirname, "src", "js", "room.js"),
+    ready: path.resolve(__dirname, "src", "js", "ready.js"),
   },
   output: {
     filename: "[name].bundle.js",
@@ -69,6 +70,12 @@ module.exports = {
       template: path.resolve(__dirname, "src", "room.html"),
       favicon: path.resolve(__dirname, "src", "static", "favicon.ico"),
       chunks: ["room"],
+    }),
+    new HtmlWebpackPlugin({
+      filename: "ready.html",
+      template: path.resolve(__dirname, "src", "ready.html"),
+      favicon: path.resolve(__dirname, "src", "static", "favicon.ico"),
+      chunks: ["ready"],
     }),
     new ImageminWebpWebpackPlugin({
       config: [
