@@ -12,5 +12,5 @@ import mochaLogoImage from "../static/logo/logo-mocha.webp";
 utils.setImage("logo-image", mochaLogoImage);
 
 document.getElementById('create-room').addEventListener('touchstart', () => {
-  location.replace('../ready.html')
+  location.href = "./ready.html";
 })

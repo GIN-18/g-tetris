@@ -15,11 +15,6 @@ const io = new Server(httpServer, {
 
 const players = []
 
-let shape = null
-let nextShape = new Shape();
-
-addShape()
-
 io.on("connection", (socket) => {
   console.log("user connected");
 
@@ -28,6 +23,7 @@ io.on("connection", (socket) => {
     const room = generateRoomId()
     socket.join(room)
     socket.emit('roomCreated', room)
+    console.log(room)
   })
 
   socket.on("disconnect", () => {
