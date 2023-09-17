@@ -26,6 +26,20 @@ io.on("connection", (socket) => {
     console.log(room)
   })
 
+  // 加入房间
+  socket.on('joinRoom', (room) => {
+    const clients = io.sockets.adapter.rooms.get(room)
+
+    if (!clients || clients.size >= 2) {
+      socket.emit('roomFull')
+      console.log('room is full');
+    } else {
+      socket.join(room)
+      socket.emit('roomJoined', room)
+      console.log('room joined')
+    }
+  })
+
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });

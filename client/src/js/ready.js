@@ -12,9 +12,16 @@ import mochaLogoImage from "../static/logo/logo-mocha.webp";
 
 utils.setImage("logo-image", mochaLogoImage);
 
+socket.on("connect", () => {
+  console.log(socket.id);
+});
+
 if (!sessionStorage.getItem('room')) {
   socket.emit('createRoom');
+} else {
+  socket.emit('joinRoom', sessionStorage.getItem('room'));
 }
+
 
 socket.on('roomCreated', (room) => {
   sessionStorage.setItem('room', room); // 把房间ID存在sessionStorage中
@@ -28,18 +35,22 @@ const clipboard = new Clipboard('#copy-button');
 
 clipboard.on('success', function (e) {
   e.clearSelection();
-  copySuccess()
+  showCopyInfo("Copied")
+});
+
+clipboard.on('error', function (e) {
+  showCopyInfo("Copy Error")
 });
 
 // 复制成功
-function copySuccess() {
+function showCopyInfo(infoText) {
   const roomInfo = document.getElementById('room-info');
 
   const copyInfo = document.createElement('span');
 
   copyInfo.classList.add('fixed', 'top-2', 'right-2', 'px-2', 'py-1', 'border', 'border-green', 'rounded', 'text-xs', 'text-green')
 
-  copyInfo.innerText = 'Copied';
+  copyInfo.innerText = infoText;
 
   roomInfo.appendChild(copyInfo)
 
