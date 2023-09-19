@@ -11,7 +11,9 @@ import mochaLogoImage from "../static/logo/logo-mocha.webp";
 
 utils.setImage("logo-image", mochaLogoImage);
 
+// 清除属性
 sessionStorage.removeItem("room")
+sessionStorage.removeItem("role")
 
 document.getElementById('create-room').addEventListener('touchstart', () => {
   location.href = "./ready.html";
@@ -36,8 +38,8 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
           class="my-5 px-3 py-2 border border-text rounded outline-none text-sm font-normal bg-base focus:border-0 focus:outline-blue placeholder:text-surface1"
           type="text" placeholder="pleace input room id">
         <div class="flex justify-around items-center w-full">
-          <button id="join-btn" class="w-1/3 py-1 rounded text-mantle bg-green" type="button">join</button>
-          <button id="cancel-btn" class="w-1/3 py-1 rounded text-mantle bg-yellow" type="button">cancel</button>
+          <button id="join-btn" class="w-1/3 py-1 rounded text-mantle bg-green" type="button">Join</button>
+          <button id="cancel-btn" class="w-1/3 py-1 rounded text-mantle bg-yellow" type="button">Cancel</button>
         </div>
       </div>
     </div>
@@ -59,10 +61,11 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
       return
     }
 
-    socket.emit('joinRoom', room)
+    socket.emit('joinRoom', { room, action: 0 }) // 0 表示加入房间
 
-    socket.on('roomJoined', (data) => {
-      sessionStorage.setItem('room', data)
+    socket.on('roomJoined', ({ room, role }) => {
+      sessionStorage.setItem('room', room)
+      sessionStorage.setItem('role', role)
       roomContainer.removeChild(inputRoomContainer)
 
       location.href = './ready.html'

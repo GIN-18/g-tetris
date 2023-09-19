@@ -32,15 +32,37 @@
       </div>
     </div>
     <div class="grow flex flex-col justify-around items-center">
-      <div class="flex border border-text rounded">
-        <span class="material-icons-round !text-6xl">person</span>
-        <div class="flex flex-col p-2">
-          <span>Player 1</span>
-          <span>Player ID</span>
+      <div class="flex w-max border border-text rounded">
+        <span class="material-icons-round border-r border-text !text-9xl">person</span>
+        <div class="flex flex-col justify-between p-2">
+          <span class="text-lg font-semibold">Player 1</span>
+          <div>
+            <label class="font-semibold">Player ID: </label>
+            <span id="player1-id" class="underline"></span>
+          </div>
+          <div>
+            <label class="font-semibold">Status: </label>
+            <span id="player1-status">not ready</span>
+          </div>
+          <button id="status-btn" class="self-end px-2 py-1 rounded text-mantle font-semibold bg-yellow">ready</button>
         </div>
       </div>
-      <span class="material-icons-round">import_export</span>
-      <div class="flex w-full border border-text rounded">player 2</div>
+      <span class="material-icons-round !text-6xl">import_export</span>
+      <div class="flex w-full border border-text rounded">
+        <span class="material-icons-round border-r border-text !text-9xl">person</span>
+        <div class="flex flex-col justify-between w-full p-2">
+          <span class="font-semibold">Player 2</span>
+          <div>
+            <label>Player ID: </label>
+            <span id="player2-id"></span>
+          </div>
+          <div>
+            <label>Status: </label>
+            <span id="player-status">not ready</span>
+          </div>
+          <button id="status-btn" class="self-end px-2 py-1 rounded text-mantle font-semibold bg-yellow">ready</button>
+        </div>
+      </div>
     </div>
   </main>
   <footer>
