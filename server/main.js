@@ -32,7 +32,6 @@ io.on("connection", (socket) => {
 
     // 房间内只有一个玩家刷新时将玩家加入房间
     if (action && !clients) {
-      console.log("action 1");
       socket.join(room)
       players[socket.id] = { room, role }
       socket.emit('roomJoined', players)
@@ -53,11 +52,12 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("user disconnected");
 
+    // 玩家离开房间
     const player = players[socket.id];
     if (player) {
-      const { roomId, playerNumber } = player;
+      const { room, role } = player;
       delete players[socket.id];
-      io.to(roomId).emit('playerLeft', playerNumber); // 向房间内的所有玩家发送离开消息
+      io.to(room).emit('playerLeft', players); // 向房间内的所有玩家发送离开消息
     }
   });
 });

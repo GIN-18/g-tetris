@@ -61,14 +61,18 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
       return
     }
 
-    socket.emit('joinRoom', { room, action: 0 }) // 0 表示加入房间
+    socket.emit('joinRoom', { room, action: 0 }) // 0 表示第一次加入房间
 
-    socket.on('roomJoined', ({ room, role }) => {
-      sessionStorage.setItem('room', room)
-      sessionStorage.setItem('role', role)
-      roomContainer.removeChild(inputRoomContainer)
+    socket.on('roomJoined', (players) => {
+      Object.keys(players).forEach(player => {
+        if (player === socket.id) {
+          sessionStorage.setItem('room', players[player].room)
+          sessionStorage.setItem('role', players[player].role)
+          roomContainer.removeChild(inputRoomContainer)
 
-      location.href = './ready.html'
+          location.href = './ready.html'
+        }
+      })
     })
 
     socket.on('roomFull', () => {

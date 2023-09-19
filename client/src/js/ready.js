@@ -12,24 +12,18 @@ import mochaLogoImage from "../static/logo/logo-mocha.webp";
 
 utils.setImage("logo-image", mochaLogoImage);
 
-let playerId = null
-
-socket.on("connect", () => {
-  playerId = socket.id;
-});
-
 if (!sessionStorage.getItem('room')) {
   socket.emit('createRoom');
 } else {
-  socket.emit('joinRoom', { room: sessionStorage.getItem('room'), role: sessionStorage.getItem('role'), action: 1 });
+  socket.emit('joinRoom', { room: sessionStorage.getItem('room'), action: 1, role: sessionStorage.getItem('role') });
 }
 
-socket.on('roomCreated', (data) => {
-  sessionStorage.setItem('room', data.room); // 把房间ID存在sessionStorage中
-  sessionStorage.setItem('role', data.role); // 把角色存在sessionStorage中
+socket.on('roomCreated', ({ room, role }) => {
+  sessionStorage.setItem('room', room); // 把房间ID存在sessionStorage中
+  sessionStorage.setItem('role', role); // 把角色存在sessionStorage中
   document.getElementById('room-id').innerText = sessionStorage.getItem('room');
 
-  document.getElementById('player1-id').innerText = playerId;
+  document.getElementById('player1-id').innerText = socket.id;
 })
 
 document.getElementById('room-id').innerText = sessionStorage.getItem('room');
@@ -37,7 +31,7 @@ document.getElementById('room-id').innerText = sessionStorage.getItem('room');
 // 刷新时重新加入房间
 socket.on('roomJoined', (players) => {
   Object.keys(players).forEach(key => {
-    if (key === playerId) {
+    if (key === socket.id) {
       document.getElementById('player1-id').innerText = key;
     } else {
       document.getElementById('player2-id').innerText = key;
@@ -48,11 +42,16 @@ socket.on('roomJoined', (players) => {
 // 玩家加入提醒
 socket.on('playerJoined', (players) => {
   Object.keys(players).forEach(key => {
-    if (key !== playerId) {
+    if (key !== socket.id) {
       document.getElementById('player2-id').innerText = key;
     }
   });
 })
+
+// 用户离开的处理逻辑
+socket.on('playerLeft', () => {
+  document.getElementById('player2-id').innerText = '';
+});
 
 // 复制房间ID
 const clipboard = new Clipboard('#copy-button');
