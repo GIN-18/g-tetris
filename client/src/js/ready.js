@@ -12,29 +12,69 @@ import mochaLogoImage from "../static/logo/logo-mocha.webp";
 
 utils.setImage("logo-image", mochaLogoImage);
 
+const roomId = document.getElementById("room-id");
+
+const player1Id = document.getElementById("player1-id");
+const player1Status = document.getElementById("player1-status");
+
+const player2Id = document.getElementById("player2-id");
+const player2Status = document.getElementById("player2-status");
+
+const statusButton = document.getElementById('status-btn')
+
 if (!sessionStorage.getItem('room')) {
   socket.emit('createRoom');
 } else {
-  socket.emit('joinRoom', { room: sessionStorage.getItem('room'), action: 1, role: sessionStorage.getItem('role') });
+  socket.emit('joinRoom', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready'), action: 1 });
 }
 
-socket.on('roomCreated', ({ room, role }) => {
+socket.on('roomCreated', ({ room, ready }) => {
   sessionStorage.setItem('room', room); // 把房间ID存在sessionStorage中
-  sessionStorage.setItem('role', role); // 把角色存在sessionStorage中
-  document.getElementById('room-id').innerText = sessionStorage.getItem('room');
+  sessionStorage.setItem('ready', ready); // 把角色存在sessionStorage中
 
-  document.getElementById('player1-id').innerText = socket.id;
+  if (!Number(sessionStorage.getItem('ready'))) {
+    player1Status.innerText = 'not ready'
+    player1Status.classList.add('text-red')
+    statusButton.innerText = 'Ready'
+  } else {
+    player1Status.innerText = 'ready'
+    player1Status.classList.add('text-green')
+    statusButton.innerText = 'Cancel'
+  }
+
+  roomId.innerText = sessionStorage.getItem('room');
+
+  player1Id.innerText = socket.id;
 })
 
-document.getElementById('room-id').innerText = sessionStorage.getItem('room');
+roomId.innerText = sessionStorage.getItem('room');
 
 // 刷新时重新加入房间
 socket.on('roomJoined', (players) => {
   Object.keys(players).forEach(key => {
     if (key === socket.id) {
-      document.getElementById('player1-id').innerText = key;
+      player1Id.innerText = key.substring(0, 16);
+
+      if (!Number(sessionStorage.getItem('ready'))) {
+        player1Status.innerText = 'not ready'
+        player1Status.classList.add('text-red')
+        statusButton.innerText = 'Ready'
+      } else {
+        player1Status.innerText = 'ready'
+        player1Status.classList.add('text-green')
+        statusButton.innerText = 'Cancel'
+      }
+
     } else {
-      document.getElementById('player2-id').innerText = key;
+      player2Id.innerText = key.substring(0, 16);
+
+      if (!Number(players[key].ready)) {
+        player2Status.innerText = 'not ready'
+        player2Status.classList.add('text-red')
+      } else {
+        player2Status.innerText = 'ready'
+        player2Status.classList.add('text-green')
+      }
     }
   });
 })
@@ -43,14 +83,60 @@ socket.on('roomJoined', (players) => {
 socket.on('playerJoined', (players) => {
   Object.keys(players).forEach(key => {
     if (key !== socket.id) {
-      document.getElementById('player2-id').innerText = key;
+      player2Id.innerText = key.substring(0, 16);
+      player2Status.innerText = 'not ready'
+      player2Status.classList.add('text-red')
+      showMessage("Player 2 joined room!!")
     }
   });
 })
 
+// 玩家准备
+statusButton.addEventListener('touchstart', () => {
+  const ready = Number(sessionStorage.getItem('ready'))
+
+  if (!ready) {
+    sessionStorage.setItem('ready', 1)
+    socket.emit('ready', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready') })
+    statusButton.innerText = 'Cancel'
+  }
+  else {
+    sessionStorage.setItem('ready', 0)
+    socket.emit('ready', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready') })
+    statusButton.innerText = 'Ready'
+  }
+})
+
+socket.on('playerReady', (players) => {
+  Object.keys(players).forEach(key => {
+    if (Number(players[key].ready) && key === socket.id) {
+      player1Status.innerText = 'ready'
+      player1Status.classList.replace('text-red', 'text-green')
+    } else if (Number(players[key].ready) && key !== socket.id) {
+      player2Status.innerText = 'ready'
+      player2Status.classList.replace('text-red', 'text-green')
+    }
+  })
+})
+
+socket.on('playerNotReady', (players) => {
+  Object.keys(players).forEach(key => {
+    if (!Number(players[key].ready) && key === socket.id) {
+      player1Status.innerText = 'not ready'
+      player1Status.classList.replace('text-green', 'text-red')
+    } else if (!Number(players[key].ready) && key !== socket.id) {
+      player2Status.innerText = 'not ready'
+      player2Status.classList.replace('text-green', 'text-red')
+    }
+  })
+})
+
+
 // 用户离开的处理逻辑
 socket.on('playerLeft', () => {
-  document.getElementById('player2-id').innerText = '';
+  player2Id.innerText = '';
+  player2Status.innerText = ''
+  showMessage("Player 2 left room!!")
 });
 
 // 复制房间ID
@@ -58,15 +144,15 @@ const clipboard = new Clipboard('#copy-button');
 
 clipboard.on('success', function (e) {
   e.clearSelection();
-  showCopyInfo("Copied")
+  showMessage("Copied")
 });
 
 clipboard.on('error', function (e) {
-  showCopyInfo("Copy Error")
+  showMessage("Copy Error")
 });
 
 // 复制成功
-function showCopyInfo(infoText) {
+function showMessage(infoText) {
   const roomInfo = document.getElementById('room-info');
 
   const copyInfo = document.createElement('span');

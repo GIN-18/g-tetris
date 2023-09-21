@@ -32,33 +32,36 @@
       </div>
     </div>
     <div class="grow flex flex-col justify-around items-center">
-      <div class="flex w-max border border-text rounded">
-        <span class="material-icons-round border-r border-text !text-9xl">person</span>
+      <div id="player-container" class="flex w-max border border-green rounded">
+        <span class="material-icons-round border-r border-green !text-9xl">person</span>
         <div class="flex flex-col justify-between p-2">
-          <span class="text-lg font-semibold">Player 1</span>
+          <div class="flex items-center text-green">
+            <span class="mr-2 text-lg font-semibold">Player 1</span>
+            <span class="material-icons-round !text-lg">star_rate</span>
+          </div>
           <div>
             <label class="font-semibold">Player ID: </label>
             <span id="player1-id" class="underline"></span>
           </div>
           <div>
             <label class="font-semibold">Status: </label>
-            <span id="player1-status">not ready</span>
+            <span id="player1-status"></span>
           </div>
-          <button id="status-btn" class="self-end px-2 py-1 rounded text-mantle font-semibold bg-yellow">ready</button>
+          <button id="status-btn" class="self-end px-2 py-1 rounded text-mantle font-semibold bg-yellow"></button>
         </div>
       </div>
       <span class="material-icons-round !text-6xl">import_export</span>
       <div class="flex w-full border border-text rounded">
         <span class="material-icons-round border-r border-text !text-9xl">person</span>
         <div class="flex flex-col justify-between w-full p-2">
-          <span class="font-semibold">Player 2</span>
+          <span class="text-lg font-semibold">Player 2</span>
           <div>
             <label>Player ID: </label>
             <span id="player2-id"></span>
           </div>
           <div>
             <label>Status: </label>
-            <span id="player-status">not ready</span>
+            <span id="player2-status"></span>
           </div>
         </div>
       </div>

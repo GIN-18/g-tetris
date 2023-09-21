@@ -13,7 +13,7 @@ utils.setImage("logo-image", mochaLogoImage);
 
 // 清除属性
 sessionStorage.removeItem("room")
-sessionStorage.removeItem("role")
+sessionStorage.removeItem('ready')
 
 document.getElementById('create-room').addEventListener('touchstart', () => {
   location.href = "./ready.html";
@@ -61,13 +61,13 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
       return
     }
 
-    socket.emit('joinRoom', { room, action: 0 }) // 0 表示第一次加入房间
+    socket.emit('joinRoom', { room, ready: 0, action: 0 })
 
     socket.on('roomJoined', (players) => {
       Object.keys(players).forEach(player => {
         if (player === socket.id) {
           sessionStorage.setItem('room', players[player].room)
-          sessionStorage.setItem('role', players[player].role)
+          sessionStorage.setItem('ready', players[player].ready)
           roomContainer.removeChild(inputRoomContainer)
 
           location.href = './ready.html'

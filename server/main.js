@@ -22,18 +22,18 @@ io.on("connection", (socket) => {
   socket.on('createRoom', () => {
     const room = generateRoomId()
     socket.join(room)
-    players[socket.id] = { room, role: 0 }
+    players[socket.id] = { room, ready: 0 }
     socket.emit('roomCreated', players[socket.id])
   })
 
   // 加入房间
-  socket.on('joinRoom', ({ room, action, role }) => {
+  socket.on('joinRoom', ({ room, action, ready }) => {
     const clients = io.sockets.adapter.rooms.get(room)
 
     // 房间内只有一个玩家刷新时将玩家加入房间
     if (action && !clients) {
       socket.join(room)
-      players[socket.id] = { room, role }
+      players[socket.id] = { room, ready }
       socket.emit('roomJoined', players)
       return
     }
@@ -43,9 +43,20 @@ io.on("connection", (socket) => {
       socket.emit('roomFull')
     } else {
       socket.join(room)
-      players[socket.id] = { room, role: 1 }
+      players[socket.id] = { room, ready: 0 }
       socket.emit('roomJoined', players)
       socket.to(room).emit('playerJoined', players)
+    }
+  })
+
+  // 玩家准备
+  socket.on('ready', ({ room, ready }) => {
+    players[socket.id].ready = ready
+
+    if (players[socket.id].ready == 1) {
+      io.to(room).emit('playerReady', players)
+    } else {
+      io.to(room).emit('playerNotReady', players)
     }
   })
 
@@ -55,7 +66,7 @@ io.on("connection", (socket) => {
     // 玩家离开房间
     const player = players[socket.id];
     if (player) {
-      const { room, role } = player;
+      const { room } = player;
       delete players[socket.id];
       io.to(room).emit('playerLeft', players); // 向房间内的所有玩家发送离开消息
     }
