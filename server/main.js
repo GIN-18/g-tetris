@@ -13,6 +13,7 @@ const io = new Server(httpServer, {
   }
 });
 
+const rooms = {}
 const players = {}
 
 io.on("connection", (socket) => {
@@ -20,21 +21,28 @@ io.on("connection", (socket) => {
 
   // 创建房间
   socket.on('createRoom', () => {
+    console.log('create room');
     const room = generateRoomId()
     socket.join(room)
-    players[socket.id] = { room, ready: 0 }
-    socket.emit('roomCreated', players[socket.id])
+
+    const player = players[socket.id] = { room, ready: 0 }
+    rooms[room] = { [socket.id]: player }
+
+    socket.emit('roomCreated', rooms[room])
   })
 
   // 加入房间
   socket.on('joinRoom', ({ room, action, ready }) => {
     const clients = io.sockets.adapter.rooms.get(room)
 
-    // 房间内只有一个玩家刷新时将玩家加入房间
+    // // 房间内只有一个玩家刷新时将玩家加入房间
     if (action && !clients) {
       socket.join(room)
-      players[socket.id] = { room, ready }
-      socket.emit('roomJoined', players)
+
+      const player = players[socket.id] = { room, ready }
+      rooms[room] = { [socket.id]: player }
+
+      socket.emit('roomJoined', rooms[room])
       return
     }
 
@@ -43,32 +51,45 @@ io.on("connection", (socket) => {
       socket.emit('roomFull')
     } else {
       socket.join(room)
-      players[socket.id] = { room, ready: 0 }
-      socket.emit('roomJoined', players)
-      socket.to(room).emit('playerJoined', players)
+
+      players[socket.id] = { room, ready }
+      rooms[room][socket.id] = { room, ready }
+
+      socket.emit('roomJoined', rooms[room])
+      socket.to(room).emit('playerJoined', rooms[room])
     }
   })
 
   // 玩家准备
   socket.on('ready', ({ room, ready }) => {
-    players[socket.id].ready = ready
+    const playerReady = rooms[room][socket.id].ready = ready
 
-    if (players[socket.id].ready == 1) {
-      io.to(room).emit('playerReady', players)
+    if (playerReady == 1) {
+      io.to(room).emit('playerReady', rooms[room])
     } else {
-      io.to(room).emit('playerNotReady', players)
+      io.to(room).emit('playerNotReady', rooms[room])
     }
   })
 
   socket.on("disconnect", () => {
     console.log("user disconnected");
 
+    console.log('players', players);
+    console.log('rooms', rooms);
+
     // 玩家离开房间
     const player = players[socket.id];
+
     if (player) {
       const { room } = player;
+
       delete players[socket.id];
+      delete rooms[room][socket.id];
       io.to(room).emit('playerLeft', players); // 向房间内的所有玩家发送离开消息
+
+      if (Object.keys(rooms[room]).length < 1) {
+        delete rooms[room];
+      }
     }
   });
 });

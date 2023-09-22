@@ -28,23 +28,26 @@ if (!sessionStorage.getItem('room')) {
   socket.emit('joinRoom', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready'), action: 1 });
 }
 
-socket.on('roomCreated', ({ room, ready }) => {
-  sessionStorage.setItem('room', room); // 把房间ID存在sessionStorage中
-  sessionStorage.setItem('ready', ready); // 把角色存在sessionStorage中
+socket.on('roomCreated', (players) => {
+  sessionStorage.setItem('room', players[socket.id].room); // 把房间ID存在sessionStorage中
+  sessionStorage.setItem('ready', players[socket.id].ready); // 把角色存在sessionStorage中
 
   if (!Number(sessionStorage.getItem('ready'))) {
-    player1Status.innerText = 'not ready'
-    player1Status.classList.add('text-red')
-    statusButton.innerText = 'Ready'
-  } else {
-    player1Status.innerText = 'ready'
-    player1Status.classList.add('text-green')
-    statusButton.innerText = 'Cancel'
+
+    if (!Number(sessionStorage.getItem('ready'))) {
+      player1Status.innerText = 'not ready'
+      player1Status.classList.add('text-red')
+      statusButton.innerText = 'Ready'
+    } else {
+      player1Status.innerText = 'ready'
+      player1Status.classList.add('text-green')
+      statusButton.innerText = 'Cancel'
+    }
+
+    roomId.innerText = sessionStorage.getItem('room');
+
+    player1Id.innerText = socket.id;
   }
-
-  roomId.innerText = sessionStorage.getItem('room');
-
-  player1Id.innerText = socket.id;
 })
 
 roomId.innerText = sessionStorage.getItem('room');
@@ -82,12 +85,17 @@ socket.on('roomJoined', (players) => {
 // 玩家加入提醒
 socket.on('playerJoined', (players) => {
   Object.keys(players).forEach(key => {
-    if (key !== socket.id) {
-      player2Id.innerText = key.substring(0, 16);
+    player2Id.innerText = key.substring(0, 16);
+
+    if (Number(players[key].ready) && key !== socket.id) {
+      player2Status.innerText = 'ready'
+      player2Status.classList.add('text-green')
+    } else if (!Number(players[key].ready) && key !== socket.id) {
       player2Status.innerText = 'not ready'
       player2Status.classList.add('text-red')
-      showMessage("Player 2 joined room!!")
     }
+
+    showMessage("Player 2 joined room!!")
   });
 })
 
@@ -95,15 +103,15 @@ socket.on('playerJoined', (players) => {
 statusButton.addEventListener('touchstart', () => {
   const ready = Number(sessionStorage.getItem('ready'))
 
+  console.log(ready);
+
   if (!ready) {
     sessionStorage.setItem('ready', 1)
     socket.emit('ready', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready') })
-    statusButton.innerText = 'Cancel'
   }
   else {
     sessionStorage.setItem('ready', 0)
     socket.emit('ready', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready') })
-    statusButton.innerText = 'Ready'
   }
 })
 
@@ -112,6 +120,7 @@ socket.on('playerReady', (players) => {
     if (Number(players[key].ready) && key === socket.id) {
       player1Status.innerText = 'ready'
       player1Status.classList.replace('text-red', 'text-green')
+      statusButton.innerText = 'Cancel'
     } else if (Number(players[key].ready) && key !== socket.id) {
       player2Status.innerText = 'ready'
       player2Status.classList.replace('text-red', 'text-green')
@@ -124,13 +133,13 @@ socket.on('playerNotReady', (players) => {
     if (!Number(players[key].ready) && key === socket.id) {
       player1Status.innerText = 'not ready'
       player1Status.classList.replace('text-green', 'text-red')
+      statusButton.innerText = 'Ready'
     } else if (!Number(players[key].ready) && key !== socket.id) {
       player2Status.innerText = 'not ready'
       player2Status.classList.replace('text-green', 'text-red')
     }
   })
 })
-
 
 // 用户离开的处理逻辑
 socket.on('playerLeft', () => {
