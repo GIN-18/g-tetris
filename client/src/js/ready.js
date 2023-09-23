@@ -21,6 +21,7 @@ const player2Id = document.getElementById("player2-id");
 const player2Status = document.getElementById("player2-status");
 
 const statusButton = document.getElementById('status-btn')
+const countdown = document.getElementById('countdown')
 
 if (!sessionStorage.getItem('room')) {
   socket.emit('createRoom');
@@ -29,6 +30,8 @@ if (!sessionStorage.getItem('room')) {
 }
 
 socket.on('roomCreated', (players) => {
+  countdown.innerText = 5
+
   sessionStorage.setItem('room', players[socket.id].room); // 把房间ID存在sessionStorage中
   sessionStorage.setItem('ready', players[socket.id].ready); // 把角色存在sessionStorage中
 
@@ -54,6 +57,8 @@ roomId.innerText = sessionStorage.getItem('room');
 
 // 刷新时重新加入房间
 socket.on('roomJoined', (players) => {
+  countdown.innerText = 5
+
   Object.keys(players).forEach(key => {
     if (key === socket.id) {
       player1Id.innerText = key.substring(0, 16);
@@ -79,6 +84,11 @@ socket.on('roomJoined', (players) => {
         player2Status.classList.add('text-green')
       }
     }
+
+    const allReady = Object.keys(players).every(key => players[key].ready == 1)
+
+    if (allReady) {
+    }
   });
 })
 
@@ -103,8 +113,6 @@ socket.on('playerJoined', (players) => {
 statusButton.addEventListener('touchstart', () => {
   const ready = Number(sessionStorage.getItem('ready'))
 
-  console.log(ready);
-
   if (!ready) {
     sessionStorage.setItem('ready', 1)
     socket.emit('ready', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready') })
@@ -115,28 +123,103 @@ statusButton.addEventListener('touchstart', () => {
   }
 })
 
-socket.on('playerReady', (players) => {
+socket.on('zeroPlayerReady', () => {
+  const borderRegex = /^border-/
+  const textRegex = /^text-/
+
+  const textMatchedValues = String(Object.values(countdown.parentElement.classList).filter(value => textRegex.test(value)))
+  const borderMatchedValues = String(Object.values(countdown.parentElement.classList).filter(value => borderRegex.test(value)))
+
+  console.log(textMatchedValues);
+
+  player1Status.innerText = 'not ready'
+  player1Status.classList.replace('text-green', 'text-red')
+  statusButton.innerText = 'Ready'
+  countdown.parentElement.classList.replace(borderMatchedValues, 'border-red')
+  countdown.parentElement.classList.replace(textMatchedValues, 'text-red')
+
+  player2Status.innerText = 'not ready'
+  player2Status.classList.replace('text-green', 'text-red')
+  countdown.parentElement.classList.replace(borderMatchedValues, 'border-red')
+  countdown.parentElement.classList.replace(textMatchedValues, 'text-red')
+})
+
+socket.on('onePlayerReady', (players) => {
+  const borderRegex = /^border-/
+  const textRegex = /^text-/
+
+  const textMatchedValues = String(Object.values(countdown.parentElement.classList).filter(value => textRegex.test(value)))
+  const borderMatchedValues = String(Object.values(countdown.parentElement.classList).filter(value => borderRegex.test(value)))
+
+  console.log('one player ready');
+
+  // 玩家1状态
   Object.keys(players).forEach(key => {
     if (Number(players[key].ready) && key === socket.id) {
       player1Status.innerText = 'ready'
       player1Status.classList.replace('text-red', 'text-green')
       statusButton.innerText = 'Cancel'
-    } else if (Number(players[key].ready) && key !== socket.id) {
+      countdown.parentElement.classList.replace(borderMatchedValues, 'border-yellow')
+      countdown.parentElement.classList.replace(textMatchedValues, 'text-yellow')
+    } else if (!Number(players[key].ready) && key === socket.id) {
+      player1Status.innerText = 'not ready'
+      player1Status.classList.replace('text-green', 'text-red')
+      statusButton.innerText = 'Ready'
+      countdown.parentElement.classList.replace(borderMatchedValues, 'border-yellow')
+      countdown.parentElement.classList.replace(textMatchedValues, 'text-yellow')
+    }
+
+    // 玩家2状态
+    if (Number(players[key].ready) && key !== socket.id) {
       player2Status.innerText = 'ready'
       player2Status.classList.replace('text-red', 'text-green')
+      countdown.parentElement.classList.replace(borderMatchedValues, 'border-yellow')
+      countdown.parentElement.classList.replace(textMatchedValues, 'text-yellow')
+    } else if (!Number(players[key].ready) && key !== socket.id) {
+      player2Status.innerText = 'not ready'
+      player2Status.classList.replace('text-green', 'text-red')
+      countdown.parentElement.classList.replace(borderMatchedValues, 'border-yellow')
+      countdown.parentElement.classList.replace(textMatchedValues, 'text-yellow')
     }
   })
 })
 
-socket.on('playerNotReady', (players) => {
+socket.on('twoPlayerReady', (players) => {
+  const borderRegex = /^border-/
+  const textRegex = /^text-/
+
+  const textMatchedValues = String(Object.values(countdown.parentElement.classList).filter(value => textRegex.test(value)))
+  const borderMatchedValues = String(Object.values(countdown.parentElement.classList).filter(value => borderRegex.test(value)))
+
+  console.log('two player ready');
+
+  // 玩家1状态
   Object.keys(players).forEach(key => {
-    if (!Number(players[key].ready) && key === socket.id) {
+    if (Number(players[key].ready) && key === socket.id) {
+      player1Status.innerText = 'ready'
+      player1Status.classList.replace('text-red', 'text-green')
+      statusButton.innerText = 'Cancel'
+      countdown.parentElement.classList.replace(borderMatchedValues, 'border-green')
+      countdown.parentElement.classList.replace(textMatchedValues, 'text-green')
+    } else if (!Number(players[key].ready) && key === socket.id) {
       player1Status.innerText = 'not ready'
       player1Status.classList.replace('text-green', 'text-red')
       statusButton.innerText = 'Ready'
+      countdown.parentElement.classList.replace(borderMatchedValues, 'border-green')
+      countdown.parentElement.classList.replace(textMatchedValues, 'text-green')
+    }
+
+    // 玩家2状态
+    if (Number(players[key].ready) && key !== socket.id) {
+      player2Status.innerText = 'ready'
+      player2Status.classList.replace('text-red', 'text-green')
+      countdown.parentElement.classList.replace(borderMatchedValues, 'border-green')
+      countdown.parentElement.classList.replace(textMatchedValues, 'text-green')
     } else if (!Number(players[key].ready) && key !== socket.id) {
       player2Status.innerText = 'not ready'
       player2Status.classList.replace('text-green', 'text-red')
+      countdown.parentElement.classList.replace(borderMatchedValues, 'border-green')
+      countdown.parentElement.classList.replace(textMatchedValues, 'text-green')
     }
   })
 })

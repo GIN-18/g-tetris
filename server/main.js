@@ -16,6 +16,8 @@ const io = new Server(httpServer, {
 const rooms = {}
 const players = {}
 
+let seconds = 5
+
 io.on("connection", (socket) => {
   console.log("user connected");
 
@@ -62,13 +64,44 @@ io.on("connection", (socket) => {
 
   // 玩家准备
   socket.on('ready', ({ room, ready }) => {
-    const playerReady = rooms[room][socket.id].ready = ready
+    const playerId = socket.id
+    const playerReady = rooms[room][playerId].ready = Number(ready)
 
-    if (playerReady == 1) {
-      io.to(room).emit('playerReady', rooms[room])
-    } else {
-      io.to(room).emit('playerNotReady', rooms[room])
+    // 零位玩家准备
+    const zeroPlayerReady = Object.keys(rooms[room]).every(key => rooms[room][key].ready == 0)
+
+    if (zeroPlayerReady) {
+      io.to(room).emit('zeroPlayerReady')
+      return
     }
+
+    // 两位玩家已准备
+    const twoPlayerReady = Object.keys(rooms[room]).every(key => rooms[room][key].ready == 1)
+
+    if (twoPlayerReady) {
+      io.to(room).emit('twoPlayerReady', rooms[room])
+      return
+    }
+
+    Object.keys(rooms[room]).forEach(key => {
+      // 一位玩家已准备
+      if ((playerReady === 1 && key === playerId) || (playerReady === 0 && key !== playerId)) {
+        io.to(room).emit('onePlayerReady', rooms[room])
+      }
+    })
+  })
+
+  // 所有玩家都准备好了
+  socket.on('allReady', (room) => {
+    let timer = setInterval(() => {
+      seconds--;
+      io.to(room).emit('countdown', seconds)
+
+      if (seconds <= 0) {
+        clearInterval(timer);
+        socket.emit('startGame')
+      }
+    }, 1000);
   })
 
   socket.on("disconnect", () => {
@@ -109,3 +142,5 @@ function addShape() {
 function generateRoomId() {
   return uuidv4().substring(0, 8)
 }
+
+// 倒计时
