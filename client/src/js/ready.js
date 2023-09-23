@@ -23,6 +23,8 @@ const player2Status = document.getElementById("player2-status");
 const statusButton = document.getElementById('status-btn')
 const countdown = document.getElementById('countdown')
 
+let countdownInterval = null;
+
 if (!sessionStorage.getItem('room')) {
   socket.emit('createRoom');
 } else {
@@ -130,8 +132,6 @@ socket.on('zeroPlayerReady', () => {
   const textMatchedValues = String(Object.values(countdown.parentElement.classList).filter(value => textRegex.test(value)))
   const borderMatchedValues = String(Object.values(countdown.parentElement.classList).filter(value => borderRegex.test(value)))
 
-  console.log(textMatchedValues);
-
   player1Status.innerText = 'not ready'
   player1Status.classList.replace('text-green', 'text-red')
   statusButton.innerText = 'Ready'
@@ -151,8 +151,6 @@ socket.on('onePlayerReady', (players) => {
   const textMatchedValues = String(Object.values(countdown.parentElement.classList).filter(value => textRegex.test(value)))
   const borderMatchedValues = String(Object.values(countdown.parentElement.classList).filter(value => borderRegex.test(value)))
 
-  console.log('one player ready');
-
   // 玩家1状态
   Object.keys(players).forEach(key => {
     if (Number(players[key].ready) && key === socket.id) {
@@ -182,6 +180,12 @@ socket.on('onePlayerReady', (players) => {
       countdown.parentElement.classList.replace(textMatchedValues, 'text-yellow')
     }
   })
+
+  // 清除倒计时
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+    countdown.innerText = 5
+  }
 })
 
 socket.on('twoPlayerReady', (players) => {
@@ -191,8 +195,6 @@ socket.on('twoPlayerReady', (players) => {
   const textMatchedValues = String(Object.values(countdown.parentElement.classList).filter(value => textRegex.test(value)))
   const borderMatchedValues = String(Object.values(countdown.parentElement.classList).filter(value => borderRegex.test(value)))
 
-  console.log('two player ready');
-
   // 玩家1状态
   Object.keys(players).forEach(key => {
     if (Number(players[key].ready) && key === socket.id) {
@@ -222,6 +224,9 @@ socket.on('twoPlayerReady', (players) => {
       countdown.parentElement.classList.replace(textMatchedValues, 'text-green')
     }
   })
+
+  // 倒计时
+  readyToCountdown(countdown.innerText)
 })
 
 // 用户离开的处理逻辑
@@ -258,4 +263,16 @@ function showMessage(infoText) {
   setTimeout(() => {
     roomInfo.removeChild(copyInfo)
   }, 1000)
+}
+
+function readyToCountdown(seconds) {
+  countdownInterval = setInterval(() => {
+    seconds--;
+    countdown.innerText = seconds;
+
+    if (seconds < 0) {
+      clearInterval(countdownInterval);
+      countdown.innerText = 5
+    }
+  }, 1000);
 }

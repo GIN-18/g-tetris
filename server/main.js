@@ -91,19 +91,6 @@ io.on("connection", (socket) => {
     })
   })
 
-  // 所有玩家都准备好了
-  socket.on('allReady', (room) => {
-    let timer = setInterval(() => {
-      seconds--;
-      io.to(room).emit('countdown', seconds)
-
-      if (seconds <= 0) {
-        clearInterval(timer);
-        socket.emit('startGame')
-      }
-    }, 1000);
-  })
-
   socket.on("disconnect", () => {
     console.log("user disconnected");
 
@@ -118,7 +105,7 @@ io.on("connection", (socket) => {
 
       delete players[socket.id];
       delete rooms[room][socket.id];
-      io.to(room).emit('playerLeft', players); // 向房间内的所有玩家发送离开消息
+      io.to(room).emit('playerLeft'); // 向房间内的所有玩家发送离开消息
 
       if (Object.keys(rooms[room]).length < 1) {
         delete rooms[room];
