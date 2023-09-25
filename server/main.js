@@ -16,32 +16,29 @@ const io = new Server(httpServer, {
 const rooms = {}
 const players = {}
 
-let seconds = 5
-
 io.on("connection", (socket) => {
   console.log("user connected");
 
   // 创建房间
   socket.on('createRoom', () => {
-    console.log('create room');
     const room = generateRoomId()
     socket.join(room)
 
-    const player = players[socket.id] = { room, ready: 0 }
+    const player = players[socket.id] = { room, ready: 0, score: 0, gameOver: 0 }
     rooms[room] = { [socket.id]: player }
 
     socket.emit('roomCreated', rooms[room])
   })
 
   // 加入房间
-  socket.on('joinRoom', ({ room, action, ready }) => {
+  socket.on('joinRoom', ({ room, ready, score, action, gameOver }) => {
     const clients = io.sockets.adapter.rooms.get(room)
 
     // // 房间内只有一个玩家刷新时将玩家加入房间
     if (action && !clients) {
       socket.join(room)
 
-      const player = players[socket.id] = { room, ready }
+      const player = players[socket.id] = { room, ready, score, gameOver }
       rooms[room] = { [socket.id]: player }
 
       socket.emit('roomJoined', rooms[room])
@@ -54,8 +51,9 @@ io.on("connection", (socket) => {
     } else {
       socket.join(room)
 
-      players[socket.id] = { room, ready }
-      rooms[room][socket.id] = { room, ready }
+      players[socket.id] = { room, ready, score, gameOver }
+      rooms[room][socket.id] = players[socket.id]
+      // rooms[room][socket.id] = { room, ready, score }
 
       socket.emit('roomJoined', rooms[room])
       socket.to(room).emit('playerJoined', rooms[room])
@@ -64,38 +62,68 @@ io.on("connection", (socket) => {
 
   // 玩家准备
   socket.on('ready', ({ room, ready }) => {
-    const playerId = socket.id
-    const playerReady = rooms[room][playerId].ready = Number(ready)
+    try {
+      const playerId = socket.id
+      const playerReady = rooms[room][playerId].ready = Number(ready)
 
-    // 零位玩家准备
-    const zeroPlayerReady = Object.keys(rooms[room]).every(key => rooms[room][key].ready == 0)
+      // 零位玩家准备
+      const zeroPlayerReady = Object.keys(rooms[room]).every(key => rooms[room][key].ready == 0)
 
-    if (zeroPlayerReady) {
-      io.to(room).emit('zeroPlayerReady')
-      return
+      if (zeroPlayerReady) {
+        io.to(room).emit('zeroPlayerReady', rooms[room])
+        return
+      }
+
+      // 两位玩家已准备
+      const twoPlayerReady = Object.keys(rooms[room]).every(key => rooms[room][key].ready == 1)
+
+      if (twoPlayerReady && Object.keys(rooms[room]).length == 2) {
+        io.to(room).emit('twoPlayerReady', rooms[room])
+        return
+      }
+
+      Object.keys(rooms[room]).forEach(key => {
+        // 一位玩家已准备
+        if ((playerReady === 1 && key === playerId) || (playerReady === 0 && key !== playerId)) {
+          io.to(room).emit('onePlayerReady', rooms[room])
+        }
+      })
+    } catch (error) {
+      console.log(error);
     }
+  })
 
-    // 两位玩家已准备
-    const twoPlayerReady = Object.keys(rooms[room]).every(key => rooms[room][key].ready == 1)
+  // 更新分数
+  socket.on('updateScore', ({ room, score }) => {
+    const playerId = socket.id;
 
-    if (twoPlayerReady) {
-      io.to(room).emit('twoPlayerReady', rooms[room])
+    rooms[room][playerId].score = score;
+    io.to(room).emit('updateScore', rooms[room]);
+  })
+
+  // 游戏结束
+  socket.on('gameOver', ({ room, gameOver }) => {
+    const playerId = socket.id
+    const playerGameOver = rooms[room][playerId].gameOver = Number(gameOver)
+
+    // 两位玩家游戏结束
+    const twoPlayerGameOver = Object.keys(rooms[room]).every(key => rooms[room][key].gameOver == 1)
+
+    if (twoPlayerGameOver && Object.keys(rooms[room]).length == 2) {
+      io.to(room).emit('twoPlayerGameOver', rooms[room])
       return
     }
 
     Object.keys(rooms[room]).forEach(key => {
-      // 一位玩家已准备
-      if ((playerReady === 1 && key === playerId) || (playerReady === 0 && key !== playerId)) {
-        io.to(room).emit('onePlayerReady', rooms[room])
+      // 一位玩家游戏结束
+      if ((playerGameOver === 1 && key === playerId) || (playerGameOver === 0 && key !== playerId)) {
+        io.to(room).emit('onePlayerGameOver', rooms[room])
       }
     })
   })
 
   socket.on("disconnect", () => {
     console.log("user disconnected");
-
-    console.log('players', players);
-    console.log('rooms', rooms);
 
     // 玩家离开房间
     const player = players[socket.id];

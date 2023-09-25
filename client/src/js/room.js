@@ -61,13 +61,14 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
       return
     }
 
-    socket.emit('joinRoom', { room, ready: 0, action: 0 })
+    socket.emit('joinRoom', { room, ready: 0, score: 0, action: 0, gameOver: 0 })
 
     socket.on('roomJoined', (players) => {
-      Object.keys(players).forEach(player => {
-        if (player === socket.id) {
-          sessionStorage.setItem('room', players[player].room)
-          sessionStorage.setItem('ready', players[player].ready)
+      Object.keys(players).forEach(key => {
+        if (key === socket.id) {
+          sessionStorage.setItem('room', players[key].room)
+          sessionStorage.setItem('ready', players[key].ready)
+          sessionStorage.setItem('gameOver', players[key].gameOver)
           roomContainer.removeChild(inputRoomContainer)
 
           location.href = './ready.html'

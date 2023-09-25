@@ -3,7 +3,7 @@ const utils = require("../utils.js");
 const socket = require("../socket.js");
 
 class Game {
-  constructor(mapCtx, previewCtx, gameMode, gameOverImage, audioUrl) {
+  constructor(mapCtx, previewCtx, gameMode, gameOverImage, gameWinImage, gameFailImage, audioUrl) {
     this.blockSize = 20;
 
     this.mapCtx = mapCtx;
@@ -29,6 +29,9 @@ class Game {
     this.gameOver = false;
 
     this.gameOverImage = gameOverImage;
+
+    this.gameWinImage = gameWinImage
+    this.gameFailImage = gameFailImage
 
     this.audioUrl = audioUrl;
     this.volumeUp = true;
@@ -97,9 +100,11 @@ class Game {
   // 结束游戏
   // XXX: again按钮和quit按钮的功能
   overGame() {
-    this.updateHighScore();
+    if (this.gameMode === 'single') {
 
-    const gameOverInfoTemplate = `
+      this.updateHighScore();
+
+      const gameOverInfoTemplate = `
       <div class="absolute top-0 left-0 w-screen h-screen bg-crust bg-opacity-95">
       <div id="game-over-info"
         class="z-10 flex flex-col justify-around items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 p-6 border-2 border-text rounded bg-surface0">
@@ -125,19 +130,56 @@ class Game {
       </div>
     `;
 
-    const gameOverContainer = document.createElement("div");
+      const gameOverContainer = document.createElement("div");
 
-    gameOverContainer.innerHTML = gameOverInfoTemplate;
+      gameOverContainer.innerHTML = gameOverInfoTemplate;
 
-    document.body.appendChild(gameOverContainer);
+      document.body.appendChild(gameOverContainer);
 
-    document.getElementById("again-btn").addEventListener("touchstart", () => {
-      location.reload();
-    });
+      document.getElementById("again-btn").addEventListener("touchstart", () => {
+        location.reload();
+      });
 
-    document.getElementById("quit-btn").addEventListener("touchstart", () => {
-      location.replace("../index.html");
-    });
+      document.getElementById("quit-btn").addEventListener("touchstart", () => {
+        location.replace("../index.html");
+      });
+
+      return
+    }
+
+    if (this.gameMode === 'double') {
+      socket.emit('gameOver', { room: sessionStorage.getItem('room'), gameOver: 1 });
+
+      const gameOverInfoTemplate = `
+        <div class="absolute top-0 left-0 w-screen h-screen bg-crust bg-opacity-95">
+        <div id="game-over-info"
+          class="z-10 flex flex-col justify-around items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 p-6 border-2 border-text rounded bg-surface0">
+          <img id="game-over-image" src="${this.gameOverImage}" alt="game over" />
+          <div class="text-xs font-semibold">
+            <button id="again-btn" class="w-20 py-1 border-2 border-text rounded" type="button">
+              AGAIN
+            </button>
+            <button id="quit-btn" class="w-20 py-1 border-2 border-text rounded" type="button">
+              QUIT
+            </button>
+          </div>
+        </div>
+      `;
+
+      const gameOverContainer = document.createElement("div");
+
+      gameOverContainer.innerHTML = gameOverInfoTemplate;
+
+      document.body.appendChild(gameOverContainer);
+
+      document.getElementById("again-btn").addEventListener("touchstart", () => {
+        location.reload();
+      });
+
+      document.getElementById("quit-btn").addEventListener("touchstart", () => {
+        location.replace("../index.html");
+      });
+    }
   }
 
   // 生成形状
@@ -162,10 +204,8 @@ class Game {
   // 添加方块
   // BUG: 游戏结束仍会有 this.shape 为 null 的情况
   addShape() {
-    if (this.gameMode === 'single') {
-      this.shape = this.nextShape;
-      this.nextShape = this.generateShape();
-    }
+    this.shape = this.nextShape;
+    this.nextShape = this.generateShape();
 
     try {
       let piece = this.generatePiece();
@@ -347,18 +387,16 @@ class Game {
     if (oldLevel !== this.level) {
       this.setDropTimer();
     }
-
-    if (this.gameMode === 'double') {
-      socket.emit('landShape', {
-        score: this.score
-      })
-    }
   }
 
   // 更新分数
   updateScore(filledRows, level) {
     this.score += filledRows * level * 10;
     document.getElementById("score").innerText = this.score;
+
+    if (this.gameMode === 'double') {
+      socket.emit('updateScore', { room: sessionStorage.getItem("room"), score: this.score })
+    }
   }
 
   // 更新最高分数
@@ -504,8 +542,6 @@ class Game {
 
   // 设置颜色
   setShapeColor(type) {
-    const shape = this.shape;
-
     let colorIndex = type - 1;
 
     switch (type) {

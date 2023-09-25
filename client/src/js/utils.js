@@ -24,6 +24,23 @@ module.exports = {
     element.classList.replace(oldColor, color);
   },
 
+  // 显示信息
+  showMessage(infoText, delay) {
+    const messageContainer = document.getElementById('message');
+
+    const messageBox = document.createElement('span');
+
+    messageBox.classList.add('px-2', 'py-1', 'border', 'border-green', 'rounded', 'text-xs', 'text-green')
+
+    messageBox.innerText = infoText;
+
+    messageContainer.appendChild(messageBox)
+
+    setTimeout(() => {
+      messageContainer.removeChild(messageBox)
+    }, delay)
+  },
+
   // 请求音频
   fetchAudio(volumeUp, audioUrl, start, end) {
     if (!volumeUp) return

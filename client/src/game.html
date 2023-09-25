@@ -14,6 +14,8 @@
         <img id="logo-image" class="h-7" />
       </a>
     </h1>
+    <span id="message"></span>
+    <!-- 菜单按钮 -->
     <button id="menu-btn" class="flex justify-center items-center" type="button">
       <span class="material-icons-round !text-3xl">menu</span>
     </button>
@@ -25,22 +27,30 @@
     <div id="game-info" class="flex flex-col justify-between items-center h-full">
       <!-- 分数 -->
       <div class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded">
-        <label>SCORE</label>
+        <label class="font-semibold">SCORE</label>
         <span id="score"></span>
+        <span id="score-diff" class="hidden text-green"></span>
       </div>
       <!-- 最高分 -->
-      <div class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded">
-        <label>HI-SCORE</label>
+      <div id="highest-score-container"
+        class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded">
+        <label class="font-semibold">HI-SCORE</label>
         <span id="highest-score"></span>
+      </div>
+      <!-- 房间 -->
+      <div id="room-container"
+        class="hidden flex-col justify-center items-center w-full p-2 border-2 border-text rounded">
+        <label class="font-semibold">ROOM</label>
+        <span id="room-id"></span>
       </div>
       <!-- 方块预览 -->
       <div class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded">
-        <label>NEXT</label>
+        <label class="font-semibold">NEXT</label>
         <canvas id="preview-canvas" width="80" height="40"></canvas>
       </div>
       <!-- 游戏等级 -->
       <div class="flex flex-col justify-center items-center w-full p-2 border-2 border-text rounded">
-        <label>LEVEL</label>
+        <label class="font-semibold">LEVEL</label>
         <span id="level"></span>
       </div>
     </div>

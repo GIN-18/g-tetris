@@ -28,7 +28,7 @@ let countdownInterval = null;
 if (!sessionStorage.getItem('room')) {
   socket.emit('createRoom');
 } else {
-  socket.emit('joinRoom', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready'), action: 1 });
+  socket.emit('joinRoom', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready'), action: 1, gameOver: sessionStorage.getItem('gameOver') });
 }
 
 socket.on('roomCreated', (players) => {
@@ -36,6 +36,7 @@ socket.on('roomCreated', (players) => {
 
   sessionStorage.setItem('room', players[socket.id].room); // 把房间ID存在sessionStorage中
   sessionStorage.setItem('ready', players[socket.id].ready); // 把角色存在sessionStorage中
+  sessionStorage.setItem('gameOver', players[socket.id].gameOver); // 把角色存在sessionStorage中
 
   if (!Number(sessionStorage.getItem('ready'))) {
 
@@ -86,11 +87,6 @@ socket.on('roomJoined', (players) => {
         player2Status.classList.add('text-green')
       }
     }
-
-    const allReady = Object.keys(players).every(key => players[key].ready == 1)
-
-    if (allReady) {
-    }
   });
 })
 
@@ -107,7 +103,7 @@ socket.on('playerJoined', (players) => {
       player2Status.classList.add('text-red')
     }
 
-    showMessage("Player 2 joined room!!")
+    utils.showMessage("Player 2 joined room!!", 1000)
   });
 })
 
@@ -125,7 +121,7 @@ statusButton.addEventListener('touchstart', () => {
   }
 })
 
-socket.on('zeroPlayerReady', () => {
+socket.on('zeroPlayerReady', (players) => {
   const borderRegex = /^border-/
   const textRegex = /^text-/
 
@@ -138,10 +134,12 @@ socket.on('zeroPlayerReady', () => {
   countdown.parentElement.classList.replace(borderMatchedValues, 'border-red')
   countdown.parentElement.classList.replace(textMatchedValues, 'text-red')
 
-  player2Status.innerText = 'not ready'
-  player2Status.classList.replace('text-green', 'text-red')
-  countdown.parentElement.classList.replace(borderMatchedValues, 'border-red')
-  countdown.parentElement.classList.replace(textMatchedValues, 'text-red')
+  if (Object.keys(players).length > 1) {
+    player2Status.innerText = 'not ready'
+    player2Status.classList.replace('text-green', 'text-red')
+    countdown.parentElement.classList.replace(borderMatchedValues, 'border-red')
+    countdown.parentElement.classList.replace(textMatchedValues, 'text-red')
+  }
 })
 
 socket.on('onePlayerReady', (players) => {
@@ -233,7 +231,7 @@ socket.on('twoPlayerReady', (players) => {
 socket.on('playerLeft', () => {
   player2Id.innerText = '';
   player2Status.innerText = ''
-  showMessage("Player 2 left room!!")
+  utils.showMessage("Player 2 left room!!", 1000)
 });
 
 // 复制房间ID
@@ -241,29 +239,12 @@ const clipboard = new Clipboard('#copy-button');
 
 clipboard.on('success', function (e) {
   e.clearSelection();
-  showMessage("Copied")
+  utils.showMessage("Copied", 1000)
 });
 
 clipboard.on('error', function (e) {
-  showMessage("Copy Error")
+  utils.showMessage("Copy Error", 1000)
 });
-
-// 复制成功
-function showMessage(infoText) {
-  const roomInfo = document.getElementById('room-info');
-
-  const copyInfo = document.createElement('span');
-
-  copyInfo.classList.add('fixed', 'top-2', 'right-2', 'px-2', 'py-1', 'border', 'border-green', 'rounded', 'text-xs', 'text-green')
-
-  copyInfo.innerText = infoText;
-
-  roomInfo.appendChild(copyInfo)
-
-  setTimeout(() => {
-    roomInfo.removeChild(copyInfo)
-  }, 1000)
-}
 
 function readyToCountdown(seconds) {
   countdownInterval = setInterval(() => {
@@ -272,6 +253,7 @@ function readyToCountdown(seconds) {
 
     if (seconds < 0) {
       clearInterval(countdownInterval);
+      location.href = "game.html"
       countdown.innerText = 5
     }
   }, 1000);
