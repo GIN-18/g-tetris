@@ -154,7 +154,11 @@ class Game {
         <div class="absolute top-0 left-0 w-screen h-screen bg-crust bg-opacity-95">
         <div id="game-over-info"
           class="z-10 flex flex-col justify-around items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 p-6 border-2 border-text rounded bg-surface0">
-          <img id="game-over-image" src="${this.gameOverImage}" alt="game over" />
+          <img id="game-over-image" alt="game over" />
+          <div id="score-container" class="my-6 text-xs">
+            <label>YOUR SCORE:</label>
+            <span id="your-score-info">${this.score}</span>
+          </div>
           <div class="text-xs font-semibold">
             <button id="again-btn" class="w-20 py-1 border-2 border-text rounded" type="button">
               AGAIN

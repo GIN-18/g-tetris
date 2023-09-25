@@ -112,19 +112,37 @@ if (gameMode === "double") {
 
   // 一个玩家游戏结束提示这个玩家游戏结束
   socket.on('onePlayerGameOver', (players) => {
+    const gameOverImage = document.getElementById('game-over-image')
+    const againButton = document.getElementById('again-btn')
+    const quitButton = document.getElementById('quit-btn')
+    const scoreContainer = document.getElementById('score-container')
+
     Object.keys(players).forEach(key => {
-      if (!players[socket.id].gameOver && key !== socket.id) {
+      if (players[socket.id].gameOver && key === socket.id) {
+        gameOverImage.src = mochaGameOverImage
+        againButton.classList.add('hidden')
+        quitButton.classList.add('hidden')
+        scoreContainer.classList.replace('my-6', 'mt-6')
+      } else if (!players[socket.id].gameOver && key !== socket.id) {
         utils.showMessage('player 2 game over', 2000)
       }
     })
   })
 
   // 两个游戏结束
-  socket.on('twoPlayerGameOver', (players) => {
+  socket.on('twoPlayerGameOver', () => {
+    const gameOverImage = document.getElementById('game-over-image')
+    const againButton = document.getElementById('again-btn')
+    const quitButton = document.getElementById('quit-btn')
+    const scoreContainer = document.getElementById('score-container')
+
     if (sessionStorage.getItem('scoreDiff') > 0) {
-      game.gameOverImage = mochaGameWinImage
+      gameOverImage.src = mochaGameWinImage
     } else {
-      game.gameOverImage = mochaGameFailImage
+      gameOverImage.src = mochaGameFailImage
+      againButton.classList.remove('hidden')
+      quitButton.classList.remove('hidden')
+      scoreContainer.classList.replace('mt-6', 'my-6')
     }
   })
 
