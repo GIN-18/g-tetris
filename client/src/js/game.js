@@ -2,6 +2,8 @@ import "../../dist/style.css";
 import "animate.css";
 import "material-icons/iconfont/material-icons.css";
 
+import confetti from 'canvas-confetti';
+
 const Game = require("./classes/Game.js");
 const Operator = require("./classes/Operator.js");
 const Music = require('./classes/Music.js')
@@ -40,11 +42,21 @@ import frappeGameWinImage from "../static/game-over/win-frappe.webp";
 import macchiatoGameWinImage from "../static/game-over/win-macchiato.webp";
 import mochaGameWinImage from "../static/game-over/win-mocha.webp";
 
+options.palette.latte.winImage = latteGameWinImage;
+options.palette.frappe.winImage = frappeGameWinImage;
+options.palette.macchiato.winImage = macchiatoGameWinImage;
+options.palette.mocha.winImage = mochaGameWinImage;
+
 // 添加游戏失败图片
 import latteGameFailImage from "../static/game-over/fail-latte.webp";
 import frappeGameFailImage from "../static/game-over/fail-frappe.webp";
 import macchiatoGameFailImage from "../static/game-over/fail-macchiato.webp";
 import mochaGameFailImage from "../static/game-over/fail-mocha.webp";
+
+options.palette.latte.failImage = latteGameFailImage;
+options.palette.frappe.failImage = frappeGameFailImage;
+options.palette.macchiato.failImage = macchiatoGameFailImage;
+options.palette.mocha.failImage = mochaGameFailImage;
 
 utils.setImage("logo-image", mochaLogoImage);
 
@@ -57,17 +69,17 @@ const mapCtx = mapCanvas.getContext("2d", { alpha: false });
 const previewCtx = previewCanvas.getContext("2d", { alpha: false });
 
 const music = new Music(audioUrl)
-const game = new Game(mapCtx, previewCtx, gameMode, mochaGameOverImage, mochaGameWinImage, mochaGameFailImage, music);
+const game = new Game(mapCtx, previewCtx, gameMode, mochaGameOverImage, music);
 const operator = new Operator(game, music);
 
-const scoreDiff = document.getElementById('score-diff')
-const highestScoreContainer = document.getElementById('highest-score-container')
-const roomContainer = document.getElementById('room-container')
-const roomId = document.getElementById('room-id')
-const statrtButton = document.getElementById('start-btn')
-const restartButton = document.getElementById('restart-btn')
-
 if (gameMode === "double") {
+  const scoreDiff = document.getElementById('score-diff')
+  const highestScoreContainer = document.getElementById('highest-score-container')
+  const roomContainer = document.getElementById('room-container')
+  const roomId = document.getElementById('room-id')
+  const statrtButton = document.getElementById('start-btn')
+  const restartButton = document.getElementById('restart-btn')
+
   statrtButton.classList.replace('flex', 'hidden')
   restartButton.classList.replace('flex', 'hidden')
   highestScoreContainer.classList.replace('flex', 'hidden')
@@ -126,7 +138,7 @@ if (gameMode === "double") {
         quitButton.classList.add('hidden')
         scoreContainer.classList.replace('my-6', 'mt-6')
       } else if (!players[socket.id].gameOver && key !== socket.id) {
-        utils.showMessage('player 2 game over', 2000)
+        utils.showMessage('player 2 game over', 5000)
       }
     })
   })
@@ -140,6 +152,7 @@ if (gameMode === "double") {
 
     if (sessionStorage.getItem('scoreDiff') > 0) {
       gameOverImage.src = mochaGameWinImage
+      frame()
     } else {
       gameOverImage.src = mochaGameFailImage
       againButton.classList.remove('hidden')
@@ -154,3 +167,23 @@ if (gameMode === "double") {
 }
 
 operator.buttomMovePiece();
+
+
+function frame() {
+  const colors = options.palette.mocha.shapeColor;
+
+  confetti({
+    particleCount: 60,
+    angle: 60,
+    spread: 55,
+    origin: { x: 0 },
+    colors: colors
+  });
+  confetti({
+    particleCount: 60,
+    angle: 120,
+    spread: 55,
+    origin: { x: 1 },
+    colors: colors
+  });
+};

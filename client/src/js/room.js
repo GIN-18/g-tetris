@@ -61,7 +61,7 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
       return
     }
 
-    socket.emit('joinRoom', { room, ready: 0, score: 0, action: 0, gameOver: 0 })
+    socket.emit('joinRoom', { room, ready: 0, score: 0, gameOver: 0, action: 0 })
 
     socket.on('roomJoined', (players) => {
       Object.keys(players).forEach(key => {

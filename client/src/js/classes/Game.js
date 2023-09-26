@@ -3,7 +3,7 @@ const utils = require("../utils.js");
 const socket = require("../socket.js");
 
 class Game {
-  constructor(mapCtx, previewCtx, gameMode, gameOverImage, gameWinImage, gameFailImage, music) {
+  constructor(mapCtx, previewCtx, gameMode, gameOverImage, music) {
     this.blockSize = 20;
 
     this.mapCtx = mapCtx;
@@ -29,9 +29,6 @@ class Game {
     this.gameOver = false;
 
     this.gameOverImage = gameOverImage;
-
-    this.gameWinImage = gameWinImage
-    this.gameFailImage = gameFailImage
 
     this.music = music
     this.volumeUp = true;

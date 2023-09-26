@@ -53,7 +53,6 @@ io.on("connection", (socket) => {
 
       players[socket.id] = { room, ready, score, gameOver }
       rooms[room][socket.id] = players[socket.id]
-      // rooms[room][socket.id] = { room, ready, score }
 
       socket.emit('roomJoined', rooms[room])
       socket.to(room).emit('playerJoined', rooms[room])

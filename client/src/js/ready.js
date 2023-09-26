@@ -71,6 +71,7 @@ socket.on('roomJoined', (players) => {
         player1Status.classList.add('text-red')
         statusButton.innerText = 'Ready'
       } else {
+        socket.emit('ready', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready') })
         player1Status.innerText = 'ready'
         player1Status.classList.add('text-green')
         statusButton.innerText = 'Cancel'
@@ -83,6 +84,7 @@ socket.on('roomJoined', (players) => {
         player2Status.innerText = 'not ready'
         player2Status.classList.add('text-red')
       } else {
+        socket.emit('ready', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready') })
         player2Status.innerText = 'ready'
         player2Status.classList.add('text-green')
       }
@@ -251,7 +253,7 @@ function readyToCountdown(seconds) {
     seconds--;
     countdown.innerText = seconds;
 
-    if (seconds < 0) {
+    if (seconds <= 0) {
       clearInterval(countdownInterval);
       location.href = "game.html"
       countdown.innerText = 5
