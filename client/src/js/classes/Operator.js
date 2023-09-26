@@ -158,6 +158,8 @@ class Operator {
         const oldFlavor = bodyElement.classList[0];
         const flavor = e.currentTarget.innerText.toLowerCase();
 
+        sessionStorage.setItem("flavor", flavor)
+
         const mapBackgroundColor = options.palette[flavor].mapBackgroundColor;
         const previewBackgroundColor =
           options.palette[flavor].previewBackgroundColor;

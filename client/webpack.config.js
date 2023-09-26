@@ -28,27 +28,24 @@ module.exports = {
       },
       {
         test: /\.webp$/,
-        use: [
-          {
-            loader: "file-loader",
-            options: {
-              name: "[name].[ext]",
-              outputPath: "images",
-            },
-          },
-        ],
+        type: 'asset/resource',
+        generator: {
+          filename: 'static/images/[hash][ext][query]',
+        }
       },
       {
         test: /\.mp3$/,
-        use: [
-          {
-            loader: "file-loader",
-            options: {
-              name: "[name].[ext]",
-              outputPath: "audio",
-            },
-          },
-        ],
+        type: 'asset/resource',
+        generator: {
+          filename: 'static/audio/[hash][ext][query]'
+        },
+      },
+      {
+        test: /\.(woff|woff2)$/,
+        type: 'asset/resource',
+        generator: {
+          filename: 'static/font/[hash][ext][query]'
+        }
       },
     ],
   },

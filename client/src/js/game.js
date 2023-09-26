@@ -72,6 +72,11 @@ const music = new Music(audioUrl)
 const game = new Game(mapCtx, previewCtx, gameMode, mochaGameOverImage, music);
 const operator = new Operator(game, music);
 
+// 设置flavor
+const bodyElement = document.body;
+const flavor = bodyElement.classList[0];
+sessionStorage.setItem('flavor', flavor)
+
 if (gameMode === "double") {
   const scoreDiff = document.getElementById('score-diff')
   const highestScoreContainer = document.getElementById('highest-score-container')
@@ -131,9 +136,11 @@ if (gameMode === "double") {
     const quitButton = document.getElementById('quit-btn')
     const scoreContainer = document.getElementById('score-container')
 
+    const flavor = sessionStorage.getItem('flavor')
+
     Object.keys(players).forEach(key => {
       if (players[socket.id].gameOver && key === socket.id) {
-        gameOverImage.src = mochaGameOverImage
+        gameOverImage.src = options.palette[flavor].gameOverImage
         againButton.classList.add('hidden')
         quitButton.classList.add('hidden')
         scoreContainer.classList.replace('my-6', 'mt-6')
@@ -150,11 +157,13 @@ if (gameMode === "double") {
     const quitButton = document.getElementById('quit-btn')
     const scoreContainer = document.getElementById('score-container')
 
+    const flavor = sessionStorage.getItem('flavor')
+
     if (sessionStorage.getItem('scoreDiff') > 0) {
-      gameOverImage.src = mochaGameWinImage
+      gameOverImage.src = options.palette[flavor].winImage
       frame()
     } else {
-      gameOverImage.src = mochaGameFailImage
+      gameOverImage.src = options.palette[flavor].failImage
       againButton.classList.remove('hidden')
       quitButton.classList.remove('hidden')
       scoreContainer.classList.replace('mt-6', 'my-6')
