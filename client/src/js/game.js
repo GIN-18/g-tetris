@@ -4,6 +4,7 @@ import "material-icons/iconfont/material-icons.css";
 
 const Game = require("./classes/Game.js");
 const Operator = require("./classes/Operator.js");
+const Music = require('./classes/Music.js')
 const utils = require("./utils.js");
 const options = require("./options.js");
 const socket = require("./socket.js")
@@ -55,8 +56,9 @@ const previewCanvas = document.getElementById("preview-canvas");
 const mapCtx = mapCanvas.getContext("2d", { alpha: false });
 const previewCtx = previewCanvas.getContext("2d", { alpha: false });
 
-const game = new Game(mapCtx, previewCtx, gameMode, mochaGameOverImage, mochaGameWinImage, mochaGameFailImage, audioUrl);
-const operator = new Operator(game, audioUrl);
+const music = new Music(audioUrl)
+const game = new Game(mapCtx, previewCtx, gameMode, mochaGameOverImage, mochaGameWinImage, mochaGameFailImage, music);
+const operator = new Operator(game, music);
 
 const scoreDiff = document.getElementById('score-diff')
 const highestScoreContainer = document.getElementById('highest-score-container')

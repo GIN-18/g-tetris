@@ -2,9 +2,10 @@ const utils = require("../utils.js");
 const options = require("../options.js");
 
 class Operator {
-  constructor(game, audioUrl) {
+  constructor(game, music) {
     this.game = game;
-    this.audioUrl = audioUrl;
+    // this.audioUrl = audioUrl;
+    this.music = music
 
     this.stopIcon = `<span class="material-icons-round !text-sm !leading-3">pause</span>`;
     this.startIcon = `<span class="material-icons-round !text-sm !leading-3">play_arrow</span>`;
@@ -52,7 +53,7 @@ class Operator {
         this.startIcon
       );
 
-      utils.fetchAudio(this.game.volumeUp, this.audioUrl, 0, 0.1900)
+      this.music.fetchMusic(this.game.volumeUp, 0, 0.1900);
 
       this.game.setDropTimer();
     });
@@ -72,7 +73,7 @@ class Operator {
           this.volumeOff
         );
 
-        utils.fetchAudio(this.game.volumeUp, this.audioUrl, 0, 0.1900)
+        this.music.fetchMusic(this.game.volumeUp, 0, 0.1900);
       });
 
     // 重新开始
@@ -92,7 +93,7 @@ class Operator {
 
         this.game.rotateShape(1);
 
-        utils.fetchAudio(this.game.volumeUp, this.audioUrl, 0, 0.1900)
+        this.music.fetchMusic(this.game.volumeUp, 0, 0.1900);
 
         utils.changeButtonColor(e.currentTarget, "bg-surface0");
       });
@@ -102,7 +103,7 @@ class Operator {
       e.preventDefault();
       this.game.dropShape();
 
-      utils.fetchAudio(this.game.volumeUp, this.audioUrl, 0, 0.1900)
+      this.music.fetchMusic(this.game.volumeUp, 0, 0.1900);
 
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
@@ -112,7 +113,7 @@ class Operator {
       e.preventDefault();
       this.game.moveLeft();
 
-      utils.fetchAudio(this.game.volumeUp, this.audioUrl, 0, 0.1900)
+      this.music.fetchMusic(this.game.volumeUp, 0, 0.1900);
 
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
@@ -122,7 +123,7 @@ class Operator {
       e.preventDefault();
       this.game.moveRight();
 
-      utils.fetchAudio(this.game.volumeUp, this.audioUrl, 0, 0.1900)
+      this.music.fetchMusic(this.game.volumeUp, 0, 0.1900);
 
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
@@ -132,7 +133,7 @@ class Operator {
       e.preventDefault();
       this.game.moveDown(true);
 
-      utils.fetchAudio(this.game.volumeUp, this.audioUrl, 0, 0.1900)
+      this.music.fetchMusic(this.game.volumeUp, 0, 0.1900);
 
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });

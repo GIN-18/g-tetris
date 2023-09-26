@@ -3,7 +3,7 @@ const utils = require("../utils.js");
 const socket = require("../socket.js");
 
 class Game {
-  constructor(mapCtx, previewCtx, gameMode, gameOverImage, gameWinImage, gameFailImage, audioUrl) {
+  constructor(mapCtx, previewCtx, gameMode, gameOverImage, gameWinImage, gameFailImage, music) {
     this.blockSize = 20;
 
     this.mapCtx = mapCtx;
@@ -33,7 +33,7 @@ class Game {
     this.gameWinImage = gameWinImage
     this.gameFailImage = gameFailImage
 
-    this.audioUrl = audioUrl;
+    this.music = music
     this.volumeUp = true;
 
     this.shape = null;
@@ -379,7 +379,7 @@ class Game {
           this.map.unshift(new Array(10).fill(0));
         }, 300);
 
-        utils.fetchAudio(this.volumeUp, this.audioUrl, 0.1900, 0.7000)
+        this.music.fetchMusic(this.volumeUp, 0.1900, 0.7000)
       }
     });
 

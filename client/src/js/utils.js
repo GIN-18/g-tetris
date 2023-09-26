@@ -1,5 +1,3 @@
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
 module.exports = {
   // 更改图标
   changeIcon(elementId, status, trueIcon, falseIcon) {
@@ -40,21 +38,4 @@ module.exports = {
       messageContainer.removeChild(messageBox)
     }, delay)
   },
-
-  // 请求音频
-  fetchAudio(volumeUp, audioUrl, start, end) {
-    if (!volumeUp) return
-
-    fetch(audioUrl)
-      .then(response => response.arrayBuffer()).then(buffer =>
-        audioCtx.decodeAudioData(buffer, (audioBuffer) => {
-
-          const source = audioCtx.createBufferSource();
-          source.buffer = audioBuffer;
-          source.connect(audioCtx.destination);
-
-          source.start(0, start, end);
-        })
-      );
-  }
 };
