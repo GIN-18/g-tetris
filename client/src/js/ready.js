@@ -29,15 +29,17 @@ let countdownInterval = null;
 if (!sessionStorage.getItem('room')) {
   socket.emit('createRoom');
 } else {
-  socket.emit('joinRoom', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready'), action: 1, gameOver: sessionStorage.getItem('gameOver') });
+  socket.emit('joinRoom', { room: sessionStorage.getItem('room'), ready: 0, action: 1, gameOver: sessionStorage.getItem('gameOver') });
 }
 
 socket.on('roomCreated', (players) => {
+  const playerId = socket.id
+
   countdown.innerText = 5
 
-  sessionStorage.setItem('room', players[socket.id].room); // 把房间ID存在sessionStorage中
-  sessionStorage.setItem('ready', players[socket.id].ready); // 把角色存在sessionStorage中
-  sessionStorage.setItem('gameOver', players[socket.id].gameOver); // 把角色存在sessionStorage中
+  sessionStorage.setItem('room', players[playerId].room); // 把房间ID存在sessionStorage中
+  sessionStorage.setItem('ready', players[playerId].ready); // 把角色存在sessionStorage中
+  sessionStorage.setItem('gameOver', players[playerId].gameOver); // 把角色存在sessionStorage中
 
   if (!Number(sessionStorage.getItem('ready'))) {
 
@@ -53,7 +55,7 @@ socket.on('roomCreated', (players) => {
 
     roomId.innerText = sessionStorage.getItem('room');
 
-    player1Id.innerText = socket.id;
+    player1Id.innerText = playerId;
   }
 })
 
@@ -61,13 +63,16 @@ roomId.innerText = sessionStorage.getItem('room');
 
 // 刷新时重新加入房间
 socket.on('roomJoined', (players) => {
+  const playerId = socket.id
+
   countdown.innerText = 5
+  sessionStorage.setItem('ready', 0) // 进入房间都是未准备状态
 
   Object.keys(players).forEach(key => {
-    if (key === socket.id) {
+    if (key === playerId) {
       player1Id.innerText = key.substring(0, 16);
 
-      if (!Number(sessionStorage.getItem('ready'))) {
+      if (!Number(players[key].ready)) {
         player1Status.innerText = 'not ready'
         player1Status.classList.add('text-red')
         statusButton.innerText = 'Ready'
@@ -77,7 +82,6 @@ socket.on('roomJoined', (players) => {
         player1Status.classList.add('text-green')
         statusButton.innerText = 'Cancel'
       }
-
     } else {
       player2Id.innerText = key.substring(0, 16);
 
@@ -95,13 +99,15 @@ socket.on('roomJoined', (players) => {
 
 // 玩家加入提醒
 socket.on('playerJoined', (players) => {
+  const playerId = socket.id
+
   Object.keys(players).forEach(key => {
     player2Id.innerText = key.substring(0, 16);
 
-    if (Number(players[key].ready) && key !== socket.id) {
+    if (Number(players[key].ready) && key !== playerId) {
       player2Status.innerText = 'ready'
       player2Status.classList.add('text-green')
-    } else if (!Number(players[key].ready) && key !== socket.id) {
+    } else if (!Number(players[key].ready) && key !== playerId) {
       player2Status.innerText = 'not ready'
       player2Status.classList.add('text-red')
     }
@@ -240,15 +246,16 @@ socket.on('playerLeft', () => {
 // 复制房间ID
 const clipboard = new Clipboard('#copy-button');
 
-clipboard.on('success', function (e) {
+clipboard.on('success', (e) => {
   e.clearSelection();
   utils.showMessage("Copied", 1500)
 });
 
-clipboard.on('error', function (e) {
+clipboard.on('error', (e) => {
   utils.showMessage("Copy Error", 1500)
 });
 
+// 倒计时
 function readyToCountdown(seconds) {
   countdownInterval = setInterval(() => {
     seconds--;
@@ -257,7 +264,6 @@ function readyToCountdown(seconds) {
     if (seconds <= 0) {
       clearInterval(countdownInterval);
       location.href = "game.html"
-      countdown.innerText = 5
     }
   }, 1000);
 }

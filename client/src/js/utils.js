@@ -24,7 +24,6 @@ module.exports = {
 
   // 显示信息
   showMessage(infoText, delay) {
-    console.log('showMessage');
     const messageContainer = document.getElementById('message');
 
     const messageBox = document.createElement('div');
