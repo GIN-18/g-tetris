@@ -1,5 +1,5 @@
-import "../../dist/style.css";
 import "animate.css";
+import "../../dist/style.css";
 import "material-icons/iconfont/material-icons.css";
 
 import confetti from 'canvas-confetti';

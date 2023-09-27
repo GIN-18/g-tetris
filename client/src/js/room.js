@@ -1,6 +1,8 @@
+import 'animate.css'
 import "../../dist/style.css";
 import "material-icons/iconfont/material-icons.css";
 
+const _ = require("lodash");
 const utils = require("./utils.js");
 const socket = require("./socket.js");
 
@@ -25,7 +27,6 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
 
 document.getElementById('join-room').addEventListener('touchstart', () => {
   const roomContainer = document.getElementById("room-container");
-  let message = ''
 
   const inputRoomTemplate = `
     <div class="absolute top-0 left-0 w-screen h-screen bg-crust bg-opacity-95"></div>
@@ -53,11 +54,11 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
   const inputRoom = document.getElementById('input-room')
 
   // 加入房间
-  document.getElementById('join-btn').addEventListener('touchstart', () => {
+  document.getElementById('join-btn').addEventListener('touchstart', _.debounce(() => {
     const room = inputRoom.value
 
     if (!room) {
-      showMessage("Pleace input room id!")
+      utils.showMessage("Pleace input room id!", 2000)
       return
     }
 
@@ -77,10 +78,10 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
     })
 
     socket.on('roomFull', () => {
-      showMessage("Room is full!")
+      utils.showMessage("Room is full!", 2000)
     })
 
-  })
+  }, 2000, { leading: true }))
 
   // 取消加入房间
   document.getElementById('cancel-btn').addEventListener('touchstart', () => {
@@ -88,20 +89,3 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
     roomContainer.removeChild(inputRoomContainer)
   })
 })
-
-function showMessage(message) {
-  const joinMessage = document.getElementById('join-message')
-
-  const messageTemplate = `
-    <span class="material-icons-round mr-1 !text-lg">error_outline</span>
-    <span>${message}</span>
-  `
-
-  joinMessage.innerHTML = messageTemplate
-
-  joinMessage.classList.replace('hidden', 'flex')
-
-  setTimeout(() => {
-    joinMessage.classList.replace('flex', 'hidden')
-  }, 2000)
-}

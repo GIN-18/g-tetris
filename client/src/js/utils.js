@@ -24,18 +24,27 @@ module.exports = {
 
   // 显示信息
   showMessage(infoText, delay) {
+    console.log('showMessage');
     const messageContainer = document.getElementById('message');
 
-    const messageBox = document.createElement('span');
+    const messageBox = document.createElement('div');
 
-    messageBox.classList.add('px-2', 'py-1', 'border', 'border-green', 'rounded', 'text-xs', 'text-green')
+    messageBox.classList.add('mb-2', 'px-2', 'py-1', 'border', 'border-green', 'rounded', 'text-xs', 'text-green', 'bg-mantle', 'animate__animated', 'animate__bounce', 'animate__fadeInRight')
 
     messageBox.innerText = infoText;
 
     messageContainer.appendChild(messageBox)
 
     setTimeout(() => {
-      messageContainer.removeChild(messageBox)
-    }, delay)
+      messageContainer.classList.remove('animate__fadeInRight');
+      messageContainer.classList.add('animate__animated', 'animate__fadeOutRight');
+
+      setTimeout(() => {
+        messageContainer.classList.remove('animate__animated', 'animate__fadeOutRight');
+        messageContainer.removeChild(messageBox)
+      }, delay);
+
+    }, delay);
+
   },
 };

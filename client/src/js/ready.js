@@ -1,3 +1,4 @@
+import 'animate.css'
 import "../../dist/style.css";
 import "material-icons/iconfont/material-icons.css";
 
@@ -104,9 +105,9 @@ socket.on('playerJoined', (players) => {
       player2Status.innerText = 'not ready'
       player2Status.classList.add('text-red')
     }
-
-    utils.showMessage("Player 2 joined room!!", 1000)
   });
+
+  utils.showMessage("Player 2 joined room!!", 1500)
 })
 
 // 玩家准备
@@ -233,7 +234,7 @@ socket.on('twoPlayerReady', (players) => {
 socket.on('playerLeft', () => {
   player2Id.innerText = '';
   player2Status.innerText = ''
-  utils.showMessage("Player 2 left room!!", 1000)
+  utils.showMessage("Player 2 left room!!", 1500)
 });
 
 // 复制房间ID
@@ -241,11 +242,11 @@ const clipboard = new Clipboard('#copy-button');
 
 clipboard.on('success', function (e) {
   e.clearSelection();
-  utils.showMessage("Copied", 1000)
+  utils.showMessage("Copied", 1500)
 });
 
 clipboard.on('error', function (e) {
-  utils.showMessage("Copy Error", 1000)
+  utils.showMessage("Copy Error", 1500)
 });
 
 function readyToCountdown(seconds) {
