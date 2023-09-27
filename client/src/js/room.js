@@ -58,7 +58,7 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
     const room = inputRoom.value
 
     if (!room) {
-      utils.showMessage("Pleace input room id!", 2000)
+      utils.showMessage("Pleace input room id!", 'error', 2000)
       return
     }
 
@@ -78,7 +78,7 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
     })
 
     socket.on('roomFull', () => {
-      utils.showMessage("Room is full!", 2000)
+      utils.showMessage("Room is full!", 'error', 2000)
     })
 
   }, 2000, { leading: true }))

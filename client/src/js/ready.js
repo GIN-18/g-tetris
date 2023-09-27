@@ -113,7 +113,8 @@ socket.on('playerJoined', (players) => {
     }
   });
 
-  utils.showMessage("Player 2 joined room!!", 1500)
+  socket.emit('ready', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready') })
+  utils.showMessage("Player 2 joined room!!", 'hint', 1500)
 })
 
 // 玩家准备
@@ -240,7 +241,7 @@ socket.on('twoPlayerReady', (players) => {
 socket.on('playerLeft', () => {
   player2Id.innerText = '';
   player2Status.innerText = ''
-  utils.showMessage("Player 2 left room!!", 1500)
+  utils.showMessage("Player 2 left room!!", 'error', 1500)
 });
 
 // 复制房间ID
@@ -248,11 +249,11 @@ const clipboard = new Clipboard('#copy-button');
 
 clipboard.on('success', (e) => {
   e.clearSelection();
-  utils.showMessage("Copied", 1500)
+  utils.showMessage("Copied", 'hint', 1500)
 });
 
 clipboard.on('error', (e) => {
-  utils.showMessage("Copy Error", 1500)
+  utils.showMessage("Copy Error", 'error', 1500)
 });
 
 // 倒计时

@@ -145,7 +145,7 @@ if (gameMode === "double") {
         quitButton.classList.add('hidden')
         scoreContainer.classList.replace('my-6', 'mt-6')
       } else if (!players[socket.id].gameOver && key !== socket.id) {
-        utils.showMessage('player 2 game over', 5000)
+        utils.showMessage('player 2 game over', 'hint', 5000)
       }
     })
   })
@@ -170,9 +170,9 @@ if (gameMode === "double") {
     }
   })
 
-  // socket.on('playerLeft', () => {
-  //   location.href = 'ready.html'
-  // })
+  socket.on('playerLeft', () => {
+    location.href = 'ready.html'
+  })
 }
 
 operator.buttomMovePiece();
