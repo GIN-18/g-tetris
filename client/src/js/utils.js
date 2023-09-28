@@ -15,24 +15,15 @@ module.exports = {
     img.src = imageSrc;
   },
 
-  // 隐藏元素
-  hideElement(operation, ...args) {
+  // 添加类名元素
+  setClassName(operation, newClassName, oldClassName, ...args) {
     args.forEach(element => {
       if (operation === 'replace') {
-        document.getElementById(element).classList.replace('flex', 'hidden');
-      } else {
-        document.getElementById(element).classList.add('hidden');
-      }
-    });
-  },
-
-  // 显示元素
-  displayElement(operation, ...args) {
-    args.forEach(element => {
-      if (operation === 'replace') {
-        document.getElementById(element).classList.replace('hidden', 'flex');
-      } else {
-        document.getElementById(element).classList.remove('hidden')
+        document.getElementById(element).classList.replace(newClassName, oldClassName);
+      } else if (operation === 'add') {
+        document.getElementById(element).classList.add(newClassName);
+      } else if (operation === 'remove') {
+        document.getElementById(element).classList.remove(oldClassName);
       }
     });
   },

@@ -24,21 +24,21 @@ io.on("connection", (socket) => {
     const room = generateRoomId()
     socket.join(room)
 
-    const player = players[socket.id] = { room, ready: 0, score: 0, gameOver: 0 }
+    const player = players[socket.id] = { room, ready: 0, score: 0, gameOver: 0, page: 'ready' }
     rooms[room] = { [socket.id]: player }
 
     socket.emit('roomCreated', rooms[room])
   })
 
   // 加入房间
-  socket.on('joinRoom', ({ room, ready, score, action, gameOver }) => {
+  socket.on('joinRoom', ({ room, ready, score, action, gameOver, page }) => {
     const clients = io.sockets.adapter.rooms.get(room)
 
     // // 房间内只有一个玩家刷新时将玩家加入房间
     if (action && !clients) {
       socket.join(room)
 
-      const player = players[socket.id] = { room, ready, score, gameOver }
+      const player = players[socket.id] = { room, ready, score, gameOver, page }
       rooms[room] = { [socket.id]: player }
 
       socket.emit('roomJoined', rooms[room])
@@ -51,7 +51,7 @@ io.on("connection", (socket) => {
     } else {
       socket.join(room)
 
-      players[socket.id] = { room, ready, score, gameOver }
+      players[socket.id] = { room, ready, score, gameOver, page }
       rooms[room][socket.id] = players[socket.id]
 
       socket.emit('roomJoined', rooms[room])
@@ -98,6 +98,14 @@ io.on("connection", (socket) => {
 
     rooms[room][playerId].score = score;
     io.to(room).emit('updateScore', rooms[room]);
+  })
+
+  socket.on('startGame', (room) => {
+    const twoPlayerReady = Object.keys(rooms[room]).every(key => Number(rooms[room][key].ready) === 1)
+
+    if (twoPlayerReady && Object.keys(rooms[room]).length === 2) {
+      io.to(room).emit('gameStart')
+    }
   })
 
   // 游戏结束
@@ -147,14 +155,7 @@ httpServer.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
 
-function addShape() {
-  shape = nextShape;
-  nextShape = new Shape();
-}
-
 // 生成房间ID
 function generateRoomId() {
   return uuidv4().substring(0, 8)
 }
-
-// 倒计时

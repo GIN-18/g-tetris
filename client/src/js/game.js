@@ -78,28 +78,35 @@ const flavor = bodyElement.classList[0];
 sessionStorage.setItem('flavor', flavor)
 
 if (gameMode === "double") {
+
   const scoreDiff = document.getElementById('score-diff')
-  const highestScoreContainer = document.getElementById('highest-score-container')
-  const roomContainer = document.getElementById('room-container')
   const roomId = document.getElementById('room-id')
-  const statrtButton = document.getElementById('start-btn')
-  const restartButton = document.getElementById('restart-btn')
 
-  statrtButton.classList.replace('flex', 'hidden')
-  restartButton.classList.replace('flex', 'hidden')
-  highestScoreContainer.classList.replace('flex', 'hidden')
+  utils.setClassName('replace', 'flex', 'hidden', 'highest-score-container', 'start-btn', 'restart-btn')
+  utils.setClassName('replace', 'hidden', 'flex', 'score-diff', 'room-container')
 
-  scoreDiff.classList.replace('hidden', 'block')
-  roomContainer.classList.replace('hidden', 'flex')
-
-  socket.emit('joinRoom', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready'), action: 1 });
+  socket.emit('joinRoom', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready'), action: 1, page: 'game' });
 
   // XXX: 一个玩家刷新后也会开始游戏
   socket.on('roomJoined', (players) => {
-    roomId.innerText = players[socket.id].room
+    const playerId = socket.id
+    const allInGame = Object.values(players).every((player) => player.page === 'game')
 
-    socket.emit('updateScore', { room: sessionStorage.getItem('room'), score: game.score })
-    game.startGame()
+    sessionStorage.setItem('page', players[playerId].page)
+    roomId.innerText = players[playerId].room
+
+    if (allInGame) {
+      socket.emit('startGame', sessionStorage.getItem('room'))
+    } else {
+      location.href = 'ready.html'
+    }
+  })
+
+  socket.on('gameStart', () => {
+    setTimeout(() => {
+      socket.emit('updateScore', { room: sessionStorage.getItem('room'), score: game.score })
+      game.startGame()
+    }, 100)
   })
 
   socket.on('updateScore', (players) => {
@@ -136,7 +143,8 @@ if (gameMode === "double") {
     Object.keys(players).forEach(key => {
       if (players[socket.id].gameOver && key === socket.id) {
         utils.setImage('game-over-image', options.palette[flavor].gameOverImage)
-        utils.hideElement('add', 'again-btn', 'quit-btn')
+        utils.setClassName('add', 'hidden', null, 'again-btn', 'quit-btn')
+        utils.setClassName('replace', 'my-6', 'mt-6', 'score-container')
       } else if (!players[socket.id].gameOver && key !== socket.id) {
         utils.showMessage('player 2 game over', 'hint', 5000)
       }
@@ -149,22 +157,25 @@ if (gameMode === "double") {
 
     if (sessionStorage.getItem('scoreDiff') > 0) {
       utils.setImage('game-over-image', options.palette[flavor].winImage)
-      frame()
+      playConfetti()
     } else {
       utils.setImage('game-over-image', options.palette[flavor].failImage)
-      utils.displayElement('remove', 'again-btn', 'quit-btn')
+      utils.setClassName('remove', null, 'hidden', 'again-btn', 'quit-btn')
+      utils.setClassName('replace', 'mt-6', 'my-6', 'score-container')
     }
   })
 
   socket.on('playerLeft', () => {
-    location.href = 'ready.html'
+    setTimeout(() => {
+      location.href = 'ready.html'
+    }, 100)
   })
 }
 
 operator.buttomMovePiece();
 
-function frame() {
-  const colors = options.palette.mocha.shapeColor;
+function playConfetti() {
+  const colors = options.palette[flavor].shapeColor;
 
   confetti({
     particleCount: 60,

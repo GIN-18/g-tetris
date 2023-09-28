@@ -89,6 +89,7 @@ class Game {
   // 开始游戏
   startGame() {
     this.gameStart = true;
+    this.gameOver = false
     this.addShape();
     this.setDropTimer();
     this.gameLoop()
@@ -102,7 +103,7 @@ class Game {
       <div id="game-over-info"
         class="z-10 flex flex-col justify-around items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 p-6 border-2 border-text rounded bg-surface0">
         <img id="game-over-image" alt="game over" />
-        <div class="my-6 text-xs">
+        <div id="score-container" class="my-6 text-xs">
           <div>
             <label>YOUR SCORE:</label>
             <span id="your-score-info">${this.score}</span>
@@ -139,11 +140,11 @@ class Game {
       utils.setImage('game-over-image', this.gameOverImage)
       anotherScoreLabel.innerText = "HI-SCORE:";
       anotherScoreInfo.innerText = this.highScore;
-    }
 
-    document.getElementById("again-btn").addEventListener("touchstart", () => {
-      location.reload();
-    });
+      document.getElementById("again-btn").addEventListener("touchstart", () => {
+        location.reload();
+      });
+    }
 
     document.getElementById("quit-btn").addEventListener("touchstart", () => {
       location.replace("../index.html");

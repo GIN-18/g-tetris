@@ -13,9 +13,10 @@ import mochaLogoImage from "../static/logo/logo-mocha.webp";
 
 utils.setImage("logo-image", mochaLogoImage);
 
-// 清除属性
+// 清除sessionStorage
 sessionStorage.removeItem("room")
 sessionStorage.removeItem('ready')
+sessionStorage.removeItem('gameOver')
 
 document.getElementById('create-room').addEventListener('touchstart', () => {
   location.href = "./ready.html";
@@ -62,7 +63,7 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
       return
     }
 
-    socket.emit('joinRoom', { room, ready: 0, score: 0, gameOver: 0, action: 0 })
+    socket.emit('joinRoom', { room, ready: 0, score: 0, gameOver: 0, action: 0, page: 'room' })
 
     socket.on('roomJoined', (players) => {
       Object.keys(players).forEach(key => {
@@ -70,6 +71,7 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
           sessionStorage.setItem('room', players[key].room)
           sessionStorage.setItem('ready', players[key].ready)
           sessionStorage.setItem('gameOver', players[key].gameOver)
+          sessionStorage.setItem('page', players[key].page)
           // roomContainer.removeChild(inputRoomContainer)
 
           location.href = './ready.html'

@@ -29,7 +29,7 @@ let countdownInterval = null;
 if (!sessionStorage.getItem('room')) {
   socket.emit('createRoom');
 } else {
-  socket.emit('joinRoom', { room: sessionStorage.getItem('room'), ready: 0, action: 1, gameOver: sessionStorage.getItem('gameOver') });
+  socket.emit('joinRoom', { room: sessionStorage.getItem('room'), ready: 0, action: 1, gameOver: sessionStorage.getItem('gameOver'), page: "ready" });
 }
 
 socket.on('roomCreated', (players) => {
@@ -40,6 +40,7 @@ socket.on('roomCreated', (players) => {
   sessionStorage.setItem('room', players[playerId].room); // 把房间ID存在sessionStorage中
   sessionStorage.setItem('ready', players[playerId].ready); // 把角色存在sessionStorage中
   sessionStorage.setItem('gameOver', players[playerId].gameOver); // 把角色存在sessionStorage中
+  sessionStorage.setItem('page', players[playerId].page)
 
   if (!Number(sessionStorage.getItem('ready'))) {
 
