@@ -131,19 +131,12 @@ if (gameMode === "double") {
 
   // 一个玩家游戏结束提示这个玩家游戏结束
   socket.on('onePlayerGameOver', (players) => {
-    const gameOverImage = document.getElementById('game-over-image')
-    const againButton = document.getElementById('again-btn')
-    const quitButton = document.getElementById('quit-btn')
-    const scoreContainer = document.getElementById('score-container')
-
     const flavor = sessionStorage.getItem('flavor')
 
     Object.keys(players).forEach(key => {
       if (players[socket.id].gameOver && key === socket.id) {
-        gameOverImage.src = options.palette[flavor].gameOverImage
-        againButton.classList.add('hidden')
-        quitButton.classList.add('hidden')
-        scoreContainer.classList.replace('my-6', 'mt-6')
+        utils.setImage('game-over-image', options.palette[flavor].gameOverImage)
+        utils.hideElement('add', 'again-btn', 'quit-btn')
       } else if (!players[socket.id].gameOver && key !== socket.id) {
         utils.showMessage('player 2 game over', 'hint', 5000)
       }
@@ -152,21 +145,14 @@ if (gameMode === "double") {
 
   // 两个游戏结束
   socket.on('twoPlayerGameOver', () => {
-    const gameOverImage = document.getElementById('game-over-image')
-    const againButton = document.getElementById('again-btn')
-    const quitButton = document.getElementById('quit-btn')
-    const scoreContainer = document.getElementById('score-container')
-
     const flavor = sessionStorage.getItem('flavor')
 
     if (sessionStorage.getItem('scoreDiff') > 0) {
-      gameOverImage.src = options.palette[flavor].winImage
+      utils.setImage('game-over-image', options.palette[flavor].winImage)
       frame()
     } else {
-      gameOverImage.src = options.palette[flavor].failImage
-      againButton.classList.remove('hidden')
-      quitButton.classList.remove('hidden')
-      scoreContainer.classList.replace('mt-6', 'my-6')
+      utils.setImage('game-over-image', options.palette[flavor].failImage)
+      utils.displayElement('remove', 'again-btn', 'quit-btn')
     }
   })
 
@@ -176,7 +162,6 @@ if (gameMode === "double") {
 }
 
 operator.buttomMovePiece();
-
 
 function frame() {
   const colors = options.palette.mocha.shapeColor;

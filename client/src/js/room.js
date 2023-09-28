@@ -70,7 +70,7 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
           sessionStorage.setItem('room', players[key].room)
           sessionStorage.setItem('ready', players[key].ready)
           sessionStorage.setItem('gameOver', players[key].gameOver)
-          roomContainer.removeChild(inputRoomContainer)
+          // roomContainer.removeChild(inputRoomContainer)
 
           location.href = './ready.html'
         }

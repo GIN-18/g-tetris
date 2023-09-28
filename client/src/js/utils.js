@@ -15,6 +15,28 @@ module.exports = {
     img.src = imageSrc;
   },
 
+  // 隐藏元素
+  hideElement(operation, ...args) {
+    args.forEach(element => {
+      if (operation === 'replace') {
+        document.getElementById(element).classList.replace('flex', 'hidden');
+      } else {
+        document.getElementById(element).classList.add('hidden');
+      }
+    });
+  },
+
+  // 显示元素
+  displayElement(operation, ...args) {
+    args.forEach(element => {
+      if (operation === 'replace') {
+        document.getElementById(element).classList.replace('hidden', 'flex');
+      } else {
+        document.getElementById(element).classList.remove('hidden')
+      }
+    });
+  },
+
   // 更改按钮背景颜色
   changeButtonColor(element, color) {
     const oldColor = element.classList[element.classList.length - 1];

@@ -97,23 +97,19 @@ class Game {
   // 结束游戏
   // XXX: again按钮和quit按钮的功能
   overGame() {
-    if (this.gameMode === 'single') {
-
-      this.updateHighScore();
-
-      const gameOverInfoTemplate = `
+    const gameOverInfoTemplate = `
       <div class="absolute top-0 left-0 w-screen h-screen bg-crust bg-opacity-95">
       <div id="game-over-info"
         class="z-10 flex flex-col justify-around items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 p-6 border-2 border-text rounded bg-surface0">
-        <img id="game-over-image" src="${this.gameOverImage}" alt="game over" />
+        <img id="game-over-image" alt="game over" />
         <div class="my-6 text-xs">
           <div>
             <label>YOUR SCORE:</label>
             <span id="your-score-info">${this.score}</span>
           </div>
           <div>
-            <label>HIGHEST SCORE:</label>
-            <span id="highest-score-info">${this.highScore}</span>
+            <label id="another-score-label"></label>
+            <span id="another-score-info"></span>
           </div>
         </div>
         <div class="text-xs font-semibold">
@@ -127,60 +123,32 @@ class Game {
       </div>
     `;
 
-      const gameOverContainer = document.createElement("div");
+    const gameOverContainer = document.createElement("div");
 
-      gameOverContainer.innerHTML = gameOverInfoTemplate;
+    gameOverContainer.innerHTML = gameOverInfoTemplate;
 
-      document.body.appendChild(gameOverContainer);
+    document.body.appendChild(gameOverContainer);
 
-      document.getElementById("again-btn").addEventListener("touchstart", () => {
-        location.reload();
-      });
-
-      document.getElementById("quit-btn").addEventListener("touchstart", () => {
-        location.replace("../index.html");
-      });
-
-      return
-    }
+    const anotherScoreLabel = document.getElementById("another-score-label");
+    const anotherScoreInfo = document.getElementById("another-score-info");
 
     if (this.gameMode === 'double') {
       socket.emit('gameOver', { room: sessionStorage.getItem('room'), gameOver: 1 });
-
-      const gameOverInfoTemplate = `
-        <div class="absolute top-0 left-0 w-screen h-screen bg-crust bg-opacity-95">
-        <div id="game-over-info"
-          class="z-10 flex flex-col justify-around items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 p-6 border-2 border-text rounded bg-surface0">
-          <img id="game-over-image" alt="game over" />
-          <div id="score-container" class="my-6 text-xs">
-            <label>YOUR SCORE:</label>
-            <span id="your-score-info">${this.score}</span>
-          </div>
-          <div class="text-xs font-semibold">
-            <button id="again-btn" class="w-20 py-1 border-2 border-text rounded" type="button">
-              AGAIN
-            </button>
-            <button id="quit-btn" class="w-20 py-1 border-2 border-text rounded" type="button">
-              QUIT
-            </button>
-          </div>
-        </div>
-      `;
-
-      const gameOverContainer = document.createElement("div");
-
-      gameOverContainer.innerHTML = gameOverInfoTemplate;
-
-      document.body.appendChild(gameOverContainer);
-
-      document.getElementById("again-btn").addEventListener("touchstart", () => {
-        location.reload();
-      });
-
-      document.getElementById("quit-btn").addEventListener("touchstart", () => {
-        location.replace("../index.html");
-      });
+    } else {
+      this.updateHighScore();
+      utils.setImage('game-over-image', this.gameOverImage)
+      anotherScoreLabel.innerText = "HI-SCORE:";
+      anotherScoreInfo.innerText = this.highScore;
     }
+
+    document.getElementById("again-btn").addEventListener("touchstart", () => {
+      location.reload();
+    });
+
+    document.getElementById("quit-btn").addEventListener("touchstart", () => {
+      location.replace("../index.html");
+    });
+
   }
 
   // 生成形状
