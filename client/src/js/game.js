@@ -87,7 +87,6 @@ if (gameMode === "double") {
 
   socket.emit('joinRoom', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready'), action: 1, page: 'game' });
 
-  // XXX: 一个玩家刷新后也会开始游戏
   socket.on('roomJoined', (players) => {
     const playerId = socket.id
     const allInGame = Object.values(players).every((player) => player.page === 'game')

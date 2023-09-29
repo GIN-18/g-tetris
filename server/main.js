@@ -63,30 +63,7 @@ io.on("connection", (socket) => {
   socket.on('ready', ({ room, ready }) => {
     try {
       const playerId = socket.id
-      const playerReady = rooms[room][playerId].ready = Number(ready)
-
-      // 零位玩家准备
-      const zeroPlayerReady = Object.keys(rooms[room]).every(key => rooms[room][key].ready == 0)
-
-      if (zeroPlayerReady) {
-        io.to(room).emit('zeroPlayerReady', rooms[room])
-        return
-      }
-
-      // 两位玩家已准备
-      const twoPlayerReady = Object.keys(rooms[room]).every(key => rooms[room][key].ready == 1)
-
-      if (twoPlayerReady && Object.keys(rooms[room]).length == 2) {
-        io.to(room).emit('twoPlayerReady', rooms[room])
-        return
-      }
-
-      Object.keys(rooms[room]).forEach(key => {
-        // 一位玩家已准备
-        if ((playerReady === 1 && key === playerId) || (playerReady === 0 && key !== playerId)) {
-          io.to(room).emit('onePlayerReady', rooms[room])
-        }
-      })
+      emitByAttr(playerId, room, 'ready', ready, 'zeroPlayerReady', 'onePlayerReady', 'twoPlayerReady')
     } catch (error) {
       console.log(error);
     }
@@ -111,22 +88,7 @@ io.on("connection", (socket) => {
   // 游戏结束
   socket.on('gameOver', ({ room, gameOver }) => {
     const playerId = socket.id
-    const playerGameOver = rooms[room][playerId].gameOver = Number(gameOver)
-
-    // 两位玩家游戏结束
-    const twoPlayerGameOver = Object.keys(rooms[room]).every(key => rooms[room][key].gameOver == 1)
-
-    if (twoPlayerGameOver && Object.keys(rooms[room]).length == 2) {
-      io.to(room).emit('twoPlayerGameOver', rooms[room])
-      return
-    }
-
-    Object.keys(rooms[room]).forEach(key => {
-      // 一位玩家游戏结束
-      if ((playerGameOver === 1 && key === playerId) || (playerGameOver === 0 && key !== playerId)) {
-        io.to(room).emit('onePlayerGameOver', rooms[room])
-      }
-    })
+    emitByAttr(playerId, room, 'gameOver', gameOver, 'zeroPlayerGameOver', 'onePlayerGameOver', 'twoPlayerGameOver')
   })
 
   socket.on("disconnect", () => {
@@ -158,4 +120,33 @@ httpServer.listen(port, () => {
 // 生成房间ID
 function generateRoomId() {
   return uuidv4().substring(0, 8)
+}
+
+// 根据属性值发出事件
+function emitByAttr(playerId, room, attr, attrValue, zeroEvent, oneEvent, twoEvent) {
+  const status = rooms[room][playerId][attr] = Number(attrValue);
+
+  const zeroCheck = Object.keys(rooms[room]).every(key => rooms[room][key][attr] == 0)
+
+  if (zeroCheck) {
+    console.log('zero');
+    io.to(room).emit(zeroEvent, rooms[room]);
+    return
+  }
+
+  Object.keys(rooms[room]).forEach(key => {
+    if ((status && key === playerId) || (!status && key !== playerId)) {
+      console.log('one');
+      io.to(room).emit(oneEvent, rooms[room]);
+      return
+    }
+  })
+
+  const twoCheck = Object.keys(rooms[room]).every(key => rooms[room][key][attr] == 1)
+
+  if (twoCheck && Object.keys(rooms[room]).length > 1) {
+    console.log('two');
+    io.to(room).emit(twoEvent, rooms[room]);
+    return
+  }
 }
