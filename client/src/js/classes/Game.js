@@ -191,13 +191,10 @@ class Game {
           }
 
           this.gameOver = true;
-
           this.gameStart = false;
-
           this.shape = null;
-
+          cancelAnimationFrame(this.animateId)
           this.overGame();
-
           return;
         }
       });
@@ -205,7 +202,6 @@ class Game {
   }
 
   // 方块旋转
-  // BUG: 快触底时，仍可以旋转并且会覆盖已有的方块
   rotateShape(rStep) {
     if (!this.gameStart || this.gamePaused || this.gameOver) return;
 
@@ -222,9 +218,9 @@ class Game {
     let piece = this.generatePiece();
 
     piece.forEach((item) => {
-      let x = this.shape.xOffset + item[1],
+      const x = this.shape.xOffset + item[1],
         y = this.shape.yOffset + item[0];
-      if (this.map[y] === undefined || this.map[y][x] === undefined) {
+      if (this.map[y] === undefined || this.map[y][x] === undefined || this.map[y][x] > 0) {
         this.shape.rotation = tempRotation;
       }
     });
@@ -258,18 +254,17 @@ class Game {
 
   // 移动方块
   moveShape(xStep, yStep) {
-    if (!this.shape || !this.gameStart || this.gamePaused || this.gameOver)
-      return;
+    if (!this.shape || !this.gameStart || this.gamePaused || this.gameOver) return;
 
     const width = this.map[0].length;
     const height = this.map.length;
 
     let canMove = true;
 
-    let piece = this.generatePiece();
+    const piece = this.generatePiece();
 
     piece.forEach((item) => {
-      let x = this.shape.xOffset + item[1] + xStep,
+      const x = this.shape.xOffset + item[1] + xStep,
         y = this.shape.yOffset + item[0] + yStep;
       if (
         x < 0 ||
@@ -283,9 +278,10 @@ class Game {
     });
 
     if (canMove) {
-      this.shape.xOffset += xStep;
-      this.shape.yOffset += yStep;
+      this.shape.xOffset += xStep
+      this.shape.yOffset += yStep
     }
+
     return canMove;
   }
 

@@ -153,6 +153,7 @@ if (gameMode === "double") {
 
   // 两个游戏结束
   socket.on('twoPlayerGameOver', () => {
+    const againButton = document.getElementById('again-btn')
     const flavor = sessionStorage.getItem('flavor')
 
     if (sessionStorage.getItem('scoreDiff') > 0) {
@@ -192,3 +193,11 @@ function playConfetti() {
     colors: colors
   });
 };
+
+// function tick() {
+//   const start = Date.now();
+//   const remain = Math.max(0, start + 60 - Date.now())
+//   const s = game.shape.xOffset
+//   const e = game.shape.xOffset + game.blockSize
+//   console.log(s, e);
+// }
