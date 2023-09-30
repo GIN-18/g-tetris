@@ -41,7 +41,7 @@ module.exports = {
 
     const messageBox = document.createElement('div');
 
-    messageBox.classList.add('mb-2', 'px-2', 'py-1', 'border', 'rounded', 'text-xs', 'bg-mantle', 'animate__animated', 'animate__bounce', 'animate__fadeInRight')
+    messageBox.classList.add('mb-2', 'px-2', 'py-1', 'border', 'rounded', 'text-xs', 'bg-mantle')
 
     if (status === 'error') {
       messageBox.classList.add('border-red', 'text-red')
@@ -54,15 +54,7 @@ module.exports = {
     messageContainer.appendChild(messageBox)
 
     setTimeout(() => {
-      messageContainer.classList.remove('animate__fadeInRight');
-      messageContainer.classList.add('animate__animated', 'animate__fadeOutRight');
-
-      setTimeout(() => {
-        messageContainer.classList.remove('animate__animated', 'animate__fadeOutRight');
-        messageContainer.removeChild(messageBox)
-      }, delay);
-
+      messageContainer.removeChild(messageBox)
     }, delay);
-
   },
 };

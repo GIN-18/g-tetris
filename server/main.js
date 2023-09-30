@@ -61,12 +61,8 @@ io.on("connection", (socket) => {
 
   // 玩家准备
   socket.on('ready', ({ room, ready }) => {
-    try {
-      const playerId = socket.id
-      emitByAttr(playerId, room, 'ready', ready, 'zeroPlayerReady', 'onePlayerReady', 'twoPlayerReady')
-    } catch (error) {
-      console.log(error);
-    }
+    const playerId = socket.id
+    emitByAttr(playerId, room, 'ready', ready, 'zeroPlayerReady', 'onePlayerReady', 'twoPlayerReady')
   })
 
   // 更新分数
@@ -89,6 +85,12 @@ io.on("connection", (socket) => {
   socket.on('gameOver', ({ room, gameOver }) => {
     const playerId = socket.id
     emitByAttr(playerId, room, 'gameOver', gameOver, 'zeroPlayerGameOver', 'onePlayerGameOver', 'twoPlayerGameOver')
+  })
+
+  // 再一次游戏
+  socket.on('again', ({ room, again }) => {
+    const playerId = socket.id
+    emitByAttr(playerId, room, 'again', again, 'zeroPlayerAgain', 'onePlayerAgain', 'twoPlayerAgain')
   })
 
   socket.on("disconnect", () => {
@@ -124,29 +126,28 @@ function generateRoomId() {
 
 // 根据属性值发出事件
 function emitByAttr(playerId, room, attr, attrValue, zeroEvent, oneEvent, twoEvent) {
-  const status = rooms[room][playerId][attr] = Number(attrValue);
+  try {
+    const status = rooms[room][playerId][attr] = Number(attrValue);
 
-  const zeroCheck = Object.keys(rooms[room]).every(key => rooms[room][key][attr] == 0)
+    const zeroCheck = Object.keys(rooms[room]).every(key => rooms[room][key][attr] == 0)
 
-  if (zeroCheck) {
-    console.log('zero');
-    io.to(room).emit(zeroEvent, rooms[room]);
-    return
-  }
-
-  Object.keys(rooms[room]).forEach(key => {
-    if ((status && key === playerId) || (!status && key !== playerId)) {
-      console.log('one');
-      io.to(room).emit(oneEvent, rooms[room]);
+    if (zeroCheck) {
+      io.to(room).emit(zeroEvent, rooms[room]);
       return
     }
-  })
 
-  const twoCheck = Object.keys(rooms[room]).every(key => rooms[room][key][attr] == 1)
+    const twoCheck = Object.keys(rooms[room]).every(key => rooms[room][key][attr] == 1)
 
-  if (twoCheck && Object.keys(rooms[room]).length > 1) {
-    console.log('two');
-    io.to(room).emit(twoEvent, rooms[room]);
-    return
-  }
+    if (twoCheck && Object.keys(rooms[room]).length > 1) {
+      io.to(room).emit(twoEvent, rooms[room]);
+      return
+    }
+
+    Object.keys(rooms[room]).forEach(key => {
+      if ((status && key === playerId) || (!status && key !== playerId)) {
+        io.to(room).emit(oneEvent, rooms[room]);
+        return
+      }
+    })
+  } catch (error) { }
 }

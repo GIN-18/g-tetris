@@ -3,7 +3,7 @@ const utils = require("../utils.js");
 const socket = require("../socket.js");
 
 class Game {
-  constructor(mapCtx, previewCtx, gameMode, gameOverImage, music) {
+  constructor(mapCtx, previewCtx, shapeColor, gameMode, gameOverImage, music) {
     this.blockSize = 20;
 
     this.mapCtx = mapCtx;
@@ -35,16 +35,7 @@ class Game {
 
     this.shape = null;
     this.nextShape = null;
-    this.shapeColor = [
-      "#89b4fa",
-      "#89dceb",
-      "#a6e3a1",
-      "#fab387",
-      "#f38ba8",
-      "#f5c2e7",
-      "#f5e0dc",
-      "#b4befe",
-    ];
+    this.shapeColor = shapeColor
 
     this.dropTimer = null;
     this.fastForward = false;
@@ -112,6 +103,10 @@ class Game {
             <label id="another-score-label"></label>
             <span id="another-score-info"></span>
           </div>
+          <div>
+            <label id="again-label"></label>
+            <span id="again-info"></span>
+          </div>
         </div>
         <div class="text-xs font-semibold">
           <button id="again-btn" class="w-20 py-1 border-2 border-text rounded" type="button">
@@ -138,7 +133,7 @@ class Game {
     } else {
       this.updateHighScore();
       utils.setImage('game-over-image', this.gameOverImage)
-      anotherScoreLabel.innerText = "HI-SCORE:";
+      anotherScoreLabel.innerText = "HIGHEST SCORE:";
       anotherScoreInfo.innerText = this.highScore;
 
       document.getElementById("again-btn").addEventListener("touchstart", () => {
@@ -333,7 +328,7 @@ class Game {
       if (isFilled) {
         filledRows.push(index);
 
-        // 满行后，将该行所有方块置0
+        // 消除行
         row.fill(8);
 
         setTimeout(() => {
@@ -388,7 +383,7 @@ class Game {
     const map = this.map;
     const piece = this.generatePiece();
 
-    let shapeType = this.shape.type;
+    const shapeType = this.shape.type;
     let xOffset = this.shape.xOffset;
     let yOffset = this.shape.yOffset;
 
@@ -413,7 +408,7 @@ class Game {
     const previewMap = this.previewMap;
     const piece = this.generateNextPiece();
 
-    let shapeType = this.nextShape.type;
+    const shapeType = this.nextShape.type;
 
     this.drawArea(
       previewCtx,
@@ -444,8 +439,6 @@ class Game {
     xOffset,
     yOffset
   ) {
-    let colorIndex = shapeType + 1;
-
     // 清空预览画布
     this.resetArea(
       ctx,
@@ -467,7 +460,7 @@ class Game {
     }
 
     // 在画布上绘制方块
-    ctx.fillStyle = this.setShapeColor(colorIndex);
+    ctx.fillStyle = this.setShapeColor(shapeType + 1);
 
     for (let i = 0, length = piece.length; i < length; i++) {
       let x = piece[i][1] + xOffset;
@@ -508,8 +501,7 @@ class Game {
 
   // 设置颜色
   setShapeColor(type) {
-    let colorIndex = type - 1;
-
+    const colorIndex = type - 1
     switch (type) {
       case 1:
         return this.shapeColor[colorIndex];

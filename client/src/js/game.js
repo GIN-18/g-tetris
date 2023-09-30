@@ -1,4 +1,3 @@
-import "animate.css";
 import "../../dist/style.css";
 import "material-icons/iconfont/material-icons.css";
 
@@ -60,6 +59,11 @@ options.palette.mocha.failImage = mochaGameFailImage;
 
 utils.setImage("logo-image", mochaLogoImage);
 
+// 设置flavor
+const bodyElement = document.body;
+const flavor = bodyElement.classList[0];
+sessionStorage.setItem('flavor', flavor)
+
 const gameMode = sessionStorage.getItem("gameMode")
 
 const mapCanvas = document.getElementById("map-canvas");
@@ -68,22 +72,18 @@ const previewCanvas = document.getElementById("preview-canvas");
 const mapCtx = mapCanvas.getContext("2d", { alpha: false });
 const previewCtx = previewCanvas.getContext("2d", { alpha: false });
 
+const shapeColor = options.palette[flavor].shapeColor;
+
 const music = new Music(audioUrl)
-const game = new Game(mapCtx, previewCtx, gameMode, mochaGameOverImage, music);
+const game = new Game(mapCtx, previewCtx, shapeColor, gameMode, mochaGameOverImage, music);
 const operator = new Operator(game, music);
 
-// 设置flavor
-const bodyElement = document.body;
-const flavor = bodyElement.classList[0];
-sessionStorage.setItem('flavor', flavor)
-
 if (gameMode === "double") {
-
   const scoreDiff = document.getElementById('score-diff')
   const roomId = document.getElementById('room-id')
 
-  utils.setClassName('replace', 'flex', 'hidden', 'highest-score-container', 'start-btn', 'restart-btn')
-  utils.setClassName('replace', 'hidden', 'flex', 'score-diff', 'room-container')
+  utils.setClassName('replace', 'flex', 'hidden', 'highest-score-container', 'start-btn', 'restart-btn') // 隐藏最高分、开始按钮和重新开始按钮
+  utils.setClassName('replace', 'hidden', 'flex', 'score-diff', 'room-container') // 显示分数差和房间信息
 
   socket.emit('joinRoom', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready'), action: 1, page: 'game' });
 
@@ -123,13 +123,13 @@ if (gameMode === "double") {
 
         if (!different) {
           scoreDiff.innerText = '0'
-          scoreDiff.classList.replace('text-red', 'text-green')
+          utils.setClassName('replace', 'text-red', 'text-green', 'score-diff')
         } else if (different > 0) {
           scoreDiff.innerText = '+' + different
-          scoreDiff.classList.replace('text-red', 'text-green')
+          utils.setClassName('replace', 'text-red', 'text-green', 'score-diff')
         } else {
           scoreDiff.innerText = different
-          scoreDiff.classList.replace('text-green', 'text-red')
+          utils.setClassName('replace', 'text-green', 'text-red', 'score-diff')
         }
       } catch (error) { }
     })
@@ -150,19 +150,37 @@ if (gameMode === "double") {
     })
   })
 
-  // 两个游戏结束
+  // 两个玩家游戏结束
   socket.on('twoPlayerGameOver', () => {
-    const againButton = document.getElementById('again-btn')
     const flavor = sessionStorage.getItem('flavor')
 
     if (sessionStorage.getItem('scoreDiff') > 0) {
       utils.setImage('game-over-image', options.palette[flavor].winImage)
+      utils.setClassName('remove', null, 'hidden', 'again-btn', 'quit-btn')
+      utils.setClassName('replace', 'mt-6', 'my-6', 'score-container')
       playConfetti()
     } else {
       utils.setImage('game-over-image', options.palette[flavor].failImage)
       utils.setClassName('remove', null, 'hidden', 'again-btn', 'quit-btn')
       utils.setClassName('replace', 'mt-6', 'my-6', 'score-container')
     }
+
+    document.getElementById('again-btn').addEventListener('touchstart', () => {
+      socket.emit('again', { room: sessionStorage.getItem('room'), again: 1 })
+    })
+  })
+
+  socket.on('onePlayerAgain', (players) => {
+    document.getElementById('again-label').innerText = 'AGAIN: '
+    document.getElementById('again-info').innerText = '1 / 2'
+  })
+
+  socket.on('twoPlayerAgain', (players) => {
+    document.getElementById('again-label').innerText = 'AGAIN: '
+    document.getElementById('again-info').innerText = '2 / 2'
+    setTimeout(() => {
+      location.reload()
+    }, 100)
   })
 
   socket.on('playerLeft', () => {
@@ -192,11 +210,3 @@ function playConfetti() {
     colors: colors
   });
 };
-
-// function tick() {
-//   const start = Date.now();
-//   const remain = Math.max(0, start + 60 - Date.now())
-//   const s = game.shape.xOffset
-//   const e = game.shape.xOffset + game.blockSize
-//   console.log(s, e);
-// }
