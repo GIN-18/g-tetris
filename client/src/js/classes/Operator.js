@@ -53,7 +53,7 @@ class Operator {
         this.startIcon
       );
 
-      this.music.fetchMusic(this.game.volumeUp, 0, 0.1900);
+      this.music.fetchMusic(0, 0.1900);
 
       this.game.setDropTimer();
     });
@@ -65,6 +65,7 @@ class Operator {
         e.preventDefault();
 
         this.game.volumeUp = !this.game.volumeUp;
+        this.music.toggleMute(this.game.volumeUp);
 
         utils.changeIcon(
           "volume-btn",
@@ -73,7 +74,7 @@ class Operator {
           this.volumeOff
         );
 
-        this.music.fetchMusic(this.game.volumeUp, 0, 0.1900);
+        this.music.fetchMusic(0, 0.1900);
       });
 
     // 重新开始
@@ -93,7 +94,7 @@ class Operator {
 
         this.game.rotateShape(1);
 
-        this.music.fetchMusic(this.game.volumeUp, 0, 0.1900);
+        this.music.fetchMusic(0, 0.1900);
 
         utils.changeButtonColor(e.currentTarget, "bg-surface0");
       });
@@ -103,7 +104,7 @@ class Operator {
       e.preventDefault();
       this.game.dropShape();
 
-      this.music.fetchMusic(this.game.volumeUp, 0, 0.1900);
+      this.music.fetchMusic(0, 0.1900);
 
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
@@ -113,7 +114,7 @@ class Operator {
       e.preventDefault();
       this.game.moveLeft();
 
-      this.music.fetchMusic(this.game.volumeUp, 0, 0.1900);
+      this.music.fetchMusic(0, 0.1900);
 
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
@@ -123,7 +124,7 @@ class Operator {
       e.preventDefault();
       this.game.moveRight();
 
-      this.music.fetchMusic(this.game.volumeUp, 0, 0.1900);
+      this.music.fetchMusic(0, 0.1900);
 
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
@@ -133,7 +134,7 @@ class Operator {
       e.preventDefault();
       this.game.moveDown(true);
 
-      this.music.fetchMusic(this.game.volumeUp, 0, 0.1900);
+      this.music.fetchMusic(0, 0.1900);
 
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });

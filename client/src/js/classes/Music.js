@@ -4,9 +4,7 @@ class Music {
     this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
 
-  fetchMusic(volumeUp, start, end) {
-    if (!volumeUp) return
-
+  fetchMusic(start, end) {
     fetch(this.audioUrl)
       .then(response => response.arrayBuffer()).then(buffer =>
         this.audioCtx.decodeAudioData(buffer, (audioBuffer) => {
@@ -18,6 +16,16 @@ class Music {
           source.start(0, start, end);
         })
       );
+  }
+
+  toggleMute(volumeUp) {
+    if (volumeUp) {
+      // 音量上昇
+      this.audioCtx.resume();
+    } else {
+      // 音量下降
+      this.audioCtx.suspend();
+    }
   }
 }
 

@@ -334,9 +334,9 @@ class Game {
         setTimeout(() => {
           this.map.splice(index, 1);
           this.map.unshift(new Array(10).fill(0));
-        }, 300);
+        }, 100);
 
-        this.music.fetchMusic(this.volumeUp, 0.1900, 0.7000)
+        this.music.fetchMusic(0.1900, 0.7000)
       }
     });
 

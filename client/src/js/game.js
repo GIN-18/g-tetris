@@ -170,12 +170,12 @@ if (gameMode === "double") {
     })
   })
 
-  socket.on('onePlayerAgain', (players) => {
+  socket.on('onePlayerAgain', () => {
     document.getElementById('again-label').innerText = 'AGAIN: '
     document.getElementById('again-info').innerText = '1 / 2'
   })
 
-  socket.on('twoPlayerAgain', (players) => {
+  socket.on('twoPlayerAgain', () => {
     document.getElementById('again-label').innerText = 'AGAIN: '
     document.getElementById('again-info').innerText = '2 / 2'
     setTimeout(() => {
