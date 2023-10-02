@@ -24,22 +24,23 @@ io.on("connection", (socket) => {
     const room = generateRoomId()
     socket.join(room)
 
-    const player = players[socket.id] = { room, ready: 0, score: 0, gameOver: 0, page: 'ready' }
+    const player = players[socket.id] = { room, ready: 0, score: 0, page: 'ready' }
     rooms[room] = { [socket.id]: player }
 
     socket.emit('roomCreated', rooms[room])
   })
 
   // 加入房间
-  socket.on('joinRoom', ({ action, room, ready, score, gameOver, page }) => {
+  socket.on('joinRoom', ({ action, room, ready, score, page }) => {
     const clients = io.sockets.adapter.rooms.get(room)
+    const playerId = socket.id
 
     // // 房间内只有一个玩家刷新时将玩家加入房间
     if (action && !clients) {
       socket.join(room)
 
-      const player = players[socket.id] = { room, ready, score, gameOver, page }
-      rooms[room] = { [socket.id]: player }
+      const player = players[playerId] = { room, ready, score, page }
+      rooms[room] = { [playerId]: player }
 
       socket.emit('roomJoined', rooms[room])
       return
@@ -51,8 +52,8 @@ io.on("connection", (socket) => {
     } else {
       socket.join(room)
 
-      players[socket.id] = { room, ready, score, gameOver, page }
-      rooms[room][socket.id] = players[socket.id]
+      players[playerId] = { room, ready, score, page }
+      rooms[room][playerId] = players[playerId]
 
       socket.emit('roomJoined', rooms[room])
       socket.to(room).emit('playerJoined', rooms[room])
@@ -73,15 +74,9 @@ io.on("connection", (socket) => {
     io.to(room).emit('updateScore', rooms[room]);
   })
 
-  socket.on('startGame', ({ room, ready }) => {
+  socket.on('startGame', ({ room, gameStart }) => {
     const playerId = socket.id;
-    emitByAttr(playerId, room, 'ready', ready, 'zeroStartGame', 'oneStartGame', 'twoStartGame')
-
-    // const twoPlayerReady = Object.keys(rooms[room]).every(key => Number(rooms[room][key].ready) === 1)
-
-    // if (twoPlayerReady && Object.keys(rooms[room]).length === 2) {
-    //   io.to(room).emit('gameStart')
-    // }
+    emitByAttr(playerId, room, 'gameStart', gameStart, 'zeroStartGame', 'oneStartGame', 'twoStartGame')
   })
 
   // 游戏结束
@@ -96,18 +91,24 @@ io.on("connection", (socket) => {
     emitByAttr(playerId, room, 'again', again, 'zeroPlayerAgain', 'onePlayerAgain', 'twoPlayerAgain')
   })
 
+  // 玩家离开房间
   socket.on("disconnect", () => {
     console.log("user disconnected");
 
-    // 玩家离开房间
-    const player = players[socket.id];
+    const playerId = socket.id
+    const player = players[playerId];
 
     if (player) {
-      const { room } = player;
+      const { room, page } = player;
 
-      delete players[socket.id];
-      delete rooms[room][socket.id];
-      io.to(room).emit('playerLeft', rooms[room]); // 向房间内的所有玩家发送离开消息
+      delete players[playerId];
+      delete rooms[room][playerId];
+
+      if (page === 'ready') {
+        io.to(room).emit('playerLeftRoom')
+      } else if (page === 'game') {
+        io.to(room).emit('playerLeftGame')
+      }
 
       if (Object.keys(rooms[room]).length < 1) {
         delete rooms[room];

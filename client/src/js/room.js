@@ -17,7 +17,6 @@ sessionStorage.setItem('gameMode', 'double')
 // 清除sessionStorage
 sessionStorage.removeItem("room")
 sessionStorage.removeItem('ready')
-sessionStorage.removeItem('gameOver')
 sessionStorage.removeItem('page')
 
 // 创建房间
@@ -62,7 +61,7 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
       return
     }
 
-    socket.emit('joinRoom', { action: 0, room, ready: 0, score: 0, gameOver: 0, page: 'ready' })
+    socket.emit('joinRoom', { action: 0, room, ready: 0, score: 0, page: 'ready' })
 
     socket.on('roomJoined', (players) => {
       const playerId = socket.id
@@ -71,7 +70,6 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
         if (key === playerId) {
           sessionStorage.setItem('room', players[key].room)
           sessionStorage.setItem('ready', players[key].ready)
-          sessionStorage.setItem('gameOver', players[key].gameOver)
           sessionStorage.setItem('page', players[key].page)
           roomContainer.removeChild(inputRoomContainer)
 

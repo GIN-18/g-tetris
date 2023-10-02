@@ -31,7 +31,7 @@ let countdownInterval = null;
 if (!sessionStorage.getItem('room')) {
   socket.emit('createRoom');
 } else {
-  socket.emit('joinRoom', { action: 1, room: sessionStorage.getItem('room'), ready: 0, gameOver: 0, page: "ready" });
+  socket.emit('joinRoom', { action: 1, room: sessionStorage.getItem('room'), ready: 0, page: "ready" });
 }
 
 socket.on('roomCreated', (players) => {
@@ -41,7 +41,6 @@ socket.on('roomCreated', (players) => {
 
   sessionStorage.setItem('room', players[playerId].room)
   sessionStorage.setItem('ready', players[playerId].ready)
-  sessionStorage.setItem('gameOver', players[playerId].gameOver)
   sessionStorage.setItem('page', players[playerId].page)
 
   if (!Number(sessionStorage.getItem('ready'))) {
@@ -195,7 +194,7 @@ socket.on('twoPlayerReady', () => {
 })
 
 // 用户离开的处理逻辑
-socket.on('playerLeft', () => {
+socket.on('playerLeftRoom', () => {
   player2Id.innerText = '';
   player2Status.innerText = ''
   utils.showMessage("Player 2 left room!!", 'error', 1500)

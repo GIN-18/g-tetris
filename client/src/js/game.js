@@ -78,6 +78,8 @@ const music = new Music(audioUrl)
 const game = new Game(mapCtx, previewCtx, shapeColor, gameMode, mochaGameOverImage, music);
 const operator = new Operator(game, music);
 
+let playerLeftTimer = null
+
 if (gameMode === "double") {
   const scoreDiff = document.getElementById('score-diff')
   const roomId = document.getElementById('room-id')
@@ -85,20 +87,26 @@ if (gameMode === "double") {
   utils.setClassName('replace', 'flex', 'hidden', 'highest-score-container', 'start-btn', 'restart-btn') // 隐藏最高分、开始按钮和重新开始按钮
   utils.setClassName('replace', 'hidden', 'flex', 'score-diff', 'room-container') // 显示分数差和房间信息
 
-  socket.emit('joinRoom', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready'), action: 1, page: 'game' });
+  socket.emit('joinRoom', { action: 1, room: sessionStorage.getItem('room'), ready: 0, page: 'game' });
 
   socket.on('roomJoined', (players) => {
     const playerId = socket.id
-    const allInGame = Object.values(players).every((player) => player.page === 'game')
 
-    sessionStorage.setItem('page', players[playerId].page)
     roomId.innerText = players[playerId].room
+    sessionStorage.setItem('ready', players[playerId].ready)
+    sessionStorage.setItem('page', players[playerId].page)
 
-    if (allInGame) {
-      socket.emit('startGame', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready') })
-    } else {
-      location.href = 'ready.html'
+    if (playerLeftTimer) {
+      clearTimeout(playerLeftTimer)
     }
+
+    socket.emit('startGame', { room: sessionStorage.getItem('room'), gameStart: 1 })
+  })
+
+  socket.on('oneStartGame', (players) => {
+    const allInGame = Object.values(players).every(player => player.page === 'game')
+
+    if (!allInGame && Object.keys(players).length > 1) location.href = 'ready.html'
   })
 
   socket.on('twoStartGame', () => {
@@ -192,10 +200,10 @@ if (gameMode === "double") {
     }, 100)
   })
 
-  socket.on('playerLeft', (players) => {
-    if (Object.keys(players).length < 2) {
+  socket.on('playerLeftGame', () => {
+    playerLeftTimer = setTimeout(() => {
       location.href = 'ready.html'
-    }
+    }, 300)
   })
 }
 
