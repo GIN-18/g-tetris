@@ -31,7 +31,7 @@ io.on("connection", (socket) => {
   })
 
   // 加入房间
-  socket.on('joinRoom', ({ room, ready, score, action, gameOver, page }) => {
+  socket.on('joinRoom', ({ action, room, ready, score, gameOver, page }) => {
     const clients = io.sockets.adapter.rooms.get(room)
 
     // // 房间内只有一个玩家刷新时将玩家加入房间
@@ -73,12 +73,15 @@ io.on("connection", (socket) => {
     io.to(room).emit('updateScore', rooms[room]);
   })
 
-  socket.on('startGame', (room) => {
-    const twoPlayerReady = Object.keys(rooms[room]).every(key => Number(rooms[room][key].ready) === 1)
+  socket.on('startGame', ({ room, ready }) => {
+    const playerId = socket.id;
+    emitByAttr(playerId, room, 'ready', ready, 'zeroStartGame', 'oneStartGame', 'twoStartGame')
 
-    if (twoPlayerReady && Object.keys(rooms[room]).length === 2) {
-      io.to(room).emit('gameStart')
-    }
+    // const twoPlayerReady = Object.keys(rooms[room]).every(key => Number(rooms[room][key].ready) === 1)
+
+    // if (twoPlayerReady && Object.keys(rooms[room]).length === 2) {
+    //   io.to(room).emit('gameStart')
+    // }
   })
 
   // 游戏结束
@@ -104,7 +107,7 @@ io.on("connection", (socket) => {
 
       delete players[socket.id];
       delete rooms[room][socket.id];
-      io.to(room).emit('playerLeft'); // 向房间内的所有玩家发送离开消息
+      io.to(room).emit('playerLeft', rooms[room]); // 向房间内的所有玩家发送离开消息
 
       if (Object.keys(rooms[room]).length < 1) {
         delete rooms[room];

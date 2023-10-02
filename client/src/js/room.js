@@ -12,17 +12,17 @@ import mochaLogoImage from "../static/logo/logo-mocha.webp";
 
 utils.setImage("logo-image", mochaLogoImage);
 
+sessionStorage.setItem('gameMode', 'double')
+
 // 清除sessionStorage
 sessionStorage.removeItem("room")
 sessionStorage.removeItem('ready')
 sessionStorage.removeItem('gameOver')
+sessionStorage.removeItem('page')
 
+// 创建房间
 document.getElementById('create-room').addEventListener('touchstart', () => {
   location.href = "./ready.html";
-})
-
-document.getElementById('join-room').addEventListener('touchstart', () => {
-
 })
 
 document.getElementById('join-room').addEventListener('touchstart', () => {
@@ -62,16 +62,18 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
       return
     }
 
-    socket.emit('joinRoom', { room, ready: 0, score: 0, gameOver: 0, action: 0, page: 'room' })
+    socket.emit('joinRoom', { action: 0, room, ready: 0, score: 0, gameOver: 0, page: 'ready' })
 
     socket.on('roomJoined', (players) => {
+      const playerId = socket.id
+
       Object.keys(players).forEach(key => {
-        if (key === socket.id) {
+        if (key === playerId) {
           sessionStorage.setItem('room', players[key].room)
           sessionStorage.setItem('ready', players[key].ready)
           sessionStorage.setItem('gameOver', players[key].gameOver)
           sessionStorage.setItem('page', players[key].page)
-          // roomContainer.removeChild(inputRoomContainer)
+          roomContainer.removeChild(inputRoomContainer)
 
           location.href = './ready.html'
         }

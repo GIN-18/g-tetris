@@ -95,13 +95,13 @@ if (gameMode === "double") {
     roomId.innerText = players[playerId].room
 
     if (allInGame) {
-      socket.emit('startGame', sessionStorage.getItem('room'))
+      socket.emit('startGame', { room: sessionStorage.getItem('room'), ready: sessionStorage.getItem('ready') })
     } else {
       location.href = 'ready.html'
     }
   })
 
-  socket.on('gameStart', () => {
+  socket.on('twoStartGame', () => {
     setTimeout(() => {
       socket.emit('updateScore', { room: sessionStorage.getItem('room'), score: game.score })
       game.startGame()
@@ -171,22 +171,31 @@ if (gameMode === "double") {
   })
 
   socket.on('onePlayerAgain', () => {
-    document.getElementById('again-label').innerText = 'AGAIN: '
-    document.getElementById('again-info').innerText = '1 / 2'
+    const againLabel = document.getElementById('again-label'),
+      againInfo = document.getElementById('again-info')
+
+    againLabel.innerText = 'AGAIN: '
+    utils.setClassName('add', 'text-red', null, 'again-info')
+    againInfo.innerText = '1 / 2'
   })
 
   socket.on('twoPlayerAgain', () => {
-    document.getElementById('again-label').innerText = 'AGAIN: '
-    document.getElementById('again-info').innerText = '2 / 2'
+    const againLabel = document.getElementById('again-label'),
+      againInfo = document.getElementById('again-info')
+
+    againLabel.innerText = 'AGAIN: '
+    utils.setClassName('replace', 'text-red', 'text-green', 'again-info')
+    againInfo.innerText = '2 / 2'
+
     setTimeout(() => {
       location.reload()
     }, 100)
   })
 
-  socket.on('playerLeft', () => {
-    setTimeout(() => {
+  socket.on('playerLeft', (players) => {
+    if (Object.keys(players).length < 2) {
       location.href = 'ready.html'
-    }, 100)
+    }
   })
 }
 

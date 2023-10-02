@@ -4,7 +4,6 @@ const options = require("../options.js");
 class Operator {
   constructor(game, music) {
     this.game = game;
-    // this.audioUrl = audioUrl;
     this.music = music
 
     this.stopIcon = `<span class="material-icons-round !text-sm !leading-3">pause</span>`;
