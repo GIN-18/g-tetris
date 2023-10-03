@@ -1,3 +1,5 @@
+const options = require('./options.js');
+
 module.exports = {
   // 更改图标
   changeIcon(elementId, status, trueIcon, falseIcon) {
@@ -57,5 +59,40 @@ module.exports = {
     setTimeout(() => {
       messageContainer.removeChild(messageBox)
     }, delay);
+  },
+
+  // 高亮当前的选项
+  highlightCurrentOption(menuGroup, option) {
+    const optionGroup = sessionStorage.getItem(option)
+
+    document.querySelectorAll(menuGroup).forEach(item => {
+      item.classList.remove("text-green");
+      item.firstElementChild.classList.add("!text-surface0");
+
+      const itemInnerText = item.lastElementChild.innerText.toLowerCase();
+
+      if (itemInnerText === optionGroup) {
+        item.firstElementChild.classList.remove("!text-surface0");
+        item.classList.add("text-green");
+      }
+    })
+  },
+
+  // 设置颜色主题
+  setPagePaltte() {
+    const bodyElement = document.body;
+    const oldFlavor = bodyElement.classList[0];
+
+    if (!sessionStorage.getItem("flavor")) {
+      sessionStorage.setItem('flavor', oldFlavor)
+    }
+
+    const flavor = sessionStorage.getItem('flavor');
+
+    const logoImage = options.palette[flavor].logoImage;
+
+    bodyElement.classList.replace(oldFlavor, flavor);
+
+    this.setImage("logo-image", logoImage);
   },
 };

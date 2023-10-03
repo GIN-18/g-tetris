@@ -1,5 +1,7 @@
+const audioUrl = require('../../static/audio/music.mp3');
+
 class Music {
-  constructor(audioUrl) {
+  constructor() {
     this.audioUrl = audioUrl;
     this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }

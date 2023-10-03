@@ -1,15 +1,19 @@
 const Shape = require("./Shape.js");
-const utils = require("../utils.js");
-const socket = require("../socket.js");
+const Music = require("./Music.js");
+const utils = require("../utils/utils.js");
+const socket = require("../utils/socket.js");
+const options = require("../utils/options.js");
 
 class Game {
-  constructor(mapCtx, previewCtx, shapeColor, gameMode, gameOverImage, music) {
+  constructor(mapCtx, previewCtx) {
     this.blockSize = 20;
+
+    this.flavor = sessionStorage.getItem("flavor") || 'mocha';
 
     this.mapCtx = mapCtx;
     this.mapWidth = 10;
     this.mapHeight = 20;
-    this.mapBackgroundColor = "#1e1e2e";
+    this.mapBackgroundColor = options.palette[this.flavor].mapBackgroundColor || "#1e1e2e";
     this.map = [...new Array(this.mapHeight)].map(() =>
       new Array(this.mapWidth).fill(0)
     );
@@ -17,25 +21,25 @@ class Game {
     this.previewCtx = previewCtx;
     this.previewWidth = 4;
     this.previewHeight = 2;
-    this.previewBackgroundColor = "#313244";
+    this.previewBackgroundColor = options.palette[this.flavor].mapBackgroundColor || "#313244";
     this.previewMap = [...new Array(this.previewHeight)].map(() =>
       new Array(this.previewWidth).fill(0)
     );
 
-    this.gameMode = gameMode;
+    this.gameMode = sessionStorage.getItem("gameMode") || 'single';
 
     this.gameStart = false;
     this.gamePaused = false;
     this.gameOver = false;
 
-    this.gameOverImage = gameOverImage;
+    this.gameOverImage = options.palette[this.flavor].gameOverImage;
 
-    this.music = music
+    this.music = new Music()
     this.volumeUp = true;
 
     this.shape = null;
     this.nextShape = null;
-    this.shapeColor = shapeColor
+    this.shapeColor = options.palette[this.flavor].shapeColor;
 
     this.dropTimer = null;
     this.fastForward = false;
@@ -497,6 +501,28 @@ class Game {
       this.blockSize,
       this.blockSize
     );
+  }
+
+  // 设置游戏颜色主题
+  setGamePalette() {
+    const flavor = sessionStorage.getItem('flavor');
+
+    const mapBackgroundColor = options.palette[flavor].mapBackgroundColor;
+    const previewBackgroundColor =
+      options.palette[flavor].previewBackgroundColor;
+    const shapeColor = options.palette[flavor].shapeColor;
+
+    const gameOverImage = options.palette[flavor].gameOverImage;
+
+    this.resetArea(this.mapCtx, mapBackgroundColor, 0, 0, 200, 400);
+    this.resetArea(this.previewCtx, previewBackgroundColor, 0, 0, 80, 40);
+
+    this.mapBackgroundColor = mapBackgroundColor;
+    this.previewBackgroundColor = previewBackgroundColor;
+
+    this.shapeColor = shapeColor;
+
+    this.gameOverImage = gameOverImage;
   }
 
   // 设置颜色

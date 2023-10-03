@@ -1,70 +1,13 @@
 import "../../dist/style.css";
 import "material-icons/iconfont/material-icons.css";
 
-import confetti from 'canvas-confetti';
+import confetti from "canvas-confetti";
 
 const Game = require("./classes/Game.js");
 const Operator = require("./classes/Operator.js");
-const Music = require('./classes/Music.js')
-const utils = require("./utils.js");
-const options = require("./options.js");
-const socket = require("./socket.js")
-
-// 导入音频文件
-import audioUrl from "../static/audio/music.mp3";
-
-// 添加logo
-import latteLogoImage from "../static/logo/logo-latte.webp";
-import frappeLogoImage from "../static/logo/logo-frappe.webp";
-import macchiatoLogoImage from "../static/logo/logo-macchiato.webp";
-import mochaLogoImage from "../static/logo/logo-mocha.webp";
-
-options.palette.latte.logoImage = latteLogoImage;
-options.palette.frappe.logoImage = frappeLogoImage;
-options.palette.macchiato.logoImage = macchiatoLogoImage;
-options.palette.mocha.logoImage = mochaLogoImage;
-
-// 添加游戏结束图片
-import latteGameOverImage from "../static/game-over/game-over-latte.webp";
-import frappeGameOverImage from "../static/game-over/game-over-frappe.webp";
-import macchiatoGameOverImage from "../static/game-over/game-over-macchiato.webp";
-import mochaGameOverImage from "../static/game-over/game-over-mocha.webp";
-
-options.palette.latte.gameOverImage = latteGameOverImage;
-options.palette.frappe.gameOverImage = frappeGameOverImage;
-options.palette.macchiato.gameOverImage = macchiatoGameOverImage;
-options.palette.mocha.gameOverImage = mochaGameOverImage;
-
-// 添加游戏胜利图片
-import latteGameWinImage from "../static/game-over/win-latte.webp";
-import frappeGameWinImage from "../static/game-over/win-frappe.webp";
-import macchiatoGameWinImage from "../static/game-over/win-macchiato.webp";
-import mochaGameWinImage from "../static/game-over/win-mocha.webp";
-
-options.palette.latte.winImage = latteGameWinImage;
-options.palette.frappe.winImage = frappeGameWinImage;
-options.palette.macchiato.winImage = macchiatoGameWinImage;
-options.palette.mocha.winImage = mochaGameWinImage;
-
-// 添加游戏失败图片
-import latteGameFailImage from "../static/game-over/fail-latte.webp";
-import frappeGameFailImage from "../static/game-over/fail-frappe.webp";
-import macchiatoGameFailImage from "../static/game-over/fail-macchiato.webp";
-import mochaGameFailImage from "../static/game-over/fail-mocha.webp";
-
-options.palette.latte.failImage = latteGameFailImage;
-options.palette.frappe.failImage = frappeGameFailImage;
-options.palette.macchiato.failImage = macchiatoGameFailImage;
-options.palette.mocha.failImage = mochaGameFailImage;
-
-utils.setImage("logo-image", mochaLogoImage);
-
-// 设置flavor
-const bodyElement = document.body;
-const flavor = bodyElement.classList[0];
-sessionStorage.setItem('flavor', flavor)
-
-const gameMode = sessionStorage.getItem("gameMode")
+const utils = require("./utils/utils.js");
+const options = require("./utils/options.js");
+const socket = require("./utils/socket.js")
 
 const mapCanvas = document.getElementById("map-canvas");
 const previewCanvas = document.getElementById("preview-canvas");
@@ -72,15 +15,16 @@ const previewCanvas = document.getElementById("preview-canvas");
 const mapCtx = mapCanvas.getContext("2d", { alpha: false });
 const previewCtx = previewCanvas.getContext("2d", { alpha: false });
 
-const shapeColor = options.palette[flavor].shapeColor;
-
-const music = new Music(audioUrl)
-const game = new Game(mapCtx, previewCtx, shapeColor, gameMode, mochaGameOverImage, music);
-const operator = new Operator(game, music);
+const game = new Game(mapCtx, previewCtx);
+const operator = new Operator(game);
 
 let playerLeftTimer = null
 
-if (gameMode === "double") {
+utils.setPagePaltte()
+game.setGamePalette()
+utils.highlightCurrentOption('.menu-item', 'flavor')
+
+if (sessionStorage.getItem('gameMode') === "double") {
   const scoreDiff = document.getElementById('score-diff')
   const roomId = document.getElementById('room-id')
 
@@ -209,7 +153,9 @@ if (gameMode === "double") {
 
 operator.buttomMovePiece();
 
+// 放礼花
 function playConfetti() {
+  const flavor = sessionStorage.getItem('flavor');
   const colors = options.palette[flavor].shapeColor;
 
   confetti({
@@ -226,4 +172,4 @@ function playConfetti() {
     origin: { x: 1 },
     colors: colors
   });
-};
+}

@@ -1,10 +1,10 @@
-const utils = require("../utils.js");
-const options = require("../options.js");
+const Music = require("./Music.js");
+const utils = require("../utils/utils.js");
 
 class Operator {
-  constructor(game, music) {
+  constructor(game) {
     this.game = game;
-    this.music = music
+    this.music = new Music()
 
     this.stopIcon = `<span class="material-icons-round !text-sm !leading-3">pause</span>`;
     this.startIcon = `<span class="material-icons-round !text-sm !leading-3">play_arrow</span>`;
@@ -152,45 +152,13 @@ class Operator {
     });
 
     document.querySelectorAll(".flavor-btn").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        const bodyElement = document.body;
-
-        const oldFlavor = bodyElement.classList[0];
+      btn.addEventListener("touchstart", (e) => {
         const flavor = e.currentTarget.innerText.toLowerCase();
+        sessionStorage.setItem('flavor', flavor)
 
-        sessionStorage.setItem("flavor", flavor)
-
-        const mapBackgroundColor = options.palette[flavor].mapBackgroundColor;
-        const previewBackgroundColor =
-          options.palette[flavor].previewBackgroundColor;
-        const shapeColor = options.palette[flavor].shapeColor;
-
-        const logoImage = options.palette[flavor].logoImage;
-        const gameOverImage = options.palette[flavor].gameOverImage;
-
-        this.game.resetArea(this.game.mapCtx, mapBackgroundColor, 0, 0, 200, 400);
-        this.game.resetArea(this.game.previewCtx, previewBackgroundColor, 0, 0, 82, 42);
-
-        this.game.mapBackgroundColor = mapBackgroundColor;
-        this.game.previewBackgroundColor = previewBackgroundColor;
-
-        this.game.shapeColor = shapeColor;
-
-        bodyElement.classList.replace(oldFlavor, flavor);
-
-        this.game.gameOverImage = gameOverImage;
-
-        utils.setImage("logo-image", logoImage);
-
-        // 高亮已选择的菜单项
-        document.querySelectorAll(".menu-item").forEach((item) => {
-          item.classList.remove("text-green");
-          item.firstElementChild.classList.add("!text-surface0");
-        })
-
-        e.currentTarget.parentElement.classList.add("text-green");
-
-        e.currentTarget.previousElementSibling.classList.remove("!text-surface0");
+        utils.setPagePaltte()
+        this.game.setGamePalette()
+        utils.highlightCurrentOption('.menu-item', 'flavor')
       });
     });
   }
