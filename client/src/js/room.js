@@ -1,4 +1,5 @@
 import "../../dist/style.css";
+import 'animate.css'
 import "material-icons/iconfont/material-icons.css";
 
 const _ = require("lodash");
@@ -57,27 +58,28 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
     }
 
     socket.emit('joinRoom', { action: 0, room, ready: 0, score: 0, page: 'ready' })
-
-    socket.on('roomJoined', (players) => {
-      const playerId = socket.id
-
-      Object.keys(players).forEach(key => {
-        if (key === playerId) {
-          sessionStorage.setItem('room', players[key].room)
-          sessionStorage.setItem('ready', players[key].ready)
-          sessionStorage.setItem('page', players[key].page)
-          roomContainer.removeChild(inputRoomContainer)
-
-          location.href = './ready.html'
-        }
-      })
-    })
-
-    socket.on('roomFull', () => {
-      utils.showMessage("Room is full!", 'error', 2000)
-    })
-
   }, 2000, { leading: true }))
+
+  socket.on('roomFull', () => {
+    utils.showMessage("Room is full!", 'error', 2000)
+    return
+  })
+
+  socket.on('roomJoined', (players) => {
+    const playerId = socket.id
+
+    Object.keys(players).forEach(key => {
+      if (key === playerId) {
+        sessionStorage.setItem('room', players[key].room)
+        sessionStorage.setItem('ready', players[key].ready)
+        sessionStorage.setItem('page', players[key].page)
+        roomContainer.removeChild(inputRoomContainer)
+
+        location.href = './ready.html'
+      }
+    })
+  })
+
 
   // 取消加入房间
   document.getElementById('cancel-btn').addEventListener('touchstart', () => {
