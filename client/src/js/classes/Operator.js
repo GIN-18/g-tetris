@@ -1,10 +1,9 @@
-const Music = require("./Music.js");
 const utils = require("../utils/utils.js");
 
 class Operator {
-  constructor(game) {
+  constructor(game, music) {
     this.game = game;
-    this.music = new Music()
+    this.music = music
 
     this.stopIcon = `<span class="material-icons-round !text-sm !leading-3">pause</span>`;
     this.startIcon = `<span class="material-icons-round !text-sm !leading-3">play_arrow</span>`;
@@ -14,7 +13,7 @@ class Operator {
   }
 
   // 按钮操作
-  buttomMovePiece() {
+  buttonMovePiece() {
     // 打开菜单
     document.getElementById("menu-btn").addEventListener("click", () => {
       document.getElementById("menu").classList.replace("hidden", "block");

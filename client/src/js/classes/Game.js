@@ -1,5 +1,6 @@
 const Shape = require("./Shape.js");
 const Music = require("./Music.js");
+const Operator = require('./Operator.js')
 const utils = require("../utils/utils.js");
 const socket = require("../utils/socket.js");
 const options = require("../utils/options.js");
@@ -8,12 +9,12 @@ class Game {
   constructor(mapCtx, previewCtx) {
     this.blockSize = 20;
 
-    this.flavor = sessionStorage.getItem("flavor") || 'mocha';
+    this.flavor = sessionStorage.getItem("flavor");
 
     this.mapCtx = mapCtx;
     this.mapWidth = 10;
     this.mapHeight = 20;
-    this.mapBackgroundColor = options.palette[this.flavor].mapBackgroundColor || "#1e1e2e";
+    this.mapBackgroundColor = options.palette[this.flavor].mapBackgroundColor;
     this.map = [...new Array(this.mapHeight)].map(() =>
       new Array(this.mapWidth).fill(0)
     );
@@ -21,7 +22,7 @@ class Game {
     this.previewCtx = previewCtx;
     this.previewWidth = 4;
     this.previewHeight = 2;
-    this.previewBackgroundColor = options.palette[this.flavor].mapBackgroundColor || "#313244";
+    this.previewBackgroundColor = options.palette[this.flavor].mapBackgroundColor;
     this.previewMap = [...new Array(this.previewHeight)].map(() =>
       new Array(this.previewWidth).fill(0)
     );
@@ -36,6 +37,8 @@ class Game {
 
     this.music = new Music()
     this.volumeUp = true;
+
+    this.operator = new Operator(this, this.music)
 
     this.shape = null;
     this.nextShape = null;
@@ -58,6 +61,7 @@ class Game {
   init() {
     this.nextShape = this.generateShape();
     this.setGameData();
+    this.operator.buttonMovePiece()
   }
 
   // 游戏动画
@@ -72,9 +76,8 @@ class Game {
 
   // 设置游戏信息
   setGameData() {
-    this.resetArea(this.mapCtx, this.mapBackgroundColor, 0, 0, 200, 400);
-
-    this.resetArea(this.previewCtx, this.previewBackgroundColor, 0, 0, 82, 42);
+    this.drawArea(this.mapCtx, this.map, this.mapBackgroundColor)
+    this.drawArea(this.previewCtx, this.previewMap, this.previewBackgroundColor)
 
     document.getElementById("score").innerText = this.score;
     document.getElementById("highest-score").innerText = this.highScore;
@@ -315,48 +318,55 @@ class Game {
   landShape() {
     let piece = this.generatePiece();
 
-    let isFilled = false,
-      filledRows = [],
-      oldLevel = this.level;
+    let oldLevel = this.level;
+    const filledRows = this.getFilledRows()
 
     piece.forEach((item) => {
-      let x = this.shape.xOffset + item[1],
+      const x = this.shape.xOffset + item[1],
         y = this.shape.yOffset + item[0];
       this.map[y][x] = this.shape.type + 1;
     });
 
-    // 判断是否有满行
-    this.map.forEach((row, index) => {
-      isFilled = row.every((item) => !!item);
-
-      if (isFilled) {
-        filledRows.push(index);
-
-        // 消除行
-        row.fill(8);
-
-        setTimeout(() => {
-          this.map.splice(index, 1);
-          this.map.unshift(new Array(10).fill(0));
-        }, 100);
-
-        this.music.fetchMusic(0.1900, 0.7000)
-      }
-    });
-
-    if (filledRows.length) {
-      this.updateScore(filledRows.length, this.level);
-      this.updateLevel();
+    if (!filledRows.length) {
+      return
     }
+
+    this.clearFilledRows(filledRows)
+    this.updateScore(filledRows.length);
+    this.updateLevel();
 
     if (oldLevel !== this.level) {
       this.setDropTimer();
     }
   }
 
+  // 获取满行
+  getFilledRows() {
+    let filledRows = [];
+    this.map.forEach((row, index) => {
+      if (row.every((item) => !!item)) {
+        filledRows.push(index);
+      }
+    });
+    return filledRows;
+  }
+
+  // XXX 消除满行
+  clearFilledRows(filledRows) {
+    filledRows.forEach(row => {
+      this.map[row].fill(8);
+
+      setTimeout(() => {
+        this.map.splice(row, 1);
+        this.map.unshift(new Array(10).fill(0));
+      }, 100);
+    })
+    this.music.fetchMusic(0.1900, 0.7000)
+  }
+
   // 更新分数
-  updateScore(filledRows, level) {
-    this.score += filledRows * level * 10;
+  updateScore(filledRows) {
+    this.score += filledRows * this.level * 10;
     document.getElementById("score").innerText = this.score;
 
     if (this.gameMode === 'double') {
@@ -381,89 +391,42 @@ class Game {
       document.getElementById("level").innerText = this.level;
     }
   }
+
   drawMap() {
     const mapCtx = this.mapCtx;
     const mapBackgroundColor = this.mapBackgroundColor;
     const map = this.map;
     const piece = this.generatePiece();
-
     const shapeType = this.shape.type;
     let xOffset = this.shape.xOffset;
     let yOffset = this.shape.yOffset;
 
-    this.drawArea(
-      mapCtx,
-      mapBackgroundColor,
-      0,
-      0,
-      200,
-      400,
-      map,
-      piece,
-      shapeType,
-      xOffset,
-      yOffset
-    );
+    this.drawArea(mapCtx, map, mapBackgroundColor);
   }
 
   drawNextShape() {
     const previewCtx = this.previewCtx;
-    const previewBackgroundColor = this.previewBackgroundColor;
     const previewMap = this.previewMap;
+    const previewBackgroundColor = this.previewBackgroundColor;
     const piece = this.generateNextPiece();
-
     const shapeType = this.nextShape.type;
 
-    this.drawArea(
-      previewCtx,
-      previewBackgroundColor,
-      0,
-      0,
-      80,
-      40,
-      previewMap,
-      piece,
-      shapeType,
-      0,
-      0
-    );
+    this.drawArea(previewCtx, previewMap, previewBackgroundColor)
+    this.drawShape(previewCtx, piece, shapeType, 0, 0)
   }
 
   // 绘制画布区域
-  drawArea(
-    ctx,
-    backgroundColor,
-    canvasX,
-    canvasY,
-    canvasWidth,
-    canvasHeight,
-    area,
-    piece,
-    shapeType,
-    xOffset,
-    yOffset
-  ) {
-    // 清空预览画布
-    this.resetArea(
-      ctx,
-      backgroundColor,
-      canvasX,
-      canvasY,
-      canvasWidth,
-      canvasHeight
-    );
-
-    // 绘制游戏地图方格
+  drawArea(ctx, area, backgroundColor) {
     for (let i = 0; i < area.length; i++) {
       for (let j = 0; j < area[i].length; j++) {
-        if (area[i][j]) {
-          ctx.fillStyle = this.setShapeColor(area[i][j]);
-          this.drawBlock(ctx, j, i);
-        }
+        ctx.fillStyle = this.setShapeColor(area[i][j], backgroundColor);
+        this.drawBlock(ctx, j, i);
       }
     }
+  }
 
-    // 在画布上绘制方块
+  // 绘制形状
+  drawShape(ctx, piece, shapeType, xOffset, yOffset) {
     ctx.fillStyle = this.setShapeColor(shapeType + 1);
 
     for (let i = 0, length = piece.length; i < length; i++) {
@@ -485,12 +448,8 @@ class Game {
             break;
         }
       }
-    }
-  }
 
-  resetArea(ctx, backgroundColor, canvasX, canvasY, canvasWidth, canvasHeight) {
-    ctx.fillStyle = backgroundColor;
-    ctx.fillRect(canvasX, canvasY, canvasWidth, canvasHeight);
+    }
   }
 
   // 绘制方块
@@ -508,14 +467,12 @@ class Game {
     const flavor = sessionStorage.getItem('flavor');
 
     const mapBackgroundColor = options.palette[flavor].mapBackgroundColor;
-    const previewBackgroundColor =
-      options.palette[flavor].previewBackgroundColor;
+    const previewBackgroundColor = options.palette[flavor].previewBackgroundColor;
     const shapeColor = options.palette[flavor].shapeColor;
-
     const gameOverImage = options.palette[flavor].gameOverImage;
 
-    this.resetArea(this.mapCtx, mapBackgroundColor, 0, 0, 200, 400);
-    this.resetArea(this.previewCtx, previewBackgroundColor, 0, 0, 80, 40);
+    this.drawArea(this.mapCtx, this.map, mapBackgroundColor)
+    this.drawArea(this.previewCtx, this.previewMap, previewBackgroundColor)
 
     this.mapBackgroundColor = mapBackgroundColor;
     this.previewBackgroundColor = previewBackgroundColor;
@@ -526,9 +483,11 @@ class Game {
   }
 
   // 设置颜色
-  setShapeColor(type) {
+  setShapeColor(type, backgroundColor) {
     const colorIndex = type - 1
     switch (type) {
+      case 0:
+        return backgroundColor;
       case 1:
         return this.shapeColor[colorIndex];
       case 2:

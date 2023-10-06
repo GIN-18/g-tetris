@@ -48,7 +48,6 @@ io.on("connection", (socket) => {
 
     // 通过房间号加入房间或者房间内有两个玩家刷新时将玩家加入房间
     if (!clients || clients.size >= 2) {
-      console.log('room is full');
       socket.emit('roomFull')
     } else {
       socket.join(room)

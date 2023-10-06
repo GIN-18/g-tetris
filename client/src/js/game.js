@@ -5,7 +5,6 @@ import "material-icons/iconfont/material-icons.css";
 import confetti from "canvas-confetti";
 
 const Game = require("./classes/Game.js");
-const Operator = require("./classes/Operator.js");
 const utils = require("./utils/utils.js");
 const options = require("./utils/options.js");
 const socket = require("./utils/socket.js")
@@ -17,7 +16,6 @@ const mapCtx = mapCanvas.getContext("2d", { alpha: false });
 const previewCtx = previewCanvas.getContext("2d", { alpha: false });
 
 const game = new Game(mapCtx, previewCtx);
-const operator = new Operator(game);
 
 let playerLeftTimer = null
 
@@ -151,8 +149,6 @@ if (sessionStorage.getItem('gameMode') === "double") {
     }, 300)
   })
 }
-
-operator.buttomMovePiece();
 
 // 放礼花
 function playConfetti() {
