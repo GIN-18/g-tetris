@@ -1,9 +1,10 @@
+const $ = require("jquery");
 const utils = require("../utils/utils.js");
 
 class Operator {
   constructor(game, music) {
     this.game = game;
-    this.music = music
+    this.music = music;
 
     this.stopIcon = `<span class="material-icons-round !text-sm !leading-3">pause</span>`;
     this.startIcon = `<span class="material-icons-round !text-sm !leading-3">play_arrow</span>`;
@@ -15,17 +16,19 @@ class Operator {
   // 按钮操作
   buttonMovePiece() {
     // 打开菜单
-    document.getElementById("menu-btn").addEventListener("click", () => {
-      document.getElementById("menu").classList.replace("hidden", "block");
+    $("#menu-btn").on("touchstart", (e) => {
+      e.preventDefault();
+      utils.setClassName("replace", "hidden", "block", "menu");
     });
 
     // 关闭菜单
-    document.getElementById("close-btn").addEventListener("click", () => {
-      document.getElementById("menu").classList.replace("block", "hidden");
+    $("#close-btn").on("touchstart", (e) => {
+      e.preventDefault();
+      utils.setClassName("replace", "block", "hidden", "menu");
     });
 
     // 开始和暂停按钮
-    document.getElementById("start-btn").addEventListener("touchstart", (e) => {
+    $("#start-btn").on("touchstart", (e) => {
       e.preventDefault();
 
       if (!this.game.gameStart) {
@@ -36,9 +39,7 @@ class Operator {
           this.stopIcon,
           this.startIcon
         );
-
         this.game.startGame();
-
         return;
       }
 
@@ -51,114 +52,94 @@ class Operator {
         this.startIcon
       );
 
-      this.music.fetchMusic(0, 0.1900);
+      this.music.fetchMusic(0, 0.19);
 
       this.game.setDropTimer();
     });
 
     // 声音按钮
-    document
-      .getElementById("volume-btn")
-      .addEventListener("touchstart", (e) => {
-        e.preventDefault();
+    $("#volume-btn").on("touchstart", (e) => {
+      e.preventDefault();
 
-        this.game.volumeUp = !this.game.volumeUp;
-        this.music.toggleMute(this.game.volumeUp);
+      this.game.volumeUp = !this.game.volumeUp;
+      this.music.toggleMute(this.game.volumeUp);
 
-        utils.changeIcon(
-          "volume-btn",
-          this.game.volumeUp,
-          this.volumeUp,
-          this.volumeOff
-        );
+      utils.changeIcon(
+        "volume-btn",
+        this.game.volumeUp,
+        this.volumeUp,
+        this.volumeOff
+      );
 
-        this.music.fetchMusic(0, 0.1900);
-      });
+      this.music.fetchMusic(0, 0.19);
+    });
 
     // 重新开始
-    document
-      .getElementById("restart-btn")
-      .addEventListener("touchstart", (e) => {
-        e.preventDefault();
-
-        location.reload();
-      });
+    $("#restart-btn").on("touchstart", (e) => {
+      e.preventDefault();
+      location.reload();
+    });
 
     // 旋转键
-    document
-      .getElementById("rotate-btn")
-      .addEventListener("touchstart", (e) => {
-        e.preventDefault();
-
-        this.game.rotateShape(1);
-
-        this.music.fetchMusic(0, 0.1900);
-
-        utils.changeButtonColor(e.currentTarget, "bg-surface0");
-      });
+    $("#rotate-btn").on("touchstart", (e) => {
+      e.preventDefault();
+      this.game.rotateShape(1);
+      this.music.fetchMusic(0, 0.19);
+      utils.changeButtonColor(e.currentTarget, "bg-surface0");
+    });
 
     // 下落键
-    document.getElementById("drop-btn").addEventListener("touchstart", (e) => {
+    $("#drop-btn").on("touchstart", (e) => {
       e.preventDefault();
       this.game.dropShape();
-
-      this.music.fetchMusic(0, 0.1900);
-
+      this.music.fetchMusic(0, 0.19);
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
 
     // 左键
-    document.getElementById("left-btn").addEventListener("touchstart", (e) => {
+    $("#left-btn").on("touchstart", (e) => {
       e.preventDefault();
       this.game.moveLeft();
-
-      this.music.fetchMusic(0, 0.1900);
-
+      this.music.fetchMusic(0, 0.19);
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
 
     // 右键
-    document.getElementById("right-btn").addEventListener("touchstart", (e) => {
+    $("#right-btn").on("touchstart", (e) => {
       e.preventDefault();
       this.game.moveRight();
-
-      this.music.fetchMusic(0, 0.1900);
-
+      this.music.fetchMusic(0, 0.19);
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
 
     // 按下下键
-    document.getElementById("down-btn").addEventListener("touchstart", (e) => {
+    $("#down-btn").on("touchstart", (e) => {
       e.preventDefault();
       this.game.moveDown(true);
-
-      this.music.fetchMusic(0, 0.1900);
-
+      this.music.fetchMusic(0, 0.19);
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
 
     // 松开下键
-    document.getElementById("down-btn").addEventListener("touchend", (e) => {
+    $("#down-btn").on("touchstart", (e) => {
       e.preventDefault();
       this.game.moveDown(false);
     });
 
     // 将按钮颜色改为背景色
-    document.querySelectorAll(".o-btn").forEach((item) => {
-      item.addEventListener("touchend", (e) => {
-        utils.changeButtonColor(e.currentTarget, "bg-mantle");
-      });
+    $(".o-btn").on("touchend", (e) => {
+      e.preventDefault();
+      utils.changeButtonColor(e.currentTarget, "bg-mantle");
     });
 
-    document.querySelectorAll(".flavor-btn").forEach((btn) => {
-      btn.addEventListener("touchstart", (e) => {
-        const flavor = e.currentTarget.innerText.toLowerCase();
-        sessionStorage.setItem('flavor', flavor)
+    $(".flavor-btn").on("touchstart", (e) => {
+      e.preventDefault();
+      const flavor = e.currentTarget.innerText.toLowerCase();
+      sessionStorage.setItem("flavor", flavor);
 
-        utils.setPagePaltte()
-        this.game.setGamePalette()
-        utils.highlightCurrentOption('.menu-item', 'flavor')
-      });
+      utils.setPagePaltte();
+      this.game.setGamePalette();
+      utils.highlightCurrentOption(".menu-item", "flavor");
     });
   }
 

@@ -1,6 +1,6 @@
 const Shape = require("./Shape.js");
 const Music = require("./Music.js");
-const Operator = require('./Operator.js')
+const Operator = require("./Operator.js");
 const utils = require("../utils/utils.js");
 const socket = require("../utils/socket.js");
 const options = require("../utils/options.js");
@@ -22,12 +22,13 @@ class Game {
     this.previewCtx = previewCtx;
     this.previewWidth = 4;
     this.previewHeight = 2;
-    this.previewBackgroundColor = options.palette[this.flavor].mapBackgroundColor;
+    this.previewBackgroundColor =
+      options.palette[this.flavor].mapBackgroundColor;
     this.previewMap = [...new Array(this.previewHeight)].map(() =>
       new Array(this.previewWidth).fill(0)
     );
 
-    this.gameMode = sessionStorage.getItem("gameMode") || 'single';
+    this.gameMode = sessionStorage.getItem("gameMode") || "single";
 
     this.gameStart = false;
     this.gamePaused = false;
@@ -35,10 +36,10 @@ class Game {
 
     this.gameOverImage = options.palette[this.flavor].gameOverImage;
 
-    this.music = new Music()
+    this.music = new Music();
     this.volumeUp = true;
 
-    this.operator = new Operator(this, this.music)
+    this.operator = new Operator(this, this.music);
 
     this.shape = null;
     this.nextShape = null;
@@ -52,7 +53,7 @@ class Game {
     this.score = 0;
     this.highScore = localStorage.getItem("highScore") || 0;
 
-    this.animateId = null
+    this.animateId = null;
 
     this.init();
   }
@@ -61,23 +62,26 @@ class Game {
   init() {
     this.nextShape = this.generateShape();
     this.setGameData();
-    this.operator.buttonMovePiece()
+    this.operator.buttonMovePiece();
   }
 
   // 游戏动画
   gameLoop() {
     if (this.gameStart) {
-      this.drawMap()
-      this.drawNextShape()
+      this.drawMap();
     }
 
-    this.animateId = requestAnimationFrame(this.gameLoop.bind(this))
+    this.animateId = requestAnimationFrame(this.gameLoop.bind(this));
   }
 
   // 设置游戏信息
   setGameData() {
-    this.drawArea(this.mapCtx, this.map, this.mapBackgroundColor)
-    this.drawArea(this.previewCtx, this.previewMap, this.previewBackgroundColor)
+    this.drawArea(this.mapCtx, this.map, this.mapBackgroundColor);
+    this.drawArea(
+      this.previewCtx,
+      this.previewMap,
+      this.previewBackgroundColor
+    );
 
     document.getElementById("score").innerText = this.score;
     document.getElementById("highest-score").innerText = this.highScore;
@@ -87,10 +91,10 @@ class Game {
   // 开始游戏
   startGame() {
     this.gameStart = true;
-    this.gameOver = false
+    this.gameOver = false;
     this.addShape();
     this.setDropTimer();
-    this.gameLoop()
+    this.gameLoop();
   }
 
   // 结束游戏
@@ -135,23 +139,27 @@ class Game {
     const anotherScoreLabel = document.getElementById("another-score-label");
     const anotherScoreInfo = document.getElementById("another-score-info");
 
-    if (this.gameMode === 'double') {
-      socket.emit('gameOver', { room: sessionStorage.getItem('room'), gameOver: 1 });
+    if (this.gameMode === "double") {
+      socket.emit("gameOver", {
+        room: sessionStorage.getItem("room"),
+        gameOver: 1,
+      });
     } else {
       this.updateHighScore();
-      utils.setImage('game-over-image', this.gameOverImage)
+      utils.setImage("game-over-image", this.gameOverImage);
       anotherScoreLabel.innerText = "HIGHEST SCORE:";
       anotherScoreInfo.innerText = this.highScore;
 
-      document.getElementById("again-btn").addEventListener("touchstart", () => {
-        location.reload();
-      });
+      document
+        .getElementById("again-btn")
+        .addEventListener("touchstart", () => {
+          location.reload();
+        });
     }
 
     document.getElementById("quit-btn").addEventListener("touchstart", () => {
       location.replace("../index.html");
     });
-
   }
 
   // 生成形状
@@ -178,6 +186,7 @@ class Game {
   addShape() {
     this.shape = this.nextShape;
     this.nextShape = this.generateShape();
+    this.drawNextShape()
 
     try {
       let piece = this.generatePiece();
@@ -195,12 +204,12 @@ class Game {
           this.gameOver = true;
           this.gameStart = false;
           this.shape = null;
-          cancelAnimationFrame(this.animateId)
+          cancelAnimationFrame(this.animateId);
           this.overGame();
           return;
         }
       });
-    } catch (e) { }
+    } catch (e) {}
   }
 
   // 方块旋转
@@ -222,7 +231,11 @@ class Game {
     piece.forEach((item) => {
       const x = this.shape.xOffset + item[1],
         y = this.shape.yOffset + item[0];
-      if (this.map[y] === undefined || this.map[y][x] === undefined || this.map[y][x] > 0) {
+      if (
+        this.map[y] === undefined ||
+        this.map[y][x] === undefined ||
+        this.map[y][x] > 0
+      ) {
         this.shape.rotation = tempRotation;
       }
     });
@@ -249,14 +262,15 @@ class Game {
   // 下坠
   dropShape() {
     if (this.shape && !this.gamePaused) {
-      while (this.moveShape(0, 1)) { }
+      while (this.moveShape(0, 1)) {}
       this.fallToLand();
     }
   }
 
   // 移动方块
   moveShape(xStep, yStep) {
-    if (!this.shape || !this.gameStart || this.gamePaused || this.gameOver) return;
+    if (!this.shape || !this.gameStart || this.gamePaused || this.gameOver)
+      return;
 
     const width = this.map[0].length;
     const height = this.map.length;
@@ -280,8 +294,8 @@ class Game {
     });
 
     if (canMove) {
-      this.shape.xOffset += xStep
-      this.shape.yOffset += yStep
+      this.shape.xOffset += xStep;
+      this.shape.yOffset += yStep;
     }
 
     return canMove;
@@ -316,10 +330,8 @@ class Game {
 
   // 方块触底后将方块合并到地图数组中
   landShape() {
-    let piece = this.generatePiece();
-
-    let oldLevel = this.level;
-    const filledRows = this.getFilledRows()
+    const piece = this.generatePiece();
+    const oldLevel = this.level;
 
     piece.forEach((item) => {
       const x = this.shape.xOffset + item[1],
@@ -327,13 +339,13 @@ class Game {
       this.map[y][x] = this.shape.type + 1;
     });
 
-    if (!filledRows.length) {
-      return
-    }
+    const filledRows = this.getFilledRows();
 
-    this.clearFilledRows(filledRows)
-    this.updateScore(filledRows.length);
-    this.updateLevel();
+    if (filledRows.length) {
+      this.clearFilledRows(filledRows);
+      this.updateScore(filledRows.length);
+      this.updateLevel();
+    }
 
     if (oldLevel !== this.level) {
       this.setDropTimer();
@@ -351,17 +363,17 @@ class Game {
     return filledRows;
   }
 
-  // XXX 消除满行
+  // XXX: 消除满行
   clearFilledRows(filledRows) {
-    filledRows.forEach(row => {
+    filledRows.forEach((row) => {
       this.map[row].fill(8);
 
       setTimeout(() => {
         this.map.splice(row, 1);
         this.map.unshift(new Array(10).fill(0));
       }, 100);
-    })
-    this.music.fetchMusic(0.1900, 0.7000)
+    });
+    this.music.fetchMusic(0.19, 0.7);
   }
 
   // 更新分数
@@ -369,8 +381,11 @@ class Game {
     this.score += filledRows * this.level * 10;
     document.getElementById("score").innerText = this.score;
 
-    if (this.gameMode === 'double') {
-      socket.emit('updateScore', { room: sessionStorage.getItem("room"), score: this.score })
+    if (this.gameMode === "double") {
+      socket.emit("updateScore", {
+        room: sessionStorage.getItem("room"),
+        score: this.score,
+      });
     }
   }
 
@@ -398,10 +413,11 @@ class Game {
     const map = this.map;
     const piece = this.generatePiece();
     const shapeType = this.shape.type;
-    let xOffset = this.shape.xOffset;
-    let yOffset = this.shape.yOffset;
+    const xOffset = this.shape.xOffset;
+    const yOffset = this.shape.yOffset;
 
     this.drawArea(mapCtx, map, mapBackgroundColor);
+    this.drawShape(mapCtx, piece, shapeType, xOffset, yOffset);
   }
 
   drawNextShape() {
@@ -411,8 +427,8 @@ class Game {
     const piece = this.generateNextPiece();
     const shapeType = this.nextShape.type;
 
-    this.drawArea(previewCtx, previewMap, previewBackgroundColor)
-    this.drawShape(previewCtx, piece, shapeType, 0, 0)
+    this.drawArea(previewCtx, previewMap, previewBackgroundColor);
+    this.drawShape(previewCtx, piece, shapeType, 0, 0);
   }
 
   // 绘制画布区域
@@ -448,7 +464,6 @@ class Game {
             break;
         }
       }
-
     }
   }
 
@@ -464,15 +479,16 @@ class Game {
 
   // 设置游戏颜色主题
   setGamePalette() {
-    const flavor = sessionStorage.getItem('flavor');
+    const flavor = sessionStorage.getItem("flavor");
 
     const mapBackgroundColor = options.palette[flavor].mapBackgroundColor;
-    const previewBackgroundColor = options.palette[flavor].previewBackgroundColor;
+    const previewBackgroundColor =
+      options.palette[flavor].previewBackgroundColor;
     const shapeColor = options.palette[flavor].shapeColor;
     const gameOverImage = options.palette[flavor].gameOverImage;
 
-    this.drawArea(this.mapCtx, this.map, mapBackgroundColor)
-    this.drawArea(this.previewCtx, this.previewMap, previewBackgroundColor)
+    this.drawArea(this.mapCtx, this.map, mapBackgroundColor);
+    this.drawArea(this.previewCtx, this.previewMap, previewBackgroundColor);
 
     this.mapBackgroundColor = mapBackgroundColor;
     this.previewBackgroundColor = previewBackgroundColor;
@@ -484,7 +500,7 @@ class Game {
 
   // 设置颜色
   setShapeColor(type, backgroundColor) {
-    const colorIndex = type - 1
+    const colorIndex = type - 1;
     switch (type) {
       case 0:
         return backgroundColor;
