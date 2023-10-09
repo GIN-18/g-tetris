@@ -84,40 +84,30 @@ class Operator {
     $("#rotate-btn").on("touchstart", (e) => {
       e.preventDefault();
       this.game.rotateShape(1);
-      this.music.fetchMusic(0, 0.19);
-      utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
 
     // 下落键
     $("#drop-btn").on("touchstart", (e) => {
       e.preventDefault();
       this.game.dropShape();
-      this.music.fetchMusic(0, 0.19);
-      utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
 
     // 左键
     $("#left-btn").on("touchstart", (e) => {
       e.preventDefault();
       this.game.moveLeft();
-      this.music.fetchMusic(0, 0.19);
-      utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
 
     // 右键
     $("#right-btn").on("touchstart", (e) => {
       e.preventDefault();
       this.game.moveRight();
-      this.music.fetchMusic(0, 0.19);
-      utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
 
     // 按下下键
     $("#down-btn").on("touchstart", (e) => {
       e.preventDefault();
       this.game.moveDown(true);
-      this.music.fetchMusic(0, 0.19);
-      utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
 
     // 松开下键
@@ -125,6 +115,13 @@ class Operator {
       e.preventDefault();
       this.game.moveDown(false);
     });
+
+    // 将按钮颜色改为激活状态
+    $('.o-btn').on('touchstart', (e) => {
+      e.preventDefault();
+      this.music.fetchMusic(0, 0.19);
+      utils.changeButtonColor(e.currentTarget, "bg-surface0");
+    })
 
     // 将按钮颜色改为背景色
     $(".o-btn").on("touchend", (e) => {

@@ -38,7 +38,6 @@ module.exports = {
   },
 
   // 显示信息
-  // XXX 动画
   showMessage(infoText, status, delay) {
     const messageContainer = document.getElementById('message');
 

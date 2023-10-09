@@ -1,3 +1,4 @@
+const $ = require("jquery");
 const Shape = require("./Shape.js");
 const Music = require("./Music.js");
 const Operator = require("./Operator.js");
@@ -83,9 +84,9 @@ class Game {
       this.previewBackgroundColor
     );
 
-    document.getElementById("score").innerText = this.score;
-    document.getElementById("highest-score").innerText = this.highScore;
-    document.getElementById("level").innerText = this.level;
+    $("#score").text(this.score);
+    $("#highest-score").text(this.highScore);
+    $("#level").text(this.level);
   }
 
   // 开始游戏
@@ -134,10 +135,7 @@ class Game {
 
     gameOverContainer.innerHTML = gameOverInfoTemplate;
 
-    document.body.appendChild(gameOverContainer);
-
-    const anotherScoreLabel = document.getElementById("another-score-label");
-    const anotherScoreInfo = document.getElementById("another-score-info");
+    $("body").append(gameOverContainer);
 
     if (this.gameMode === "double") {
       socket.emit("gameOver", {
@@ -147,18 +145,18 @@ class Game {
     } else {
       this.updateHighScore();
       utils.setImage("game-over-image", this.gameOverImage);
-      anotherScoreLabel.innerText = "HIGHEST SCORE:";
-      anotherScoreInfo.innerText = this.highScore;
+      $("#another-score-label").text("HIGHEST SCORE:");
+      $("#another-score-info").text(this.highScore);
 
-      document
-        .getElementById("again-btn")
-        .addEventListener("touchstart", () => {
-          location.reload();
-        });
+      $("#again-btn").on("touchstart", (e) => {
+        e.preventDefault();
+        location.reload();
+      });
     }
 
-    document.getElementById("quit-btn").addEventListener("touchstart", () => {
-      location.replace("../index.html");
+    $("#quit-btn").on("touchstart", (e) => {
+      e.preventDefault();
+      location.href = "../index.html";
     });
   }
 
@@ -186,13 +184,13 @@ class Game {
   addShape() {
     this.shape = this.nextShape;
     this.nextShape = this.generateShape();
-    this.drawNextShape()
+    this.drawNextShape();
 
     try {
-      let piece = this.generatePiece();
+      const piece = this.generatePiece();
 
       piece.forEach((item) => {
-        let x = this.shape.xOffset + item[1],
+        const x = this.shape.xOffset + item[1],
           y = this.shape.yOffset + item[0];
 
         if (y >= 0 && this.map[y][x]) {
@@ -209,24 +207,24 @@ class Game {
           return;
         }
       });
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // 方块旋转
   rotateShape(rStep) {
     if (!this.gameStart || this.gamePaused || this.gameOver) return;
 
-    let tempRotation = this.shape.rotation;
+    const tempRotation = this.shape.rotation;
 
     this.shape.rotation += rStep;
 
-    let r =
+    const r =
       this.shape.rotation %
       this.shape.shapeTable[this.shape.shapeType[this.shape.type]].length;
 
     this.shape.rotation = r;
 
-    let piece = this.generatePiece();
+    const piece = this.generatePiece();
 
     piece.forEach((item) => {
       const x = this.shape.xOffset + item[1],
@@ -262,7 +260,7 @@ class Game {
   // 下坠
   dropShape() {
     if (this.shape && !this.gamePaused) {
-      while (this.moveShape(0, 1)) {}
+      while (this.moveShape(0, 1)) { }
       this.fallToLand();
     }
   }
@@ -272,12 +270,11 @@ class Game {
     if (!this.shape || !this.gameStart || this.gamePaused || this.gameOver)
       return;
 
-    const width = this.map[0].length;
-    const height = this.map.length;
+    const width = this.map[0].length,
+      height = this.map.length,
+      piece = this.generatePiece();
 
     let canMove = true;
-
-    const piece = this.generatePiece();
 
     piece.forEach((item) => {
       const x = this.shape.xOffset + item[1] + xStep,
@@ -330,8 +327,8 @@ class Game {
 
   // 方块触底后将方块合并到地图数组中
   landShape() {
-    const piece = this.generatePiece();
-    const oldLevel = this.level;
+    const piece = this.generatePiece(),
+      oldLevel = this.level;
 
     piece.forEach((item) => {
       const x = this.shape.xOffset + item[1],
@@ -350,6 +347,7 @@ class Game {
     if (oldLevel !== this.level) {
       this.setDropTimer();
     }
+
   }
 
   // 获取满行
@@ -379,7 +377,7 @@ class Game {
   // 更新分数
   updateScore(filledRows) {
     this.score += filledRows * this.level * 10;
-    document.getElementById("score").innerText = this.score;
+    $("#score").text(this.score);
 
     if (this.gameMode === "double") {
       socket.emit("updateScore", {
@@ -403,10 +401,11 @@ class Game {
     if (this.score >= nextLevelScore) {
       this.level += 1;
       this.updateLevel();
-      document.getElementById("level").innerText = this.level;
+      $("#level").text(this.level);
     }
   }
 
+  // 绘制地图
   drawMap() {
     const mapCtx = this.mapCtx;
     const mapBackgroundColor = this.mapBackgroundColor;
@@ -420,6 +419,7 @@ class Game {
     this.drawShape(mapCtx, piece, shapeType, xOffset, yOffset);
   }
 
+  // 绘制下一个形状
   drawNextShape() {
     const previewCtx = this.previewCtx;
     const previewMap = this.previewMap;

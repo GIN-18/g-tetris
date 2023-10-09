@@ -1,26 +1,29 @@
 import "../../dist/style.css";
-import 'animate.css'
+import "animate.css";
 import "material-icons/iconfont/material-icons.css";
 
 const _ = require("lodash");
+const $ = require("jquery");
 const utils = require("./utils/utils.js");
 const socket = require("./utils/socket.js");
 
-utils.setPagePaltte()
+utils.setPagePaltte();
 
-sessionStorage.setItem('gameMode', 'double')
+sessionStorage.setItem("gameMode", "double");
 
 // 清除sessionStorage
-sessionStorage.removeItem("room")
-sessionStorage.removeItem('ready')
-sessionStorage.removeItem('page')
+sessionStorage.removeItem("room");
+sessionStorage.removeItem("ready");
+sessionStorage.removeItem("page");
 
 // 创建房间
-document.getElementById('create-room').addEventListener('touchstart', () => {
+$("#create-room").on("touchstart", (e) => {
+  e.preventDefault();
   location.href = "./ready.html";
-})
+});
 
-document.getElementById('join-room').addEventListener('touchstart', () => {
+$("#join-room").on("touchstart", (e) => {
+  e.preventDefault();
   const roomContainer = document.getElementById("room-container");
 
   const inputRoomTemplate = `
@@ -39,51 +42,63 @@ document.getElementById('join-room').addEventListener('touchstart', () => {
         </div>
       </div>
     </div>
-  `
-  const inputRoomContainer = document.createElement('div')
+  `;
+  const inputRoomContainer = document.createElement("div");
 
-  inputRoomContainer.innerHTML = inputRoomTemplate
+  inputRoomContainer.innerHTML = inputRoomTemplate;
 
-  roomContainer.appendChild(inputRoomContainer)
-
-  const inputRoom = document.getElementById('input-room')
+  $("#room-container").append(inputRoomContainer);
 
   // 加入房间
-  document.getElementById('join-btn').addEventListener('touchstart', _.debounce(() => {
-    const room = inputRoom.value
+  $("#join-btn").on(
+    "touchstart",
+    _.debounce(
+      (e) => {
+        e.preventDefault();
+        const room = $('#input-room').val()
 
-    if (!room) {
-      utils.showMessage("Pleace input room id!", 'error', 2000)
-      return
-    }
+        if (!room) {
+          utils.showMessage("Pleace input room id!!!", "error", 2000);
+          return;
+        }
 
-    socket.emit('joinRoom', { action: 0, room, ready: 0, score: 0, page: 'ready' })
-  }, 2000, { leading: true }))
-
-  socket.on('roomFull', () => {
-    utils.showMessage("Room is full!", 'error', 2000)
-    return
-  })
-
-  socket.on('roomJoined', (players) => {
-    const playerId = socket.id
-
-    Object.keys(players).forEach(key => {
-      if (key === playerId) {
-        sessionStorage.setItem('room', players[key].room)
-        sessionStorage.setItem('ready', players[key].ready)
-        sessionStorage.setItem('page', players[key].page)
-        roomContainer.removeChild(inputRoomContainer)
-
-        location.href = './ready.html'
-      }
-    })
-  })
-
+        socket.emit("joinRoom", {
+          action: 0,
+          room,
+          ready: 0,
+          score: 0,
+          page: "ready",
+        });
+      },
+      2000,
+      { leading: true }
+    )
+  );
 
   // 取消加入房间
-  document.getElementById('cancel-btn').addEventListener('touchstart', () => {
-    inputRoom.value = ''
-    roomContainer.removeChild(inputRoomContainer)
-  })
-})
+  $("#cancel-btn").on("touchstart", (e) => {
+    e.preventDefault();
+    $('#input-room').val("");
+    roomContainer.removeChild(inputRoomContainer);
+  });
+});
+
+socket.on("roomFull", () => {
+  utils.showMessage("Room is full!!!", "error", 2000);
+  return;
+});
+
+socket.on("roomJoined", (players) => {
+  const playerId = socket.id;
+
+  Object.keys(players).forEach((key) => {
+    if (key === playerId) {
+      sessionStorage.setItem("room", players[key].room);
+      sessionStorage.setItem("ready", players[key].ready);
+      sessionStorage.setItem("page", players[key].page);
+      roomContainer.removeChild(inputRoomContainer);
+
+      location.href = "./ready.html";
+    }
+  });
+});
