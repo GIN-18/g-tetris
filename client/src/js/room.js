@@ -9,8 +9,6 @@ const socket = require("./utils/socket.js");
 
 utils.setPagePaltte();
 
-sessionStorage.setItem("gameMode", "double");
-
 // 清除sessionStorage
 sessionStorage.removeItem("room");
 sessionStorage.removeItem("ready");
@@ -24,8 +22,8 @@ $("#create-room").on("touchstart", (e) => {
 
 $("#join-room").on("touchstart", (e) => {
   e.preventDefault();
-  const roomContainer = document.getElementById("room-container");
 
+  const inputRoomContainer = $("<div></div>");
   const inputRoomTemplate = `
     <div class="absolute top-0 left-0 w-screen h-screen bg-crust bg-opacity-95"></div>
     <div
@@ -43,11 +41,9 @@ $("#join-room").on("touchstart", (e) => {
       </div>
     </div>
   `;
-  const inputRoomContainer = document.createElement("div");
+  inputRoomContainer.html(inputRoomTemplate);
 
-  inputRoomContainer.innerHTML = inputRoomTemplate;
-
-  $("#room-container").append(inputRoomContainer);
+  $("body").append(inputRoomContainer);
 
   // 加入房间
   $("#join-btn").on(
@@ -55,7 +51,7 @@ $("#join-room").on("touchstart", (e) => {
     _.debounce(
       (e) => {
         e.preventDefault();
-        const room = $('#input-room').val()
+        const room = $("#input-room").val();
 
         if (!room) {
           utils.showMessage("Pleace input room id!!!", "error", 2000);
@@ -78,8 +74,8 @@ $("#join-room").on("touchstart", (e) => {
   // 取消加入房间
   $("#cancel-btn").on("touchstart", (e) => {
     e.preventDefault();
-    $('#input-room').val("");
-    roomContainer.removeChild(inputRoomContainer);
+    $("#input-room").val("");
+    inputRoomContainer.remove();
   });
 });
 
@@ -96,7 +92,6 @@ socket.on("roomJoined", (players) => {
       sessionStorage.setItem("room", players[key].room);
       sessionStorage.setItem("ready", players[key].ready);
       sessionStorage.setItem("page", players[key].page);
-      roomContainer.removeChild(inputRoomContainer);
 
       location.href = "./ready.html";
     }

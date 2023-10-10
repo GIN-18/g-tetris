@@ -1,4 +1,4 @@
-const options = require('./options.js');
+const options = require("./options.js");
 
 module.exports = {
   // 更改图标
@@ -19,13 +19,15 @@ module.exports = {
 
   // 添加类名元素
   setClassName(operation, newClassName, oldClassName, ...args) {
-    args.forEach(element => {
-      if (operation === 'replace') {
-        document.getElementById(element).classList.replace(newClassName, oldClassName);
-      } else if (operation === 'add') {
-        document.getElementById(element).classList.add(newClassName);
-      } else if (operation === 'remove') {
-        document.getElementById(element).classList.remove(oldClassName);
+    args.forEach((element) => {
+      const tempElement = $(`#${element}`);
+      if (operation === "replace") {
+        tempElement.addClass(newClassName);
+        tempElement.removeClass(oldClassName);
+      } else if (operation === "add") {
+        tempElement.addClass(newClassName);
+      } else if (operation === "remove") {
+        tempElement.removeClass(oldClassName);
       }
     });
   },
@@ -39,37 +41,48 @@ module.exports = {
 
   // 显示信息
   showMessage(infoText, status, delay) {
-    const messageContainer = document.getElementById('message');
+    const messageContainer = document.getElementById("message");
 
-    const messageBox = document.createElement('div');
+    const messageBox = document.createElement("div");
 
-    messageBox.classList.add('mb-2', 'px-2', 'py-1', 'border', 'rounded', 'text-xs', 'bg-mantle', 'animate__animated', 'animate__bounce', 'animate__fadeInRight')
+    messageBox.classList.add(
+      "mb-2",
+      "px-2",
+      "py-1",
+      "border",
+      "rounded",
+      "text-xs",
+      "bg-mantle",
+      "animate__animated",
+      "animate__bounce",
+      "animate__fadeInRight"
+    );
 
-    if (status === 'error') {
-      messageBox.classList.add('border-red', 'text-red')
+    if (status === "error") {
+      messageBox.classList.add("border-red", "text-red");
     } else {
-      messageBox.classList.add('border-green', 'text-green')
+      messageBox.classList.add("border-green", "text-green");
     }
 
     messageBox.innerText = infoText;
 
-    messageContainer.appendChild(messageBox)
+    messageContainer.appendChild(messageBox);
 
     setTimeout(() => {
-      messageBox.classList.remove('animate__fadeInRight')
-      messageBox.classList.add('animate__fadeOutRight')
+      messageBox.classList.remove("animate__fadeInRight");
+      messageBox.classList.add("animate__fadeOutRight");
 
-      messageBox.addEventListener('animationend', () => {
-        messageContainer.removeChild(messageBox)
-      })
+      messageBox.addEventListener("animationend", () => {
+        messageContainer.removeChild(messageBox);
+      });
     }, delay);
   },
 
   // 高亮当前的选项
   highlightCurrentOption(menuGroup, option) {
-    const optionGroup = sessionStorage.getItem(option)
+    const optionGroup = sessionStorage.getItem(option);
 
-    document.querySelectorAll(menuGroup).forEach(item => {
+    document.querySelectorAll(menuGroup).forEach((item) => {
       item.classList.remove("text-green");
       item.firstElementChild.classList.add("!text-surface0");
 
@@ -79,7 +92,7 @@ module.exports = {
         item.firstElementChild.classList.remove("!text-surface0");
         item.classList.add("text-green");
       }
-    })
+    });
   },
 
   // 设置颜色主题
@@ -88,10 +101,10 @@ module.exports = {
     const oldFlavor = bodyElement.classList[0];
 
     if (!sessionStorage.getItem("flavor")) {
-      sessionStorage.setItem('flavor', oldFlavor)
+      sessionStorage.setItem("flavor", oldFlavor);
     }
 
-    const flavor = sessionStorage.getItem('flavor');
+    const flavor = sessionStorage.getItem("flavor");
 
     const logoImage = options.palette[flavor].logoImage;
 

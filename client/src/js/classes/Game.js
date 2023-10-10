@@ -207,7 +207,7 @@ class Game {
           return;
         }
       });
-    } catch (e) { }
+    } catch (e) {}
   }
 
   // 方块旋转
@@ -260,7 +260,7 @@ class Game {
   // 下坠
   dropShape() {
     if (this.shape && !this.gamePaused) {
-      while (this.moveShape(0, 1)) { }
+      while (this.moveShape(0, 1)) {}
       this.fallToLand();
     }
   }
@@ -347,7 +347,6 @@ class Game {
     if (oldLevel !== this.level) {
       this.setDropTimer();
     }
-
   }
 
   // 获取满行
