@@ -1,3 +1,4 @@
+const $ = require("jquery");
 const options = require("./options.js");
 
 module.exports = {

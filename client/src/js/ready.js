@@ -3,6 +3,7 @@ import "animate.css";
 import "material-icons/iconfont/material-icons.css";
 
 const $ = require("jquery");
+const _ = require("lodash");
 const Clipboard = require("clipboard");
 const utils = require("./utils/utils.js");
 const socket = require("./utils/socket.js");
@@ -62,11 +63,11 @@ socket.on("roomJoined", (players) => {
 
   countdown.text(5);
 
-  Object.keys(players).forEach((player) => {
+  _.forEach(players, (value, player) => {
     if (player === playerId) {
       player1Id.text(player.substring(0, 12));
 
-      if (!players[player].ready) {
+      if (!value.ready) {
         player1Status.text("not ready").addClass("text-red");
         statusButton.text("Ready");
       } else {
@@ -80,7 +81,7 @@ socket.on("roomJoined", (players) => {
     } else {
       player2Id.text(player.substring(0, 12));
 
-      if (!players[player].ready) {
+      if (!value.ready) {
         player2Status.text("not ready").addClass("text-red");
       } else {
         socket.emit("ready", {
@@ -97,12 +98,12 @@ socket.on("roomJoined", (players) => {
 socket.on("playerJoined", (players) => {
   const playerId = socket.id;
 
-  Object.keys(players).forEach((player) => {
+  _.forEach(players, (value, player) => {
     player2Id.text(player.substring(0, 12));
 
-    if (players[player].ready && player !== playerId) {
+    if (value.ready && player !== playerId) {
       player2Status.text("ready").addClass("text-green");
-    } else if (!players[player].ready && player !== playerId) {
+    } else if (!value.ready && player !== playerId) {
       player2Status.text("not ready").addClass("text-red");
     }
   });
@@ -140,7 +141,7 @@ socket.on("zeroPlayerReady", (players) => {
     .addClass("text-red");
   statusButton.text("Ready");
 
-  if (Object.keys(players).length > 1) {
+  if (_.size(players) > 1) {
     player2Status
       .text("not ready")
       .removeClass("text-green")
@@ -154,14 +155,14 @@ socket.on("onePlayerReady", (players) => {
   const playerId = socket.id;
 
   // 玩家1状态
-  Object.keys(players).forEach((player) => {
-    if (players[player].ready && player === playerId) {
+  _.forEach(players, (value, player) => {
+    if (value.ready && player === playerId) {
       player1Status
         .text("ready")
         .removeClass("text-red")
         .addClass("text-green");
       statusButton.text("Cancel");
-    } else if (!players[player].ready && player === playerId) {
+    } else if (!value.ready && player === playerId) {
       player1Status
         .text("not ready")
         .removeClass("text-green")
@@ -170,12 +171,12 @@ socket.on("onePlayerReady", (players) => {
     }
 
     // 玩家2状态
-    if (players[player].ready && player !== playerId) {
+    if (value.ready && player !== playerId) {
       player2Status
         .text("ready")
         .removeClass("text-red")
         .addClass("text-green");
-    } else if (!players[player].ready && player !== playerId) {
+    } else if (!value.ready && player !== playerId) {
       player2Status
         .text("not ready")
         .removeClass("text-green")
