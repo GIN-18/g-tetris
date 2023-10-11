@@ -1,6 +1,5 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const ImageminWebpWebpackPlugin = require("imagemin-webp-webpack-plugin");
 
 module.exports = {
   mode: "development",
@@ -18,9 +17,13 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        loader: "babel-loader",
-        include: path.resolve(__dirname, "src", "js"),
         exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env"],
+          },
+        },
       },
       {
         test: /\.css$/,
@@ -28,24 +31,24 @@ module.exports = {
       },
       {
         test: /\.webp$/,
-        type: 'asset/resource',
+        type: "asset/resource",
         generator: {
-          filename: 'static/images/[hash][ext][query]',
-        }
+          filename: "static/images/[hash][ext][query]",
+        },
       },
       {
         test: /\.mp3$/,
-        type: 'asset/resource',
+        type: "asset/resource",
         generator: {
-          filename: 'static/audio/[hash][ext][query]'
+          filename: "static/audio/[hash][ext][query]",
         },
       },
       {
         test: /\.(woff|woff2)$/,
-        type: 'asset/resource',
+        type: "asset/resource",
         generator: {
-          filename: 'static/font/[hash][ext][query]'
-        }
+          filename: "static/font/[hash][ext][query]",
+        },
       },
     ],
   },
@@ -73,17 +76,6 @@ module.exports = {
       template: path.resolve(__dirname, "src", "ready.html"),
       favicon: path.resolve(__dirname, "src", "static", "favicon.ico"),
       chunks: ["ready"],
-    }),
-    new ImageminWebpWebpackPlugin({
-      config: [
-        {
-          test: /\.(jpe?g|png)/,
-          options: {
-            quality: 75,
-          },
-        },
-      ],
-      overrideExtension: true,
     }),
   ],
   devServer: {

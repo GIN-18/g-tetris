@@ -18,13 +18,13 @@ class Operator {
     // 打开菜单
     $("#menu-btn").on("touchstart", (e) => {
       e.preventDefault();
-      utils.setClassName("replace", "hidden", "block", "menu");
+      $('#menu').removeClass('hidden')
     });
 
     // 关闭菜单
     $("#close-btn").on("touchstart", (e) => {
       e.preventDefault();
-      utils.setClassName("replace", "block", "hidden", "menu");
+      $('#menu').addClass('hidden')
     });
 
     // 开始和暂停按钮
