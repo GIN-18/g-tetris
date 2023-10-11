@@ -22,7 +22,6 @@ const game = new Game(mapCtx, previewCtx);
 let playerLeftTimer = null;
 
 utils.setPagePaltte();
-game.setGamePalette();
 utils.highlightCurrentOption(".menu-item", "flavor");
 
 if (sessionStorage.getItem("gameMode") === "double") {

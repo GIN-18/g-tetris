@@ -24,7 +24,7 @@ class Game {
     this.previewWidth = 4;
     this.previewHeight = 2;
     this.previewBackgroundColor =
-      options.palette[this.flavor].mapBackgroundColor;
+      options.palette[this.flavor].previewBackgroundColor;
     this.previewMap = [...new Array(this.previewHeight)].map(() =>
       new Array(this.previewWidth).fill(0)
     );
@@ -78,11 +78,7 @@ class Game {
   // 设置游戏信息
   setGameData() {
     this.drawArea(this.mapCtx, this.map, this.mapBackgroundColor);
-    this.drawArea(
-      this.previewCtx,
-      this.previewMap,
-      this.previewBackgroundColor
-    );
+    this.drawNextShape();
 
     $("#score").text(this.score);
     $("#highest-score").text(this.highScore);
@@ -204,7 +200,6 @@ class Game {
           this.shape = null;
           cancelAnimationFrame(this.animateId);
           this.overGame();
-          return;
         }
       });
     } catch (e) {}
@@ -478,16 +473,11 @@ class Game {
 
   // 设置游戏颜色主题
   setGamePalette() {
-    const flavor = sessionStorage.getItem("flavor");
-
-    const mapBackgroundColor = options.palette[flavor].mapBackgroundColor;
-    const previewBackgroundColor =
-      options.palette[flavor].previewBackgroundColor;
-    const shapeColor = options.palette[flavor].shapeColor;
-    const gameOverImage = options.palette[flavor].gameOverImage;
-
-    this.drawArea(this.mapCtx, this.map, mapBackgroundColor);
-    this.drawArea(this.previewCtx, this.previewMap, previewBackgroundColor);
+    const flavor = sessionStorage.getItem("flavor"),
+      mapBackgroundColor = options.palette[flavor].mapBackgroundColor,
+      previewBackgroundColor = options.palette[flavor].previewBackgroundColor,
+      shapeColor = options.palette[flavor].shapeColor,
+      gameOverImage = options.palette[flavor].gameOverImage;
 
     this.mapBackgroundColor = mapBackgroundColor;
     this.previewBackgroundColor = previewBackgroundColor;
@@ -495,6 +485,9 @@ class Game {
     this.shapeColor = shapeColor;
 
     this.gameOverImage = gameOverImage;
+
+    this.drawArea(this.mapCtx, this.map, mapBackgroundColor);
+    this.drawNextShape();
   }
 
   // 设置颜色
