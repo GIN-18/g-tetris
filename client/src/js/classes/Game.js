@@ -237,6 +237,7 @@ class Game {
 
   // 下移
   moveDown(enable) {
+    if (enable && !this.moveShape(0, 1)) return;
     this.fastForward = enable;
     this.setDropTimer();
   }
@@ -305,7 +306,6 @@ class Game {
   fallToLand() {
     if (this.moveShape(0, 1)) return;
     this.landShape();
-    this.addShape();
   }
 
   // 方块触底后将方块合并到地图数组中
@@ -325,6 +325,8 @@ class Game {
       this.clearFilledRows(filledRows);
       this.updateScore(filledRows.length);
       this.updateLevel();
+    } else {
+      this.addShape();
     }
 
     if (oldLevel !== this.level) {
@@ -343,17 +345,52 @@ class Game {
     return filledRows;
   }
 
-  // XXX: 消除满行
+  // 消除满行
   clearFilledRows(filledRows) {
-    filledRows.forEach((row) => {
-      this.map[row].fill(8);
+    if (this.dropTimer) {
+      clearInterval(this.dropTimer);
+      this.dropTimer = null;
+    }
 
-      setTimeout(() => {
-        this.map.splice(row, 1);
-        this.map.unshift(new Array(10).fill(0));
-      }, 3000);
-    });
-    this.music.fetchMusic(0.19, 0.7);
+    let animationFrame = null;
+    let progress = 0;
+    const numCols = this.map[0].length;
+
+    function animate() {
+      if (progress === numCols) {
+        // 动画结束
+        // 删除行
+        filledRows.forEach((row) => {
+          this.map.splice(row, 1);
+          this.map.unshift(new Array(10).fill(0));
+        });
+
+        // 添加新方块并重新启动下落计时器
+        this.addShape();
+        this.setDropTimer();
+
+        // 播放音效
+        this.music.fetchMusic(0.19, 0.7);
+
+        return;
+      }
+
+      // 绘制一列小方块
+      this.mapCtx.fillStyle = this.shapeColor[7];
+      for (let row = 0; row < filledRows.length; row++) {
+        const x = progress * 20;
+        const y = filledRows[row] * 20;
+        this.mapCtx.fillRect(x, y, 20, 20);
+      }
+
+      progress += 0.5;
+
+      // 请求下一帧绘制
+      animationFrame = requestAnimationFrame(animate.bind(this));
+    }
+
+    // 开始动画
+    animationFrame = requestAnimationFrame(animate.bind(this));
   }
 
   // 更新分数
@@ -389,13 +426,13 @@ class Game {
 
   // 绘制地图
   drawMap() {
-    const mapCtx = this.mapCtx;
-    const mapBackgroundColor = this.mapBackgroundColor;
-    const map = this.map;
-    const piece = this.generatePiece();
-    const shapeType = this.shape.type;
-    const xOffset = this.shape.xOffset;
-    const yOffset = this.shape.yOffset;
+    const mapCtx = this.mapCtx,
+      mapBackgroundColor = this.mapBackgroundColor,
+      map = this.map,
+      piece = this.generatePiece(),
+      shapeType = this.shape.type,
+      xOffset = this.shape.xOffset,
+      yOffset = this.shape.yOffset;
 
     this.drawArea(mapCtx, map, mapBackgroundColor);
     this.drawShape(mapCtx, piece, shapeType, xOffset, yOffset);
@@ -403,11 +440,11 @@ class Game {
 
   // 绘制下一个形状
   drawNextShape() {
-    const previewCtx = this.previewCtx;
-    const previewMap = this.previewMap;
-    const previewBackgroundColor = this.previewBackgroundColor;
-    const piece = this.generateNextPiece();
-    const shapeType = this.nextShape.type;
+    const previewCtx = this.previewCtx,
+      previewMap = this.previewMap,
+      previewBackgroundColor = this.previewBackgroundColor,
+      piece = this.generateNextPiece(),
+      shapeType = this.nextShape.type;
 
     this.drawArea(previewCtx, previewMap, previewBackgroundColor);
     this.drawShape(previewCtx, piece, shapeType, 0, 0);

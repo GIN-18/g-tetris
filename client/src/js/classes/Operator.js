@@ -18,13 +18,13 @@ class Operator {
     // 打开菜单
     $("#menu-btn").on("touchstart", (e) => {
       e.preventDefault();
-      $('#menu').removeClass('hidden')
+      $("#menu").removeClass("hidden");
     });
 
     // 关闭菜单
     $("#close-btn").on("touchstart", (e) => {
       e.preventDefault();
-      $('#menu').addClass('hidden')
+      $("#menu").addClass("hidden");
     });
 
     // 开始和暂停按钮
@@ -117,11 +117,11 @@ class Operator {
     });
 
     // 将按钮颜色改为激活状态
-    $('.o-btn').on('touchstart', (e) => {
+    $(".o-btn").on("touchstart", (e) => {
       e.preventDefault();
       this.music.fetchMusic(0, 0.19);
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
-    })
+    });
 
     // 将按钮颜色改为背景色
     $(".o-btn").on("touchend", (e) => {
