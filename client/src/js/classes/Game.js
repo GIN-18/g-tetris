@@ -2,7 +2,6 @@ const $ = require("jquery");
 const Shape = require("./Shape.js");
 const Music = require("./Music.js");
 const Operator = require("./Operator.js");
-const utils = require("../utils/utils.js");
 const socket = require("../utils/socket.js");
 const options = require("../utils/options.js");
 
@@ -66,15 +65,6 @@ class Game {
     this.operator.buttonMovePiece();
   }
 
-  // 游戏动画
-  gameLoop() {
-    if (this.gameStart) {
-      this.drawMap();
-    }
-
-    this.animateId = requestAnimationFrame(this.gameLoop.bind(this));
-  }
-
   // 设置游戏信息
   setGameData() {
     this.drawArea(this.mapCtx, this.map, this.mapBackgroundColor);
@@ -88,10 +78,8 @@ class Game {
   // 开始游戏
   startGame() {
     this.gameStart = true;
-    this.gameOver = false;
     this.addShape();
     this.setDropTimer();
-    this.gameLoop();
   }
 
   // 结束游戏
@@ -127,9 +115,9 @@ class Game {
       </div>
     `;
 
-    const gameOverContainer = document.createElement("div");
+    const gameOverContainer = $("<div></div>");
 
-    gameOverContainer.innerHTML = gameOverInfoTemplate;
+    gameOverContainer.html(gameOverInfoTemplate);
 
     $("body").append(gameOverContainer);
 
@@ -140,7 +128,7 @@ class Game {
       });
     } else {
       this.updateHighScore();
-      utils.setImage("game-over-image", this.gameOverImage);
+      $("#game-over-image").attr("src", this.gameOverImage);
       $("#another-score-label").text("HIGHEST SCORE:");
       $("#another-score-info").text(this.highScore);
 
@@ -180,6 +168,7 @@ class Game {
   addShape() {
     this.shape = this.nextShape;
     this.nextShape = this.generateShape();
+    this.drawMap();
     this.drawNextShape();
 
     try {
@@ -197,9 +186,9 @@ class Game {
 
           this.gameOver = true;
           this.gameStart = false;
-          this.shape = null;
-          cancelAnimationFrame(this.animateId);
           this.overGame();
+          this.shape = null;
+          this.nextShape = null;
         }
       });
     } catch (e) {}
@@ -232,6 +221,8 @@ class Game {
         this.shape.rotation = tempRotation;
       }
     });
+
+    this.drawMap();
   }
 
   // 左移
@@ -246,8 +237,6 @@ class Game {
 
   // 下移
   moveDown(enable) {
-    if (this.fastForward === enable || this.gameOver) return;
-    if (enable && !this.moveShape(0, 1)) return;
     this.fastForward = enable;
     this.setDropTimer();
   }
@@ -262,8 +251,7 @@ class Game {
 
   // 移动方块
   moveShape(xStep, yStep) {
-    if (!this.shape || !this.gameStart || this.gamePaused || this.gameOver)
-      return;
+    if (!this.gameStart || this.gamePaused || this.gameOver) return;
 
     const width = this.map[0].length,
       height = this.map.length,
@@ -288,6 +276,7 @@ class Game {
     if (canMove) {
       this.shape.xOffset += xStep;
       this.shape.yOffset += yStep;
+      this.drawMap();
     }
 
     return canMove;
@@ -314,10 +303,9 @@ class Game {
   }
 
   fallToLand() {
-    if (!this.moveShape(0, 1)) {
-      this.landShape();
-      this.addShape();
-    }
+    if (this.moveShape(0, 1)) return;
+    this.landShape();
+    this.addShape();
   }
 
   // 方块触底后将方块合并到地图数组中
@@ -363,7 +351,7 @@ class Game {
       setTimeout(() => {
         this.map.splice(row, 1);
         this.map.unshift(new Array(10).fill(0));
-      }, 100);
+      }, 3000);
     });
     this.music.fetchMusic(0.19, 0.7);
   }

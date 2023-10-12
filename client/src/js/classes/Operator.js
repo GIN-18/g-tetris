@@ -111,7 +111,7 @@ class Operator {
     });
 
     // 松开下键
-    $("#down-btn").on("touchstart", (e) => {
+    $("#down-btn").on("touchend", (e) => {
       e.preventDefault();
       this.game.moveDown(false);
     });
