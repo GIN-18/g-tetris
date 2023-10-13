@@ -19,12 +19,12 @@ class Operator {
     $("#menu-btn").on("touchstart", (e) => {
       e.preventDefault();
 
-      const menuContainer = $("<div></div>").hide();
+      const menuContainer = $("<div></div>");
       const separatorElement = $(`
         <div class="absolute top-0 left-0 w-screen h-screen bg-crust bg-opacity-95"></div>
       `);
       const menuTemplate = `
-        <aside class="absolute top-0 right-0 w-2/3 h-screen p-3 bg-surface0">
+        <aside class="absolute top-0 right-0 w-2/3 h-screen p-3 bg-surface0 animate__animated animate__slideInRight">
           <header class="flex justify-between items-center">
             <h2 class="text-lg font-semibold">OPTIONS</h2>
             <button id="close-btn" class="flex justify-center items-center">
@@ -64,15 +64,17 @@ class Operator {
 
       utils.highlightCurrentOption(".menu-item", "flavor");
 
-      menuContainer.fadeIn();
-
       // 关闭菜单
       $("#close-btn").on("touchstart", (e) => {
         e.preventDefault();
-        menuContainer.fadeOut(() => {
-          separatorElement.remove();
-          menuContainer.remove();
-        });
+        menuContainer
+          .children()
+          .removeClass("animate__slideInRight")
+          .addClass("animate__slideOutRight")
+          .on("animationend", () => {
+            separatorElement.remove();
+            menuContainer.remove();
+          });
       });
 
       $(".flavor-btn").on("touchstart", (e) => {

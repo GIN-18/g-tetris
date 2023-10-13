@@ -198,7 +198,7 @@ class Game {
 
   // 方块旋转
   rotateShape(rStep) {
-    if (!this.gameStart || this.gamePaused || this.gameOver) return;
+    if (!this.gameStart || this.gamePaused || this.gameOver || !this.dropTimer) return;
 
     const tempRotation = this.shape.rotation;
 
@@ -259,7 +259,7 @@ class Game {
 
   // 移动方块
   moveShape(xStep, yStep) {
-    if (!this.gameStart || this.gamePaused || this.gameOver) return;
+    if (!this.gameStart || this.gamePaused || this.gameOver || !this.dropTimer) return;
 
     const width = this.map[0].length,
       height = this.map.length,
@@ -334,10 +334,6 @@ class Game {
       this.updateLevel();
     } else {
       this.addShape();
-    }
-
-    if (oldLevel !== this.level) {
-      this.setDropTimer();
     }
   }
 

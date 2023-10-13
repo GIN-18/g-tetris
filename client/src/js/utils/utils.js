@@ -55,7 +55,6 @@ module.exports = {
       "text-xs",
       "bg-mantle",
       "animate__animated",
-      "animate__bounce",
       "animate__fadeInRight"
     );
 
