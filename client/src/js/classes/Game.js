@@ -85,8 +85,11 @@ class Game {
   // 结束游戏
   // XXX: again按钮和quit按钮的功能
   overGame() {
+    const gameOverContainer = $("<div></div>").hide();
+    const separatorElement = $(`
+      <div class="absolute top-0 left-0 w-screen h-screen bg-crust bg-opacity-95"></div>
+    `);
     const gameOverInfoTemplate = `
-      <div class="absolute top-0 left-0 w-screen h-screen bg-crust bg-opacity-95">
       <div id="game-over-info"
         class="z-10 flex flex-col justify-around items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 p-6 border-2 border-text rounded bg-surface0">
         <img id="game-over-image" alt="game over" />
@@ -114,12 +117,11 @@ class Game {
         </div>
       </div>
     `;
-
-    const gameOverContainer = $("<div></div>");
-
     gameOverContainer.html(gameOverInfoTemplate);
 
-    $("body").append(gameOverContainer);
+    $("body").append(separatorElement).append(gameOverContainer);
+
+    gameOverContainer.fadeIn("slow");
 
     if (this.gameMode === "double") {
       socket.emit("gameOver", {
@@ -237,17 +239,22 @@ class Game {
 
   // 下移
   moveDown(enable) {
-    if (enable && !this.moveShape(0, 1)) return;
+    if (
+      !this.gameStart ||
+      this.gamePaused ||
+      this.gameOver ||
+      (enable && !this.moveShape(0, 1))
+    )
+      return;
     this.fastForward = enable;
     this.setDropTimer();
   }
 
   // 下坠
   dropShape() {
-    if (this.shape && !this.gamePaused) {
-      while (this.moveShape(0, 1)) {}
-      this.fallToLand();
-    }
+    if (this.gamePaused || !this.dropTimer) return;
+    while (this.moveShape(0, 1)) {}
+    this.fallToLand();
   }
 
   // 移动方块

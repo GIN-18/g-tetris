@@ -23,9 +23,11 @@ $("#create-room").on("touchstart", (e) => {
 $("#join-room").on("touchstart", (e) => {
   e.preventDefault();
 
-  const inputRoomContainer = $("<div></div>");
-  const inputRoomTemplate = `
+  const inputRoomContainer = $("<div></div>").hide();
+  const separatorElement = $(`
     <div class="absolute top-0 left-0 w-screen h-screen bg-crust bg-opacity-95"></div>
+  `);
+  const inputRoomTemplate = `
     <div
       class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col justify-between items-center font-semibold">
       <div id="join-message" class="hidden justify-center items-center text-red"></div>
@@ -43,7 +45,9 @@ $("#join-room").on("touchstart", (e) => {
   `;
   inputRoomContainer.html(inputRoomTemplate);
 
-  $("body").append(inputRoomContainer);
+  $("body").append(separatorElement).append(inputRoomContainer);
+
+  inputRoomContainer.fadeIn();
 
   // 加入房间
   $("#join-btn").on(
@@ -75,7 +79,10 @@ $("#join-room").on("touchstart", (e) => {
   $("#cancel-btn").on("touchstart", (e) => {
     e.preventDefault();
     $("#input-room").val("");
-    inputRoomContainer.remove();
+    inputRoomContainer.fadeOut(() => {
+      separatorElement.remove();
+      inputRoomContainer.remove();
+    });
   });
 });
 
