@@ -3,5 +3,9 @@
 @tailwind utilities;
 
 * {
-  @apply touch-manipulation
+  @apply touch-manipulation;
+}
+
+html {
+  @apply w-full h-full;
 }

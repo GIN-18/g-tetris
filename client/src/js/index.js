@@ -3,6 +3,6 @@ import "material-icons/iconfont/material-icons.css";
 
 const utils = require("./utils/utils.js");
 
-sessionStorage.removeItem('gameMode')
+sessionStorage.removeItem("gameMode");
 
-utils.setPagePaltte()
+utils.setPagePaltte();

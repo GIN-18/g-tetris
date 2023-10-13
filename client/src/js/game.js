@@ -11,6 +11,8 @@ const utils = require("./utils/utils.js");
 const options = require("./utils/options.js");
 const socket = require("./utils/socket.js");
 
+utils.preventZoom();
+
 const mapCanvas = document.getElementById("map-canvas");
 const previewCanvas = document.getElementById("preview-canvas");
 
@@ -25,7 +27,7 @@ utils.setPagePaltte();
 utils.highlightCurrentOption(".menu-item", "flavor");
 
 if (sessionStorage.getItem("gameMode") === "double") {
-  const scoreDiff = $('#score-diff')
+  const scoreDiff = $("#score-diff");
 
   $("#highest-score-container, #start-btn, #restart-btn")
     .removeClass("flex")
@@ -89,7 +91,7 @@ if (sessionStorage.getItem("gameMode") === "double") {
         sessionStorage.setItem("scoreDiff", different);
 
         if (!different) {
-          scoreDiff.text(0)
+          scoreDiff.text(0);
           $("#score-diff").removeClass("text-red").addClass("text-green");
         } else if (different > 0) {
           scoreDiff.text(`+${different}`);
