@@ -12,12 +12,6 @@ module.exports = {
     }
   },
 
-  // 设置图片
-  setImage(elementId, imageSrc) {
-    const img = document.getElementById(elementId);
-    img.src = imageSrc;
-  },
-
   // 添加类名元素
   setClassName(operation, newClassName, oldClassName, ...args) {
     args.forEach((element) => {
@@ -110,7 +104,7 @@ module.exports = {
 
     bodyElement.classList.replace(oldFlavor, flavor);
 
-    this.setImage("logo-image", logoImage);
+    $('#logo-image').attr('src', logoImage)
   },
 
   // 阻止页面放大

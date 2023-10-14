@@ -25,7 +25,7 @@ $("#join-room").on("touchstart", (e) => {
 
   const inputRoomContainer = $("<div></div>").hide();
   const separatorElement = $(`
-    <div class="absolute top-0 left-0 w-screen h-screen bg-crust bg-opacity-95"></div>
+    <div class="absolute top-0 left-0 w-full h-full bg-crust bg-opacity-95"></div>
   `);
   const inputRoomTemplate = `
     <div

@@ -11,8 +11,6 @@ const utils = require("./utils/utils.js");
 const options = require("./utils/options.js");
 const socket = require("./utils/socket.js");
 
-utils.preventZoom();
-
 const mapCanvas = document.getElementById("map-canvas");
 const previewCanvas = document.getElementById("preview-canvas");
 
@@ -23,6 +21,7 @@ const game = new Game(mapCtx, previewCtx);
 
 let playerLeftTimer = null;
 
+utils.preventZoom();
 utils.setPagePaltte();
 utils.highlightCurrentOption(".menu-item", "flavor");
 
@@ -100,7 +99,7 @@ if (sessionStorage.getItem("gameMode") === "double") {
           scoreDiff.text(different);
           $("#score-diff").removeClass("text-green").addClass("text-red");
         }
-      } catch (error) {}
+      } catch (error) { }
     });
   });
 
@@ -145,22 +144,14 @@ if (sessionStorage.getItem("gameMode") === "double") {
 
   // 一个玩家再来一次
   socket.on("onePlayerAgain", () => {
-    const againLabel = document.getElementById("again-label"),
-      againInfo = document.getElementById("again-info");
-
-    againLabel.innerText = "AGAIN: ";
-    utils.setClassName("add", "text-red", null, "again-info");
-    againInfo.innerText = "1 / 2";
+    $('#again-label').text('AGAIN: ');
+    $('#again-info').text('1 / 2').addClass('text-red');
   });
 
   // 两个玩家再来一次
   socket.on("twoPlayerAgain", () => {
-    const againLabel = document.getElementById("again-label"),
-      againInfo = document.getElementById("again-info");
-
-    againLabel.innerText = "AGAIN: ";
-    utils.setClassName("replace", "text-red", "text-green", "again-info");
-    againInfo.innerText = "2 / 2";
+    $('#again-label').text('AGAIN: ');
+    $('#again-info').text('2 / 2').removeClass('text-red').addClass('text-green');
 
     setTimeout(() => {
       location.reload();
