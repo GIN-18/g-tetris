@@ -6,25 +6,12 @@ module.exports = {
   changeIcon(elementId, status, trueIcon, falseIcon) {
     const parentElement = document.getElementById(elementId);
     if (status) {
+      console.log(trueIcon)
       parentElement.innerHTML = trueIcon;
     } else {
+      console.log(falseIcon)
       parentElement.innerHTML = falseIcon;
     }
-  },
-
-  // 添加类名元素
-  setClassName(operation, newClassName, oldClassName, ...args) {
-    args.forEach((element) => {
-      const tempElement = $(`#${element}`);
-      if (operation === "replace") {
-        tempElement.addClass(newClassName);
-        tempElement.removeClass(oldClassName);
-      } else if (operation === "add") {
-        tempElement.addClass(newClassName);
-      } else if (operation === "remove") {
-        tempElement.removeClass(oldClassName);
-      }
-    });
   },
 
   // 更改按钮背景颜色

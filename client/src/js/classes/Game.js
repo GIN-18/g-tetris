@@ -28,13 +28,13 @@ class Game {
       new Array(this.previewWidth).fill(0)
     );
 
-    thisMode = sessionStorage.getItem("gameMode") || "single";
+    this.gameMode = sessionStorage.getItem("gameMode") || "single";
 
-    thisStart = false;
-    thisPaused = false;
-    thisOver = false;
+    this.gameStart = false;
+    this.gamePaused = false;
+    this.gameOver = false;
 
-    thisOverImage = options.palette[this.flavor].gameOverImage;
+    this.gameOverImage = options.palette[this.flavor].gameOverImage;
 
     this.music = new Music();
     this.volumeUp = true;
@@ -54,8 +54,8 @@ class Game {
     this.stopIcon = `<span class="material-icons-round !text-sm !leading-3">pause</span>`;
     this.startIcon = `<span class="material-icons-round !text-sm !leading-3">play_arrow</span>`;
 
-    this.volumeOff = `<span class="material-icons-round !text-sm !leading-3">volume_off</span>`;
-    this.volumeUp = `<span class="material-icons-round !text-sm !leading-3">volume_up</span>`;
+    this.volumeOffIcon = `<span class="material-icons-round !text-sm !leading-3">volume_off</span>`;
+    this.volumeUpIcon = `<span class="material-icons-round !text-sm !leading-3">volume_up</span>`;
 
     this.animateId = null;
 
@@ -80,7 +80,7 @@ class Game {
 
   // 开始游戏
   startGame() {
-    thisStart = true;
+    this.gameStart = true;
     this.addShape();
     this.setDropTimer();
   }
@@ -88,11 +88,10 @@ class Game {
   // 结束游戏
   // XXX: again按钮和quit按钮的功能
   overGame() {
-    const gameOverContainer = $("<div></div>").hide();
     const separatorElement = $(`
       <div class="absolute top-0 left-0 w-full h-full bg-crust bg-opacity-95"></div>
     `);
-    const gameOverInfoTemplate = `
+    const gameOverInfoTemplate = $(`
       <div id="game-over-info"
         class="z-10 flex flex-col justify-around items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 p-6 border-2 border-text rounded bg-surface0">
         <img id="game-over-image" alt="game over" />
@@ -119,12 +118,10 @@ class Game {
           </button>
         </div>
       </div>
-    `;
-    gameOverContainer.html(gameOverInfoTemplate);
+    `).hide();
+    $("body").append(separatorElement).append(gameOverInfoTemplate);
 
-    $("body").append(separatorElement).append(gameOverContainer);
-
-    gameOverContainer.fadeIn("slow");
+    gameOverInfoTemplate.fadeIn("slow");
 
     if (thisMode === "double") {
       socket.emit("gameOver", {
@@ -133,7 +130,7 @@ class Game {
       });
     } else {
       this.updateHighScore();
-      $("#game-over-image").attr("src", thisOverImage);
+      $("#game-over-image").attr("src", this.gameOverImage);
       $("#another-score-label").text("HIGHEST SCORE:");
       $("#another-score-info").text(this.highScore);
 
@@ -189,8 +186,8 @@ class Game {
             this.dropTimer = null;
           }
 
-          thisOver = true;
-          thisStart = false;
+          this.gameOver = true;
+          this.gameStart = false;
           this.overGame();
           this.shape = null;
           this.nextShape = null;
@@ -201,7 +198,7 @@ class Game {
 
   // 方块旋转
   rotateShape(rStep) {
-    if (!thisStart || thisPaused || thisOver || !this.dropTimer) return;
+    if (!this.gameStart || this.gamePaused || this.gameOver || !this.dropTimer) return;
 
     const tempRotation = this.shape.rotation;
 
@@ -243,9 +240,9 @@ class Game {
   // 下移
   moveDown(enable) {
     if (
-      !thisStart ||
-      thisPaused ||
-      thisOver ||
+      !this.gameStart ||
+      this.gamePaused ||
+      this.gameOver ||
       (enable && !this.moveShape(0, 1))
     )
       return;
@@ -255,14 +252,14 @@ class Game {
 
   // 下坠
   dropShape() {
-    if (thisPaused || !this.dropTimer) return;
+    if (this.gamePaused || !this.dropTimer) return;
     while (this.moveShape(0, 1)) { }
     this.fallToLand();
   }
 
   // 移动方块
   moveShape(xStep, yStep) {
-    if (!thisStart || thisPaused || thisOver || !this.dropTimer) return;
+    if (!this.gameStart || this.gamePaused || this.gameOver || !this.dropTimer) return;
 
     const width = this.map[0].length,
       height = this.map.length,
@@ -301,12 +298,12 @@ class Game {
       timestep = 80;
     }
 
-    if (this.dropTimer || thisPaused) {
+    if (this.dropTimer || this.gamePaused) {
       clearInterval(this.dropTimer);
       this.dropTimer = null;
     }
 
-    if (!thisPaused) {
+    if (!this.gamePaused) {
       this.dropTimer = setInterval(() => {
         this.fallToLand();
       }, timestep);
@@ -514,7 +511,7 @@ class Game {
 
     this.shapeColor = shapeColor;
 
-    thisOverImage = gameOverImage;
+    this.gameOverImage = gameOverImage;
 
     this.drawArea(this.mapCtx, this.map, mapBackgroundColor);
     this.drawNextShape();
@@ -549,12 +546,11 @@ class Game {
     $("#menu-btn").on("touchstart", (e) => {
       e.preventDefault();
 
-      const menuContainer = $("<div></div>");
       const separatorElement = $(`
-        <div class="absolute top-0 left-0 w-full h-full bg-crust bg-opacity-95"></div>
-      `);
-      const menuTemplate = `
-        <aside class="absolute top-0 right-0 w-2/3 h-full p-3 bg-surface0 animate__animated animate__fadeInRight">
+        <div class="fixed top-0 left-0 w-full h-full bg-crust bg-opacity-95"></div>
+      `).hide();
+      const menuTemplate = $(`
+        <aside class="fixed top-0 right-0 w-2/3 h-full p-3 bg-surface0 animate__animated animate__fadeInRight">
           <header class="flex justify-between items-center">
             <h2 class="text-lg font-semibold">OPTIONS</h2>
             <button id="close-btn" class="flex justify-center items-center">
@@ -587,23 +583,24 @@ class Game {
             </ul>
           </div>
         </aside>
-      `;
-      menuContainer.html(menuTemplate);
+      `)
+      $("body").append(separatorElement).append(menuTemplate);
 
-      $("body").append(separatorElement).append(menuContainer);
+      separatorElement.fadeIn('fast')
 
       utils.highlightCurrentOption(".menu-item", "flavor");
 
       // 关闭菜单
       $("#close-btn").on("touchstart", (e) => {
         e.preventDefault();
-        menuContainer
-          .children()
+        menuTemplate
           .removeClass("animate__fadeInRight")
           .addClass("animate__fadeOutRight")
           .on("animationend", () => {
-            separatorElement.remove();
-            menuContainer.remove();
+            separatorElement.fadeOut('fast', () => {
+              separatorElement.remove();
+            });
+            menuTemplate.remove();
           });
       });
 
@@ -620,6 +617,7 @@ class Game {
 
     // 开始和暂停按钮
     $("#start-btn").on("touchstart", (e) => {
+      console.log("start-btn");
       e.preventDefault();
 
       if (!this.gameStart) {
@@ -658,8 +656,8 @@ class Game {
       utils.changeIcon(
         "volume-btn",
         this.volumeUp,
-        this.volumeUp,
-        this.volumeOff
+        this.volumeUpIcon,
+        this.volumeOffIcon
       );
 
       this.music.fetchMusic(0, 0.19);
