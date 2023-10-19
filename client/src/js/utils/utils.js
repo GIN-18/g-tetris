@@ -6,10 +6,8 @@ module.exports = {
   changeIcon(elementId, status, trueIcon, falseIcon) {
     const parentElement = document.getElementById(elementId);
     if (status) {
-      console.log(trueIcon)
       parentElement.innerHTML = trueIcon;
     } else {
-      console.log(falseIcon)
       parentElement.innerHTML = falseIcon;
     }
   },

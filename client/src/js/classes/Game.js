@@ -123,7 +123,7 @@ class Game {
 
     gameOverInfoTemplate.fadeIn("slow");
 
-    if (thisMode === "double") {
+    if (this.gameMode === "double") {
       socket.emit("gameOver", {
         room: sessionStorage.getItem("room"),
         gameOver: 1,
@@ -400,7 +400,7 @@ class Game {
     this.score += filledRows * this.level * 10;
     $("#score").text(this.score);
 
-    if (thisMode === "double") {
+    if (this.gameMode === "double") {
       socket.emit("updateScore", {
         room: sessionStorage.getItem("room"),
         score: this.score,
@@ -513,7 +513,11 @@ class Game {
 
     this.gameOverImage = gameOverImage;
 
-    this.drawArea(this.mapCtx, this.map, mapBackgroundColor);
+    if (!this.gameStart) {
+      this.drawArea(this.mapCtx, this.map, mapBackgroundColor);
+    } else {
+      this.drawMap()
+    }
     this.drawNextShape();
   }
 
@@ -617,7 +621,6 @@ class Game {
 
     // 开始和暂停按钮
     $("#start-btn").on("touchstart", (e) => {
-      console.log("start-btn");
       e.preventDefault();
 
       if (!this.gameStart) {

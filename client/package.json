@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "dev": "webpack-dev-server --open",
-    "tb": "npx tailwindcss -i ./src/css/style.css -o ./dist/style.css --watch",
     "build": "webpack"
   },
   "repository": {
@@ -28,6 +27,7 @@
     "css-loader": "^6.8.1",
     "html-webpack-plugin": "^5.5.3",
     "postcss": "^8.4.27",
+    "postcss-loader": "^7.3.3",
     "style-loader": "^3.3.3",
     "tailwindcss": "^3.3.3",
     "webpack": "^5.88.2",

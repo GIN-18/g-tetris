@@ -1,4 +1,4 @@
-import "../../dist/style.css";
+import "../css/style.css";
 import "animate.css";
 import "material-icons/iconfont/material-icons.css";
 

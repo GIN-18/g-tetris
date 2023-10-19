@@ -27,7 +27,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"],
+        use: ["style-loader", "css-loader", "postcss-loader"],
       },
       {
         test: /\.webp$/,
@@ -81,12 +81,5 @@ module.exports = {
   devServer: {
     port: 8000,
     static: path.resolve(__dirname, "dist"),
-    // proxy: {
-    //   '/socket.io':{
-    //     target: 'http://localhost:3000',
-    //     ws: true,
-    //     changeOrigin: true
-    //   }
-    // }
   },
 };
