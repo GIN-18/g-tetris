@@ -1,5 +1,5 @@
 {
-  "name": "g-tetris",
+  "name": "catppuccin-tetris",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GIN-18/g-tetris.git"
+    "url": "git+https://github.com/GIN-18/catppuccin-tetris.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/GIN-18/g-tetris/issues"
+    "url": "https://github.com/GIN-18/catppuccin-tetris/issues"
   },
-  "homepage": "https://github.com/GIN-18/g-tetris#readme",
+  "homepage": "https://github.com/GIN-18/catppuccin-tetris#readme",
   "devDependencies": {
     "@babel/core": "^7.22.9",
     "@babel/preset-env": "^7.22.9",
