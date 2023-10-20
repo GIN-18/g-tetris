@@ -65,7 +65,7 @@ socket.on("roomJoined", (players) => {
 
   _.forEach(players, (value, player) => {
     if (player === playerId) {
-      player1Id.text(player.substring(0, 12));
+      player1Id.text(player.substring(0, 8));
 
       if (!value.ready) {
         player1Status.text("not ready").addClass("text-red");
@@ -79,7 +79,7 @@ socket.on("roomJoined", (players) => {
         statusButton.text("Cancel");
       }
     } else {
-      player2Id.text(player.substring(0, 12));
+      player2Id.text(player.substring(0, 8));
 
       if (!value.ready) {
         player2Status.text("not ready").addClass("text-red");
@@ -99,7 +99,7 @@ socket.on("playerJoined", (players) => {
   const playerId = socket.id;
 
   _.forEach(players, (value, player) => {
-    player2Id.text(player.substring(0, 12));
+    player2Id.text(player.substring(0, 8));
 
     if (value.ready && player !== playerId) {
       player2Status.text("ready").addClass("text-green");
