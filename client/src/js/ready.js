@@ -52,7 +52,7 @@ socket.on("roomCreated", (players) => {
 
   roomId.text(sessionStorage.getItem("room"));
 
-  player1Id.text(playerId);
+  player1Id.text(playerId.substring(0, 8));
 });
 
 roomId.text(sessionStorage.getItem("room"));
