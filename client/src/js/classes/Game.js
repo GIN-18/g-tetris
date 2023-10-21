@@ -34,8 +34,6 @@ class Game {
     this.gamePaused = false;
     this.gameOver = false;
 
-    this.gameOverImage = options.palette[this.flavor].gameOverImage;
-
     this.music = new Music();
     this.volumeUp = true;
 
@@ -94,7 +92,7 @@ class Game {
     const gameOverInfoTemplate = $(`
       <div id="game-over-info"
         class="z-10 flex flex-col justify-around items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 p-6 border-2 border-text rounded bg-surface0">
-        <img id="game-over-image" alt="game over" />
+        <div id="game-over-title" class="text-6xl font-[Dubtronic]"></div>
         <div id="score-container" class="my-6 text-xs">
           <div>
             <label>YOUR SCORE:</label>
@@ -130,7 +128,7 @@ class Game {
       });
     } else {
       this.updateHighScore();
-      $("#game-over-image").attr("src", this.gameOverImage);
+      $("#game-over-title").text("GAME OVER")
       $("#another-score-label").text("HIGHEST SCORE:");
       $("#another-score-info").text(this.highScore);
 
@@ -503,15 +501,12 @@ class Game {
     const flavor = sessionStorage.getItem("flavor"),
       mapBackgroundColor = options.palette[flavor].mapBackgroundColor,
       previewBackgroundColor = options.palette[flavor].previewBackgroundColor,
-      shapeColor = options.palette[flavor].shapeColor,
-      gameOverImage = options.palette[flavor].gameOverImage;
+      shapeColor = options.palette[flavor].shapeColor
 
     this.mapBackgroundColor = mapBackgroundColor;
     this.previewBackgroundColor = previewBackgroundColor;
 
     this.shapeColor = shapeColor;
-
-    this.gameOverImage = gameOverImage;
 
     if (!this.gameStart) {
       this.drawArea(this.mapCtx, this.map, mapBackgroundColor);

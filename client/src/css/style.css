@@ -9,3 +9,10 @@
 html {
   @apply w-full h-full;
 }
+
+@layer base {
+  @font-face {
+    font-family: Dubtronic;
+    src: url(../static/font/Dubtronic-Inline.woff) format('woff');
+  }
+}

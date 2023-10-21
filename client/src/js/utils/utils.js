@@ -85,11 +85,7 @@ module.exports = {
 
     const flavor = sessionStorage.getItem("flavor");
 
-    const logoImage = options.palette[flavor].logoImage;
-
     bodyElement.classList.replace(oldFlavor, flavor);
-
-    $('#logo-image').attr('src', logoImage)
   },
 
   // 阻止页面放大

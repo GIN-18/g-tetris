@@ -106,14 +106,10 @@ if (sessionStorage.getItem("gameMode") === "double") {
   // 一个玩家游戏结束提示这个玩家游戏结束
   socket.on("onePlayerGameOver", (players) => {
     const playerId = socket.id;
-    const flavor = sessionStorage.getItem("flavor");
 
     Object.keys(players).forEach((player) => {
       if (players[playerId].gameOver && player === playerId) {
-        $("#game-over-image").attr(
-          "src",
-          options.palette[flavor].gameOverImage
-        );
+        $("#game-over-title").text("GAME OVER");
         $("#again-btn, #quit-btn").addClass("hidden");
         $("#score-container").removeClass("my-6").addClass("mt-6");
       } else if (!players[playerId].gameOver && player !== playerId) {
@@ -124,15 +120,13 @@ if (sessionStorage.getItem("gameMode") === "double") {
 
   // 两个玩家游戏结束
   socket.on("twoPlayerGameOver", () => {
-    const flavor = sessionStorage.getItem("flavor");
-
     if (sessionStorage.getItem("scoreDiff") > 0) {
-      $("#game-over-image").attr("src", options.palette[flavor].winImage);
+      $("#game-over-title").text("WIN");
       $("#again-btn, #quit-btn").removeClass("hidden");
       $("#score-container").removeClass("mt-6").addClass("my-6");
       playConfetti();
     } else {
-      $("#game-over-image").attr("src", options.palette[flavor].failImage);
+      $("#game-over-title").text("TRY AGAIN");
       $("#again-btn, #quit-btn").removeClass("hidden");
       $("#score-container").removeClass("mt-6").addClass("my-6");
     }
