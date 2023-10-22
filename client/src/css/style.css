@@ -2,17 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  @font-face {
+    font-family: Dubtronic;
+    src: url(../static/font/Dubtronic-Inline.woff) format('woff');
+  }
+}
+
 * {
   @apply touch-manipulation;
 }
 
 html {
   @apply w-full h-full;
-}
-
-@layer base {
-  @font-face {
-    font-family: Dubtronic;
-    src: url(../static/font/Dubtronic-Inline.woff) format('woff');
-  }
 }

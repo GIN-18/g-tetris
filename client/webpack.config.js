@@ -10,6 +10,7 @@ module.exports = {
     ready: path.resolve(__dirname, "src", "js", "ready.js"),
   },
   output: {
+    clean: true,
     filename: "[name].bundle.js",
     path: path.resolve(__dirname, "dist"),
   },

@@ -92,7 +92,7 @@ class Game {
     const gameOverInfoTemplate = $(`
       <div id="game-over-info"
         class="z-10 flex flex-col justify-around items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 p-6 border-2 border-text rounded bg-surface0">
-        <div id="game-over-title" class="text-6xl font-[Dubtronic]"></div>
+        <div id="game-over-title" class="text-4xl font-[Dubtronic]"></div>
         <div id="score-container" class="my-6 text-xs">
           <div>
             <label>YOUR SCORE:</label>

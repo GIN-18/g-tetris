@@ -121,7 +121,7 @@ if (sessionStorage.getItem("gameMode") === "double") {
   // 两个玩家游戏结束
   socket.on("twoPlayerGameOver", () => {
     if (sessionStorage.getItem("scoreDiff") > 0) {
-      $("#game-over-title").text("WIN");
+      $("#game-over-title").text("VICTORY");
       $("#again-btn, #quit-btn").removeClass("hidden");
       $("#score-container").removeClass("mt-6").addClass("my-6");
       playConfetti();

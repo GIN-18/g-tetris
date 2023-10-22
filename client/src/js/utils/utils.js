@@ -1,6 +1,3 @@
-const $ = require("jquery");
-const options = require("./options.js");
-
 module.exports = {
   // 更改图标
   changeIcon(elementId, status, trueIcon, falseIcon) {
