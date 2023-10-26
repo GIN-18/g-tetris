@@ -55,8 +55,6 @@ class Game {
     this.volumeOffIcon = `<span class="material-icons-round !text-sm !leading-3">volume_off</span>`;
     this.volumeUpIcon = `<span class="material-icons-round !text-sm !leading-3">volume_up</span>`;
 
-    this.animateId = null;
-
     this.init();
   }
 
@@ -83,67 +81,6 @@ class Game {
     this.setDropTimer();
   }
 
-  // 结束游戏
-  // XXX: again按钮和quit按钮的功能
-  overGame() {
-    const separatorElement = $(`
-      <div class="absolute top-0 left-0 w-full h-full bg-crust bg-opacity-95"></div>
-    `);
-    const gameOverInfoTemplate = $(`
-      <div id="game-over-info"
-        class="z-10 flex flex-col justify-around items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 p-6 border-2 border-text rounded bg-surface0">
-        <div id="game-over-title" class="text-4xl font-[Dubtronic]"></div>
-        <div id="score-container" class="my-6 text-xs">
-          <div>
-            <label>YOUR SCORE:</label>
-            <span id="your-score-info">${this.score}</span>
-          </div>
-          <div>
-            <label id="another-score-label"></label>
-            <span id="another-score-info"></span>
-          </div>
-          <div>
-            <label id="again-label"></label>
-            <span id="again-info"></span>
-          </div>
-        </div>
-        <div class="text-xs font-semibold">
-          <button id="again-btn" class="w-20 py-1 border-2 border-text rounded" type="button">
-            AGAIN
-          </button>
-          <button id="quit-btn" class="w-20 py-1 border-2 border-text rounded" type="button">
-            QUIT
-          </button>
-        </div>
-      </div>
-    `).hide();
-    $("body").append(separatorElement).append(gameOverInfoTemplate);
-
-    gameOverInfoTemplate.fadeIn("slow");
-
-    if (this.gameMode === "double") {
-      socket.emit("gameOver", {
-        room: sessionStorage.getItem("room"),
-        gameOver: 1,
-      });
-    } else {
-      this.updateHighScore();
-      $("#game-over-title").text("GAME OVER")
-      $("#another-score-label").text("HIGHEST SCORE:");
-      $("#another-score-info").text(this.highScore);
-
-      $("#again-btn").on("touchstart", (e) => {
-        e.preventDefault();
-        location.reload();
-      });
-    }
-
-    $("#quit-btn").on("touchstart", (e) => {
-      e.preventDefault();
-      location.href = "../index.html";
-    });
-  }
-
   // 生成形状
   generateShape() {
     return new Shape();
@@ -164,34 +101,34 @@ class Game {
   }
 
   // 添加方块
-  // BUG: 游戏结束仍会有 this.shape 为 null 的情况
   addShape() {
     this.shape = this.nextShape;
     this.nextShape = this.generateShape();
+
     this.drawMap();
     this.drawNextShape();
 
-    try {
-      const piece = this.generatePiece();
+    const piece = this.generatePiece();
 
-      piece.forEach((item) => {
-        const x = this.shape.xOffset + item[1],
-          y = this.shape.yOffset + item[0];
+    for (let i = 0; i < piece.length; i++) {
+      const item = piece[i],
+        x = this.shape.xOffset + item[1],
+        y = this.shape.yOffset + item[0];
 
-        if (y >= 0 && this.map[y][x]) {
-          if (this.dropTimer) {
-            clearInterval(this.dropTimer);
-            this.dropTimer = null;
-          }
-
-          this.gameOver = true;
-          this.gameStart = false;
-          this.overGame();
-          this.shape = null;
-          this.nextShape = null;
+      if (y >= 0 && this.map[y][x]) {
+        if (this.dropTimer) {
+          clearInterval(this.dropTimer);
+          this.dropTimer = null;
         }
-      });
-    } catch (e) { }
+
+        this.gameOver = true;
+        this.gameStart = false;
+        this.shape = null;
+        this.nextShape = null;
+        this.overGame();
+        break
+      }
+    }
   }
 
   // 方块旋转
@@ -237,13 +174,7 @@ class Game {
 
   // 下移
   moveDown(enable) {
-    if (
-      !this.gameStart ||
-      this.gamePaused ||
-      this.gameOver ||
-      (enable && !this.moveShape(0, 1))
-    )
-      return;
+    if (this.fastForward === enable || (enable && !this.moveShape(0, 1))) return;
     this.fastForward = enable;
     this.setDropTimer();
   }
@@ -288,8 +219,10 @@ class Game {
     return canMove;
   }
 
+  // 设置下落时间
   setDropTimer() {
     let timestep = Math.round(80 + 800 * Math.pow(0.75, this.level - 1));
+
     timestep = Math.max(10, timestep);
 
     if (this.fastForward) {
@@ -308,6 +241,7 @@ class Game {
     }
   }
 
+  // 下落至触底
   fallToLand() {
     if (this.moveShape(0, 1)) return;
     this.landShape();
@@ -315,6 +249,19 @@ class Game {
 
   // 方块触底后将方块合并到地图数组中
   landShape() {
+    this.mergeShape()
+
+    const filledRows = this.getFilledRows();
+
+    if (filledRows.length) {
+      this.clearFilledRows(filledRows);
+    } else {
+      this.addShape();
+    }
+  }
+
+  // 合并方块到地图
+  mergeShape() {
     const piece = this.generatePiece();
 
     piece.forEach((item) => {
@@ -322,75 +269,70 @@ class Game {
         y = this.shape.yOffset + item[0];
       this.map[y][x] = this.shape.type + 1;
     });
-
-    const filledRows = this.getFilledRows();
-
-    if (filledRows.length) {
-      this.clearFilledRows(filledRows);
-      this.updateScore(filledRows.length);
-      this.updateLevel();
-    } else {
-      this.addShape();
-    }
   }
 
   // 获取满行
   getFilledRows() {
     let filledRows = [];
+
     this.map.forEach((row, index) => {
       if (row.every((item) => !!item)) {
         filledRows.push(index);
       }
     });
+
     return filledRows;
   }
 
   // 消除满行
   clearFilledRows(filledRows) {
+    let animationFrame = null, progress = 0;
+    const numCols = this.map[0].length;
+
     if (this.dropTimer) {
       clearInterval(this.dropTimer);
       this.dropTimer = null;
     }
 
-    let animationFrame = null;
-    let progress = 0;
-    const numCols = this.map[0].length;
-
-    function animate() {
+    const animate = () => {
+      // 动画结束
       if (progress === numCols) {
-        // 动画结束
+        // 停止动画
+        cancelAnimationFrame(animationFrame);
+
         // 删除行
         filledRows.forEach((row) => {
           this.map.splice(row, 1);
           this.map.unshift(new Array(10).fill(0));
         });
 
-        // 添加新方块并重新启动下落计时器
+        // 更新分数、等级、新方块和重新启动下落计时器
+        this.updateScore(filledRows.length);
+        this.updateLevel();
         this.addShape();
         this.setDropTimer();
 
         // 播放音效
         this.music.fetchMusic(0.19, 0.7);
 
-        return;
+        return
       }
 
       // 绘制一列小方块
       this.mapCtx.fillStyle = this.shapeColor[7];
       for (let row = 0; row < filledRows.length; row++) {
-        const x = progress * 20;
-        const y = filledRows[row] * 20;
-        this.mapCtx.fillRect(x, y, 20, 20);
+        const x = progress * this.blockSize, y = filledRows[row] * this.blockSize;
+        this.mapCtx.fillRect(x, y, this.blockSize, this.blockSize);
       }
 
       progress += 0.5;
 
       // 请求下一帧绘制
-      animationFrame = requestAnimationFrame(animate.bind(this));
+      animationFrame = requestAnimationFrame(animate);
     }
 
     // 开始动画
-    animationFrame = requestAnimationFrame(animate.bind(this));
+    animate();
   }
 
   // 更新分数
@@ -465,8 +407,7 @@ class Game {
     ctx.fillStyle = this.setShapeColor(shapeType + 1);
 
     for (let i = 0, length = piece.length; i < length; i++) {
-      let x = piece[i][1] + xOffset;
-      let y = piece[i][0] + yOffset;
+      const x = piece[i][1] + xOffset, y = piece[i][0] + yOffset;
 
       if (ctx.canvas.id === "map-canvas") {
         this.drawBlock(ctx, x, y);
@@ -537,6 +478,67 @@ class Game {
       case 7:
         return this.shapeColor[colorIndex];
     }
+  }
+
+  // 结束游戏
+  // XXX: again按钮和quit按钮的功能
+  overGame() {
+    const separatorElement = $(`
+      <div class="absolute top-0 left-0 w-full h-full bg-crust bg-opacity-95"></div>
+    `);
+    const gameOverInfoTemplate = $(`
+      <div id="game-over-info"
+        class="z-10 flex flex-col justify-around items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 p-6 border-2 border-text rounded bg-surface0">
+        <div id="game-over-title" class="text-4xl font-[Dubtronic]"></div>
+        <div id="score-container" class="my-6 text-xs">
+          <div>
+            <label>YOUR SCORE:</label>
+            <span id="your-score-info">${this.score}</span>
+          </div>
+          <div>
+            <label id="another-score-label"></label>
+            <span id="another-score-info"></span>
+          </div>
+          <div>
+            <label id="again-label"></label>
+            <span id="again-info"></span>
+          </div>
+        </div>
+        <div class="text-xs font-semibold">
+          <button id="again-btn" class="w-20 py-1 border-2 border-text rounded" type="button">
+            AGAIN
+          </button>
+          <button id="quit-btn" class="w-20 py-1 border-2 border-text rounded" type="button">
+            QUIT
+          </button>
+        </div>
+      </div>
+    `).hide();
+    $("body").append(separatorElement).append(gameOverInfoTemplate);
+
+    gameOverInfoTemplate.fadeIn("slow");
+
+    if (this.gameMode === "double") {
+      socket.emit("gameOver", {
+        room: sessionStorage.getItem("room"),
+        gameOver: 1,
+      });
+    } else {
+      this.updateHighScore();
+      $("#game-over-title").text("GAME OVER")
+      $("#another-score-label").text("HIGHEST SCORE:");
+      $("#another-score-info").text(this.highScore);
+
+      $("#again-btn").on("touchstart", (e) => {
+        e.preventDefault();
+        location.reload();
+      });
+    }
+
+    $("#quit-btn").on("touchstart", (e) => {
+      e.preventDefault();
+      location.href = "../index.html";
+    });
   }
 
   // 按钮操作
