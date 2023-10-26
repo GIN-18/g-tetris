@@ -135,6 +135,12 @@ class Shape {
     this.rotation = 0;
     this.xOffset = 3;
     this.yOffset = 0;
+
+    this.setYOffset()
+  }
+
+  setYOffset() {
+    this.yOffset = this.type === 1 ? -1 : -2;
   }
 }
 

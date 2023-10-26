@@ -108,14 +108,16 @@ class Game {
     this.drawMap();
     this.drawNextShape();
 
-    const piece = this.generatePiece();
+    const piece = this.generatePiece(),
+      xOffset = this.shape.xOffset,
+      yOffset = this.shape.yOffset;
 
     for (let i = 0; i < piece.length; i++) {
       const item = piece[i],
-        x = this.shape.xOffset + item[1],
-        y = this.shape.yOffset + item[0];
+        x = xOffset + item[1],
+        y = yOffset + item[0];
 
-      if (y >= 0 && this.map[y][x]) {
+      if (y >= yOffset && this.map[y + Math.abs(yOffset)][x]) {
         if (this.dropTimer) {
           clearInterval(this.dropTimer);
           this.dropTimer = null;
@@ -151,9 +153,10 @@ class Game {
       const x = this.shape.xOffset + item[1],
         y = this.shape.yOffset + item[0];
       if (
-        this.map[y] === undefined ||
-        this.map[y][x] === undefined ||
-        this.map[y][x] > 0
+        y >= 0 && (
+          this.map[y] === undefined ||
+          this.map[y][x] === undefined ||
+          this.map[y][x] > 0)
       ) {
         this.shape.rotation = tempRotation;
       }
@@ -174,7 +177,7 @@ class Game {
 
   // 下移
   moveDown(enable) {
-    if (this.fastForward === enable || (enable && !this.moveShape(0, 1))) return;
+    if (this.gameOver || this.fastForward === enable || (enable && !this.moveShape(0, 1))) return;
     this.fastForward = enable;
     this.setDropTimer();
   }
@@ -267,7 +270,7 @@ class Game {
     piece.forEach((item) => {
       const x = this.shape.xOffset + item[1],
         y = this.shape.yOffset + item[0];
-      this.map[y][x] = this.shape.type + 1;
+      if (y >= 0) this.map[y][x] = this.shape.type + 1;
     });
   }
 
@@ -313,7 +316,7 @@ class Game {
         this.setDropTimer();
 
         // 播放音效
-        this.music.fetchMusic(0.19, 0.7);
+        this.music.playAudio(0.19, 0.7);
 
         return
       }
@@ -641,7 +644,7 @@ class Game {
         this.startIcon
       );
 
-      this.music.fetchMusic(0, 0.19);
+      this.music.playAudio(0, 0.19);
 
       this.setDropTimer();
     });
@@ -660,7 +663,7 @@ class Game {
         this.volumeOffIcon
       );
 
-      this.music.fetchMusic(0, 0.19);
+      this.music.playAudio(0, 0.19);
     });
 
     // 重新开始
@@ -708,7 +711,7 @@ class Game {
     // 将按钮颜色改为激活状态
     $(".o-btn").on("touchstart", (e) => {
       e.preventDefault();
-      this.music.fetchMusic(0, 0.19);
+      this.music.playAudio(0, 0.19);
       utils.changeButtonColor(e.currentTarget, "bg-surface0");
     });
 
