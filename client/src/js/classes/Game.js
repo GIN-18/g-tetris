@@ -290,7 +290,8 @@ class Game {
   // 消除满行
   clearFilledRows(filledRows) {
     let animationFrame = null, progress = 0;
-    const numCols = this.map[0].length;
+    const numCols = this.map[0].length,
+      blockSize = this.blockSize;
 
     if (this.dropTimer) {
       clearInterval(this.dropTimer);
@@ -323,10 +324,13 @@ class Game {
 
       // 绘制一列小方块
       this.mapCtx.fillStyle = this.shapeColor[7];
-      for (let row = 0; row < filledRows.length; row++) {
-        const x = progress * this.blockSize, y = filledRows[row] * this.blockSize;
-        this.mapCtx.fillRect(x, y, this.blockSize, this.blockSize);
-      }
+
+      const x = progress * blockSize,
+        yArray = filledRows.map((row) => row * blockSize);
+
+      yArray.forEach((y) => {
+        this.mapCtx.fillRect(x, y, blockSize, blockSize);
+      });
 
       progress += 0.5;
 
@@ -371,28 +375,22 @@ class Game {
 
   // 绘制地图
   drawMap() {
-    const mapCtx = this.mapCtx,
-      mapBackgroundColor = this.mapBackgroundColor,
-      map = this.map,
-      piece = this.generatePiece(),
-      shapeType = this.shape.type,
-      xOffset = this.shape.xOffset,
-      yOffset = this.shape.yOffset;
+    const { mapCtx, mapBackgroundColor, map } = this,
+      { type, xOffset, yOffset } = this.shape,
+      piece = this.generatePiece();
 
     this.drawArea(mapCtx, map, mapBackgroundColor);
-    this.drawShape(mapCtx, piece, shapeType, xOffset, yOffset);
+    this.drawShape(mapCtx, piece, type, xOffset, yOffset);
   }
 
   // 绘制下一个形状
   drawNextShape() {
-    const previewCtx = this.previewCtx,
-      previewMap = this.previewMap,
-      previewBackgroundColor = this.previewBackgroundColor,
-      piece = this.generateNextPiece(),
-      shapeType = this.nextShape.type;
+    const { previewCtx, previewMap, previewBackgroundColor } = this,
+      type = this.nextShape.type,
+      piece = this.generateNextPiece();
 
     this.drawArea(previewCtx, previewMap, previewBackgroundColor);
-    this.drawShape(previewCtx, piece, shapeType, 0, 0);
+    this.drawShape(previewCtx, piece, type, 0, 0);
   }
 
   // 绘制画布区域
@@ -443,9 +441,7 @@ class Game {
   // 设置游戏颜色主题
   setGamePalette() {
     const flavor = sessionStorage.getItem("flavor"),
-      mapBackgroundColor = options.palette[flavor].mapBackgroundColor,
-      previewBackgroundColor = options.palette[flavor].previewBackgroundColor,
-      shapeColor = options.palette[flavor].shapeColor
+      { mapBackgroundColor, previewBackgroundColor, shapeColor } = options.palette[flavor];
 
     this.mapBackgroundColor = mapBackgroundColor;
     this.previewBackgroundColor = previewBackgroundColor;
