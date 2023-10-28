@@ -38,8 +38,11 @@ class Game {
     this.volumeUp = true;
 
     this.shape = null;
+    this.shapeClone = null;
     this.nextShape = new Shape();
     this.shapeColor = options.palette[this.flavor].shapeColor;
+    this.clearLineColor = options.palette[this.flavor].clearLineColor;
+    this.shapeCloneColor = options.palette[this.flavor].shapeCloneColor;
 
     this.dropTimer = null;
     this.fastForward = false;
@@ -93,6 +96,13 @@ class Game {
     ];
   }
 
+  // 生成当前方块的克隆
+  generatePieceClone() {
+    return this.shapeClone.shapeTable[
+      this.shapeClone.shapeType[this.shapeClone.type]
+    ][this.shapeClone.rotation];
+  }
+
   // 生成下一个方块
   generateNextPiece() {
     return this.nextShape.shapeTable[
@@ -103,6 +113,7 @@ class Game {
   // 添加方块
   addShape() {
     this.shape = this.nextShape;
+    this.shapeClone = { ...this.shape };
     this.nextShape = this.generateShape();
 
     this.drawMap();
@@ -146,6 +157,7 @@ class Game {
       this.shape.shapeTable[this.shape.shapeType[this.shape.type]].length;
 
     this.shape.rotation = r;
+    this.shapeClone.rotation = r;
 
     const piece = this.generatePiece();
 
@@ -159,6 +171,7 @@ class Game {
           this.map[y][x] > 0)
       ) {
         this.shape.rotation = tempRotation;
+        this.shapeClone.rotation = tempRotation;
       }
     });
 
@@ -216,6 +229,7 @@ class Game {
     if (canMove) {
       this.shape.xOffset += xStep;
       this.shape.yOffset += yStep;
+      this.shapeClone.xOffset += xStep;
       this.drawMap();
     }
 
@@ -323,7 +337,7 @@ class Game {
       }
 
       // 绘制一列小方块
-      this.mapCtx.fillStyle = this.shapeColor[7];
+      this.mapCtx.fillStyle = this.clearLineColor;
 
       const x = progress * blockSize,
         yArray = filledRows.map((row) => row * blockSize);
@@ -375,12 +389,30 @@ class Game {
 
   // 绘制地图
   drawMap() {
-    const { mapCtx, mapBackgroundColor, map } = this,
-      { type, xOffset, yOffset } = this.shape,
-      piece = this.generatePiece();
+    const { map, mapCtx, mapBackgroundColor, shapeCloneColor } = this,
+      { type: shapeType, xOffset: shapeXOffset, yOffset: shapeYOffset } = this.shape,
+      { type: shapeCloneType, xOffset: shapeCloneXOffset, yOffset: shapeCloneYOffset } = this.shapeClone,
+      piece = this.generatePiece(),
+      clonePiece = this.generatePieceClone()
+
+    const previewCloneShape = (offset) => {
+      for (let i = 0; i < clonePiece.length; i++) {
+        const x = shapeCloneXOffset + clonePiece[i][1],
+          y = offset + clonePiece[i][0];
+
+        if (offset >= shapeYOffset && (y > map.length - 2 || (map[y] && map[y + 1][x]))) {
+          return offset;
+        }
+      }
+
+      return previewCloneShape(offset + 1);
+    }
+
+    const finalYOffset = previewCloneShape(shapeCloneYOffset)
 
     this.drawArea(mapCtx, map, mapBackgroundColor);
-    this.drawShape(mapCtx, piece, type, xOffset, yOffset);
+    this.drawShape(mapCtx, clonePiece, shapeCloneType, shapeCloneXOffset, finalYOffset, shapeCloneColor);
+    this.drawShape(mapCtx, piece, shapeType, shapeXOffset, shapeYOffset);
   }
 
   // 绘制下一个形状
@@ -404,8 +436,8 @@ class Game {
   }
 
   // 绘制形状
-  drawShape(ctx, piece, shapeType, xOffset, yOffset) {
-    ctx.fillStyle = this.setShapeColor(shapeType + 1);
+  drawShape(ctx, piece, shapeType, xOffset, yOffset, shapeCloneColor) {
+    ctx.fillStyle = shapeCloneColor || this.setShapeColor(shapeType + 1);
 
     for (let i = 0, length = piece.length; i < length; i++) {
       const x = piece[i][1] + xOffset, y = piece[i][0] + yOffset;
