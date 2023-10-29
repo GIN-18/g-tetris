@@ -473,10 +473,11 @@ class Game {
   // 设置游戏颜色主题
   setGamePalette() {
     const flavor = sessionStorage.getItem("flavor"),
-      { mapBackgroundColor, previewBackgroundColor, shapeColor } = options.palette[flavor];
+      { mapBackgroundColor, previewBackgroundColor, shapeCloneColor, shapeColor } = options.palette[flavor];
 
     this.mapBackgroundColor = mapBackgroundColor;
     this.previewBackgroundColor = previewBackgroundColor;
+    this.shapeCloneColor = shapeCloneColor;
 
     this.shapeColor = shapeColor;
 

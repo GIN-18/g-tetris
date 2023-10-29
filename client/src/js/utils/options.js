@@ -4,7 +4,7 @@ module.exports = {
       mapBackgroundColor: "#eff1f5",
       previewBackgroundColor: "#ccd0da",
       clearLineColor: '#7287fd',
-      shapeCloneColor: "#9ca0b0",
+      shapeCloneColor: "#dce0e8",
       shapeColor: [
         '#dc8a78',
         '#ea76cb',
@@ -19,7 +19,7 @@ module.exports = {
       mapBackgroundColor: "#303446",
       previewBackgroundColor: "#414559",
       clearLineColor: '#babbf1',
-      shapeCloneColor: "#737994",
+      shapeCloneColor: "#414559",
       shapeColor: [
         '#f2d5cf',
         '#f4b8e4',
@@ -34,7 +34,7 @@ module.exports = {
       mapBackgroundColor: "#24273a",
       previewBackgroundColor: "#363a4f",
       clearLineColor: "#b7bdf8",
-      shapeCloneColor: "#6e738d",
+      shapeCloneColor: "#363a4f",
       shapeColor: [
         '#f4dbd6',
         '#f5bde6',
@@ -49,7 +49,7 @@ module.exports = {
       mapBackgroundColor: "#1e1e2e",
       previewBackgroundColor: "#313244",
       clearLineColor: '#b4befe',
-      shapeCloneColor: "#6c7086",
+      shapeCloneColor: "#313244",
       shapeColor: [
         '#f5e0dc',
         '#f5c2e7',
