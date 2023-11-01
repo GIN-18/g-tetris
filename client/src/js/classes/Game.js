@@ -52,11 +52,11 @@ class Game {
     this.score = 0;
     this.highScore = localStorage.getItem("highScore") || 0;
 
-    this.stopIcon = `<span class="material-icons-round !text-sm !leading-3">pause</span>`;
-    this.startIcon = `<span class="material-icons-round !text-sm !leading-3">play_arrow</span>`;
+    this.stopIcon = `<span class="material-icons-round text-sm leading-3">pause</span>`;
+    this.startIcon = `<span class="material-icons-round text-sm leading-3">play_arrow</span>`;
 
-    this.volumeOffIcon = `<span class="material-icons-round !text-sm !leading-3">volume_off</span>`;
-    this.volumeUpIcon = `<span class="material-icons-round !text-sm !leading-3">volume_up</span>`;
+    this.volumeOffIcon = `<span class="material-icons-round text-sm leading-3">volume_off</span>`;
+    this.volumeUpIcon = `<span class="material-icons-round text-sm leading-3">volume_up</span>`;
 
     this.init();
   }
@@ -139,14 +139,15 @@ class Game {
         this.shape = null;
         this.nextShape = null;
         this.overGame();
-        break
+        break;
       }
     }
   }
 
   // 方块旋转
   rotateShape(rStep) {
-    if (!this.gameStart || this.gamePaused || this.gameOver || !this.dropTimer) return;
+    if (!this.gameStart || this.gamePaused || this.gameOver || !this.dropTimer)
+      return;
 
     const tempRotation = this.shape.rotation;
 
@@ -165,8 +166,8 @@ class Game {
       const x = this.shape.xOffset + item[1],
         y = this.shape.yOffset + item[0];
       if (
-        y >= 0 && (
-          this.map[y] === undefined ||
+        y >= 0 &&
+        (this.map[y] === undefined ||
           this.map[y][x] === undefined ||
           this.map[y][x] > 0)
       ) {
@@ -190,7 +191,12 @@ class Game {
 
   // 下移
   moveDown(enable) {
-    if (this.gameOver || this.fastForward === enable || (enable && !this.moveShape(0, 1))) return;
+    if (
+      this.gameOver ||
+      this.fastForward === enable ||
+      (enable && !this.moveShape(0, 1))
+    )
+      return;
     this.fastForward = enable;
     this.setDropTimer();
   }
@@ -198,13 +204,14 @@ class Game {
   // 下坠
   dropShape() {
     if (this.gamePaused || !this.dropTimer) return;
-    while (this.moveShape(0, 1)) { }
+    while (this.moveShape(0, 1)) {}
     this.fallToLand();
   }
 
   // 移动方块
   moveShape(xStep, yStep) {
-    if (!this.gameStart || this.gamePaused || this.gameOver || !this.dropTimer) return;
+    if (!this.gameStart || this.gamePaused || this.gameOver || !this.dropTimer)
+      return;
 
     const width = this.map[0].length,
       height = this.map.length,
@@ -266,7 +273,7 @@ class Game {
 
   // 方块触底后将方块合并到地图数组中
   landShape() {
-    this.mergeShape()
+    this.mergeShape();
 
     const filledRows = this.getFilledRows();
 
@@ -303,7 +310,8 @@ class Game {
 
   // 消除满行
   clearFilledRows(filledRows) {
-    let animationFrame = null, progress = 0;
+    let animationFrame = null,
+      progress = 0;
     const numCols = this.map[0].length,
       blockSize = this.blockSize;
 
@@ -333,7 +341,7 @@ class Game {
         // 播放音效
         this.music.playAudio(0.19, 0.7);
 
-        return
+        return;
       }
 
       // 绘制一列小方块
@@ -350,7 +358,7 @@ class Game {
 
       // 请求下一帧绘制
       animationFrame = requestAnimationFrame(animate);
-    }
+    };
 
     // 开始动画
     animate();
@@ -390,28 +398,46 @@ class Game {
   // 绘制地图
   drawMap() {
     const { map, mapCtx, mapBackgroundColor, shapeCloneColor } = this,
-      { type: shapeType, xOffset: shapeXOffset, yOffset: shapeYOffset } = this.shape,
-      { type: shapeCloneType, xOffset: shapeCloneXOffset, yOffset: shapeCloneYOffset } = this.shapeClone,
+      {
+        type: shapeType,
+        xOffset: shapeXOffset,
+        yOffset: shapeYOffset,
+      } = this.shape,
+      {
+        type: shapeCloneType,
+        xOffset: shapeCloneXOffset,
+        yOffset: shapeCloneYOffset,
+      } = this.shapeClone,
       piece = this.generatePiece(),
-      clonePiece = this.generatePieceClone()
+      clonePiece = this.generatePieceClone();
 
     const previewCloneShape = (offset) => {
       for (let i = 0; i < clonePiece.length; i++) {
         const x = shapeCloneXOffset + clonePiece[i][1],
           y = offset + clonePiece[i][0];
 
-        if (offset >= shapeYOffset && (y > map.length - 2 || (map[y] && map[y + 1][x]))) {
+        if (
+          offset >= shapeYOffset &&
+          (y > map.length - 2 || (map[y] && map[y + 1][x]))
+        ) {
           return offset;
         }
       }
 
       return previewCloneShape(offset + 1);
-    }
+    };
 
-    const finalYOffset = previewCloneShape(shapeCloneYOffset)
+    const finalYOffset = previewCloneShape(shapeCloneYOffset);
 
     this.drawArea(mapCtx, map, mapBackgroundColor);
-    this.drawShape(mapCtx, clonePiece, shapeCloneType, shapeCloneXOffset, finalYOffset, shapeCloneColor);
+    this.drawShape(
+      mapCtx,
+      clonePiece,
+      shapeCloneType,
+      shapeCloneXOffset,
+      finalYOffset,
+      shapeCloneColor
+    );
     this.drawShape(mapCtx, piece, shapeType, shapeXOffset, shapeYOffset);
   }
 
@@ -440,7 +466,8 @@ class Game {
     ctx.fillStyle = shapeCloneColor || this.setShapeColor(shapeType + 1);
 
     for (let i = 0, length = piece.length; i < length; i++) {
-      const x = piece[i][1] + xOffset, y = piece[i][0] + yOffset;
+      const x = piece[i][1] + xOffset,
+        y = piece[i][0] + yOffset;
 
       if (ctx.canvas.id === "map-canvas") {
         this.drawBlock(ctx, x, y);
@@ -473,7 +500,12 @@ class Game {
   // 设置游戏颜色主题
   setGamePalette() {
     const flavor = sessionStorage.getItem("flavor"),
-      { mapBackgroundColor, previewBackgroundColor, shapeCloneColor, shapeColor } = options.palette[flavor];
+      {
+        mapBackgroundColor,
+        previewBackgroundColor,
+        shapeCloneColor,
+        shapeColor,
+      } = options.palette[flavor];
 
     this.mapBackgroundColor = mapBackgroundColor;
     this.previewBackgroundColor = previewBackgroundColor;
@@ -484,7 +516,7 @@ class Game {
     if (!this.gameStart) {
       this.drawArea(this.mapCtx, this.map, mapBackgroundColor);
     } else {
-      this.drawMap()
+      this.drawMap();
     }
     this.drawNextShape();
   }
@@ -557,7 +589,7 @@ class Game {
       });
     } else {
       this.updateHighScore();
-      $("#game-over-title").text("GAME OVER")
+      $("#game-over-title").text("GAME OVER");
       $("#another-score-label").text("HIGHEST SCORE:");
       $("#another-score-info").text(this.highScore);
 
@@ -587,39 +619,39 @@ class Game {
           <header class="flex justify-between items-center">
             <h2 class="text-lg font-semibold">OPTIONS</h2>
             <button id="close-btn" class="flex justify-center items-center">
-              <span class="material-icons-round !text-2xl !leading-3">close</span>
+              <span class="material-icons-round text-2xl leading-3">close</span>
             </button>
           </header>
           <div class="mt-3">
             <!-- 配色 -->
             <div class="flex justify-start items-center">
-              <span class="material-icons-round mr-2 !text-xl">color_lens</span>
+              <span class="material-icons-round mr-2 text-xl">color_lens</span>
               <span class="font-semibold">Paltte</span>
             </div>
             <ul>
               <li class="menu-item flex justify-start items-center ml-6">
-                <span class="material-icons-round mr-2 !text-xs !text-surface0">star_rate</span>
+                <span class="material-icons-round mr-2 text-xs text-surface0">star_rate</span>
                 <button class="flavor-btn flex justify-start items-center w-full text-sm">Latte</button>
               </li>
               <li class="menu-item flex justify-start items-center ml-6">
-                <span class="material-icons-round mr-2 !text-xs !text-surface0">star_rate</span>
+                <span class="material-icons-round mr-2 text-xs text-surface0">star_rate</span>
                 <button class="flavor-btn flex justify-start items-center w-full text-sm">Frappe</button>
               </li>
               <li class="menu-item flex justify-start items-center ml-6">
-                <span class="material-icons-round mr-2 !text-xs !text-surface0">star_rate</span>
+                <span class="material-icons-round mr-2 text-xs text-surface0">star_rate</span>
                 <button class="flavor-btn flex justify-start items-center w-full text-sm">Macchiato</button>
               </li>
               <li class="menu-item flex justify-start items-center ml-6 text-green">
-                <span class="material-icons-round mr-2 !text-xs">star_rate</span>
+                <span class="material-icons-round mr-2 text-xs">star_rate</span>
                 <button class="flavor-btn flex justify-start items-center w-full text-sm">Mocha</button>
               </li>
             </ul>
           </div>
         </aside>
-      `)
+      `);
       $("body").append(separatorElement).append(menuTemplate);
 
-      separatorElement.fadeIn('fast')
+      separatorElement.fadeIn("fast");
 
       utils.highlightCurrentOption(".menu-item", "flavor");
 
@@ -630,7 +662,7 @@ class Game {
           .removeClass("animate__fadeInRight")
           .addClass("animate__fadeOutRight")
           .on("animationend", () => {
-            separatorElement.fadeOut('fast', () => {
+            separatorElement.fadeOut("fast", () => {
               separatorElement.remove();
             });
             menuTemplate.remove();
@@ -741,7 +773,7 @@ class Game {
     $(".o-btn").on("touchstart", (e) => {
       e.preventDefault();
       this.music.playAudio(0, 0.19);
-      utils.changeButtonColor(e.currentTarget, "bg-surface0");
+      utils.changeButtonColor(e.currentTarget, "bg-surface2");
     });
 
     // 将按钮颜色改为背景色

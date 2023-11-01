@@ -60,12 +60,12 @@ module.exports = {
 
     document.querySelectorAll(menuGroup).forEach((item) => {
       item.classList.remove("text-green");
-      item.firstElementChild.classList.add("!text-surface0");
+      item.firstElementChild.classList.add("text-surface0");
 
       const itemInnerText = item.lastElementChild.innerText.toLowerCase();
 
       if (itemInnerText === optionGroup) {
-        item.firstElementChild.classList.remove("!text-surface0");
+        item.firstElementChild.classList.remove("text-surface0");
         item.classList.add("text-green");
       }
     });
