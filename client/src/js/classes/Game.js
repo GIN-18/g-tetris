@@ -366,7 +366,7 @@ class Game {
 
   // 更新分数
   updateScore(filledRows) {
-    this.score += filledRows * this.level * 10;
+    this.score += (filledRows * this.level + (filledRows - 1)) * 10;
     $("#score").text(this.score);
 
     if (this.gameMode === "double") {
