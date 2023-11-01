@@ -510,38 +510,30 @@ class Game {
     this.mapBackgroundColor = mapBackgroundColor;
     this.previewBackgroundColor = previewBackgroundColor;
     this.shapeCloneColor = shapeCloneColor;
-
     this.shapeColor = shapeColor;
+    this.drawNextShape();
 
     if (!this.gameStart) {
       this.drawArea(this.mapCtx, this.map, mapBackgroundColor);
     } else {
       this.drawMap();
     }
-    this.drawNextShape();
   }
 
   // 设置颜色
   setShapeColor(type, backgroundColor) {
     const colorIndex = type - 1;
-    switch (type) {
-      case 0:
-        return backgroundColor;
-      case 1:
-        return this.shapeColor[colorIndex];
-      case 2:
-        return this.shapeColor[colorIndex];
-      case 3:
-        return this.shapeColor[colorIndex];
-      case 4:
-        return this.shapeColor[colorIndex];
-      case 5:
-        return this.shapeColor[colorIndex];
-      case 6:
-        return this.shapeColor[colorIndex];
-      case 7:
-        return this.shapeColor[colorIndex];
-    }
+    const shapeColor = {
+      0: backgroundColor,
+      1: this.shapeColor[colorIndex],
+      2: this.shapeColor[colorIndex],
+      3: this.shapeColor[colorIndex],
+      4: this.shapeColor[colorIndex],
+      5: this.shapeColor[colorIndex],
+      6: this.shapeColor[colorIndex],
+      7: this.shapeColor[colorIndex],
+    };
+    return shapeColor[type];
   }
 
   // 结束游戏
