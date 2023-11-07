@@ -1,5 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   mode: "development",
@@ -28,7 +29,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader", "postcss-loader"],
+        use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
       },
       {
         test: /\.webp$/,
@@ -91,6 +92,9 @@ module.exports = {
       favicon: path.resolve(__dirname, "src", "static", "favicon.ico"),
       chunks: ["ready"],
     }),
+    new MiniCssExtractPlugin({
+      filename: "css/[name].css",
+    })
   ],
   devServer: {
     port: 8000,
