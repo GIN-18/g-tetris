@@ -388,6 +388,8 @@ class Game {
 
   // 绘制地图
   drawMap() {
+    if (!this.shape) return;
+
     const { map, mapCtx, shapeCloneColor, shape, shapeClone } = this,
       { type: shapeType, xOffset: shapeXOffset, yOffset: shapeYOffset } = shape,
       { type: shapeCloneType, xOffset: shapeCloneXOffset, yOffset: shapeCloneYOffset } = shapeClone,
@@ -432,7 +434,7 @@ class Game {
     for (let i = 0; i < area.length; i++) {
       for (let j = 0; j < area[i].length; j++) {
         if (!area[i][j]) continue;
-        ctx.fillStyle = this.setShapeColor(area[i][j]);
+        ctx.fillStyle = this.shapeColor[area[i][j] - 1];
         this.drawBlock(ctx, j, i);
       }
     }
@@ -448,7 +450,7 @@ class Game {
 
   // 绘制形状
   drawShape(ctx, piece, shapeType, xOffset, yOffset, shapeCloneColor) {
-    ctx.fillStyle = shapeCloneColor || this.setShapeColor(shapeType + 1);
+    ctx.fillStyle = shapeCloneColor || this.shapeColor[shapeType];
 
     for (let i = 0, length = piece.length; i < length; i++) {
       const x = piece[i][1] + xOffset,
@@ -491,15 +493,6 @@ class Game {
     this.shapeColor = shapeColor;
     this.drawNextShape();
     this.drawMap();
-  }
-
-  // 设置颜色
-  setShapeColor(type) {
-    const colorIndex = type - 1;
-    const shapeColor = {
-      [type]: this.shapeColor[colorIndex],
-    };
-    return shapeColor[type];
   }
 
   // 结束游戏
