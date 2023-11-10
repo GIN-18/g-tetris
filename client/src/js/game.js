@@ -14,8 +14,8 @@ const socket = require("./utils/socket.js");
 const mapCanvas = document.getElementById("map-canvas");
 const previewCanvas = document.getElementById("preview-canvas");
 
-const mapCtx = mapCanvas.getContext("2d", { alpha: false });
-const previewCtx = previewCanvas.getContext("2d", { alpha: false });
+const mapCtx = mapCanvas.getContext("2d");
+const previewCtx = previewCanvas.getContext("2d");
 
 const game = new Game(mapCtx, previewCtx);
 

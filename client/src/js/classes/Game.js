@@ -14,19 +14,11 @@ class Game {
     this.mapCtx = mapCtx;
     this.mapWidth = 10;
     this.mapHeight = 20;
-    this.mapBackgroundColor = options.palette[this.flavor].mapBackgroundColor;
     this.map = [...new Array(this.mapHeight)].map(() =>
       new Array(this.mapWidth).fill(0)
     );
 
     this.previewCtx = previewCtx;
-    this.previewWidth = 4;
-    this.previewHeight = 2;
-    this.previewBackgroundColor =
-      options.palette[this.flavor].previewBackgroundColor;
-    this.previewMap = [...new Array(this.previewHeight)].map(() =>
-      new Array(this.previewWidth).fill(0)
-    );
 
     this.gameMode = sessionStorage.getItem("gameMode") || "single";
 
@@ -69,7 +61,6 @@ class Game {
 
   // 设置游戏信息
   setGameData() {
-    this.drawArea(this.mapCtx, this.map, this.mapBackgroundColor);
     this.drawNextShape();
 
     $("#score").text(this.score);
@@ -204,7 +195,7 @@ class Game {
   // 下坠
   dropShape() {
     if (this.gamePaused || !this.dropTimer) return;
-    while (this.moveShape(0, 1)) {}
+    while (this.moveShape(0, 1)) { }
     this.fallToLand();
   }
 
@@ -397,68 +388,62 @@ class Game {
 
   // 绘制地图
   drawMap() {
-    const { map, mapCtx, mapBackgroundColor, shapeCloneColor } = this,
-      {
-        type: shapeType,
-        xOffset: shapeXOffset,
-        yOffset: shapeYOffset,
-      } = this.shape,
-      {
-        type: shapeCloneType,
-        xOffset: shapeCloneXOffset,
-        yOffset: shapeCloneYOffset,
-      } = this.shapeClone,
+    const { map, mapCtx, shapeCloneColor, shape, shapeClone } = this,
+      { type: shapeType, xOffset: shapeXOffset, yOffset: shapeYOffset } = shape,
+      { type: shapeCloneType, xOffset: shapeCloneXOffset, yOffset: shapeCloneYOffset } = shapeClone,
       piece = this.generatePiece(),
       clonePiece = this.generatePieceClone();
 
-    const previewCloneShape = (offset) => {
+    const finalYOffset = findPreviewOffset(shapeCloneYOffset);
+
+    this.clearArea(mapCtx);
+    this.drawArea();
+    this.drawShape(mapCtx, clonePiece, shapeCloneType, shapeCloneXOffset, finalYOffset, shapeCloneColor);
+    this.drawShape(mapCtx, piece, shapeType, shapeXOffset, shapeYOffset);
+
+    function findPreviewOffset(offset) {
       for (let i = 0; i < clonePiece.length; i++) {
         const x = shapeCloneXOffset + clonePiece[i][1],
           y = offset + clonePiece[i][0];
 
-        if (
-          offset >= shapeYOffset &&
-          (y > map.length - 2 || (map[y] && map[y + 1][x]))
-        ) {
+        if (offset >= shapeYOffset && (y > map.length - 2 || (map[y] && map[y + 1][x]))) {
           return offset;
         }
       }
 
-      return previewCloneShape(offset + 1);
+      return findPreviewOffset(offset + 1);
     };
-
-    const finalYOffset = previewCloneShape(shapeCloneYOffset);
-
-    this.drawArea(mapCtx, map, mapBackgroundColor);
-    this.drawShape(
-      mapCtx,
-      clonePiece,
-      shapeCloneType,
-      shapeCloneXOffset,
-      finalYOffset,
-      shapeCloneColor
-    );
-    this.drawShape(mapCtx, piece, shapeType, shapeXOffset, shapeYOffset);
   }
 
   // 绘制下一个形状
   drawNextShape() {
-    const { previewCtx, previewMap, previewBackgroundColor } = this,
+    const previewCtx = this.previewCtx,
       type = this.nextShape.type,
       piece = this.generateNextPiece();
 
-    this.drawArea(previewCtx, previewMap, previewBackgroundColor);
+    this.clearArea(previewCtx)
     this.drawShape(previewCtx, piece, type, 0, 0);
   }
 
   // 绘制画布区域
-  drawArea(ctx, area, backgroundColor) {
+  drawArea() {
+    const ctx = this.mapCtx, area = this.map;
+
     for (let i = 0; i < area.length; i++) {
       for (let j = 0; j < area[i].length; j++) {
-        ctx.fillStyle = this.setShapeColor(area[i][j], backgroundColor);
+        if (!area[i][j]) continue;
+        ctx.fillStyle = this.setShapeColor(area[i][j]);
         this.drawBlock(ctx, j, i);
       }
     }
+  }
+
+  // 清除画布区域
+  clearArea(ctx) {
+    const width = ctx.canvas.width,
+      height = ctx.canvas.height;
+
+    ctx.clearRect(0, 0, width, height);
   }
 
   // 绘制形状
@@ -500,38 +485,19 @@ class Game {
   // 设置游戏颜色主题
   setGamePalette() {
     const flavor = sessionStorage.getItem("flavor"),
-      {
-        mapBackgroundColor,
-        previewBackgroundColor,
-        shapeCloneColor,
-        shapeColor,
-      } = options.palette[flavor];
+      { shapeCloneColor, shapeColor, } = options.palette[flavor];
 
-    this.mapBackgroundColor = mapBackgroundColor;
-    this.previewBackgroundColor = previewBackgroundColor;
     this.shapeCloneColor = shapeCloneColor;
     this.shapeColor = shapeColor;
     this.drawNextShape();
-
-    if (!this.gameStart) {
-      this.drawArea(this.mapCtx, this.map, mapBackgroundColor);
-    } else {
-      this.drawMap();
-    }
+    this.drawMap();
   }
 
   // 设置颜色
-  setShapeColor(type, backgroundColor) {
+  setShapeColor(type) {
     const colorIndex = type - 1;
     const shapeColor = {
-      0: backgroundColor,
-      1: this.shapeColor[colorIndex],
-      2: this.shapeColor[colorIndex],
-      3: this.shapeColor[colorIndex],
-      4: this.shapeColor[colorIndex],
-      5: this.shapeColor[colorIndex],
-      6: this.shapeColor[colorIndex],
-      7: this.shapeColor[colorIndex],
+      [type]: this.shapeColor[colorIndex],
     };
     return shapeColor[type];
   }
