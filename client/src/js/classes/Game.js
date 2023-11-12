@@ -6,7 +6,7 @@ const socket = require("../utils/socket.js");
 const options = require("../utils/options.js");
 
 class Game {
-  constructor(mapCtx, previewCtx) {
+  constructor(mapCtx, nextShapeCtx) {
     this.blockSize = 20;
 
     this.flavor = sessionStorage.getItem("flavor");
@@ -18,7 +18,7 @@ class Game {
       new Array(this.mapWidth).fill(0)
     );
 
-    this.previewCtx = previewCtx;
+    this.nextShapeCtx = nextShapeCtx;
 
     this.gameMode = sessionStorage.getItem("gameMode") || "single";
 
@@ -30,11 +30,11 @@ class Game {
     this.volumeUp = true;
 
     this.shape = null;
-    this.shapeClone = null;
     this.nextShape = new Shape();
+    this.previewShape = null;
     this.shapeColor = options.palette[this.flavor].shapeColor;
     this.clearLineColor = options.palette[this.flavor].clearLineColor;
-    this.shapeCloneColor = options.palette[this.flavor].shapeCloneColor;
+    this.previewShapeColor = options.palette[this.flavor].previewShapeColor;
 
     this.dropTimer = null;
     this.fastForward = false;
@@ -43,6 +43,8 @@ class Game {
 
     this.score = 0;
     this.highScore = localStorage.getItem("highScore") || 0;
+
+    this.animationId = null;
 
     this.stopIcon = `<span class="material-icons-round text-sm leading-3">pause</span>`;
     this.startIcon = `<span class="material-icons-round text-sm leading-3">play_arrow</span>`;
@@ -88,10 +90,10 @@ class Game {
   }
 
   // 生成当前方块的克隆
-  generatePieceClone() {
-    return this.shapeClone.shapeTable[
-      this.shapeClone.shapeType[this.shapeClone.type]
-    ][this.shapeClone.rotation];
+  generatePreviewPiece() {
+    return this.previewShape.shapeTable[
+      this.previewShape.shapeType[this.previewShape.type]
+    ][this.previewShape.rotation];
   }
 
   // 生成下一个方块
@@ -104,7 +106,7 @@ class Game {
   // 添加方块
   addShape() {
     this.shape = this.nextShape;
-    this.shapeClone = { ...this.shape };
+    this.previewShape = { ...this.shape };
     this.nextShape = this.generateShape();
 
     this.drawMap();
@@ -149,7 +151,7 @@ class Game {
       this.shape.shapeTable[this.shape.shapeType[this.shape.type]].length;
 
     this.shape.rotation = r;
-    this.shapeClone.rotation = r;
+    this.previewShape.rotation = r;
 
     const piece = this.generatePiece();
 
@@ -163,7 +165,7 @@ class Game {
           this.map[y][x] > 0)
       ) {
         this.shape.rotation = tempRotation;
-        this.shapeClone.rotation = tempRotation;
+        this.previewShape.rotation = tempRotation;
       }
     });
 
@@ -227,7 +229,7 @@ class Game {
     if (canMove) {
       this.shape.xOffset += xStep;
       this.shape.yOffset += yStep;
-      this.shapeClone.xOffset += xStep;
+      this.previewShape.xOffset += xStep;
       this.drawMap();
     }
 
@@ -390,23 +392,24 @@ class Game {
   drawMap() {
     if (!this.shape) return;
 
-    const { map, mapCtx, shapeCloneColor, shape, shapeClone } = this,
+    const { map, mapCtx, shape, previewShape, previewShapeColor } = this,
       { type: shapeType, xOffset: shapeXOffset, yOffset: shapeYOffset } = shape,
-      { type: shapeCloneType, xOffset: shapeCloneXOffset, yOffset: shapeCloneYOffset } = shapeClone,
+      { type: previewShapeType, xOffset: previewShapeXOffset, yOffset: previewShapeYOffset } = previewShape,
       piece = this.generatePiece(),
-      clonePiece = this.generatePieceClone();
-
-    const finalYOffset = findPreviewOffset(shapeCloneYOffset);
+      previewPiece = this.generatePreviewPiece(),
+      finalYOffset = findPreviewOffset(previewShapeYOffset);
 
     this.clearArea(mapCtx);
     this.drawArea();
-    this.drawShape(mapCtx, clonePiece, shapeCloneType, shapeCloneXOffset, finalYOffset, shapeCloneColor);
+    this.drawShape(mapCtx, previewPiece, previewShapeType, previewShapeXOffset, finalYOffset, previewShapeColor);
     this.drawShape(mapCtx, piece, shapeType, shapeXOffset, shapeYOffset);
 
+    console.log(shapeXOffset, shapeYOffset)
+
     function findPreviewOffset(offset) {
-      for (let i = 0; i < clonePiece.length; i++) {
-        const x = shapeCloneXOffset + clonePiece[i][1],
-          y = offset + clonePiece[i][0];
+      for (let i = 0; i < previewPiece.length; i++) {
+        const x = previewShapeXOffset + previewPiece[i][1],
+          y = offset + previewPiece[i][0];
 
         if (offset >= shapeYOffset && (y > map.length - 2 || (map[y] && map[y + 1][x]))) {
           return offset;
@@ -417,9 +420,20 @@ class Game {
     };
   }
 
+  animation(func){
+    if(this.animationId) cancelAnimationFrame(this.animationId);
+
+    function animate(){
+      console.log("animate");
+      this.animationId =  requestAnimationFrame(animate);
+    }
+
+    animate();
+  }
+
   // 绘制下一个形状
   drawNextShape() {
-    const previewCtx = this.previewCtx,
+    const previewCtx = this.nextShapeCtx,
       type = this.nextShape.type,
       piece = this.generateNextPiece();
 
@@ -449,8 +463,8 @@ class Game {
   }
 
   // 绘制形状
-  drawShape(ctx, piece, shapeType, xOffset, yOffset, shapeCloneColor) {
-    ctx.fillStyle = shapeCloneColor || this.shapeColor[shapeType];
+  drawShape(ctx, piece, shapeType, xOffset, yOffset, previewShapeColor) {
+    ctx.fillStyle = previewShapeColor || this.shapeColor[shapeType];
 
     for (let i = 0, length = piece.length; i < length; i++) {
       const x = piece[i][1] + xOffset,
@@ -487,9 +501,9 @@ class Game {
   // 设置游戏颜色主题
   setGamePalette() {
     const flavor = sessionStorage.getItem("flavor"),
-      { shapeCloneColor, shapeColor, } = options.palette[flavor];
+      { previewShapeColor, shapeColor, } = options.palette[flavor];
 
-    this.shapeCloneColor = shapeCloneColor;
+    this.previewShapeColor = previewShapeColor;
     this.shapeColor = shapeColor;
     this.drawNextShape();
     this.drawMap();

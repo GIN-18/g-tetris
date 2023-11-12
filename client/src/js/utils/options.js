@@ -2,7 +2,7 @@ module.exports = {
   palette: {
     latte: {
       clearLineColor: '#7287fd',
-      shapeCloneColor: "#dce0e8",
+      previewShapeColor: "#dce0e8",
       shapeColor: [
         '#dc8a78',
         '#ea76cb',
@@ -15,7 +15,7 @@ module.exports = {
     },
     frappe: {
       clearLineColor: '#babbf1',
-      shapeCloneColor: "#414559",
+      previewShapeColor: "#414559",
       shapeColor: [
         '#f2d5cf',
         '#f4b8e4',
@@ -28,7 +28,7 @@ module.exports = {
     },
     macchiato: {
       clearLineColor: "#b7bdf8",
-      shapeCloneColor: "#363a4f",
+      previewShapeColor: "#363a4f",
       shapeColor: [
         '#f4dbd6',
         '#f5bde6',
@@ -41,7 +41,7 @@ module.exports = {
     },
     mocha: {
       clearLineColor: '#b4befe',
-      shapeCloneColor: "#313244",
+      previewShapeColor: "#313244",
       shapeColor: [
         '#f5e0dc',
         '#f5c2e7',
