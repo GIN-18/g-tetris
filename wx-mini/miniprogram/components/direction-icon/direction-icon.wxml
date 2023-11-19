@@ -1,0 +1,1 @@
+<image class="{{ direction }}" src="../../static/images/triangle.svg" mode="aspectFit"></image>

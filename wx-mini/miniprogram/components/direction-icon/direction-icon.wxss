@@ -1,0 +1,12 @@
+image {
+  box-sizing: border-box;
+  width: 48rpx;
+}
+
+.left {
+  transform: rotate(90deg);
+}
+
+.right {
+  transform: rotate(270deg);
+}
