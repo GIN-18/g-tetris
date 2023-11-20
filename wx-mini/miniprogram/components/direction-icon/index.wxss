@@ -1,6 +1,6 @@
 image {
-  box-sizing: border-box;
   width: 48rpx;
+  height: 48rpx;
 }
 
 .left {
@@ -9,4 +9,8 @@ image {
 
 .right {
   transform: rotate(270deg);
+}
+
+.margin {
+  margin-bottom: -26rpx;
 }

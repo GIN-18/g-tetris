@@ -35,21 +35,21 @@
   <!-- 左区按键 - 方向键 -->
   <view id="left-btn">
     <!-- 下坠键 -->
-    <view id="drop-btn" class="d-btn">
-      <image src="../../static/images/triangle.svg" mode="aspectFit"></image>
-      <image src="../../static/images/triangle.svg" mode="aspectFit"></image>
+    <view id="drop-btn" class="d-btn" bind:touchstart="dropPiece">
+      <direction-icon direction="margin"></direction-icon>
+      <direction-icon></direction-icon>
     </view>
     <!-- 左右键 -->
     <view id="horizontal-btn">
-      <view class="d-btn">
+      <view class="d-btn" bind:touchstart="moveLeft">
         <direction-icon direction="left"></direction-icon>
       </view>
-      <view class="d-btn">
+      <view class="d-btn" bind:touchstart="moveRight">
         <direction-icon direction="right"></direction-icon>
       </view>
     </view>
     <!-- 下移键 -->
-    <view class="d-btn">
+    <view class="d-btn" bind:touchstart="moveDown" bind:touchend="endDown">
       <direction-icon></direction-icon>
     </view>
   </view>
@@ -57,11 +57,11 @@
   <view id="right-btn">
     <!-- 功能键 -->
     <view id="function-btn">
-      <view class="f-btn">s</view>
+      <view class="f-btn" bindtouchstart="startGame">s</view>
       <view class="f-btn">v</view>
       <view class="f-btn">r</view>
     </view>
     <!-- 旋转键 -->
-    <view id="rotation-btn">R</view>
+    <view id="rotation-btn" bind:touchstart="rotatePiece">R</view>
   </view>
 </view>
