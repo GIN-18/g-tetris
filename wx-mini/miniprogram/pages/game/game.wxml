@@ -48,15 +48,19 @@
   <view id="right-btn">
     <!-- 功能键 -->
     <view id="function-btn">
-      <view class="f-btn" bindtouchstart="startGame">s</view>
-      <view class="f-btn">v</view>
+      <view class="f-btn" bind:touchstart="startGame">
+        <status-icon status="{{ gamePlay }}" trueSrc="{{ pauseSrc }}" falseSrc="{{ playSrc }}"></status-icon>
+      </view>
+      <view class="f-btn" bind:touchstart="volumeChange">
+        <status-icon status="{{ volume }}" trueSrc="{{ volumeSrc }}" falseSrc="{{ muteSrc }}"></status-icon>
+      </view>
       <view class="f-btn">
-        <image id="reload" src="../../static/images/reload.svg"></image>
+        <image id="reload" src="/static/images/reload.svg"></image>
       </view>
     </view>
     <!-- 旋转键 -->
     <view id="rotation-btn" bind:touchstart="rotatePiece">
-      <image src="../../static/images/repeat.svg"></image>
+      <image src="/static/images/repeat.svg"></image>
     </view>
   </view>
 </view>

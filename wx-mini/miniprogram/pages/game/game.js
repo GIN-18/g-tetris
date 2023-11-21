@@ -11,7 +11,6 @@ Page({
 
     blockSize: 20,
 
-
     map: [...new Array(20)].map(() => new Array(10).fill(0)),
 
     mapCanvas: null,
@@ -27,7 +26,7 @@ Page({
     gamePlay: false,
     gameOver: false,
 
-    volumeUp: true,
+    volume: true,
 
     shape: null,
     nextShape: new Shape(),
@@ -49,6 +48,11 @@ Page({
     score: 0,
     highScore: 0,
     level: 1,
+
+    playSrc: "/static/images/play.svg",
+    pauseSrc: "/static/images/pause.svg",
+    volumeSrc: "/static/images/volume.svg",
+    muteSrc: "/static/images/mute.svg",
   },
 
   /**
@@ -118,8 +122,17 @@ Page({
 
   // 开始游戏
   startGame() {
-    this.addShape()
-    this.setDropTimer()
+    this.setData({
+      gamePlay: !this.data.gamePlay
+    })
+
+    const { gamePlay, dropTimer } = this.data
+
+    if (!dropTimer) this.addShape()
+
+    if (gamePlay) this.setDropTimer()
+
+    if (!gamePlay && dropTimer) clearInterval(dropTimer)
   },
 
   // 添加形状
@@ -136,7 +149,7 @@ Page({
     this.drawMap()
     this.drawNextPiece()
 
-    // 游戏结束
+    // XXX: 游戏结束
     const { map, shape, dropTimer } = this.data
     const xo = shape.xOffset;
     const yo = shape.yOffset;
@@ -159,7 +172,8 @@ Page({
           gameOver: true,
           gamePlay: false,
           shape: null,
-          nextShape: null
+          nextShape: null,
+          previewShape: null
         })
 
         break;
@@ -170,15 +184,14 @@ Page({
   // 设置下落间隔
   setDropTimer() {
     const { level, fastForward, dropTimer, gamePlay } = this.data
+
+    if (!gamePlay) return
+
     let timestep = Math.round(80 + 800 * Math.pow(0.75, level - 1));
 
-    timestep = Math.max(10, timestep);
+    fastForward ? timestep = 80 : timestep = Math.max(10, timestep);
 
-    if (fastForward) {
-      timestep = 80;
-    }
-
-    if (dropTimer || gamePlay) {
+    if (dropTimer) {
       clearInterval(dropTimer);
 
       this.setData({
@@ -186,17 +199,13 @@ Page({
       })
     }
 
-    if (!gamePlay) {
-      let d;
+    const d = setInterval(() => {
+      this.fallToLand();
+    }, timestep);
 
-      d = setInterval(() => {
-        this.fallToLand();
-      }, timestep);
-
-      this.setData({
-        dropTimer: d,
-      })
-    }
+    this.setData({
+      dropTimer: d,
+    })
   },
 
   //下落触底
@@ -378,7 +387,7 @@ Page({
   movePiece(xStep, yStep) {
     const { map, shape, previewShape, gamePlay, gameOver, dropTimer } = this.data
 
-    // if (!gamePlay || gameOver || !dropTimer) return;
+    if (!gamePlay || gameOver || !dropTimer) return;
 
     const w = map[0].length;
     const h = map.length;
@@ -416,7 +425,7 @@ Page({
   rotatePiece() {
     const { map, shape, gamePlay, gameOver, dropTimer } = this.data
 
-    // if (!gamePlay || gameOver || !dropTimer) return;
+    if (!gamePlay || gameOver || !dropTimer) return;
 
     let { rotation } = shape
     const ir = rotation
@@ -469,20 +478,20 @@ Page({
       }
     }
 
+    // 绘制预览方块
+    ctx.fillStyle = psc
+    for (let i = 0; i < pp.length; i++) {
+      const x = (pp[i][1] + pxo) * bs
+      const y = (pp[i][0] + pfy) * bs
+      ctx.fillRect(x, y, bs, bs)
+    }
+
     // 绘制方块
     ctx.fillStyle = sc[t]
     for (let i = 0; i < p.length; i++) {
       const x = (p[i][1] + xo) * bs
       const y = (p[i][0] + yo) * bs
 
-      ctx.fillRect(x, y, bs, bs)
-    }
-
-    // 绘制预览方块
-    ctx.fillStyle = psc
-    for (let i = 0; i < pp.length; i++) {
-      const x = (pp[i][1] + pxo) * bs
-      const y = (pp[i][0] + pfy) * bs
       ctx.fillRect(x, y, bs, bs)
     }
 
@@ -526,6 +535,13 @@ Page({
           break
       }
     }
+  },
+
+  // 音量键
+  volumeChange() {
+    this.setData({
+      volume: !this.data.volume
+    })
   },
 
   // 初始化画布

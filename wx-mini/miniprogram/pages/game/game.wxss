@@ -86,8 +86,8 @@ page {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 130rpx;
-  height:130rpx;
+  width: 120rpx;
+  height:120rpx;
   border: 4rpx solid var(--text-page);
   border-radius: 50%;
 }
@@ -97,7 +97,6 @@ page {
   flex-direction: column;
   justify-content: space-around;
 }
-
 
 #horizontal-btn{
   box-sizing: border-box;
