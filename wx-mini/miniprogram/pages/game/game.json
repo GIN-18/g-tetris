@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "GAME",
   "usingComponents": {
-    "direction-icon": "../../components/direction-icon/index"
+    "direction-icon": "../../components/direction-icon/index",
+    "info-box": "../../components/info-box/index"
   }
 }

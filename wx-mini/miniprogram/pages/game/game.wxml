@@ -7,25 +7,16 @@
   <!-- 游戏信息 -->
   <view id="info">
     <!-- 分数 -->
-    <view class="info-item">
-      <view class="info-label">SCORE</view> 
-      <view>{{ score }}</view>
-    </view>
+    <info-box title="SCORE" content="{{ score }}"></info-box>
     <!-- 最高分 -->
-    <view class="info-item">
-      <view class="info-label">HI-SCORE</view> 
-      <view>{{ highScore }}</view>
-    </view>
+    <info-box title="HI-SCORE" content="{{ highScore }}"></info-box>
     <!-- 下一个方块 -->
-    <view class="info-item">
-      <view class="info-label">NEXT</view> 
+    <view id="next-box">
+      <view id="next-title">NEXT</view> 
       <canvas id="next" type="2d"></canvas>
     </view>
     <!-- 等级 -->
-    <view class="info-item">
-      <view class="info-label">LEVEL</view> 
-      <view>{{ level }}</view>
-    </view>
+    <info-box title="LEVEL" content="{{ level }}"></info-box>
   </view>
 </view>
 
@@ -59,9 +50,13 @@
     <view id="function-btn">
       <view class="f-btn" bindtouchstart="startGame">s</view>
       <view class="f-btn">v</view>
-      <view class="f-btn">r</view>
+      <view class="f-btn">
+        <image id="reload" src="../../static/images/reload.svg"></image>
+      </view>
     </view>
     <!-- 旋转键 -->
-    <view id="rotation-btn" bind:touchstart="rotatePiece">R</view>
+    <view id="rotation-btn" bind:touchstart="rotatePiece">
+      <image src="../../static/images/repeat.svg"></image>
+    </view>
   </view>
 </view>

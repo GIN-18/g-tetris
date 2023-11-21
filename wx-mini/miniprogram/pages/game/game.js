@@ -31,6 +31,8 @@ Page({
 
     shape: null,
     nextShape: new Shape(),
+    previewShape: null,
+    previewShapeColor: "#313244",
     clearLineColor: '#b4befe',
     shapeColor: [
       '#f5e0dc',
@@ -109,14 +111,8 @@ Page({
   },
 
   // 生成方块
-  generatePiece() {
-    const { shape: s } = this.data
-    return s.shapeTable[s.shapeType[s.type]][s.rotation]
-  },
-
-  // 生成下一个方块
-  generateNextPiece() {
-    const { nextShape: s } = this.data
+  generatePiece(shape) {
+    const { [shape]: s } = this.data
     return s.shapeTable[s.shapeType[s.type]][s.rotation]
   },
 
@@ -133,8 +129,42 @@ Page({
       nextShape: new Shape(),
     })
 
+    this.setData({
+      previewShape: { ...this.data.shape }
+    })
+
     this.drawMap()
     this.drawNextPiece()
+
+    // 游戏结束
+    const { map, shape, dropTimer } = this.data
+    const xo = shape.xOffset;
+    const yo = shape.yOffset;
+    const p = this.generatePiece("shape")
+
+    for (let i = 0; i < p.length; i++) {
+      const x = p[i][1] + xo;
+      const y = p[i][0] + yo;
+
+      if (y >= yo && map[y + Math.abs(yo)][x]) {
+        if (dropTimer) {
+          clearInterval(dropTimer);
+
+          this.setData({
+            dropTimer: null,
+          })
+        }
+
+        this.setData({
+          gameOver: true,
+          gamePlay: false,
+          shape: null,
+          nextShape: null
+        })
+
+        break;
+      }
+    }
   },
 
   // 设置下落间隔
@@ -192,7 +222,7 @@ Page({
   mergePiece() {
     const { map, shape } = this.data
     const { type: t, xOffset: xo, yOffset: yo } = shape
-    const p = this.generatePiece();
+    const p = this.generatePiece("shape");
 
     for (let i = 0; i < p.length; i++) {
       const x = p[i][1] + xo;
@@ -346,17 +376,18 @@ Page({
 
   // 移动方块
   movePiece(xStep, yStep) {
-    const { map, shape, gamePlay, gameOver, dropTimer } = this.data
+    const { map, shape, previewShape, gamePlay, gameOver, dropTimer } = this.data
 
     // if (!gamePlay || gameOver || !dropTimer) return;
 
     const w = map[0].length;
     const h = map.length;
-    const p = this.generatePiece();
+    const p = this.generatePiece("shape");
 
     let canMove = true;
     let xo = shape.xOffset;
     let yo = shape.yOffset;
+    let pxo = previewShape.xOffset;
 
     for (let i = 0; i < p.length; i++) {
       const x = p[i][1] + xo + xStep;
@@ -372,6 +403,7 @@ Page({
       this.setData({
         "shape.xOffset": xo += xStep,
         "shape.yOffset": yo += yStep,
+        "previewShape.xOffset": pxo += xStep,
       })
 
       this.drawMap();
@@ -394,9 +426,10 @@ Page({
 
     this.setData({
       "shape.rotation": r,
+      "previewShape.rotation": r,
     })
 
-    const p = this.generatePiece();
+    const p = this.generatePiece("shape");
 
     for (let i = 0; i < p.length; i++) {
       const x = shape.xOffset + p[i][1];
@@ -405,6 +438,7 @@ Page({
       if (y >= 0 && (map[y] === undefined || map[y][x] === undefined || map[y][x] > 0)) {
         this.setData({
           "shape.rotation": ir,
+          "previewShape.rotation": ir,
         })
       }
     }
@@ -414,9 +448,12 @@ Page({
 
   // 绘制地图
   drawMap() {
-    const { blockSize: bs, map: m, shape: s, shapeColor: sc, mapCtx: ctx, mapWidth: w, mapHeight: h } = this.data
+    const { blockSize: bs, map: m, shape: s, previewShape: ps, previewShapeColor: psc, shapeColor: sc, mapCtx: ctx, mapWidth: w, mapHeight: h } = this.data
     const { xOffset: xo, yOffset: yo, type: t } = s
-    const p = this.generatePiece()
+    const { xOffset: pxo, yOffset: pyo } = ps
+    const p = this.generatePiece("shape")
+    const pp = this.generatePiece("previewShape")
+    const pfy = findPreviewOffset(pyo)
 
     ctx.clearRect(0, 0, w, h)
 
@@ -440,12 +477,34 @@ Page({
 
       ctx.fillRect(x, y, bs, bs)
     }
+
+    // 绘制预览方块
+    ctx.fillStyle = psc
+    for (let i = 0; i < pp.length; i++) {
+      const x = (pp[i][1] + pxo) * bs
+      const y = (pp[i][0] + pfy) * bs
+      ctx.fillRect(x, y, bs, bs)
+    }
+
+    // 获取预览方块的最终y坐标
+    function findPreviewOffset(offset) {
+      for (let i = 0; i < pp.length; i++) {
+        const x = pxo + pp[i][1];
+        const y = offset + pp[i][0];
+
+        if (offset >= yo && (y > m.length - 2 || (m[y] && m[y + 1][x]))) {
+          return offset;
+        }
+      }
+
+      return findPreviewOffset(offset + 1);
+    };
   },
 
   // 绘制下一个方块
   drawNextPiece() {
     const { blockSize: bs, nextShape: ns, shapeColor: sc, nextCtx: ctx, nextWidth: w, nextHeight: h } = this.data
-    const p = this.generateNextPiece()
+    const p = this.generatePiece("nextShape")
     const t = ns.type
 
     ctx.clearRect(0, 0, w, h)
