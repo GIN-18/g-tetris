@@ -53,6 +53,8 @@ Page({
     pauseSrc: "/static/images/pause.svg",
     volumeSrc: "/static/images/volume.svg",
     muteSrc: "/static/images/mute.svg",
+
+    active: false,
   },
 
   /**
@@ -348,7 +350,7 @@ Page({
   dropPiece() {
     const { gamePlay, dropTimer } = this.data
 
-    // if (gamePlay || !dropTimer) return;
+    if (!gamePlay || !dropTimer) return;
 
     while (this.movePiece(0, 1)) { }
 
@@ -451,6 +453,10 @@ Page({
         })
       }
     }
+
+    this.setData({
+      active: true
+    })
 
     this.drawMap();
   },

@@ -3,6 +3,7 @@
   "usingComponents": {
     "direction-icon": "../../components/direction-icon/index",
     "info-box": "../../components/info-box/index",
-    "status-icon": "../../components/status-icon/index"
+    "status-icon": "../../components/status-icon/index",
+    "button-box": "../../components/button-box/index"
   }
 }

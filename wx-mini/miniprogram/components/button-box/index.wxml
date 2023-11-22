@@ -1,0 +1,4 @@
+<!--components/button-box/index.wxml-->
+<view class="btn {{ type }} {{ active? 'active' : '' }}">
+  <slot></slot>
+</view>

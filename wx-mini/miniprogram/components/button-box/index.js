@@ -1,12 +1,15 @@
-// components/info-box/index.js
+// components/button-box/index.js
 Component({
 
   /**
    * 组件的属性列表
    */
   properties: {
-    title: {
+    type: {
       type: String,
+    },
+    active: {
+      type: Boolean,
     }
   },
 

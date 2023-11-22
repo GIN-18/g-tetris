@@ -1,4 +1,4 @@
 <view class="info-box">
   <view class="info-label">{{ title }}</view> 
-  <view>{{ content }}</view>
+  <slot></slot>
 </view>

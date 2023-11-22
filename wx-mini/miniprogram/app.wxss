@@ -22,5 +22,6 @@ page {
   --bg-page: #11111b;
   --bg-map: #181825;
   --bg-next: #313244;
+  --bg-active: #585b70;
   --text-page: #cdd6f4;
 }

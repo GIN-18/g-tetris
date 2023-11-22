@@ -1,0 +1,40 @@
+.btn {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.d-btn {
+  width: 120rpx;
+  height:120rpx;
+  border: 4rpx solid var(--text-page);
+  border-radius: 50%;
+}
+
+.f-btn{
+  width: 58rpx;
+  height: 58rpx;
+  border: 4rpx solid var(--text-page);
+  border-radius: 10rpx;
+}
+
+.r-btn {
+  width: 240rpx;
+  height: 240rpx;
+  border: 4rpx solid var(--text-page);
+  border-radius: 50%;
+}
+
+.drop-btn{
+  flex-direction: column;
+  justify-content: space-around;
+  width: 120rpx;
+  height:120rpx;
+  border: 4rpx solid var(--text-page);
+  border-radius: 50%;
+}
+
+.active {
+  background-color: var(--bg-active);
+}

@@ -46,19 +46,6 @@ page {
   justify-content: space-between;
 }
 
-#next-box {
-  box-sizing: border-box;
-  padding: 12rpx;
-  border: 4rpx solid var(--text-page);
-  border-radius: 10rpx;
-  text-align: center;
-}
-
-#next-title {
-  margin-bottom: 6rpx;
-  font-weight: 600;
-}
-
 /* 分割线 */
 #line {
   box-sizing: border-box;
@@ -81,23 +68,6 @@ page {
   width: 50%;
 }
 
-#left-btn .d-btn{
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 120rpx;
-  height:120rpx;
-  border: 4rpx solid var(--text-page);
-  border-radius: 50%;
-}
-
-#drop-btn{
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-}
-
 #horizontal-btn{
   box-sizing: border-box;
   display: flex;
@@ -118,27 +88,6 @@ page {
   display: flex;
   justify-content: space-between;
   width: 100%;
-}
-
-#function-btn .f-btn{
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 58rpx;
-  height: 58rpx;
-  border: 4rpx solid var(--text-page);
-  border-radius: 10rpx;
-}
-
-#rotation-btn{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 240rpx;
-  height: 240rpx;
-  border: 4rpx solid var(--text-page);
-  border-radius: 50%;
 }
 
 #reload {
