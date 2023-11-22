@@ -1,7 +1,9 @@
+<!-- 页面头部 -->
 <view id="header">
   <text id="title">{{ title }}</text>
 </view>
 
+<!-- 游戏主体 -->
 <view id="main">
   <canvas id="map" type="2d"></canvas>
   <!-- 游戏信息 -->
@@ -25,8 +27,10 @@
   </view>
 </view>
 
+<!-- 分割线 -->
 <view id="line"></view>
 
+<!-- 操作 -->
 <view id="operation">
   <!-- 左区按键 - 方向键 -->
   <view id="left-btn">
@@ -72,3 +76,11 @@
     </button-box>
   </view>
 </view>
+
+<!-- 游戏结束 -->
+<game-over wx:if="{{ gameOver }}" score="{{ score }}" highScore="{{ highScore }}">
+  <view id="game-over-btn-box">
+    <button-box type="g-btn">AGAIN</button-box>
+    <button-box type="g-btn">QUIT</button-box>
+  </view>
+</game-over>

@@ -53,8 +53,6 @@ Page({
     pauseSrc: "/static/images/pause.svg",
     volumeSrc: "/static/images/volume.svg",
     muteSrc: "/static/images/mute.svg",
-
-    active: false,
   },
 
   /**
@@ -453,10 +451,6 @@ Page({
         })
       }
     }
-
-    this.setData({
-      active: true
-    })
 
     this.drawMap();
   },

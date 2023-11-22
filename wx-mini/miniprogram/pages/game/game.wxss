@@ -91,6 +91,15 @@ page {
 }
 
 #reload {
+  box-sizing: border-box;
   width: 24rpx;
   height: 24rpx;
+}
+
+#game-over-btn-box {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin-top: 16rpx;
 }

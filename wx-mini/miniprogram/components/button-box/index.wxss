@@ -26,6 +26,14 @@
   border-radius: 50%;
 }
 
+.g-btn {
+  width: 118rpx;
+  padding: 4rpx 0;
+  border: 4rpx solid var(--text-page);
+  border-radius: 10rpx;
+  font-weight: 600;
+}
+
 .drop-btn{
   flex-direction: column;
   justify-content: space-around;

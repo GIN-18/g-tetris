@@ -24,6 +24,7 @@ Component({
       this.setData({
         active: true,
       })
+      wx.vibrateShort()
     },
     recoverActive() {
       this.setData({
