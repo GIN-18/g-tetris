@@ -1,4 +1,8 @@
-<!--components/button-box/index.wxml-->
-<view class="btn {{ type }} {{ active? 'active' : '' }}">
+<!-- BUG: 开始键和音量键有时候不会触发touchend事件 -->
+<view
+  class="btn {{ type }} {{ active? 'active' : '' }}"
+  bind:touchstart="changeActive"
+  bind:touchend="recoverActive"
+>
   <slot></slot>
 </view>

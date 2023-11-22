@@ -62,12 +62,12 @@
         <status-icon status="{{ volume }}" trueSrc="{{ volumeSrc }}" falseSrc="{{ muteSrc }}"></status-icon>
       </button-box>
       <!-- 重新开始 -->
-      <button-box type="f-btn" active="{{ active }}">
+      <button-box type="f-btn">
         <image id="reload" src="/static/images/reload.svg"></image>
       </button-box>
     </view>
     <!-- 旋转键 -->
-    <button-box type="r-btn" active="{{ active }}" bind:touchstart="rotatePiece">
+    <button-box type="r-btn" bind:touchstart="rotatePiece">
       <image src="/static/images/repeat.svg"></image>
     </button-box>
   </view>
