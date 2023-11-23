@@ -1,7 +1,7 @@
 {
   "pages": [
-    "pages/game/game",
-    "pages/index/index"
+    "pages/index/index",
+    "pages/game/game"
   ],
   "window": {
     "backgroundColor": "#181825",
@@ -9,7 +9,7 @@
     "navigationBarBackgroundColor": "#11111b",
     "navigationBarTitleText": "TETRIS",
     "navigationBarTextStyle": "white",
-    "enablePullDownRefresh": true
+    "enablePullDownRefresh": false
   },
   "sitemapLocation": "sitemap.json",
   "style": "v2",

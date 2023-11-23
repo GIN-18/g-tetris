@@ -1,6 +1,6 @@
 <!-- 页面头部 -->
 <view id="header">
-  <text id="title">{{ title }}</text>
+  <text id="title" bind:touchstart="backToIndex">{{ title }}</text>
 </view>
 
 <!-- 游戏主体 -->
@@ -81,6 +81,6 @@
 <game-over wx:if="{{ gameOver }}" score="{{ score }}" highScore="{{ highScore }}">
   <view id="game-over-btn-box">
     <button-box type="g-btn" bind:touchstart="restartGame">AGAIN</button-box>
-    <button-box type="g-btn">QUIT</button-box>
+    <button-box type="g-btn" bind:touchstart="backToIndex">QUIT</button-box>
   </view>
 </game-over>

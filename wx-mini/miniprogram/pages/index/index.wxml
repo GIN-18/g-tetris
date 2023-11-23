@@ -1,2 +1,6 @@
-<!--pages/index/index.wxml-->
-<text>pages/index/index.wxml</text>
+<view id="title">TETRIS</view>
+
+<view id="select-container">
+  <index-select src="{{ single }}" content="SINGLE" url="/pages/game/game"></index-select>
+  <index-select src="{{ double }}" content="DOUBLE"></index-select>
+</view>

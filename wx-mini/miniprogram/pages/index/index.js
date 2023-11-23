@@ -5,7 +5,8 @@ Page({
    * 页面的初始数据
    */
   data: {
-
+    single: "/static/images/single.svg",
+    double: "/static/images/double.svg",
   },
 
   /**

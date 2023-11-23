@@ -1,0 +1,4 @@
+<view class="container" bind:touchstart="redirect">
+  <image class="icon" src="{{ src }}"></image>
+  <text class="content">{{ content }}</text>
+</view>

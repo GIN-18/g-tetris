@@ -157,6 +157,20 @@ Page({
     this.drawNextPiece()
   },
 
+  // 音量键
+  volumeChange() {
+    this.setData({
+      volume: !this.data.volume
+    })
+  },
+
+  // 回到首页
+  backToIndex() {
+    wx.navigateTo({
+      url: '/pages/index/index',
+    })
+  },
+
   // 添加形状
   addShape() {
     this.setData({
@@ -557,13 +571,6 @@ Page({
           break
       }
     }
-  },
-
-  // 音量键
-  volumeChange() {
-    this.setData({
-      volume: !this.data.volume
-    })
   },
 
   // 初始化画布

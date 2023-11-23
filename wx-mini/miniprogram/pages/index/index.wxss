@@ -1,1 +1,31 @@
-/* pages/index/index.wxss */
+page{
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  color: var(--text-page);
+  background-color: var(--bg-page);
+}
+
+#title {
+  box-sizing: border-box;
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-page);
+  font-size: 140rpx;
+  font-family: Dubtronic Inline;
+}
+
+#select-container {
+  box-sizing: border-box;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
