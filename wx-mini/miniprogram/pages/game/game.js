@@ -135,6 +135,28 @@ Page({
     if (!gamePlay && dropTimer) clearInterval(dropTimer)
   },
 
+  // 重新开始
+  restartGame() {
+    const { mapCtx: m, mapWidth: w, mapHeight: h, dropTimer } = this.data
+
+    if (dropTimer) clearInterval(dropTimer)
+
+    this.setData({
+      map: [...new Array(20)].map(() => new Array(10).fill(0)),
+      shape: null,
+      nextShape: new Shape(),
+      previewShape: null,
+      dropTimer: null,
+      gamePlay: false,
+      gameOver: false,
+      score: 0,
+      level: 1,
+    })
+
+    m.clearRect(0, 0, w, h)
+    this.drawNextPiece()
+  },
+
   // 添加形状
   addShape() {
     this.setData({
@@ -169,11 +191,11 @@ Page({
         }
 
         this.setData({
-          gameOver: true,
           gamePlay: false,
           shape: null,
           nextShape: null,
-          previewShape: null
+          previewShape: null,
+          gameOver: true,
         })
 
         break;
