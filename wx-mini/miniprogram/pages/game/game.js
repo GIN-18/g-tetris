@@ -46,7 +46,7 @@ Page({
     dropTimer: null,
 
     score: 0,
-    highScore: 0,
+    highScore: wx.getStorageSync('highScore') || 0,
     level: 1,
 
     playSrc: "/static/images/play.svg",
@@ -151,6 +151,7 @@ Page({
       gameOver: false,
       score: 0,
       level: 1,
+      highScore: wx.getStorageSync('highScore') || 0,
     })
 
     m.clearRect(0, 0, w, h)
@@ -211,6 +212,8 @@ Page({
           previewShape: null,
           gameOver: true,
         })
+
+        this.updateHighScore()
 
         break;
       }
@@ -365,6 +368,17 @@ Page({
     })
   },
 
+  // 更新最高分
+  updateHighScore() {
+    const { score: s, highScore: hs } = this.data
+
+    if (s > hs) {
+      this.setData({
+        highScore: wx.setStorageSync('highScore', s)
+      })
+    }
+  },
+
   // 更新等级
   updateLevel() {
     let { score, level } = this.data;
@@ -403,6 +417,8 @@ Page({
 
   // 下移
   moveDown() {
+    if (!this.movePiece(0, 1)) return
+
     this.setData({
       fastForward: true,
     })
