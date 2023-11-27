@@ -159,7 +159,7 @@ Page({
   },
 
   // 音量键
-  volumeChange() {
+  changeVolume() {
     this.setData({
       volume: !this.data.volume
     })
@@ -332,7 +332,7 @@ Page({
         this.setDropTimer();
 
         // 播放音效
-        // this.music.playAudio(0.19, 0.7);
+        this.playAudio("clear")
 
         return;
       }

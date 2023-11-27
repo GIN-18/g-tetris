@@ -62,7 +62,7 @@
         <status-icon status="{{ gamePlay }}" trueSrc="{{ pauseSrc }}" falseSrc="{{ playSrc }}"></status-icon>
       </button-box>
       <!-- 音量 -->
-      <button-box type="f-btn" bind:touchstart="volumeChange">
+      <button-box type="f-btn" bind:touchstart="changeVolume">
         <status-icon status="{{ volume }}" trueSrc="{{ volumeSrc }}" falseSrc="{{ muteSrc }}"></status-icon>
       </button-box>
       <!-- 重新开始 -->

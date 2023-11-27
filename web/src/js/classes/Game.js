@@ -22,8 +22,7 @@ class Game {
 
     this.gameMode = sessionStorage.getItem("gameMode") || "single";
 
-    this.gameStart = false;
-    this.gamePaused = false;
+    this.gamePlay = false;
     this.gameOver = false;
 
     this.music = new Music();
@@ -44,14 +43,6 @@ class Game {
     this.score = 0;
     this.highScore = localStorage.getItem("highScore") || 0;
 
-    this.animationId = null;
-
-    this.stopIcon = `<span class="material-icons-round text-sm leading-3">pause</span>`;
-    this.startIcon = `<span class="material-icons-round text-sm leading-3">play_arrow</span>`;
-
-    this.volumeOffIcon = `<span class="material-icons-round text-sm leading-3">volume_off</span>`;
-    this.volumeUpIcon = `<span class="material-icons-round text-sm leading-3">volume_up</span>`;
-
     this.init();
   }
 
@@ -70,56 +61,27 @@ class Game {
     $("#level").text(this.level);
   }
 
-  // 开始游戏
-  startGame() {
-    this.gameStart = true;
-    this.addShape();
-    this.setDropTimer();
-  }
-
-  // 生成形状
-  generateShape() {
-    return new Shape();
-  }
-
-  // 生成当前方块
-  generatePiece() {
-    return this.shape.shapeTable[this.shape.shapeType[this.shape.type]][
-      this.shape.rotation
-    ];
-  }
-
-  // 生成当前方块的克隆
-  generatePreviewPiece() {
-    return this.previewShape.shapeTable[
-      this.previewShape.shapeType[this.previewShape.type]
-    ][this.previewShape.rotation];
-  }
-
-  // 生成下一个方块
-  generateNextPiece() {
-    return this.nextShape.shapeTable[
-      this.nextShape.shapeType[this.nextShape.type]
-    ][this.nextShape.rotation];
+  // 生成方块
+  generatePiece(shape) {
+    const { [shape]: s } = this
+    return s.shapeTable[s.shapeType[s.type]][s.rotation];
   }
 
   // 添加方块
   addShape() {
     this.shape = this.nextShape;
     this.previewShape = { ...this.shape };
-    this.nextShape = this.generateShape();
+    this.nextShape = new Shape();
 
-    this.drawMap();
+    this.drawGame();
     this.drawNextShape();
 
-    const piece = this.generatePiece(),
-      xOffset = this.shape.xOffset,
-      yOffset = this.shape.yOffset;
+    const piece = this.generatePiece("shape"),
+      { xOffset, yOffset } = this.shape
 
     for (let i = 0; i < piece.length; i++) {
-      const item = piece[i],
-        x = xOffset + item[1],
-        y = yOffset + item[0];
+      const x = piece[i][1] + xOffset,
+        y = piece[i][0] + yOffset;
 
       if (y >= yOffset && this.map[y + Math.abs(yOffset)][x]) {
         if (this.dropTimer) {
@@ -128,48 +90,22 @@ class Game {
         }
 
         this.gameOver = true;
-        this.gameStart = false;
+        this.gamePlay = false;
+        this.map = null;
         this.shape = null;
         this.nextShape = null;
+        this.previewShape = null;
         this.overGame();
         break;
       }
     }
   }
 
-  // 方块旋转
-  rotateShape(rStep) {
-    if (!this.gameStart || this.gamePaused || this.gameOver || !this.dropTimer)
-      return;
-
-    const tempRotation = this.shape.rotation;
-
-    this.shape.rotation += rStep;
-
-    const r =
-      this.shape.rotation %
-      this.shape.shapeTable[this.shape.shapeType[this.shape.type]].length;
-
-    this.shape.rotation = r;
-    this.previewShape.rotation = r;
-
-    const piece = this.generatePiece();
-
-    piece.forEach((item) => {
-      const x = this.shape.xOffset + item[1],
-        y = this.shape.yOffset + item[0];
-      if (
-        y >= 0 &&
-        (this.map[y] === undefined ||
-          this.map[y][x] === undefined ||
-          this.map[y][x] > 0)
-      ) {
-        this.shape.rotation = tempRotation;
-        this.previewShape.rotation = tempRotation;
-      }
-    });
-
-    this.drawMap();
+  // 下坠
+  dropShape() {
+    if (this.gamePaused || !this.dropTimer) return;
+    while (this.moveShape(0, 1)) { }
+    this.fallToLand();
   }
 
   // 左移
@@ -194,27 +130,90 @@ class Game {
     this.setDropTimer();
   }
 
-  // 下坠
-  dropShape() {
-    if (this.gamePaused || !this.dropTimer) return;
-    while (this.moveShape(0, 1)) { }
-    this.fallToLand();
+  // 开始游戏
+  startGame() {
+    if (!this.dropTimer) this.addShape()
+
+    if (this.gamePlay) this.setDropTimer()
+
+    if (!this.gamePlay && this.dropTimer) clearInterval(this.dropTimer)
+  }
+
+  // 重新开始
+  restartGame() {
+    if (this.dropTimer) clearInterval(this.dropTimer);
+
+    this.map = [...new Array(this.mapHeight)].map(() =>
+      new Array(this.mapWidth).fill(0)
+    );
+
+    this.gamePlay = false;
+    this.gameOver = false;
+
+    this.shape = null;
+    this.nextShape = new Shape();
+    this.previewShape = null;
+
+    this.dropTimer = null;
+    this.fastForward = false;
+
+    this.score = 0;
+    this.level = 1;
+
+    this.clearArea(this.mapCtx)
+    this.drawNextShape()
+    utils.changeIcon("start-btn", this.gamePlay)
+  }
+
+  // 方块旋转
+  rotateShape() {
+    if (!this.gamePlay || this.gameOver || !this.dropTimer) return;
+
+    const tempRotation = this.shape.rotation;
+
+    this.shape.rotation += 1;
+
+    const currentRotation =
+      this.shape.rotation %
+      this.shape.shapeTable[this.shape.shapeType[this.shape.type]].length;
+
+    this.shape.rotation = currentRotation;
+    this.previewShape.rotation = currentRotation;
+
+    const piece = this.generatePiece("shape");
+
+    for (let i = 0; i < piece.length; i++) {
+      const x = piece[i][1] + this.shape.xOffset,
+        y = piece[i][0] + this.shape.yOffset;
+
+      if (
+        y >= 0 &&
+        (this.map[y] === undefined ||
+          this.map[y][x] === undefined ||
+          this.map[y][x] > 0)
+      ) {
+        this.shape.rotation = tempRotation;
+        this.previewShape.rotation = tempRotation;
+      }
+    }
+
+    this.drawGame();
   }
 
   // 移动方块
   moveShape(xStep, yStep) {
-    if (!this.gameStart || this.gamePaused || this.gameOver || !this.dropTimer)
-      return;
+    if (!this.gamePlay || this.gameOver || !this.dropTimer) return;
 
     const width = this.map[0].length,
       height = this.map.length,
-      piece = this.generatePiece();
+      piece = this.generatePiece("shape");
 
     let canMove = true;
 
-    piece.forEach((item) => {
-      const x = this.shape.xOffset + item[1] + xStep,
-        y = this.shape.yOffset + item[0] + yStep;
+    for (let i = 0; i < piece.length; i++) {
+      const x = piece[i][1] + this.shape.xOffset + xStep,
+        y = piece[i][0] + this.shape.yOffset + yStep;
+
       if (
         x < 0 ||
         x >= width ||
@@ -224,13 +223,13 @@ class Game {
         canMove = false;
         return canMove;
       }
-    });
+    }
 
     if (canMove) {
       this.shape.xOffset += xStep;
       this.shape.yOffset += yStep;
       this.previewShape.xOffset += xStep;
-      this.drawMap();
+      this.drawGame();
     }
 
     return canMove;
@@ -238,24 +237,20 @@ class Game {
 
   // 设置下落时间
   setDropTimer() {
+    if (!this.gamePlay) return;
+
     let timestep = Math.round(80 + 800 * Math.pow(0.75, this.level - 1));
 
-    timestep = Math.max(10, timestep);
+    this.fastForward ? timestep = 80 : Math.max(10, timestep);
 
-    if (this.fastForward) {
-      timestep = 80;
-    }
-
-    if (this.dropTimer || this.gamePaused) {
+    if (this.dropTimer) {
       clearInterval(this.dropTimer);
       this.dropTimer = null;
     }
 
-    if (!this.gamePaused) {
-      this.dropTimer = setInterval(() => {
-        this.fallToLand();
-      }, timestep);
-    }
+    this.dropTimer = setInterval(() => {
+      this.fallToLand();
+    }, timestep);
   }
 
   // 下落至触底
@@ -264,7 +259,7 @@ class Game {
     this.landShape();
   }
 
-  // 方块触底后将方块合并到地图数组中
+  // 方块触底
   landShape() {
     this.mergeShape();
 
@@ -272,31 +267,31 @@ class Game {
 
     if (filledRows.length) {
       this.clearFilledRows(filledRows);
-    } else {
-      this.addShape();
+      return;
     }
+
+    this.addShape();
   }
 
   // 合并方块到地图
   mergeShape() {
-    const piece = this.generatePiece();
+    const piece = this.generatePiece("shape");
 
-    piece.forEach((item) => {
-      const x = this.shape.xOffset + item[1],
-        y = this.shape.yOffset + item[0];
+    for (let i = 0; i < piece.length; i++) {
+      const x = piece[i][1] + this.shape.xOffset,
+        y = piece[i][0] + this.shape.yOffset;
+
       if (y >= 0) this.map[y][x] = this.shape.type + 1;
-    });
+    }
   }
 
   // 获取满行
   getFilledRows() {
     let filledRows = [];
 
-    this.map.forEach((row, index) => {
-      if (row.every((item) => !!item)) {
-        filledRows.push(index);
-      }
-    });
+    for (let i = 0; i < this.map.length; i++) {
+      if (this.map[i].every((item) => !!item)) filledRows.push(i)
+    }
 
     return filledRows;
   }
@@ -305,6 +300,7 @@ class Game {
   clearFilledRows(filledRows) {
     let animationFrame = null,
       progress = 0;
+
     const numCols = this.map[0].length,
       blockSize = this.blockSize;
 
@@ -389,27 +385,25 @@ class Game {
   }
 
   // 绘制地图
-  drawMap() {
+  drawGame() {
     if (!this.shape) return;
 
     const { map, mapCtx, shape, previewShape, previewShapeColor } = this,
       { type: shapeType, xOffset: shapeXOffset, yOffset: shapeYOffset } = shape,
       { type: previewShapeType, xOffset: previewShapeXOffset, yOffset: previewShapeYOffset } = previewShape,
-      piece = this.generatePiece(),
-      previewPiece = this.generatePreviewPiece(),
+      piece = this.generatePiece("shape"),
+      previewPiece = this.generatePiece("previewShape"),
       finalYOffset = findPreviewOffset(previewShapeYOffset);
 
     this.clearArea(mapCtx);
-    this.drawArea();
-    this.drawShape(mapCtx, previewPiece, previewShapeType, previewShapeXOffset, finalYOffset, previewShapeColor);
-    this.drawShape(mapCtx, piece, shapeType, shapeXOffset, shapeYOffset);
-
-    console.log(shapeXOffset, shapeYOffset)
+    this.drawMap();
+    this.drawPiece(mapCtx, previewPiece, previewShapeType, previewShapeXOffset, finalYOffset, previewShapeColor);
+    this.drawPiece(mapCtx, piece, shapeType, shapeXOffset, shapeYOffset);
 
     function findPreviewOffset(offset) {
       for (let i = 0; i < previewPiece.length; i++) {
-        const x = previewShapeXOffset + previewPiece[i][1],
-          y = offset + previewPiece[i][0];
+        const x = previewPiece[i][1] + previewShapeXOffset,
+          y = previewPiece[i][0] + offset;
 
         if (offset >= shapeYOffset && (y > map.length - 2 || (map[y] && map[y + 1][x]))) {
           return offset;
@@ -420,38 +414,14 @@ class Game {
     };
   }
 
-  animation(func){
-    if(this.animationId) cancelAnimationFrame(this.animationId);
-
-    function animate(){
-      console.log("animate");
-      this.animationId =  requestAnimationFrame(animate);
-    }
-
-    animate();
-  }
-
   // 绘制下一个形状
   drawNextShape() {
     const previewCtx = this.nextShapeCtx,
       type = this.nextShape.type,
-      piece = this.generateNextPiece();
+      piece = this.generatePiece("nextShape");
 
     this.clearArea(previewCtx)
-    this.drawShape(previewCtx, piece, type, 0, 0);
-  }
-
-  // 绘制画布区域
-  drawArea() {
-    const ctx = this.mapCtx, area = this.map;
-
-    for (let i = 0; i < area.length; i++) {
-      for (let j = 0; j < area[i].length; j++) {
-        if (!area[i][j]) continue;
-        ctx.fillStyle = this.shapeColor[area[i][j] - 1];
-        this.drawBlock(ctx, j, i);
-      }
-    }
+    this.drawPiece(previewCtx, piece, type, 0, 0);
   }
 
   // 清除画布区域
@@ -462,11 +432,22 @@ class Game {
     ctx.clearRect(0, 0, width, height);
   }
 
+  // 绘制画布区域
+  drawMap() {
+    for (let i = 0; i < this.map.length; i++) {
+      for (let j = 0; j < this.map[i].length; j++) {
+        if (!this.map[i][j]) continue;
+        this.mapCtx.fillStyle = this.shapeColor[this.map[i][j] - 1];
+        this.drawBlock(this.mapCtx, j, i);
+      }
+    }
+  }
+
   // 绘制形状
-  drawShape(ctx, piece, shapeType, xOffset, yOffset, previewShapeColor) {
+  drawPiece(ctx, piece, shapeType, xOffset, yOffset, previewShapeColor) {
     ctx.fillStyle = previewShapeColor || this.shapeColor[shapeType];
 
-    for (let i = 0, length = piece.length; i < length; i++) {
+    for (let i = 0; i < piece.length; i++) {
       const x = piece[i][1] + xOffset,
         y = piece[i][0] + yOffset;
 
@@ -489,7 +470,7 @@ class Game {
   }
 
   // 绘制方块
-  drawBlock(ctx, x = 1, y = 1, xOffset = 0, yOffset = 0) {
+  drawBlock(ctx, x, y, xOffset = 0, yOffset = 0) {
     ctx.fillRect(
       x * this.blockSize + xOffset,
       y * this.blockSize + yOffset,
@@ -506,14 +487,14 @@ class Game {
     this.previewShapeColor = previewShapeColor;
     this.shapeColor = shapeColor;
     this.drawNextShape();
-    this.drawMap();
+    this.drawGame();
   }
 
   // 结束游戏
   // XXX: again按钮和quit按钮的功能
   overGame() {
     const separatorElement = $(`
-      <div class="absolute top-0 left-0 w-full h-full bg-crust bg-opacity-95"></div>
+      <div id="sparator" class="absolute top-0 left-0 w-full h-full bg-crust bg-opacity-95"></div>
     `);
     const gameOverInfoTemplate = $(`
       <div id="game-over-info"
@@ -560,7 +541,9 @@ class Game {
 
       $("#again-btn").on("touchstart", (e) => {
         e.preventDefault();
-        location.reload();
+        $("#game-over-info").remove()
+        $("#sparator").remove()
+        this.restartGame()
       });
     }
 
@@ -645,65 +628,6 @@ class Game {
       });
     });
 
-    // 开始和暂停按钮
-    $("#start-btn").on("touchstart", (e) => {
-      e.preventDefault();
-
-      if (!this.gameStart) {
-        this.gameStart = true;
-        utils.changeIcon(
-          "start-btn",
-          this.gameStart,
-          this.stopIcon,
-          this.startIcon
-        );
-        this.startGame();
-        return;
-      }
-
-      this.gamePaused = !this.gamePaused;
-
-      utils.changeIcon(
-        "start-btn",
-        !this.gamePaused,
-        this.stopIcon,
-        this.startIcon
-      );
-
-      this.music.playAudio(0, 0.19);
-
-      this.setDropTimer();
-    });
-
-    // 声音按钮
-    $("#volume-btn").on("touchstart", (e) => {
-      e.preventDefault();
-
-      this.volumeUp = !this.volumeUp;
-      this.music.toggleMute(this.volumeUp);
-
-      utils.changeIcon(
-        "volume-btn",
-        this.volumeUp,
-        this.volumeUpIcon,
-        this.volumeOffIcon
-      );
-
-      this.music.playAudio(0, 0.19);
-    });
-
-    // 重新开始
-    $("#restart-btn").on("touchstart", (e) => {
-      e.preventDefault();
-      location.reload();
-    });
-
-    // 旋转键
-    $("#rotate-btn").on("touchstart", (e) => {
-      e.preventDefault();
-      this.rotateShape(1);
-    });
-
     // 下落键
     $("#drop-btn").on("touchstart", (e) => {
       e.preventDefault();
@@ -732,6 +656,42 @@ class Game {
     $("#down-btn").on("touchend", (e) => {
       e.preventDefault();
       this.moveDown(false);
+    });
+
+    // 开始和暂停按
+    $("#start-btn").on("touchstart", (e) => {
+      e.preventDefault();
+
+      this.gamePlay = !this.gamePlay;
+      this.startGame()
+      utils.changeIcon("start-btn", this.gamePlay)
+
+      this.music.playAudio(0, 0.19);
+    });
+
+    // 声音按钮
+    $("#volume-btn").on("touchstart", (e) => {
+      e.preventDefault();
+
+      this.volumeUp = !this.volumeUp;
+      this.music.toggleMute(this.volumeUp);
+      utils.changeIcon("volume-btn", this.volumeUp);
+
+      this.music.playAudio(0, 0.19);
+    });
+
+    // 重新开始
+    $("#restart-btn").on("touchstart", (e) => {
+      e.preventDefault();
+      this.restartGame()
+
+      this.music.playAudio(0, 0.19);
+    });
+
+    // 旋转键
+    $("#rotate-btn").on("touchstart", (e) => {
+      e.preventDefault();
+      this.rotateShape();
     });
 
     // 将按钮颜色改为激活状态

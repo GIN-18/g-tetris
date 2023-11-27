@@ -1,12 +1,21 @@
 module.exports = {
   // 更改图标
-  changeIcon(elementId, status, trueIcon, falseIcon) {
+  changeIcon(elementId, status) {
     const parentElement = document.getElementById(elementId);
-    if (status) {
-      parentElement.innerHTML = trueIcon;
-    } else {
-      parentElement.innerHTML = falseIcon;
+
+    let icon;
+
+    switch (elementId) {
+      case "start-btn":
+        icon = status ? "pause" : "play_arrow";
+        break;
+      case "volume-btn":
+        icon = status ? "volume_up" : "volume_off";
+        break;
     }
+
+    const iconHtml = `<span class="material-icons-round text-sm leading-3">${icon}</span>`;
+    parentElement.innerHTML = iconHtml;
   },
 
   // 更改按钮背景颜色
