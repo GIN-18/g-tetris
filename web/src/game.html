@@ -19,6 +19,8 @@
     <!-- 信息展示区域 -->
     <div id="message" class="fixed top-2 right-2 z-10"></div>
   </header>
+
+  <!-- 游戏主体 -->
   <main class="flex justify-around items-center w-full">
     <!-- 游戏地图 -->
     <canvas id="map-canvas" class="border-2 border-text rounded bg-base" width="200" height="400"></canvas>
@@ -54,12 +56,15 @@
       </div>
     </div>
   </main>
+
   <!-- 分割线 -->
   <hr class="w-full border-t-2 border-dashed border-text" />
-  <!-- 操作 -->
+
+  <!-- 按键 -->
   <div class="w-full">
     <div id="operate" class="flex justify-between items-center w-full">
       <div id="direction-btn" class="flex flex-col justify-center items-center w-1/2">
+        <!-- 下坠键 -->
         <button id="drop-btn"
           class="o-btn flex flex-col justify-center items-center w-16 h-16 border-2 border-text rounded-full bg-mantle"
           type="button">
@@ -67,17 +72,20 @@
           <span class="material-icons-round text-3xl leading-3">arrow_drop_down</span>
         </button>
         <div id="h-btn" class="flex justify-between items-center w-full">
+          <!-- 左键 -->
           <button id="left-btn"
             class="o-btn flex justify-center items-center w-16 h-16 border-2 border-text rounded-full bg-mantle"
             type="button">
             <span class="material-icons-round text-3xl">arrow_left</span>
           </button>
+          <!-- 右键 -->
           <button id="right-btn"
             class="o-btn flex justify-center items-center w-16 h-16 border-2 border-text rounded-full bg-mantle"
             type="button">
             <span class="material-icons-round text-3xl">arrow_right</span>
           </button>
         </div>
+        <!-- 下移键 -->
         <button id="down-btn"
           class="o-btn flex justify-center items-center w-16 h-16 border-2 border-text rounded-full bg-mantle"
           type="button">

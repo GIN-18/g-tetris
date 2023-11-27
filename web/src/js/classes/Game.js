@@ -26,7 +26,7 @@ class Game {
     this.gameOver = false;
 
     this.music = new Music();
-    this.volumeUp = true;
+    this.volume = true;
 
     this.shape = null;
     this.nextShape = new Shape();
@@ -416,12 +416,12 @@ class Game {
 
   // 绘制下一个形状
   drawNextShape() {
-    const previewCtx = this.nextShapeCtx,
+    const nextShapeCtx = this.nextShapeCtx,
       type = this.nextShape.type,
       piece = this.generatePiece("nextShape");
 
-    this.clearArea(previewCtx)
-    this.drawPiece(previewCtx, piece, type, 0, 0);
+    this.clearArea(nextShapeCtx)
+    this.drawPiece(nextShapeCtx, piece, type, 0, 0);
   }
 
   // 清除画布区域
@@ -491,7 +491,6 @@ class Game {
   }
 
   // 结束游戏
-  // XXX: again按钮和quit按钮的功能
   overGame() {
     const separatorElement = $(`
       <div id="sparator" class="absolute top-0 left-0 w-full h-full bg-crust bg-opacity-95"></div>
@@ -661,31 +660,23 @@ class Game {
     // 开始和暂停按
     $("#start-btn").on("touchstart", (e) => {
       e.preventDefault();
-
       this.gamePlay = !this.gamePlay;
       this.startGame()
       utils.changeIcon("start-btn", this.gamePlay)
-
-      this.music.playAudio(0, 0.19);
     });
 
     // 声音按钮
     $("#volume-btn").on("touchstart", (e) => {
       e.preventDefault();
-
-      this.volumeUp = !this.volumeUp;
-      this.music.toggleMute(this.volumeUp);
-      utils.changeIcon("volume-btn", this.volumeUp);
-
-      this.music.playAudio(0, 0.19);
+      this.volume = !this.volume;
+      this.music.toggleMute(this.volume);
+      utils.changeIcon("volume-btn", this.volume);
     });
 
     // 重新开始
     $("#restart-btn").on("touchstart", (e) => {
       e.preventDefault();
       this.restartGame()
-
-      this.music.playAudio(0, 0.19);
     });
 
     // 旋转键
