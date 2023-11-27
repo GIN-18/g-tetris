@@ -161,7 +161,7 @@ class Game {
     this.level = 1;
 
     this.clearArea(this.mapCtx)
-    this.drawNextShape()
+    this.setGameData()
     utils.changeIcon("start-btn", this.gamePlay)
   }
 
@@ -662,6 +662,7 @@ class Game {
       e.preventDefault();
       this.gamePlay = !this.gamePlay;
       this.startGame()
+      this.music.playAudio(0, 0.19);
       utils.changeIcon("start-btn", this.gamePlay)
     });
 
@@ -670,6 +671,7 @@ class Game {
       e.preventDefault();
       this.volume = !this.volume;
       this.music.toggleMute(this.volume);
+      this.music.playAudio(0, 0.19);
       utils.changeIcon("volume-btn", this.volume);
     });
 
@@ -677,6 +679,7 @@ class Game {
     $("#restart-btn").on("touchstart", (e) => {
       e.preventDefault();
       this.restartGame()
+      this.music.playAudio(0, 0.19);
     });
 
     // 旋转键
