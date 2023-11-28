@@ -71,7 +71,9 @@ if (sessionStorage.getItem("gameMode") === "double") {
         room: sessionStorage.getItem("room"),
         score: game.score,
       });
+      game.gamePlay = true;
       game.startGame();
+      game.setDropTimer();
     }, 100);
   });
 
