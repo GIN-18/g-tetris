@@ -160,6 +160,8 @@ Page({
 
   // 音量键
   changeVolume() {
+    this.playAudio("key")
+
     this.setData({
       volume: !this.data.volume
     })
@@ -210,6 +212,7 @@ Page({
           shape: null,
           nextShape: null,
           previewShape: null,
+          audio: null,
           gameOver: true,
         })
 
