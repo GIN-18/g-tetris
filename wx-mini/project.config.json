@@ -36,8 +36,8 @@
     "packNpmRelationList": [],
     "minifyWXSS": true
   },
-  "appid": "wx2c8329325da80e63",
-  "projectname": "quickstart-wx-cloud",
+  "appid": "wx94a9e831b0e99045",
+  "projectname": "俄罗斯方块",
   "libVersion": "2.20.1",
   "cloudfunctionTemplateRoot": "cloudfunctionTemplate/",
   "condition": {
@@ -57,8 +57,8 @@
       "list": [
         {
           "id": -1,
-          "name": "db guide",
-          "pathName": "pages/databaseGuide/databaseGuide"
+          "name": "game",
+          "pathName": "pages/game/game"
         }
       ]
     }

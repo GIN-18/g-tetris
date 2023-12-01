@@ -7,8 +7,6 @@ Page({
    * 页面的初始数据
    */
   data: {
-    title: "TETRIS",
-
     blockSize: 20,
 
     map: [...new Array(20)].map(() => new Array(10).fill(0)),
@@ -122,6 +120,8 @@ Page({
 
   // 开始游戏
   startGame() {
+    this.playAudio("key")
+
     this.setData({
       gamePlay: !this.data.gamePlay
     })
@@ -137,6 +137,8 @@ Page({
 
   // 重新开始
   restartGame() {
+    this.playAudio("key")
+
     const { mapCtx: m, mapWidth: w, mapHeight: h, dropTimer } = this.data
 
     if (dropTimer) clearInterval(dropTimer)
@@ -164,6 +166,23 @@ Page({
 
     this.setData({
       volume: !this.data.volume
+    })
+  },
+
+  // 播放声音
+  playAudio(type) {
+    const { volume } = this.data
+
+    if (!volume) return
+
+    const audio = wx.createInnerAudioContext()
+
+    type === "key" ? audio.src = "/static/audio/key.mp3" : audio.src = "/static/audio/clean.mp3"
+
+    audio.play()
+
+    audio.onEnded(() => {
+      audio.destroy()
     })
   },
 
@@ -399,6 +418,8 @@ Page({
 
   // 下坠
   dropPiece() {
+    this.playAudio("key");
+
     const { gamePlay, dropTimer } = this.data
 
     if (!gamePlay || !dropTimer) return;
@@ -410,16 +431,22 @@ Page({
 
   // 左移
   moveLeft() {
+    this.playAudio("key");
+
     this.movePiece(-1, 0);
   },
 
   // 右移
   moveRight() {
+    this.playAudio("key");
+
     this.movePiece(1, 0);
   },
 
   // 下移
   moveDown() {
+    this.playAudio("key")
+
     if (!this.movePiece(0, 1)) return
 
     this.setData({
@@ -479,6 +506,8 @@ Page({
   // 旋转方块
   rotatePiece() {
     const { map, shape, gamePlay, gameOver, dropTimer } = this.data
+
+    this.playAudio("key")
 
     if (!gamePlay || gameOver || !dropTimer) return;
 

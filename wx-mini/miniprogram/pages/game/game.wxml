@@ -1,7 +1,7 @@
 <!-- 页面头部 -->
-<view id="header">
+<!-- <view id="header">
   <text id="title">{{ title }}</text>
-</view>
+</view> -->
 
 <!-- 游戏主体 -->
 <view id="main">
@@ -62,9 +62,9 @@
         <status-icon status="{{ gamePlay }}" trueSrc="{{ pauseSrc }}" falseSrc="{{ playSrc }}"></status-icon>
       </button-box>
       <!-- 音量 -->
-      <!-- <button-box type="f-btn" bind:touchstart="changeVolume">
+      <button-box type="f-btn" bind:touchstart="changeVolume">
         <status-icon status="{{ volume }}" trueSrc="{{ volumeSrc }}" falseSrc="{{ muteSrc }}"></status-icon>
-      </button-box> -->
+      </button-box>
       <!-- 重新开始 -->
       <button-box type="f-btn" bind:touchstart="restartGame">
         <image id="reload" src="/static/images/reload.svg"></image>
