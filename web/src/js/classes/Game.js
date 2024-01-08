@@ -143,6 +143,8 @@ class Game {
   restartGame() {
     if (this.dropTimer) clearInterval(this.dropTimer);
 
+    if (this.gameOver) this.updateHighScore()
+
     this.map = [...new Array(this.mapHeight)].map(() =>
       new Array(this.mapWidth).fill(0)
     );
@@ -159,6 +161,7 @@ class Game {
 
     this.score = 0;
     this.level = 1;
+    this.highScore = localStorage.getItem('highScore')
 
     this.clearArea(this.mapCtx)
     this.setGameData()
