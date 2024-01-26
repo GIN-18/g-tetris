@@ -9,6 +9,9 @@ const socket = require("./utils/socket.js");
 
 utils.setPagePaltte();
 
+// 设置游戏模式
+sessionStorage.setItem("gameMode", "double");
+
 // 清除sessionStorage
 sessionStorage.removeItem("room");
 sessionStorage.removeItem("ready");
@@ -17,7 +20,7 @@ sessionStorage.removeItem("page");
 // 创建房间
 $("#create-room").on("touchstart", (e) => {
   e.preventDefault();
-  location.href = "./ready.html";
+  location.href = "./game.html";
 });
 
 $("#join-room").on("touchstart", (e) => {

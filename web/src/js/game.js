@@ -7,6 +7,7 @@ import confetti from "canvas-confetti";
 const $ = require("jquery");
 const _ = require("lodash");
 const Game = require("./classes/Game.js");
+const Partition = require('./classes/Partition.js')
 const utils = require("./utils/utils.js");
 const options = require("./utils/options.js");
 const socket = require("./utils/socket.js");
@@ -18,6 +19,9 @@ const mapCtx = mapCanvas.getContext("2d");
 const nextShapeCtx = nextShapeCanvas.getContext("2d");
 
 const game = new Game(mapCtx, nextShapeCtx);
+const partition = new Partition();
+
+partition.showPartition()
 
 let playerLeftTimer = null;
 
@@ -33,12 +37,21 @@ if (sessionStorage.getItem("gameMode") === "double") {
     .addClass("hidden");
   $("#score-diff, #room-container").removeClass("hidden").addClass("flex");
 
-  socket.emit("joinRoom", {
-    action: 1,
-    room: sessionStorage.getItem("room"),
-    ready: 0,
-    page: "game",
-  });
+  if (!sessionStorage.getItem("room")) {
+    // 第一次进入时，创建房间
+    socket.emit("createRoom");
+  } else {
+    // 刷新进入时，加入房间
+    socket.emit("joinRoom", {
+      action: 1,
+      room: sessionStorage.getItem("room"),
+      ready: 0,
+    });
+  }
+
+  socket.on("roomCreated", (data) => {
+    console.log("room created", data)
+  })
 
   socket.on("roomJoined", (players) => {
     const playerId = socket.id;

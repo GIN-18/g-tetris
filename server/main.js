@@ -3,8 +3,6 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 const { v4: uuidv4 } = require("uuid");
 
-const Shape = require("./src/Shape.js");
-
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -28,7 +26,6 @@ io.on("connection", (socket) => {
       room,
       ready: 0,
       score: 0,
-      page: "ready",
     });
     rooms[room] = { [socket.id]: player };
 
@@ -36,7 +33,7 @@ io.on("connection", (socket) => {
   });
 
   // 加入房间
-  socket.on("joinRoom", ({ action, room, ready, score, page }) => {
+  socket.on("joinRoom", ({ action, room, ready, score }) => {
     const clients = io.sockets.adapter.rooms.get(room);
     const playerId = socket.id;
 
@@ -44,7 +41,7 @@ io.on("connection", (socket) => {
     if (action && !clients) {
       socket.join(room);
 
-      const player = (players[playerId] = { room, ready, score, page });
+      const player = (players[playerId] = { room, ready, score });
       rooms[room] = { [playerId]: player };
 
       socket.emit("roomJoined", rooms[room]);
@@ -57,7 +54,7 @@ io.on("connection", (socket) => {
     } else {
       socket.join(room);
 
-      players[playerId] = { room, ready, score, page };
+      players[playerId] = { room, ready, score };
       rooms[room][playerId] = players[playerId];
 
       socket.emit("roomJoined", rooms[room]);
@@ -136,16 +133,10 @@ io.on("connection", (socket) => {
     const player = players[playerId];
 
     if (player) {
-      const { room, page } = player;
+      const { room } = player;
 
       delete players[playerId];
       delete rooms[room][playerId];
-
-      if (page === "ready") {
-        io.to(room).emit("playerLeftRoom");
-      } else if (page === "game") {
-        io.to(room).emit("playerLeftGame");
-      }
 
       if (Object.keys(rooms[room]).length < 1) {
         delete rooms[room];
