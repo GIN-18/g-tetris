@@ -15,7 +15,6 @@ sessionStorage.setItem("gameMode", "double");
 // 清除sessionStorage
 sessionStorage.removeItem("room");
 sessionStorage.removeItem("ready");
-sessionStorage.removeItem("page");
 
 // 创建房间
 $("#create-room").on("touchstart", (e) => {
@@ -57,6 +56,7 @@ $("#join-room").on("touchstart", (e) => {
         e.preventDefault();
         const room = $("#input-room").val();
 
+        // 显示未输入房间ID的信息
         if (!room) {
           utils.showMessage("Pleace input room id!!!", "error", 2000);
           return;
@@ -67,7 +67,6 @@ $("#join-room").on("touchstart", (e) => {
           room,
           ready: 0,
           score: 0,
-          page: "ready",
         });
       },
       2000,
@@ -86,21 +85,26 @@ $("#join-room").on("touchstart", (e) => {
   });
 });
 
+// 未找到房间
+socket.on('roomNotFound', () => {
+  utils.showMessage("Room not found!!!", "error", 2000);
+})
+
+// 房间已满
 socket.on("roomFull", () => {
   utils.showMessage("Room is full!!!", "error", 2000);
   return;
 });
 
 socket.on("roomJoined", (players) => {
-  const playerId = socket.id;
+  const playersArray = Object.keys(players);
 
-  Object.keys(players).forEach((key) => {
-    if (key === playerId) {
-      sessionStorage.setItem("room", players[key].room);
-      sessionStorage.setItem("ready", players[key].ready);
-      sessionStorage.setItem("page", players[key].page);
-
-      location.href = "./ready.html";
+  for (let i = 0; i < playersArray.length; i++) {
+    if (playersArray[i] === socket.id) {
+      sessionStorage.setItem("room", players[socket.id].room);
+      sessionStorage.setItem("ready", players[socket.id].ready);
+      location.href = "./game.html";
+      break;
     }
-  });
+  }
 });

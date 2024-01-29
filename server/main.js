@@ -12,7 +12,6 @@ const io = new Server(httpServer, {
 });
 
 const rooms = {};
-const players = {};
 
 io.on("connection", (socket) => {
   console.log("user connected");
@@ -22,12 +21,13 @@ io.on("connection", (socket) => {
     const room = generateRoomId();
     socket.join(room);
 
-    const player = (players[socket.id] = {
-      room,
-      ready: 0,
-      score: 0,
-    });
-    rooms[room] = { [socket.id]: player };
+    rooms[room] = {
+      [socket.id]: {
+        room,
+        ready: 0,
+        score: 0,
+      }
+    };
 
     socket.emit("roomCreated", rooms[room]);
   });
@@ -35,27 +35,38 @@ io.on("connection", (socket) => {
   // 加入房间
   socket.on("joinRoom", ({ action, room, ready, score }) => {
     const clients = io.sockets.adapter.rooms.get(room);
-    const playerId = socket.id;
 
-    // // 房间内只有一个玩家刷新时将玩家加入房间
-    if (action && !clients) {
+    //  玩家刷新时将玩家加入房间
+    if (action) {
       socket.join(room);
 
-      const player = (players[playerId] = { room, ready, score });
-      rooms[room] = { [playerId]: player };
+      rooms[room][socket.id] = {
+        room,
+        ready,
+        score,
+      }
 
       socket.emit("roomJoined", rooms[room]);
       return;
     }
 
+    // 未找到房间
+    if (!clients) {
+      socket.emit("roomNotFound");
+      return;
+    }
+
     // 通过房间号加入房间或者房间内有两个玩家刷新时将玩家加入房间
-    if (!clients || clients.size >= 2) {
+    if (clients.size >= 2) {
       socket.emit("roomFull");
     } else {
       socket.join(room);
 
-      players[playerId] = { room, ready, score };
-      rooms[room][playerId] = players[playerId];
+      rooms[room][socket.id] = {
+        room,
+        ready,
+        score,
+      };
 
       socket.emit("roomJoined", rooms[room]);
       socket.to(room).emit("playerJoined", rooms[room]);
@@ -129,18 +140,8 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("user disconnected");
 
-    const playerId = socket.id;
-    const player = players[playerId];
-
-    if (player) {
-      const { room } = player;
-
-      delete players[playerId];
-      delete rooms[room][playerId];
-
-      if (Object.keys(rooms[room]).length < 1) {
-        delete rooms[room];
-      }
+    for (const room in rooms) {
+      delete rooms[room][socket.id];
     }
   });
 });

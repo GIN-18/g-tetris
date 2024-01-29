@@ -7,7 +7,6 @@ import confetti from "canvas-confetti";
 const $ = require("jquery");
 const _ = require("lodash");
 const Game = require("./classes/Game.js");
-const Partition = require('./classes/Partition.js')
 const utils = require("./utils/utils.js");
 const options = require("./utils/options.js");
 const socket = require("./utils/socket.js");
@@ -19,75 +18,88 @@ const mapCtx = mapCanvas.getContext("2d");
 const nextShapeCtx = nextShapeCanvas.getContext("2d");
 
 const game = new Game(mapCtx, nextShapeCtx);
-const partition = new Partition();
-
-partition.showPartition()
-
-let playerLeftTimer = null;
 
 utils.preventZoom();
 utils.setPagePaltte();
 utils.highlightCurrentOption(".menu-item", "flavor");
 
-if (sessionStorage.getItem("gameMode") === "double") {
-  const scoreDiff = $("#score-diff");
+// 双人模式
+if (sessionStorage.getItem('gameMode') === 'double') {
+  const scoreDiff = $('#score-diff');
 
-  $("#highest-score-container, #start-btn, #restart-btn")
-    .removeClass("flex")
-    .addClass("hidden");
-  $("#score-diff, #room-container").removeClass("hidden").addClass("flex");
+  $('#highest-score-container, #start-btn, #restart-btn')
+    .removeClass('flex')
+    .addClass('hidden');
+  $('#score-diff, #room-container').removeClass('hidden').addClass('flex');
 
   if (!sessionStorage.getItem("room")) {
     // 第一次进入时，创建房间
-    socket.emit("createRoom");
+    socket.emit('createRoom');
   } else {
     // 刷新进入时，加入房间
-    socket.emit("joinRoom", {
+    socket.emit('joinRoom', {
       action: 1,
-      room: sessionStorage.getItem("room"),
+      room: sessionStorage.getItem('room'),
       ready: 0,
+      score: 0,
     });
   }
 
-  socket.on("roomCreated", (data) => {
-    console.log("room created", data)
+  // 房间创建成功
+  socket.on('roomCreated', (players) => {
+    const room = players[socket.id].room;
+
+    sessionStorage.setItem('room', room)
+
+    $('#room, #room-id').text(room)
+    $('#players').text(`${_.size(players)} / 2`)
   })
 
-  socket.on("roomJoined", (players) => {
-    const playerId = socket.id;
+  // 加入房间成功
+  socket.on('roomJoined', (players) => {
+    $('#room, #room-id').text(players[socket.id].room);
+    $('#players').text(`${_.size(players)} / 2`);
 
-    $("#room-id").text(players[playerId].room);
-    sessionStorage.setItem("ready", players[playerId].ready);
-    sessionStorage.setItem("page", players[playerId].page);
+    sessionStorage.setItem("ready", players[socket.id].ready);
 
-    if (playerLeftTimer) {
-      clearTimeout(playerLeftTimer);
-    }
+    // socket.emit("startGame", {
+    //   room: sessionStorage.getItem("room"),
+    //   gameStart: 1,
+    // });
+  });
 
-    socket.emit("startGame", {
-      room: sessionStorage.getItem("room"),
-      gameStart: 1,
+  // 玩家2加入房间成功
+  socket.on('playerJoined', (players) => {
+    $('#players').text(`${_.size(players)} / 2`)
+
+    utils.showMessage('Player2 joined', 'success', 1000)
+
+    // _.forEach(players, (value, player) => {
+    //   player2Id.text(player.substring(0, 8));
+
+    //   if (value.ready && player !== playerId) {
+    //     player2Status.text("ready").addClass("text-green");
+    //   } else if (!value.ready && player !== playerId) {
+    //     player2Status.text("not ready").addClass("text-red");
+    //   }
+    // });
+
+    // socket.emit("ready", {
+    //   room: sessionStorage.getItem("room"),
+    //   ready: sessionStorage.getItem("ready"),
+    // });
+    // utils.showMessage("Player 2 joined room!!", "hint", 1500);
+  });
+
+  socket.on('twoStartGame', () => {
+    socket.emit('updateScore', {
+      room: sessionStorage.getItem('room'),
+      score: game.score,
     });
-  });
 
-  socket.on("oneStartGame", (players) => {
-    const allInGame = Object.values(players).every(
-      (player) => player.page === "game"
-    );
-
-    if (!allInGame && _.size(players) > 1) location.href = "ready.html";
-  });
-
-  socket.on("twoStartGame", () => {
-    setTimeout(() => {
-      socket.emit("updateScore", {
-        room: sessionStorage.getItem("room"),
-        score: game.score,
-      });
-      game.gamePlay = true;
-      game.startGame();
-      game.setDropTimer();
-    }, 100);
+    game.gamePlay = true;
+    game.startGame();
+    game.setDropTimer();
   });
 
   socket.on("updateScore", (players) => {
@@ -165,13 +177,6 @@ if (sessionStorage.getItem("gameMode") === "double") {
     setTimeout(() => {
       location.reload();
     }, 100);
-  });
-
-  // 玩家离开游戏界面
-  socket.on("playerLeftGame", () => {
-    playerLeftTimer = setTimeout(() => {
-      location.href = "ready.html";
-    }, 300);
   });
 }
 
