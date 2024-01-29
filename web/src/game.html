@@ -125,14 +125,27 @@
   <div id="partition" class="absolute top-0 left-0 w-full h-full bg-crust bg-opacity-95"></div>
 
   <!-- 游戏准备 -->
-  <div class="z-10 flex flex-col justify-center items-center absolute top-0 left-0 w-full h-full px-28">
-    <div class="flex justify-between w-full">
+  <div id="ready-container"
+    class="z-10 flex flex-col justify-center items-center absolute top-0 left-0 w-full h-full px-20">
+    <h2 class="mb-20 text-4xl font-[Dubtronic]">PREPARE</h2>
+    <!-- 房间号 -->
+    <div class="flex justify-between w-full mb-2">
       <span class="font-semibold">Room: </span>
       <span id="room"></span>
     </div>
-    <div class="flex justify-between w-full">
+    <!-- 玩家人数 -->
+    <div class="flex justify-between w-full mb-2">
       <span class="font-semibold">Players: </span>
       <span id="players"></span>
+    </div>
+    <!-- 准备状态 -->
+    <div class="flex justify-between w-full mb-16">
+      <span class="font-semibold">Status: </span>
+      <span id="ready"></span>
+    </div>
+    <!-- 准备按钮 -->
+    <div class="flex justify-end w-full">
+      <button id="ready-btn" class="px-3 py-1 rounded text-base font-semibold bg-yellow"></button>
     </div>
   </div>
 </body>

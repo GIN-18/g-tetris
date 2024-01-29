@@ -1,38 +1,40 @@
-import "../css/style.css";
-import "animate.css";
-import "material-icons/iconfont/material-icons.css";
+import '../css/style.css';
+import 'animate.css';
+import 'material-icons/iconfont/material-icons.css';
 
-import confetti from "canvas-confetti";
+import confetti from 'canvas-confetti';
 
-const $ = require("jquery");
-const _ = require("lodash");
-const Game = require("./classes/Game.js");
-const utils = require("./utils/utils.js");
-const options = require("./utils/options.js");
-const socket = require("./utils/socket.js");
+const $ = require('jquery');
+const _ = require('lodash');
+const Game = require('./classes/Game.js');
+const utils = require('./utils/utils.js');
+const options = require('./utils/options.js');
+const socket = require('./utils/socket.js');
 
-const mapCanvas = document.getElementById("map-canvas");
-const nextShapeCanvas = document.getElementById("next-shape-canvas");
+const mapCanvas = document.getElementById('map-canvas');
+const nextShapeCanvas = document.getElementById('next-shape-canvas');
 
-const mapCtx = mapCanvas.getContext("2d");
-const nextShapeCtx = nextShapeCanvas.getContext("2d");
+const mapCtx = mapCanvas.getContext('2d');
+const nextShapeCtx = nextShapeCanvas.getContext('2d');
 
 const game = new Game(mapCtx, nextShapeCtx);
 
 utils.preventZoom();
 utils.setPagePaltte();
-utils.highlightCurrentOption(".menu-item", "flavor");
+utils.highlightCurrentOption('.menu-item', 'flavor');
 
 // 双人模式
 if (sessionStorage.getItem('gameMode') === 'double') {
   const scoreDiff = $('#score-diff');
 
-  $('#highest-score-container, #start-btn, #restart-btn')
-    .removeClass('flex')
-    .addClass('hidden');
+  // 隐藏最高分，开始按钮，重新开始按钮
+  $('#highest-score-container, #start-btn, #restart-btn').remove()
+  // 显示得分差，房间容器
   $('#score-diff, #room-container').removeClass('hidden').addClass('flex');
 
-  if (!sessionStorage.getItem("room")) {
+  setInfoByReady();
+
+  if (!sessionStorage.getItem('room')) {
     // 第一次进入时，创建房间
     socket.emit('createRoom');
   } else {
@@ -40,7 +42,7 @@ if (sessionStorage.getItem('gameMode') === 'double') {
     socket.emit('joinRoom', {
       action: 1,
       room: sessionStorage.getItem('room'),
-      ready: 0,
+      ready: sessionStorage.getItem('ready'),
       score: 0,
     });
   }
@@ -61,37 +63,55 @@ if (sessionStorage.getItem('gameMode') === 'double') {
     $('#players').text(`${_.size(players)} / 2`);
 
     sessionStorage.setItem("ready", players[socket.id].ready);
-
-    // socket.emit("startGame", {
-    //   room: sessionStorage.getItem("room"),
-    //   gameStart: 1,
-    // });
   });
 
   // 玩家2加入房间成功
   socket.on('playerJoined', (players) => {
     $('#players').text(`${_.size(players)} / 2`)
-
-    utils.showMessage('Player2 joined', 'success', 1000)
-
-    // _.forEach(players, (value, player) => {
-    //   player2Id.text(player.substring(0, 8));
-
-    //   if (value.ready && player !== playerId) {
-    //     player2Status.text("ready").addClass("text-green");
-    //   } else if (!value.ready && player !== playerId) {
-    //     player2Status.text("not ready").addClass("text-red");
-    //   }
-    // });
-
-    // socket.emit("ready", {
-    //   room: sessionStorage.getItem("room"),
-    //   ready: sessionStorage.getItem("ready"),
-    // });
-    // utils.showMessage("Player 2 joined room!!", "hint", 1500);
+    utils.showMessage('Player 2 joined', 'success', 1000)
   });
 
+  // 游戏准备
+  $('#ready-btn').on('click', () => {
+    const ready = Number(sessionStorage.getItem('ready'));
+
+    if (ready) {
+      sessionStorage.setItem('ready', 0);
+    } else {
+      sessionStorage.setItem('ready', 1);
+    }
+
+    setInfoByReady()
+
+    socket.emit('ready', {
+      room: sessionStorage.getItem('room'),
+      ready: sessionStorage.getItem('ready'),
+    });
+  })
+
+  // 一位玩家已准备
+  socket.on('onePlayerReady', (players) => {
+    const ready = Number(players[socket.id].ready);
+
+    if (ready) {
+      utils.showMessage('Player 2 not ready', 'error', 2000);
+    } else {
+      utils.showMessage('Player 2 ready', 'success', 2000);
+    }
+  })
+
+  // 两位玩家已准备
+  socket.on('twoPlayerReady', () => {
+    socket.emit('startGame', {
+      room: sessionStorage.getItem('room'),
+      gameStart: 1,
+    })
+  })
+
   socket.on('twoStartGame', () => {
+    $('#partition').hide()
+    $('#ready-container').removeClass('flex').addClass('hidden')
+
     socket.emit('updateScore', {
       room: sessionStorage.getItem('room'),
       score: game.score,
@@ -199,4 +219,16 @@ function playConfetti() {
     origin: { x: 1 },
     colors: colors,
   });
+}
+
+function setInfoByReady() {
+  const ready = Number(sessionStorage.getItem('ready'));
+
+  if (ready) {
+    $('#ready').text('ready');
+    $('#ready-btn').text('Cancel');
+  } else {
+    $('#ready').text('not ready');
+    $('#ready-btn').text('Ready');
+  }
 }

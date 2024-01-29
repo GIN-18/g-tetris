@@ -36,17 +36,19 @@ io.on("connection", (socket) => {
   socket.on("joinRoom", ({ action, room, ready, score }) => {
     const clients = io.sockets.adapter.rooms.get(room);
 
-    //  玩家刷新时将玩家加入房间
+    socket.join(room);
+
+    rooms[room][socket.id] = {
+      room,
+      ready,
+      score,
+    };
+
+    socket.emit("roomJoined", rooms[room]);
+
+    //  玩家刷新时提醒玩家加入房间
     if (action) {
-      socket.join(room);
-
-      rooms[room][socket.id] = {
-        room,
-        ready,
-        score,
-      }
-
-      socket.emit("roomJoined", rooms[room]);
+      socket.to(room).emit("playerJoined", rooms[room]);
       return;
     }
 
@@ -59,25 +61,14 @@ io.on("connection", (socket) => {
     // 通过房间号加入房间或者房间内有两个玩家刷新时将玩家加入房间
     if (clients.size >= 2) {
       socket.emit("roomFull");
-    } else {
-      socket.join(room);
-
-      rooms[room][socket.id] = {
-        room,
-        ready,
-        score,
-      };
-
-      socket.emit("roomJoined", rooms[room]);
-      socket.to(room).emit("playerJoined", rooms[room]);
+      return;
     }
   });
 
   // 玩家准备
   socket.on("ready", ({ room, ready }) => {
-    const playerId = socket.id;
     emitByAttr(
-      playerId,
+      socket.id,
       room,
       "ready",
       ready,
@@ -89,16 +80,14 @@ io.on("connection", (socket) => {
 
   // 更新分数
   socket.on("updateScore", ({ room, score }) => {
-    const playerId = socket.id;
-
-    rooms[room][playerId].score = score;
+    rooms[room][socket.id].score = score;
     io.to(room).emit("updateScore", rooms[room]);
   });
 
+  // 开始游戏
   socket.on("startGame", ({ room, gameStart }) => {
-    const playerId = socket.id;
     emitByAttr(
-      playerId,
+      socket.id,
       room,
       "gameStart",
       gameStart,
@@ -110,9 +99,8 @@ io.on("connection", (socket) => {
 
   // 游戏结束
   socket.on("gameOver", ({ room, gameOver }) => {
-    const playerId = socket.id;
     emitByAttr(
-      playerId,
+      socket.id,
       room,
       "gameOver",
       gameOver,
@@ -124,9 +112,8 @@ io.on("connection", (socket) => {
 
   // 再一次游戏
   socket.on("again", ({ room, again }) => {
-    const playerId = socket.id;
     emitByAttr(
-      playerId,
+      socket.id,
       room,
       "again",
       again,
@@ -140,6 +127,7 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("user disconnected");
 
+    // 玩家离开房间就从房间中删除玩家
     for (const room in rooms) {
       delete rooms[room][socket.id];
     }
