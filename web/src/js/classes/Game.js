@@ -540,15 +540,13 @@ class Game {
       $('#another-score-span').text('Highest Score: ');
       $('#another-score-info').text(this.highScore);
 
-      $('#again-btn').on('touchstart', (e) => {
-        e.preventDefault();
+      $('#again-btn').on('touchstart', () => {
         $('#sparator').removeClass('block').addClass('hidden');
         $('#game-over-info').remove();
         this.restartGame()
       });
 
-      $('#quit-btn').on('touchstart', (e) => {
-        e.preventDefault();
+      $('#quit-btn').on('touchstart', () => {
         location.href = '../../index.html';
       });
     }
@@ -557,38 +555,37 @@ class Game {
   // 按钮操作
   buttonMovePiece() {
     // 打开菜单
-    $('#menu-btn').on('touchstart', (e) => {
-      e.preventDefault();
+    $('#menu-btn').on('touchstart', () => {
       const menuTemplate = $(`
-        <aside class='fixed top-0 right-0 w-2/3 h-full p-3 bg-surface0 animate__animated animate__fadeInRight'>
-          <header class='flex justify-between items-center'>
-            <h2 class='text-lg font-semibold'>OPTIONS</h2>
-            <button id='close-btn' class='flex justify-center items-center'>
-              <span class='material-icons-round text-2xl leading-3'>close</span>
+        <aside class="fixed top-0 right-0 w-2/3 h-full p-3 bg-surface0 animate__animated animate__fadeInRight">
+          <header class="flex justify-between items-center">
+            <h2 class="text-lg font-semibold">OPTIONS</h2>
+            <button id="close-btn" class="flex justify-center items-center">
+              <span class="material-icons-round text-2xl leading-3">close</span>
             </button>
           </header>
-          <div class='mt-3'>
+          <div class="mt-3">
             <!-- 配色 -->
-            <div class='flex justify-start items-center'>
-              <span class='material-icons-round mr-2 text-xl'>color_lens</span>
-              <span class='font-semibold'>Paltte</span>
+            <div class="flex justify-start items-center">
+              <span class="material-icons-round mr-2 text-xl">color_lens</span>
+              <span class="font-semibold">Paltte</span>
             </div>
             <ul>
-              <li class='menu-item flex justify-start items-center ml-6'>
-                <span class='material-icons-round mr-2 text-xs text-surface0'>star_rate</span>
-                <button class='flavor-btn flex justify-start items-center w-full text-sm'>Latte</button>
+              <li class="menu-item flex justify-start items-center ml-6">
+                <span class="material-icons-round mr-2 text-xs text-surface0">star_rate</span>
+                <button class="flavor-btn flex justify-start items-center w-full text-sm">Latte</button>
               </li>
-              <li class='menu-item flex justify-start items-center ml-6'>
-                <span class='material-icons-round mr-2 text-xs text-surface0'>star_rate</span>
-                <button class='flavor-btn flex justify-start items-center w-full text-sm'>Frappe</button>
+              <li class="menu-item flex justify-start items-center ml-6">
+                <span class="material-icons-round mr-2 text-xs text-surface0">star_rate</span>
+                <button class="flavor-btn flex justify-start items-center w-full text-sm">Frappe</button>
               </li>
-              <li class='menu-item flex justify-start items-center ml-6'>
-                <span class='material-icons-round mr-2 text-xs text-surface0'>star_rate</span>
-                <button class='flavor-btn flex justify-start items-center w-full text-sm'>Macchiato</button>
+              <li class="menu-item flex justify-start items-center ml-6">
+                <span class="material-icons-round mr-2 text-xs text-surface0">star_rate</span>
+                <button class="flavor-btn flex justify-start items-center w-full text-sm">Macchiato</button>
               </li>
-              <li class='menu-item flex justify-start items-center ml-6 text-green'>
-                <span class='material-icons-round mr-2 text-xs'>star_rate</span>
-                <button class='flavor-btn flex justify-start items-center w-full text-sm'>Mocha</button>
+              <li class="menu-item flex justify-start items-center ml-6 text-green">
+                <span class="material-icons-round mr-2 text-xs">star_rate</span>
+                <button class="flavor-btn flex justify-start items-center w-full text-sm">Mocha</button>
               </li>
             </ul>
           </div>
@@ -601,8 +598,7 @@ class Game {
       utils.highlightCurrentOption('.menu-item', 'flavor');
 
       // 关闭菜单
-      $('#close-btn').on('touchstart', (e) => {
-        e.preventDefault();
+      $('#close-btn').on('touchstart', () => {
         $('#sparator').removeClass('block').addClass('hidden'); // 隐藏分隔层
         menuTemplate
           .removeClass('animate__fadeInRight')
@@ -613,7 +609,6 @@ class Game {
       });
 
       $('.flavor-btn').on('touchstart', (e) => {
-        e.preventDefault();
         const flavor = e.currentTarget.innerText.toLowerCase();
         sessionStorage.setItem('flavor', flavor);
 
@@ -624,38 +619,32 @@ class Game {
     });
 
     // 下落键
-    $('#drop-btn').on('touchstart', (e) => {
-      e.preventDefault();
+    $('#drop-btn').on('touchstart', () => {
       this.dropShape();
     });
 
     // 左键
-    $('#left-btn').on('touchstart', (e) => {
-      e.preventDefault();
+    $('#left-btn').on('touchstart', () => {
       this.moveLeft();
     });
 
     // 右键
-    $('#right-btn').on('touchstart', (e) => {
-      e.preventDefault();
+    $('#right-btn').on('touchstart', () => {
       this.moveRight();
     });
 
     // 按下下键
-    $('#down-btn').on('touchstart', (e) => {
-      e.preventDefault();
+    $('#down-btn').on('touchstart', () => {
       this.moveDown(true);
     });
 
     // 松开下键
-    $('#down-btn').on('touchend', (e) => {
-      e.preventDefault();
+    $('#down-btn').on('touchend', () => {
       this.moveDown(false);
     });
 
     // 开始和暂停按
-    $('#start-btn').on('touchstart', (e) => {
-      e.preventDefault();
+    $('#start-btn').on('touchstart', () => {
       this.gamePlay = !this.gamePlay;
       this.startGame()
       this.music.playAudio(0, 0.19);
@@ -663,8 +652,7 @@ class Game {
     });
 
     // 声音按钮
-    $('#volume-btn').on('touchstart', (e) => {
-      e.preventDefault();
+    $('#volume-btn').on('touchstart', () => {
       this.volume = !this.volume;
       this.music.toggleMute(this.volume);
       this.music.playAudio(0, 0.19);
@@ -672,28 +660,24 @@ class Game {
     });
 
     // 重新开始
-    $('#restart-btn').on('touchstart', (e) => {
-      e.preventDefault();
+    $('#restart-btn').on('touchstart', () => {
       this.restartGame()
       this.music.playAudio(0, 0.19);
     });
 
     // 旋转键
-    $('#rotate-btn').on('touchstart', (e) => {
-      e.preventDefault();
+    $('#rotate-btn').on('touchstart', () => {
       this.rotateShape();
     });
 
     // 将按钮颜色改为激活状态
     $('.o-btn').on('touchstart', (e) => {
-      e.preventDefault();
       this.music.playAudio(0, 0.19);
       utils.changeButtonColor(e.currentTarget, 'bg-surface2');
     });
 
     // 将按钮颜色改为背景色
     $('.o-btn').on('touchend', (e) => {
-      e.preventDefault();
       utils.changeButtonColor(e.currentTarget, 'bg-mantle');
     });
   }
