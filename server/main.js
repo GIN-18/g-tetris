@@ -1,23 +1,23 @@
-const express = require("express");
-const { createServer } = require("http");
-const { Server } = require("socket.io");
-const { v4: uuidv4 } = require("uuid");
+const express = require('express');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",
+    origin: '*',
   },
 });
 
 const rooms = {};
 
-io.on("connection", (socket) => {
-  console.log("user connected");
+io.on('connection', (socket) => {
+  console.log('user connected');
 
   // 创建房间
-  socket.on("createRoom", () => {
+  socket.on('createRoom', () => {
     const room = generateRoomId();
     socket.join(room);
 
@@ -29,11 +29,11 @@ io.on("connection", (socket) => {
       }
     };
 
-    socket.emit("roomCreated", rooms[room]);
+    socket.emit('roomCreated', rooms[room]);
   });
 
   // 加入房间
-  socket.on("joinRoom", ({ action, room, ready, score }) => {
+  socket.on('joinRoom', ({ action, room, ready, score }) => {
     const clients = io.sockets.adapter.rooms.get(room);
 
     socket.join(room);
@@ -44,88 +44,86 @@ io.on("connection", (socket) => {
       score,
     };
 
-    socket.emit("roomJoined", rooms[room]);
+    socket.emit('roomJoined', rooms[room]);
 
     //  玩家刷新时提醒玩家加入房间
     if (action) {
-      socket.to(room).emit("playerJoined", rooms[room]);
+      socket.to(room).emit('playerJoined', rooms[room]);
       return;
     }
 
     // 未找到房间
     if (!clients) {
-      socket.emit("roomNotFound");
+      socket.emit('roomNotFound');
       return;
     }
 
     // 通过房间号加入房间或者房间内有两个玩家刷新时将玩家加入房间
     if (clients.size >= 2) {
-      socket.emit("roomFull");
+      socket.emit('roomFull');
       return;
     }
   });
 
   // 玩家准备
-  socket.on("ready", ({ room, ready }) => {
+  socket.on('ready', ({ room, ready }) => {
     emitByAttr(
       socket.id,
       room,
-      "ready",
+      'ready',
       ready,
-      "zeroPlayerReady",
-      "onePlayerReady",
-      "twoPlayerReady"
+      'onePlayerReady',
+      'twoPlayerReady'
     );
   });
 
   // 更新分数
-  socket.on("updateScore", ({ room, score }) => {
+  socket.on('updateScore', ({ room, score }) => {
     rooms[room][socket.id].score = score;
-    io.to(room).emit("updateScore", rooms[room]);
+    io.to(room).emit('updateScore', rooms[room]);
   });
 
   // 开始游戏
-  socket.on("startGame", ({ room, gameStart }) => {
+  socket.on('startGame', ({ room, gameStart }) => {
     emitByAttr(
       socket.id,
       room,
-      "gameStart",
+      'gameStart',
       gameStart,
-      "zeroStartGame",
-      "oneStartGame",
-      "twoStartGame"
+      'oneStartGame',
+      'twoStartGame'
     );
   });
 
   // 游戏结束
-  socket.on("gameOver", ({ room, gameOver }) => {
+  socket.on('gameOver', ({ room, gameOver }) => {
     emitByAttr(
       socket.id,
       room,
-      "gameOver",
+      'gameOver',
       gameOver,
-      "zeroPlayerGameOver",
-      "onePlayerGameOver",
-      "twoPlayerGameOver"
+      'onePlayerGameOver',
+      'twoPlayerGameOver'
     );
   });
 
   // 再一次游戏
-  socket.on("again", ({ room, again }) => {
+  socket.on('again', ({ room, again }) => {
     emitByAttr(
       socket.id,
       room,
-      "again",
+      'again',
       again,
-      "zeroPlayerAgain",
-      "onePlayerAgain",
-      "twoPlayerAgain"
+      'onePlayerAgain',
+      'twoPlayerAgain'
     );
   });
 
   // 玩家离开房间
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+
+    console.log(rooms)
 
     // 玩家离开房间就从房间中删除玩家
     for (const room in rooms) {
@@ -151,21 +149,11 @@ function emitByAttr(
   room,
   attr,
   attrValue,
-  zeroEvent,
   oneEvent,
   twoEvent
 ) {
   try {
     const status = (rooms[room][playerId][attr] = Number(attrValue));
-
-    const zeroCheck = Object.keys(rooms[room]).every(
-      (key) => rooms[room][key][attr] == 0
-    );
-
-    if (zeroCheck) {
-      io.to(room).emit(zeroEvent, rooms[room]);
-      return;
-    }
 
     const twoCheck = Object.keys(rooms[room]).every(
       (key) => rooms[room][key][attr] == 1

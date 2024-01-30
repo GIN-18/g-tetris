@@ -28,9 +28,7 @@ module.exports = {
   // 显示信息
   showMessage(infoText, status, delay) {
     const messageContainer = document.getElementById("message");
-
     const messageBox = document.createElement("div");
-
     messageBox.classList.add(
       "mb-2",
       "px-2",
@@ -42,17 +40,22 @@ module.exports = {
       "animate__animated",
       "animate__fadeInRight"
     );
-
-    if (status === "error") {
-      messageBox.classList.add("border-red", "text-red");
-    } else {
-      messageBox.classList.add("border-green", "text-green");
+    switch (status) {
+      case 'success':
+        messageBox.classList.add("border-green", "text-green");
+        break;
+      case 'error':
+        messageBox.classList.add("border-red", "text-red");
+        break;
+      case 'warn':
+        messageBox.classList.add("border-yellow", "text-yellow");
+        break;
+      case 'hint':
+        messageBox.classList.add("border-peach", "text-peach");
+        break;
     }
-
     messageBox.innerText = infoText;
-
     messageContainer.appendChild(messageBox);
-
     setTimeout(() => {
       messageBox.classList.remove("animate__fadeInRight");
       messageBox.classList.add("animate__fadeOutRight");

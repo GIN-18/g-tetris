@@ -1,15 +1,15 @@
-const $ = require("jquery");
-const Shape = require("./Shape.js");
-const Music = require("./Music.js");
-const utils = require("../utils/utils.js");
-const socket = require("../utils/socket.js");
-const options = require("../utils/options.js");
+const $ = require('jquery');
+const Shape = require('./Shape.js');
+const Music = require('./Music.js');
+const utils = require('../utils/utils.js');
+const socket = require('../utils/socket.js');
+const options = require('../utils/options.js');
 
 class Game {
   constructor(mapCtx, nextShapeCtx) {
     this.blockSize = 20;
 
-    this.flavor = sessionStorage.getItem("flavor");
+    this.flavor = sessionStorage.getItem('flavor');
 
     this.mapCtx = mapCtx;
     this.mapWidth = 10;
@@ -20,7 +20,7 @@ class Game {
 
     this.nextShapeCtx = nextShapeCtx;
 
-    this.gameMode = sessionStorage.getItem("gameMode") || "single";
+    this.gameMode = sessionStorage.getItem('gameMode') || 'single';
 
     this.gamePlay = false;
     this.gameOver = false;
@@ -41,7 +41,7 @@ class Game {
     this.level = 1;
 
     this.score = 0;
-    this.highScore = localStorage.getItem("highScore") || 0;
+    this.highScore = localStorage.getItem('highScore') || 0;
 
     this.init();
   }
@@ -56,9 +56,9 @@ class Game {
   setGameData() {
     this.drawNextShape();
 
-    $("#score").text(this.score);
-    $("#highest-score").text(this.highScore);
-    $("#level").text(this.level);
+    $('#score').text(this.score);
+    $('#highest-score').text(this.highScore);
+    $('#level').text(this.level);
   }
 
   // 生成方块
@@ -76,7 +76,7 @@ class Game {
     this.drawGame();
     this.drawNextShape();
 
-    const piece = this.generatePiece("shape"),
+    const piece = this.generatePiece('shape'),
       { xOffset, yOffset } = this.shape
 
     for (let i = 0; i < piece.length; i++) {
@@ -161,11 +161,11 @@ class Game {
 
     this.score = 0;
     this.level = 1;
-    this.highScore = localStorage.getItem('highScore')
+    this.highScore = localStorage.getItem('highScore') || 0
 
     this.clearArea(this.mapCtx)
     this.setGameData()
-    utils.changeIcon("start-btn", this.gamePlay)
+    utils.changeIcon('start-btn', this.gamePlay)
   }
 
   // 方块旋转
@@ -183,7 +183,7 @@ class Game {
     this.shape.rotation = currentRotation;
     this.previewShape.rotation = currentRotation;
 
-    const piece = this.generatePiece("shape");
+    const piece = this.generatePiece('shape');
 
     for (let i = 0; i < piece.length; i++) {
       const x = piece[i][1] + this.shape.xOffset,
@@ -209,7 +209,7 @@ class Game {
 
     const width = this.map[0].length,
       height = this.map.length,
-      piece = this.generatePiece("shape");
+      piece = this.generatePiece('shape');
 
     let canMove = true;
 
@@ -278,7 +278,7 @@ class Game {
 
   // 合并方块到地图
   mergeShape() {
-    const piece = this.generatePiece("shape");
+    const piece = this.generatePiece('shape');
 
     for (let i = 0; i < piece.length; i++) {
       const x = piece[i][1] + this.shape.xOffset,
@@ -359,11 +359,12 @@ class Game {
   // 更新分数
   updateScore(filledRows) {
     this.score += (filledRows * this.level + (filledRows - 1)) * 10;
-    $("#score").text(this.score);
 
-    if (this.gameMode === "double") {
-      socket.emit("updateScore", {
-        room: sessionStorage.getItem("room"),
+    $('#score').text(this.score);
+
+    if (this.gameMode === 'double') {
+      socket.emit('updateScore', {
+        room: sessionStorage.getItem('room'),
         score: this.score,
       });
     }
@@ -372,7 +373,7 @@ class Game {
   // 更新最高分数
   updateHighScore() {
     if (this.score > this.highScore) {
-      localStorage.setItem("highScore", this.score);
+      localStorage.setItem('highScore', this.score);
     }
   }
 
@@ -383,7 +384,7 @@ class Game {
     if (this.score >= nextLevelScore) {
       this.level += 1;
       this.updateLevel();
-      $("#level").text(this.level);
+      $('#level').text(this.level);
     }
   }
 
@@ -394,8 +395,8 @@ class Game {
     const { map, mapCtx, shape, previewShape, previewShapeColor } = this,
       { type: shapeType, xOffset: shapeXOffset, yOffset: shapeYOffset } = shape,
       { type: previewShapeType, xOffset: previewShapeXOffset, yOffset: previewShapeYOffset } = previewShape,
-      piece = this.generatePiece("shape"),
-      previewPiece = this.generatePiece("previewShape"),
+      piece = this.generatePiece('shape'),
+      previewPiece = this.generatePiece('previewShape'),
       finalYOffset = findPreviewOffset(previewShapeYOffset);
 
     this.clearArea(mapCtx);
@@ -421,7 +422,7 @@ class Game {
   drawNextShape() {
     const nextShapeCtx = this.nextShapeCtx,
       type = this.nextShape.type,
-      piece = this.generatePiece("nextShape");
+      piece = this.generatePiece('nextShape');
 
     this.clearArea(nextShapeCtx)
     this.drawPiece(nextShapeCtx, piece, type, 0, 0);
@@ -454,7 +455,7 @@ class Game {
       const x = piece[i][1] + xOffset,
         y = piece[i][0] + yOffset;
 
-      if (ctx.canvas.id === "map-canvas") {
+      if (ctx.canvas.id === 'map-canvas') {
         this.drawBlock(ctx, x, y);
       } else {
         switch (shapeType) {
@@ -484,7 +485,7 @@ class Game {
 
   // 设置游戏颜色主题
   setGamePalette() {
-    const flavor = sessionStorage.getItem("flavor"),
+    const flavor = sessionStorage.getItem('flavor'),
       { previewShapeColor, shapeColor, } = options.palette[flavor];
 
     this.previewShapeColor = previewShapeColor;
@@ -495,213 +496,205 @@ class Game {
 
   // 结束游戏
   overGame() {
-    const separatorElement = $(`
-      <div id="sparator" class="absolute top-0 left-0 w-full h-full bg-crust bg-opacity-95"></div>
-    `);
     const gameOverInfoTemplate = $(`
       <div id="game-over-info"
-        class="z-10 flex flex-col justify-around items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 p-6 border-2 border-text rounded bg-surface0">
-        <div id="game-over-title" class="text-4xl font-[Dubtronic]"></div>
-        <div id="score-container" class="my-6 text-xs">
-          <div>
-            <label>YOUR SCORE:</label>
-            <span id="your-score-info">${this.score}</span>
-          </div>
-          <div>
-            <label id="another-score-label"></label>
-            <span id="another-score-info"></span>
-          </div>
-          <div>
-            <label id="again-label"></label>
-            <span id="again-info"></span>
-          </div>
+        class="z-10 flex flex-col justify-center items-center absolute top-0 left-0 w-full h-full px-20">
+        <h2 id="game-over-title" class="mb-20 text-3xl font-[Dubtronic]"></h2>
+        <div class="flex justify-between w-full mb-2">
+          <span class="font-semibold">Your Score:</span>
+          <span id="your-score-info">${this.score}</span>
         </div>
-        <div class="text-xs font-semibold">
-          <button id="again-btn" class="w-20 py-1 border-2 border-text rounded" type="button">
-            AGAIN
+        <div class="flex justify-between w-full mb-2">
+          <span id="another-score-span" class="font-semibold"></span>
+          <span id="another-score-info"></span>
+        </div>
+        <div id="again-container" class="flex justify-between w-full">
+          <span id="again-span" class="font-semibold">Again</span>
+          <span id="again-info">0 / 2</span>
+        </div>
+        <div class="flex justify-around w-full mt-16">
+          <button id="again-btn" class="px-3 py-1 rounded text-base font-semibold bg-yellow" type="button">
+            Again
           </button>
-          <button id="quit-btn" class="w-20 py-1 border-2 border-text rounded" type="button">
-            QUIT
+          <button id="quit-btn" class="quit-btn px-3 py-1 rounded text-base font-semibold bg-red" type="button">
+            Quit
           </button>
         </div>
       </div>
     `).hide();
-    $("body").append(separatorElement).append(gameOverInfoTemplate);
 
-    gameOverInfoTemplate.fadeIn("slow");
+    $('#sparator').removeClass('hidden').addClass('block');
+    $('body').append(gameOverInfoTemplate);
 
-    if (this.gameMode === "double") {
-      socket.emit("gameOver", {
-        room: sessionStorage.getItem("room"),
+    gameOverInfoTemplate.fadeIn('slow');
+
+    if (this.gameMode === 'double') {
+      socket.emit('gameOver', {
+        room: sessionStorage.getItem('room'),
         gameOver: 1,
       });
     } else {
       this.updateHighScore();
-      $("#game-over-title").text("GAME OVER");
-      $("#another-score-label").text("HIGHEST SCORE:");
-      $("#another-score-info").text(this.highScore);
+      $('#again-container').removeClass('flex').addClass('hidden');
+      $('#game-over-title').text('GAME OVER');
+      $('#another-score-span').text('Highest Score: ');
+      $('#another-score-info').text(this.highScore);
 
-      $("#again-btn").on("touchstart", (e) => {
+      $('#again-btn').on('touchstart', (e) => {
         e.preventDefault();
-        $("#game-over-info").remove()
-        $("#sparator").remove()
+        $('#sparator').removeClass('block').addClass('hidden');
+        $('#game-over-info').remove();
         this.restartGame()
       });
-    }
 
-    $("#quit-btn").on("touchstart", (e) => {
-      e.preventDefault();
-      location.href = "../index.html";
-    });
+      $('#quit-btn').on('touchstart', (e) => {
+        e.preventDefault();
+        location.href = '../../index.html';
+      });
+    }
   }
 
   // 按钮操作
   buttonMovePiece() {
     // 打开菜单
-    $("#menu-btn").on("touchstart", (e) => {
+    $('#menu-btn').on('touchstart', (e) => {
       e.preventDefault();
-
-      const separatorElement = $(`
-        <div class="fixed top-0 left-0 w-full h-full bg-crust bg-opacity-95"></div>
-      `).hide();
       const menuTemplate = $(`
-        <aside class="fixed top-0 right-0 w-2/3 h-full p-3 bg-surface0 animate__animated animate__fadeInRight">
-          <header class="flex justify-between items-center">
-            <h2 class="text-lg font-semibold">OPTIONS</h2>
-            <button id="close-btn" class="flex justify-center items-center">
-              <span class="material-icons-round text-2xl leading-3">close</span>
+        <aside class='fixed top-0 right-0 w-2/3 h-full p-3 bg-surface0 animate__animated animate__fadeInRight'>
+          <header class='flex justify-between items-center'>
+            <h2 class='text-lg font-semibold'>OPTIONS</h2>
+            <button id='close-btn' class='flex justify-center items-center'>
+              <span class='material-icons-round text-2xl leading-3'>close</span>
             </button>
           </header>
-          <div class="mt-3">
+          <div class='mt-3'>
             <!-- 配色 -->
-            <div class="flex justify-start items-center">
-              <span class="material-icons-round mr-2 text-xl">color_lens</span>
-              <span class="font-semibold">Paltte</span>
+            <div class='flex justify-start items-center'>
+              <span class='material-icons-round mr-2 text-xl'>color_lens</span>
+              <span class='font-semibold'>Paltte</span>
             </div>
             <ul>
-              <li class="menu-item flex justify-start items-center ml-6">
-                <span class="material-icons-round mr-2 text-xs text-surface0">star_rate</span>
-                <button class="flavor-btn flex justify-start items-center w-full text-sm">Latte</button>
+              <li class='menu-item flex justify-start items-center ml-6'>
+                <span class='material-icons-round mr-2 text-xs text-surface0'>star_rate</span>
+                <button class='flavor-btn flex justify-start items-center w-full text-sm'>Latte</button>
               </li>
-              <li class="menu-item flex justify-start items-center ml-6">
-                <span class="material-icons-round mr-2 text-xs text-surface0">star_rate</span>
-                <button class="flavor-btn flex justify-start items-center w-full text-sm">Frappe</button>
+              <li class='menu-item flex justify-start items-center ml-6'>
+                <span class='material-icons-round mr-2 text-xs text-surface0'>star_rate</span>
+                <button class='flavor-btn flex justify-start items-center w-full text-sm'>Frappe</button>
               </li>
-              <li class="menu-item flex justify-start items-center ml-6">
-                <span class="material-icons-round mr-2 text-xs text-surface0">star_rate</span>
-                <button class="flavor-btn flex justify-start items-center w-full text-sm">Macchiato</button>
+              <li class='menu-item flex justify-start items-center ml-6'>
+                <span class='material-icons-round mr-2 text-xs text-surface0'>star_rate</span>
+                <button class='flavor-btn flex justify-start items-center w-full text-sm'>Macchiato</button>
               </li>
-              <li class="menu-item flex justify-start items-center ml-6 text-green">
-                <span class="material-icons-round mr-2 text-xs">star_rate</span>
-                <button class="flavor-btn flex justify-start items-center w-full text-sm">Mocha</button>
+              <li class='menu-item flex justify-start items-center ml-6 text-green'>
+                <span class='material-icons-round mr-2 text-xs'>star_rate</span>
+                <button class='flavor-btn flex justify-start items-center w-full text-sm'>Mocha</button>
               </li>
             </ul>
           </div>
         </aside>
       `);
-      $("body").append(separatorElement).append(menuTemplate);
 
-      separatorElement.fadeIn("fast");
+      $('#sparator').removeClass('hidden').addClass('block'); // 显示分隔层
+      $('body').append(menuTemplate);
 
-      utils.highlightCurrentOption(".menu-item", "flavor");
+      utils.highlightCurrentOption('.menu-item', 'flavor');
 
       // 关闭菜单
-      $("#close-btn").on("touchstart", (e) => {
+      $('#close-btn').on('touchstart', (e) => {
         e.preventDefault();
+        $('#sparator').removeClass('block').addClass('hidden'); // 隐藏分隔层
         menuTemplate
-          .removeClass("animate__fadeInRight")
-          .addClass("animate__fadeOutRight")
-          .on("animationend", () => {
-            separatorElement.fadeOut("fast", () => {
-              separatorElement.remove();
-            });
+          .removeClass('animate__fadeInRight')
+          .addClass('animate__fadeOutRight')
+          .on('animationend', () => {
             menuTemplate.remove();
           });
       });
 
-      $(".flavor-btn").on("touchstart", (e) => {
+      $('.flavor-btn').on('touchstart', (e) => {
         e.preventDefault();
         const flavor = e.currentTarget.innerText.toLowerCase();
-        sessionStorage.setItem("flavor", flavor);
+        sessionStorage.setItem('flavor', flavor);
 
         utils.setPagePaltte();
         this.setGamePalette();
-        utils.highlightCurrentOption(".menu-item", "flavor");
+        utils.highlightCurrentOption('.menu-item', 'flavor');
       });
     });
 
     // 下落键
-    $("#drop-btn").on("touchstart", (e) => {
+    $('#drop-btn').on('touchstart', (e) => {
       e.preventDefault();
       this.dropShape();
     });
 
     // 左键
-    $("#left-btn").on("touchstart", (e) => {
+    $('#left-btn').on('touchstart', (e) => {
       e.preventDefault();
       this.moveLeft();
     });
 
     // 右键
-    $("#right-btn").on("touchstart", (e) => {
+    $('#right-btn').on('touchstart', (e) => {
       e.preventDefault();
       this.moveRight();
     });
 
     // 按下下键
-    $("#down-btn").on("touchstart", (e) => {
+    $('#down-btn').on('touchstart', (e) => {
       e.preventDefault();
       this.moveDown(true);
     });
 
     // 松开下键
-    $("#down-btn").on("touchend", (e) => {
+    $('#down-btn').on('touchend', (e) => {
       e.preventDefault();
       this.moveDown(false);
     });
 
     // 开始和暂停按
-    $("#start-btn").on("touchstart", (e) => {
+    $('#start-btn').on('touchstart', (e) => {
       e.preventDefault();
       this.gamePlay = !this.gamePlay;
       this.startGame()
       this.music.playAudio(0, 0.19);
-      utils.changeIcon("start-btn", this.gamePlay)
+      utils.changeIcon('start-btn', this.gamePlay)
     });
 
     // 声音按钮
-    $("#volume-btn").on("touchstart", (e) => {
+    $('#volume-btn').on('touchstart', (e) => {
       e.preventDefault();
       this.volume = !this.volume;
       this.music.toggleMute(this.volume);
       this.music.playAudio(0, 0.19);
-      utils.changeIcon("volume-btn", this.volume);
+      utils.changeIcon('volume-btn', this.volume);
     });
 
     // 重新开始
-    $("#restart-btn").on("touchstart", (e) => {
+    $('#restart-btn').on('touchstart', (e) => {
       e.preventDefault();
       this.restartGame()
       this.music.playAudio(0, 0.19);
     });
 
     // 旋转键
-    $("#rotate-btn").on("touchstart", (e) => {
+    $('#rotate-btn').on('touchstart', (e) => {
       e.preventDefault();
       this.rotateShape();
     });
 
     // 将按钮颜色改为激活状态
-    $(".o-btn").on("touchstart", (e) => {
+    $('.o-btn').on('touchstart', (e) => {
       e.preventDefault();
       this.music.playAudio(0, 0.19);
-      utils.changeButtonColor(e.currentTarget, "bg-surface2");
+      utils.changeButtonColor(e.currentTarget, 'bg-surface2');
     });
 
     // 将按钮颜色改为背景色
-    $(".o-btn").on("touchend", (e) => {
+    $('.o-btn').on('touchend', (e) => {
       e.preventDefault();
-      utils.changeButtonColor(e.currentTarget, "bg-mantle");
+      utils.changeButtonColor(e.currentTarget, 'bg-mantle');
     });
   }
 }

@@ -7,6 +7,7 @@ import confetti from 'canvas-confetti';
 const $ = require('jquery');
 const _ = require('lodash');
 const Game = require('./classes/Game.js');
+const Clipboard = require('clipboard')
 const utils = require('./utils/utils.js');
 const options = require('./utils/options.js');
 const socket = require('./utils/socket.js');
@@ -23,14 +24,21 @@ utils.preventZoom();
 utils.setPagePaltte();
 utils.highlightCurrentOption('.menu-item', 'flavor');
 
+// 单人模式移除分隔层和准备层
+if (!sessionStorage.getItem('gameMode')) {
+  $('#sparator').removeClass('block').addClass('hidden');
+  $('#ready-container').removeClass('flex').addClass('hidden');
+}
+
 // 双人模式
 if (sessionStorage.getItem('gameMode') === 'double') {
-  const scoreDiff = $('#score-diff');
-
   // 隐藏最高分，开始按钮，重新开始按钮
   $('#highest-score-container, #start-btn, #restart-btn').remove()
   // 显示得分差，房间容器
   $('#score-diff, #room-container').removeClass('hidden').addClass('flex');
+
+  $('#sparator').removeClass('hidden').addClass('block');
+  $('#ready-container').removeClass('hidden').addClass('flex');
 
   setInfoByReady();
 
@@ -45,6 +53,12 @@ if (sessionStorage.getItem('gameMode') === 'double') {
       ready: sessionStorage.getItem('ready'),
       score: 0,
     });
+
+    // 刷新进入房间发送一个准备的请求
+    socket.emit('ready', {
+      room: sessionStorage.getItem('room'),
+      ready: sessionStorage.getItem('ready')
+    })
   }
 
   // 房间创建成功
@@ -68,11 +82,11 @@ if (sessionStorage.getItem('gameMode') === 'double') {
   // 玩家2加入房间成功
   socket.on('playerJoined', (players) => {
     $('#players').text(`${_.size(players)} / 2`)
-    utils.showMessage('Player 2 joined', 'success', 1000)
+    utils.showMessage('Player 2 joined', 'success', 2000)
   });
 
   // 游戏准备
-  $('#ready-btn').on('click', () => {
+  $('#ready').on('touchstart', () => {
     const ready = Number(sessionStorage.getItem('ready'));
 
     if (ready) {
@@ -89,6 +103,23 @@ if (sessionStorage.getItem('gameMode') === 'double') {
     });
   })
 
+  // 退出按钮
+  $('#quit').on('touchstart', () => {
+    location.href = './index.html';
+  })
+
+  // 复制房间号
+  const clipboard = new Clipboard('#room-container');
+  // 复制成功触发
+  clipboard.on("success", (e) => {
+    e.clearSelection();
+    utils.showMessage("Copied", "success", 1500);
+  });
+  // 复制失败触发
+  clipboard.on("error", (e) => {
+    utils.showMessage("Copy Error", "error", 1500);
+  });
+
   // 一位玩家已准备
   socket.on('onePlayerReady', (players) => {
     const ready = Number(players[socket.id].ready);
@@ -102,6 +133,7 @@ if (sessionStorage.getItem('gameMode') === 'double') {
 
   // 两位玩家已准备
   socket.on('twoPlayerReady', () => {
+    // 发送开始游戏请求
     socket.emit('startGame', {
       room: sessionStorage.getItem('room'),
       gameStart: 1,
@@ -109,94 +141,98 @@ if (sessionStorage.getItem('gameMode') === 'double') {
   })
 
   socket.on('twoStartGame', () => {
-    $('#partition').hide()
-    $('#ready-container').removeClass('flex').addClass('hidden')
+    $('#sparator').removeClass('block').addClass('hidden'); // 隐藏分隔层
+    $('#ready-container').removeClass('flex').addClass('hidden'); // 隐藏准备层
 
+    // 更新分数
     socket.emit('updateScore', {
       room: sessionStorage.getItem('room'),
       score: game.score,
     });
 
+    // 开始游戏
     game.gamePlay = true;
     game.startGame();
     game.setDropTimer();
   });
 
   socket.on("updateScore", (players) => {
-    const playerId = socket.id;
-    let player1Key = null;
-    let player2Key = null;
+    const scoreArray = [];
 
-    Object.keys(players).forEach((key) => {
-      try {
-        if (key === playerId) player1Key = key;
-        if (key !== playerId) player2Key = key;
+    for (let player in players) {
+      if (player === socket.id) {
+        scoreArray[0] = players[player].score; // 本人玩家的分数存在数组的首位
+      } else {
+        scoreArray[1] = players[player].score; // 玩家2的分数存在数组的第二位
+      }
+    }
 
-        const different = players[player1Key].score - players[player2Key].score;
+    const scoreDiff = scoreArray[0] - scoreArray[1]; // 获取分数差
 
-        sessionStorage.setItem("scoreDiff", different);
+    sessionStorage.setItem("scoreDiff", scoreDiff);
 
-        if (!different) {
-          scoreDiff.text(0);
-          $("#score-diff").removeClass("text-red").addClass("text-green");
-        } else if (different > 0) {
-          scoreDiff.text(`+${different}`);
-          $("#score-diff").removeClass("text-red").addClass("text-green");
-        } else {
-          scoreDiff.text(different);
-          $("#score-diff").removeClass("text-green").addClass("text-red");
-        }
-      } catch (error) { }
-    });
+    if (!scoreDiff) {
+      $('#score-diff')
+        .text(0)
+        .removeClass("text-red")
+        .addClass("text-green");
+    } else if (scoreDiff > 0) {
+      $('#score-diff')
+        .text(`+${scoreDiff}`)
+        .removeClass("text-red")
+        .addClass("text-green");
+    } else {
+      $('#score-diff')
+        .text(scoreDiff)
+        .removeClass("text-green")
+        .addClass("text-red");
+    }
   });
 
   // 一个玩家游戏结束提示这个玩家游戏结束
-  socket.on("onePlayerGameOver", (players) => {
-    const playerId = socket.id;
+  socket.on('onePlayerGameOver', (players) => {
+    const gameOver = players[socket.id].gameOver;
 
-    Object.keys(players).forEach((player) => {
-      if (players[playerId].gameOver && player === playerId) {
-        $("#game-over-title").text("GAME OVER");
-        $("#again-btn, #quit-btn").addClass("hidden");
-        $("#score-container").removeClass("my-6").addClass("mt-6");
-      } else if (!players[playerId].gameOver && player !== playerId) {
-        utils.showMessage("player 2 game over", "hint", 5000);
-      }
-    });
+    if (gameOver) {
+      $('#game-over-title').text('GAME OVER');
+    } else {
+      utils.showMessage('player 2 game over', 'hint', 5000);
+    }
   });
 
   // 两个玩家游戏结束
-  socket.on("twoPlayerGameOver", () => {
+  socket.on('twoPlayerGameOver', () => {
     if (sessionStorage.getItem("scoreDiff") > 0) {
       $("#game-over-title").text("VICTORY");
-      $("#again-btn, #quit-btn").removeClass("hidden");
-      $("#score-container").removeClass("mt-6").addClass("my-6");
       playConfetti();
     } else {
       $("#game-over-title").text("TRY AGAIN");
-      $("#again-btn, #quit-btn").removeClass("hidden");
-      $("#score-container").removeClass("mt-6").addClass("my-6");
     }
 
+    $("#score-container").removeClass("mt-6").addClass("my-6");
+
     $("#again-btn").on("touchstart", () => {
-      socket.emit("again", { room: sessionStorage.getItem("room"), again: 1 });
+      socket.emit("again", {
+        room: sessionStorage.getItem("room"),
+        again: 1,
+      });
+    });
+
+    $('#quit-btn').on('touchstart', (e) => {
+      e.preventDefault();
+      location.href = '../../index.html';
     });
   });
 
   // 一个玩家再来一次
   socket.on("onePlayerAgain", () => {
-    $('#again-label').text('AGAIN: ');
-    $('#again-info').text('1 / 2').addClass('text-red');
+    $('#again-info').text('1 / 2').addClass('text-yellow');
   });
 
   // 两个玩家再来一次
-  socket.on("twoPlayerAgain", () => {
-    $('#again-label').text('AGAIN: ');
-    $('#again-info').text('2 / 2').removeClass('text-red').addClass('text-green');
-
-    setTimeout(() => {
-      location.reload();
-    }, 100);
+  socket.on('twoPlayerAgain', () => {
+    $('#again-info').text('2 / 2').removeClass('text-yellow').addClass('text-green');
+    location.reload();
   });
 }
 
@@ -225,10 +261,10 @@ function setInfoByReady() {
   const ready = Number(sessionStorage.getItem('ready'));
 
   if (ready) {
-    $('#ready').text('ready');
-    $('#ready-btn').text('Cancel');
+    $('#ready-status').text('ready').removeClass('text-red').addClass('text-green');
+    $('#ready').text('Cancel');
   } else {
-    $('#ready').text('not ready');
-    $('#ready-btn').text('Ready');
+    $('#ready-status').text('not ready').removeClass('text-green').addClass('text-red');
+    $('#ready').text('Ready');
   }
 }
