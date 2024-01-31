@@ -203,8 +203,6 @@ if (sessionStorage.getItem('gameMode') === 'double') {
       }
     }
 
-    console.log(sessionStorage.getItem('scoreDiff'))
-
     if (gameOver) {
       $('#game-over-title').text('GAME OVER')
       $('#another-score-span').text('Player 2 score: ')
@@ -215,9 +213,19 @@ if (sessionStorage.getItem('gameMode') === 'double') {
   })
 
   // 两个玩家游戏结束
-  socket.on('twoPlayerGameOver', () => {
+  socket.on('twoPlayerGameOver', (players) => {
+    let anotherScore
+
+    for (let player in players) {
+      if (socket.id !== player) {
+        anotherScore = players[player].score
+      }
+    }
+
     if (sessionStorage.getItem("scoreDiff") > 0) {
       $("#game-over-title").text("VICTORY")
+      $('#another-score-span').text('Player 2 score: ')
+      $('#another-score-info').text(anotherScore)
       playConfetti()
     } else {
       $("#game-over-title").text("TRY AGAIN")
