@@ -8,6 +8,7 @@ const $ = require('jquery')
 const _ = require('lodash')
 const Game = require('./classes/Game.js')
 const Clipboard = require('clipboard')
+const Sparator = require('./classes/Sparator.js')
 const utils = require('./utils/utils.js')
 const options = require('./utils/options.js')
 const socket = require('./utils/socket.js')
@@ -19,28 +20,46 @@ const mapCtx = mapCanvas.getContext('2d')
 const nextShapeCtx = nextShapeCanvas.getContext('2d')
 
 const game = new Game(mapCtx, nextShapeCtx)
+const sparator = new Sparator()
 
 utils.preventZoom()
 utils.setPagePaltte()
 utils.highlightCurrentOption('.menu-item', 'flavor')
 
-// 单人模式移除分隔层和准备层
-if (!sessionStorage.getItem('gameMode')) {
-  $('#sparator').removeClass('block').addClass('hidden')
-  $('#ready-container').removeClass('flex').addClass('hidden')
-}
-
 // 双人模式
 if (sessionStorage.getItem('gameMode') === 'double') {
+  // 准备层的模板
+  const prepareTemplate = `
+    <div id="ready-container"
+      class="z-10 flex flex-col justify-center items-center absolute top-0 left-0 w-full h-full px-20">
+      <h2 class="mb-20 text-4xl font-[Dubtronic]">PREPARE</h2>
+      <div id="room-container" class="flex justify-between w-full mb-2" data-clipboard-action="copy"
+        data-clipboard-target="#room">
+        <span class="font-semibold">Room: </span>
+        <span id="room"></span>
+      </div>
+      <div class="flex justify-between w-full mb-2">
+        <span class="font-semibold">Players: </span>
+        <span id="players"></span>
+      </div>
+      <div class="flex justify-between w-full">
+        <span class="font-semibold">Status: </span>
+        <span id="ready-status"></span>
+      </div>
+      <div class="flex justify-around w-full mt-16">
+        <button id="ready" class="px-3 py-1 rounded text-base font-semibold bg-yellow"></button>
+        <button id="quit" class="px-3 py-1 rounded text-base font-semibold bg-red">Quit</button>
+      </div>
+    </div>
+  `
+
   // 隐藏最高分，开始按钮，重新开始按钮
   $('#highest-score-container, #start-btn, #restart-btn').remove()
   // 显示得分差，房间容器
   $('#score-diff, #room-container').removeClass('hidden').addClass('flex')
 
-  $('#sparator').removeClass('hidden').addClass('block')
-  $('#ready-container').removeClass('hidden').addClass('flex')
-
-  setInfoByReady()
+  sparator.showSparator()
+  $('body').append(prepareTemplate)
 
   if (!sessionStorage.getItem('room')) {
     // 第一次进入时，创建房间
@@ -50,25 +69,23 @@ if (sessionStorage.getItem('gameMode') === 'double') {
     socket.emit('joinRoom', {
       action: 1,
       room: sessionStorage.getItem('room'),
-      ready: sessionStorage.getItem('ready'),
+      ready: 0,
       score: 0,
     })
 
-    // 刷新进入房间发送一个准备的请求
-    socket.emit('ready', {
-      room: sessionStorage.getItem('room'),
-      ready: sessionStorage.getItem('ready')
-    })
+    setInfoByReady()
   }
 
   // 房间创建成功
   socket.on('roomCreated', (players) => {
-    const room = players[socket.id].room
+    const { room, ready } = players[socket.id]
 
     sessionStorage.setItem('room', room)
+    sessionStorage.setItem('ready', ready)
 
     $('#room, #room-id').text(room)
     $('#players').text(`${_.size(players)} / 2`)
+    setInfoByReady()
   })
 
   // 加入房间成功
@@ -116,7 +133,7 @@ if (sessionStorage.getItem('gameMode') === 'double') {
     utils.showMessage("Copied", "success", 1500)
   })
   // 复制失败触发
-  clipboard.on("error", (e) => {
+  clipboard.on("error", () => {
     utils.showMessage("Copy Error", "error", 1500)
   })
 
@@ -141,8 +158,9 @@ if (sessionStorage.getItem('gameMode') === 'double') {
   })
 
   socket.on('twoStartGame', () => {
-    $('#sparator').removeClass('block').addClass('hidden') // 隐藏分隔层
+    sparator.hideSparator()
     $('#ready-container').removeClass('flex').addClass('hidden') // 隐藏准备层
+    $('#game-over-info').removeClass('flex').addClass('hidden') // 隐藏游戏结束层
 
     // 更新分数
     socket.emit('updateScore', {
@@ -207,6 +225,7 @@ if (sessionStorage.getItem('gameMode') === 'double') {
       $('#game-over-title').text('GAME OVER')
       $('#another-score-span').text('Player 2 score: ')
       $('#another-score-info').text(anotherScore)
+      sparator.showSparator()
     } else {
       utils.showMessage('player 2 game over', 'hint', 5000)
     }
@@ -222,16 +241,18 @@ if (sessionStorage.getItem('gameMode') === 'double') {
       }
     }
 
-    if (sessionStorage.getItem("scoreDiff") > 0) {
-      $("#game-over-title").text("VICTORY")
-      $('#another-score-span').text('Player 2 score: ')
-      $('#another-score-info').text(anotherScore)
+    sparator.hideSparator()
+    sparator.showSparator()
+
+    if (sessionStorage.getItem('scoreDiff') > 0) {
+      $('#game-over-title').text('VICTORY')
       playConfetti()
     } else {
-      $("#game-over-title").text("TRY AGAIN")
+      $('#game-over-title').text('TRY AGAIN')
     }
 
-    $("#score-container").removeClass("mt-6").addClass("my-6")
+    $('#another-score-span').text('Player 2 score: ')
+    $('#another-score-info').text(anotherScore)
 
     $("#again-btn").on("touchstart", () => {
       socket.emit("again", {
@@ -247,13 +268,26 @@ if (sessionStorage.getItem('gameMode') === 'double') {
 
   // 一个玩家再来一次
   socket.on("onePlayerAgain", () => {
-    $('#again-info').text('1 / 2').addClass('text-yellow')
+    $('#again-info')
+      .text('1 / 2')
+      .addClass('text-yellow')
   })
 
   // 两个玩家再来一次
   socket.on('twoPlayerAgain', () => {
-    $('#again-info').text('2 / 2').removeClass('text-yellow').addClass('text-green')
-    location.reload()
+    $('#again-info')
+      .text('2 / 2')
+      .removeClass('text-yellow')
+      .addClass('text-green')
+    game.restartGame()
+    socket.emit('ready', {
+      room: sessionStorage.getItem("room"),
+      ready: 1,
+    })
+  })
+
+  socket.on('restartGame', (players) => {
+    console.log('restart game', players)
   })
 }
 
@@ -282,10 +316,16 @@ function setInfoByReady() {
   const ready = Number(sessionStorage.getItem('ready'))
 
   if (ready) {
-    $('#ready-status').text('ready').removeClass('text-red').addClass('text-green')
+    $('#ready-status')
+      .text('ready')
+      .removeClass('text-red')
+      .addClass('text-green')
     $('#ready').text('Cancel')
   } else {
-    $('#ready-status').text('not ready').removeClass('text-green').addClass('text-red')
+    $('#ready-status')
+      .text('not ready')
+      .removeClass('text-green')
+      .addClass('text-red')
     $('#ready').text('Ready')
   }
 }

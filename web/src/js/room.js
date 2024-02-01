@@ -17,14 +17,11 @@ sessionStorage.removeItem("room");
 sessionStorage.removeItem("ready");
 
 // 创建房间
-$("#create-room").on("touchstart", (e) => {
-  e.preventDefault();
+$("#create-room").on("touchstart", () => {
   location.href = "./game.html";
 });
 
-$("#join-room").on("touchstart", (e) => {
-  e.preventDefault();
-
+$("#join-room").on("touchstart", () => {
   const separatorElement = $(`
     <div class="absolute top-0 left-0 w-full h-full bg-crust bg-opacity-95"></div>
   `);
@@ -52,8 +49,7 @@ $("#join-room").on("touchstart", (e) => {
   $("#join-btn").on(
     "touchstart",
     _.debounce(
-      (e) => {
-        e.preventDefault();
+      () => {
         const room = $("#input-room").val();
 
         // 显示未输入房间ID的信息
@@ -75,8 +71,7 @@ $("#join-room").on("touchstart", (e) => {
   );
 
   // 取消加入房间
-  $("#cancel-btn").on("touchstart", (e) => {
-    e.preventDefault();
+  $("#cancel-btn").on("touchstart", () => {
     $("#input-room").val("");
     inputRoomTemplate.fadeOut(() => {
       separatorElement.remove();

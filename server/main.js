@@ -119,6 +119,16 @@ io.on('connection', (socket) => {
     );
   });
 
+  socket.on('restartGame', ({ room, ready, score, gameStart, gameOver, again }) => {
+    rooms[room][socket.id].ready = ready;
+    rooms[room][socket.id].score = score; // 更新分数
+    rooms[room][socket.id].gameStart = gameStart; // 更新游戏开始状态
+    rooms[room][socket.id].gameOver = gameOver; // 更新游戏结束状态
+    rooms[room][socket.id].again = again; // 更新再来一局状态
+    console.log(rooms[room][socket.id]);
+    socket.to(room).emit('restartGame', rooms[room]);
+  })
+
   // 玩家离开房间
   socket.on('disconnect', () => {
     console.log('user disconnected');

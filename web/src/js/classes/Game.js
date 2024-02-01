@@ -1,6 +1,7 @@
 const $ = require('jquery');
 const Shape = require('./Shape.js');
 const Music = require('./Music.js');
+const Sparator = require('./Sparator.js')
 const utils = require('../utils/utils.js');
 const socket = require('../utils/socket.js');
 const options = require('../utils/options.js');
@@ -43,6 +44,8 @@ class Game {
     this.score = 0;
     this.highScore = localStorage.getItem('highScore') || 0;
 
+    this.sparator = new Sparator();
+
     this.init();
   }
 
@@ -57,8 +60,11 @@ class Game {
     this.drawNextShape();
 
     $('#score').text(this.score);
-    $('#highest-score').text(this.highScore);
     $('#level').text(this.level);
+
+    if (this.gameMode === 'single') {
+      $('#highest-score').text(this.highScore);
+    }
   }
 
   // 生成方块
@@ -133,16 +139,13 @@ class Game {
   // 开始游戏
   startGame() {
     if (!this.dropTimer) this.addShape()
-
     if (this.gamePlay) this.setDropTimer()
-
     if (!this.gamePlay && this.dropTimer) clearInterval(this.dropTimer)
   }
 
   // 重新开始
   restartGame() {
     if (this.dropTimer) clearInterval(this.dropTimer);
-
     if (this.gameOver) this.updateHighScore()
 
     this.map = [...new Array(this.mapHeight)].map(() =>
@@ -161,11 +164,26 @@ class Game {
 
     this.score = 0;
     this.level = 1;
-    this.highScore = localStorage.getItem('highScore') || 0
 
     this.clearArea(this.mapCtx)
+
+    if (this.gameMode === 'double') {
+      $('#game-over-info').remove()
+
+      socket.emit('restartGame', {
+        room: sessionStorage.getItem('room'),
+        ready: 0,
+        score: 0,
+        gameStart: 0,
+        gameOver: 0,
+        again: 0,
+      })
+    } else {
+      this.highScore = localStorage.getItem('highScore') || 0
+      utils.changeIcon('start-btn', this.gamePlay)
+    }
+
     this.setGameData()
-    utils.changeIcon('start-btn', this.gamePlay)
   }
 
   // 方块旋转
@@ -592,14 +610,14 @@ class Game {
         </aside>
       `);
 
-      $('#sparator').removeClass('hidden').addClass('block'); // 显示分隔层
+      this.sparator.showSparator();
       $('body').append(menuTemplate);
 
       utils.highlightCurrentOption('.menu-item', 'flavor');
 
       // 关闭菜单
       $('#close-btn').on('touchstart', () => {
-        $('#sparator').removeClass('block').addClass('hidden'); // 隐藏分隔层
+        this.sparator.hideSparator();
         menuTemplate
           .removeClass('animate__fadeInRight')
           .addClass('animate__fadeOutRight')
