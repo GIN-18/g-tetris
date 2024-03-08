@@ -541,7 +541,7 @@ class Game {
       </div>
     `).hide();
 
-    $('#sparator').removeClass('hidden').addClass('block');
+    this.sparator.showSparator();
     $('body').append(gameOverInfoTemplate);
 
     gameOverInfoTemplate.fadeIn('slow');
@@ -559,7 +559,7 @@ class Game {
       $('#another-score-info').text(this.highScore);
 
       $('#again-btn').on('touchstart', () => {
-        $('#sparator').removeClass('block').addClass('hidden');
+        this.sparator.hideSparator();
         $('#game-over-info').remove();
         this.restartGame()
       });
