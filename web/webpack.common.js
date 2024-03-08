@@ -10,13 +10,13 @@ module.exports = {
   },
   output: {
     clean: true,
-    filename: 'js/[name].bundle.js',
+    filename: 'js/[name].[contenthash].js',
     path: path.resolve(__dirname, 'dist'),
   },
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.js$/i,
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
@@ -26,44 +26,31 @@ module.exports = {
         },
       },
       {
-        test: /\.css$/,
+        test: /\.css$/i,
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
       },
       {
-        test: /\.webp$/,
+        test: /\.webp$/i,
         type: 'asset/resource',
         generator: {
           filename: 'static/images/[hash][ext][query]',
         },
       },
       {
-        test: /\.mp3$/,
+        test: /\.mp3$/i,
         type: 'asset/resource',
         generator: {
           filename: 'static/audio/[hash][ext][query]',
         },
       },
       {
-        test: /\.(woff|woff2)$/,
+        test: /\.(woff|woff2)$/i,
         type: 'asset/resource',
         generator: {
           filename: 'static/font/[hash][ext][query]',
         },
       },
     ],
-  },
-  optimization: {
-    splitChunks: {
-      chunks: 'all',
-      minSize: 0,
-      cacheGroups: {
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          chunks: 'all'
-        }
-      }
-    }
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -85,7 +72,7 @@ module.exports = {
       chunks: ['room'],
     }),
     new MiniCssExtractPlugin({
-      filename: 'css/[name].css',
+      filename: 'css/[name].[contenthash].css',
     })
   ],
 };
