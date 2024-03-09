@@ -2,5 +2,5 @@
 </script>
 
 <template>
-  <h1>tetris</h1>
+  <h1 class="font-[Dubtronic-Inline]">tetris</h1>
 </template>
