@@ -1,6 +1,14 @@
 <script setup>
+import { onMounted } from "vue";
+import Logo from "@/components/Logo.vue";
+
+onMounted(() => {
+  document.body.classList.add("mocha");
+});
 </script>
 
 <template>
-  <h1 class="font-[Dubtronic-Inline]">tetris</h1>
+  <header>
+    <Logo />
+  </header>
 </template>
