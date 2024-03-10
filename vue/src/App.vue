@@ -2,6 +2,7 @@
 import { onMounted } from "vue";
 import Logo from "@/components/Logo.vue";
 import Map from "@/components/Map.vue";
+import Info from "@/components/Info.vue";
 import Button from "@/components/Button.vue";
 
 onMounted(() => {
@@ -15,7 +16,23 @@ onMounted(() => {
   </header>
 
   <main>
-    <Map />
+    <div class="flex justify-around items-center w-full">
+      <Map />
+      <div class="flex flex-col justify-between items-center">
+        <Info title="SCORE">
+          <span>xxx</span>
+        </Info>
+        <Info title="HI-SCORE">
+          <span>xxx</span>
+        </Info>
+        <Info title="NEXT">
+          <span>xxx</span>
+        </Info>
+        <Info title="LEVEL">
+          <span>xxx</span>
+        </Info>
+      </div>
+    </div>
 
     <hr class="w-full border-t-2 border-dashed border-text" />
 
