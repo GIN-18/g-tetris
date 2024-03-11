@@ -6,6 +6,7 @@ import Info from "@/components/Info.vue";
 import Button from "@/components/Button.vue";
 
 import { Shape } from "@/assets/js/Shape.js";
+import { options } from "@/assets/js/options.js";
 
 const map_canvas = ref();
 const next_canvas = ref();
@@ -44,7 +45,7 @@ function drawPiece(ctx, piece) {
   for (let i = 0; i < piece.length; i++) {
     const x = piece[i][1] + shape.xOffset;
     const y = piece[i][0] + shape.yOffset;
-    ctx.fillStyle = "#cdd6f4";
+    ctx.fillStyle = options.palette.mocha.shapeColor[shape.type];
     ctx.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
   }
 }
@@ -56,14 +57,14 @@ function drawPiece(ctx, piece) {
   </header>
 
   <main>
-    <div class="flex justify-around items-center w-full">
+    <div class="flex justify-around items-center w-full h-full">
       <canvas
         ref="map_canvas"
         class="border-2 border-text rounded bg-mantle"
         width="200"
         height="400"
       ></canvas>
-      <div class="flex flex-col justify-between items-center">
+      <div class="flex flex-col justify-between items-center h-full">
         <Info title="SCORE">
           <span>{{ score }}</span>
         </Info>
@@ -83,50 +84,50 @@ function drawPiece(ctx, piece) {
         </Info>
       </div>
     </div>
-
-    <hr class="w-full border-t-2 border-dashed border-text" />
-
-    <div class="flex">
-      <div class="flex flex-col justify-center items-center w-1/2">
-        <Button
-          description="direction"
-          icon="icon-[material-symbols--arrow-downward-alt-rounded]"
-        />
-        <div class="flex justify-between w-full">
-          <Button
-            description="direction"
-            icon="icon-[material-symbols--arrow-left-rounded]"
-          />
-          <Button
-            description="direction"
-            icon="icon-[material-symbols--arrow-right-rounded]"
-          />
-        </div>
-        <Button
-          description="direction"
-          icon="icon-[material-symbols--arrow-drop-down-rounded]"
-        />
-      </div>
-      <div class="flex flex-col justify-between items-end w-1/2">
-        <div class="flex">
-          <Button
-            description="box"
-            icon="icon-[material-symbols--play-arrow-rounded]"
-          />
-          <Button
-            description="box"
-            icon="icon-[material-symbols--replay-rounded]"
-          />
-          <Button
-            description="box"
-            icon="icon-[material-symbols--volume-up-rounded]"
-          />
-        </div>
-        <Button
-          description="rotate"
-          icon="icon-[material-symbols--rotate-right-rounded]"
-        />
-      </div>
-    </div>
   </main>
+
+  <hr class="w-full border-t-2 border-dashed border-text" />
+
+  <div class="flex">
+    <div class="flex flex-col justify-center items-center w-1/2">
+      <Button
+        description="direction"
+        icon="icon-[material-symbols--arrow-downward-alt-rounded]"
+      />
+      <div class="flex justify-between w-full">
+        <Button
+          description="direction"
+          icon="icon-[material-symbols--arrow-left-rounded]"
+        />
+        <Button
+          description="direction"
+          icon="icon-[material-symbols--arrow-right-rounded]"
+        />
+      </div>
+      <Button
+        description="direction"
+        icon="icon-[material-symbols--arrow-drop-down-rounded]"
+      />
+    </div>
+    <div class="flex flex-col justify-between items-end w-1/2">
+      <div class="flex gap-4">
+        <Button
+          description="box"
+          icon="icon-[material-symbols--play-arrow-rounded]"
+        />
+        <Button
+          description="box"
+          icon="icon-[material-symbols--replay-rounded]"
+        />
+        <Button
+          description="box"
+          icon="icon-[material-symbols--volume-up-rounded]"
+        />
+      </div>
+      <Button
+        description="rotate"
+        icon="icon-[material-symbols--rotate-right-rounded]"
+      />
+    </div>
+  </div>
 </template>

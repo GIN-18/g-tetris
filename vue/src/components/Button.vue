@@ -32,7 +32,7 @@ function addClass(btn) {
     return
   }
 
-  btn.classList.add('ml-2', 'p-1', 'rounded', 'text-sm')
+  btn.classList.add('p-2', 'rounded', 'text-sm')
 }
 </script>
 
