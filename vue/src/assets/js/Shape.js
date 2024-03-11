@@ -130,20 +130,18 @@ export class Shape {
         ],
       ],
     };
+    this.type = 0;
     this.rotation = 0;
-    this.XOffset = 3;
+    this.xOffset = 3;
+    this.yOffset = this.type === 1 ? -1 : -2
   }
 
   getPiece() {
-    const type =  this.getType()
-    return this.shapeTable[type][this.rotation]
+    this.getType()
+    return this.shapeTable[this.type][this.rotation]
   }
 
   getType() {
-    return  Math.floor(Math.random() * 7)
-  }
-
-  getYOffset() {
-    return this.getType() === 1 ? -1 : -2
+    this.type = Math.floor(Math.random() * 7)
   }
 }
