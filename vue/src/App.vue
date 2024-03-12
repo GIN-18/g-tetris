@@ -1,54 +1,37 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { useShapeStore } from "./stores/shape";
+
+import { getShape } from "@/assets/js/shape.js";
 
 import Logo from "@/components/Logo.vue";
 import Info from "@/components/Info.vue";
 import Button from "@/components/Button.vue";
+import Canvas from "@/components/Canvas.vue";
 
-import { Shape } from "@/assets/js/Shape.js";
-import { options } from "@/assets/js/options.js";
+const mapCanvas = ref(null);
+const nextCanvas = ref(null);
 
-const map_canvas = ref();
-const next_canvas = ref();
-const shape = new Shape();
+const shape = useShapeStore();
 
-const BLOCK = 20;
-const currentPiece = null;
-const nextPiece = shape.getPiece();
-const score = 0;
-const hi_score = 0;
-const level = 1;
+const map = new Array(20).fill(0).map(() => new Array(10).fill(0));
+const score = ref(0);
+const hi_score = ref(0);
+const level = ref(1);
+
+let gamePlay = ref(false);
+
+function playGame() {
+  gamePlay.value = !gamePlay.value;
+  shape.currentShape = shape.nextShape;
+  shape.nextShape = getShape();
+  mapCanvas.value.drawShape(shape.currentShape);
+  nextCanvas.value.drawShape(shape.nextShape);
+}
 
 onMounted(() => {
   document.body.classList.add("mocha");
-  const map_ctx = map_canvas.value.getContext("2d");
-  const next_ctx = next_canvas.value.getContext("2d");
-  drawPiece(map_ctx, nextPiece);
-  drawPiece(next_ctx, nextPiece);
 });
-
-function drawPiece(ctx, piece) {
-  shape.yOffset = 0;
-
-  if (ctx.canvas.width === 80) {
-    if (shape.type === 0) {
-      shape.xOffset = 0;
-      shape.yOffset = 0;
-    } else if (shape.type === 1) {
-      shape.xOffset = 0;
-      shape.yOffset = 1 / 2;
-    } else {
-      shape.xOffset = 1 / 2;
-    }
-  }
-
-  for (let i = 0; i < piece.length; i++) {
-    const x = piece[i][1] + shape.xOffset;
-    const y = piece[i][0] + shape.yOffset;
-    ctx.fillStyle = options.palette.mocha.shapeColor[shape.type];
-    ctx.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
-  }
-}
 </script>
 
 <template>
@@ -58,12 +41,12 @@ function drawPiece(ctx, piece) {
 
   <main>
     <div class="flex justify-around items-center w-full h-full">
-      <canvas
-        ref="map_canvas"
+      <Canvas
+        ref="mapCanvas"
         class="border-2 border-text rounded bg-mantle"
         width="200"
         height="400"
-      ></canvas>
+      />
       <div class="flex flex-col justify-between items-center h-full">
         <Info title="SCORE">
           <span>{{ score }}</span>
@@ -72,12 +55,7 @@ function drawPiece(ctx, piece) {
           <span>{{ hi_score }}</span>
         </Info>
         <Info title="NEXT">
-          <canvas
-            ref="next_canvas"
-            class="bg-surface0"
-            width="80"
-            height="40"
-          ></canvas>
+          <Canvas ref="nextCanvas" class="bg-surface0" width="80" height="40" />
         </Info>
         <Info title="LEVEL">
           <span>{{ level }}</span>
@@ -113,7 +91,12 @@ function drawPiece(ctx, piece) {
       <div class="flex gap-4">
         <Button
           description="box"
-          icon="icon-[material-symbols--play-arrow-rounded]"
+          :icon="
+            gamePlay
+              ? 'icon-[material-symbols--pause-rounded]'
+              : 'icon-[material-symbols--play-arrow-rounded]'
+          "
+          @click="playGame"
         />
         <Button
           description="box"
