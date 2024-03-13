@@ -23,11 +23,15 @@ const level = ref(1);
 
 let gamePlay = ref(false);
 
+let lastTime = ref(0);
+const frameInterval = ref(1000 / 10);
+
+
 function playGame() {
   gamePlay.value = !gamePlay.value;
 
   addShape();
-  gameLoop();
+  requestAnimationFrame(gameLoop)
 }
 
 function addShape() {
@@ -39,12 +43,12 @@ function addShape() {
 }
 
 function rotateShape() {
-  const currentRotation = currentShape.rotation;
-  const tempRotation = (currentShape.rotation += 1);
+  const currentRotation = currentShape.value.rotation;
+  const tempRotation = (currentShape.value.rotation += 1);
 
-  const resultRotation = tempRotation % currentShape.pieces.length;
+  const resultRotation = tempRotation % currentShape.value.pieces.length;
 
-  currentShape.rotation = resultRotation;
+  currentShape.value.rotation = resultRotation;
   mapCanvas.value.drawShape(currentShape);
 }
 
@@ -60,12 +64,11 @@ function moveShape(xStep, yStep) {
     let x = cs[i][1] + currentShape.value.x;
     let y = cs[i][0] + currentShape.value.y;
 
-    if (x < 0 || x >= w) {
+    if (xStep && (x < 0 || x >= w || (map.value[y] && map.value[y][x]))) {
       currentShape.value.x -= xStep;
-      return;
     }
 
-    if (y >= h || map.value[y] && map.value[y][x]) {
+    if(yStep && (y >= h || (map.value[y] && map.value[y][x]))) {
       currentShape.value.y -= yStep;
       mergeShape()
       addShape()
@@ -75,11 +78,16 @@ function moveShape(xStep, yStep) {
   mapCanvas.value.drawShape(currentShape);
 }
 
-function gameLoop() {
-  const animationId = requestAnimationFrame(() => {
+function gameLoop(currentTime) {
+   const deltaTime = currentTime - lastTime.value;
+
+  if (deltaTime > frameInterval.value) {
+    // 在这里执行动画逻辑
     moveShape(0, 1);
-    gameLoop();
-  });
+    lastTime.value = currentTime - (deltaTime % frameInterval.value);
+  }
+
+  requestAnimationFrame(gameLoop);
 }
 
 function mergeShape() {
@@ -120,7 +128,13 @@ onMounted(() => {
           <span>{{ hi_score }}</span>
         </Info>
         <Info title="NEXT">
-          <Canvas ref="nextCanvas" id="next" class="bg-surface0" width="80" height="40" />
+          <Canvas
+            ref="nextCanvas"
+            id="next"
+            class="bg-surface0"
+            width="80"
+            height="40"
+          />
         </Info>
         <Info title="LEVEL">
           <span>{{ level }}</span>
