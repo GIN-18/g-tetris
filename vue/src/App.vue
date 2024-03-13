@@ -38,12 +38,16 @@ function addShape() {
   currentShape.value = nextShape.value;
   nextShape.value = getShape();
 
-  forEachShape((cs, x, y) => {
-    // game over
-    if (map.value[y] && map.value[y][x]) {
-      cancelAnimationFrame(frameId);
-    }
-  }, 0, 1);
+  forEachShape(
+    (cs, x, y) => {
+      // game over
+      if (map.value[y] && map.value[y][x]) {
+        cancelAnimationFrame(frameId);
+      }
+    },
+    0,
+    1
+  );
 
   mapCanvas.value.drawShape(currentShape);
   nextCanvas.value.drawShape(nextShape);
@@ -78,6 +82,7 @@ function moveShape(xStep, yStep) {
       if (yStep && (y >= h || (map.value[y] && map.value[y][x]))) {
         currentShape.value.y -= yStep;
         mergeShape();
+        cleanFilledRows();
         addShape();
       }
     }
@@ -101,7 +106,26 @@ function gameLoop(currentTime) {
 function mergeShape() {
   forEachShape((cs, x, y) => {
     if (y >= 0) map.value[y][x] = currentShape.value.type + 1;
-  })
+  });
+}
+
+function cleanFilledRows() {
+  const filledRows = getFilledRows()
+
+  for(let i = 0; i < filledRows.length; i++) {
+    map.value.splice(filledRows[i], 1);
+    map.value.unshift(new Array(map.value[0].length).fill(0));
+  }
+}
+
+function getFilledRows() {
+  let filledRows = [];
+  for (let i = 0; i < map.value.length; i++) {
+    if (map.value[i].every((item) => !!item)) {
+      filledRows.push(i);
+    }
+  }
+  return filledRows;
 }
 
 function forEachShape(fn, xStep = 0, yStep = 0) {
