@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { useShapeStore } from "./stores/shape";
+import { storeToRefs } from "pinia";
+import { useGameStore } from "./stores/game.js";
 
 import { getShape } from "@/assets/js/shape.js";
 
@@ -9,12 +10,13 @@ import Info from "@/components/Info.vue";
 import Button from "@/components/Button.vue";
 import Canvas from "@/components/Canvas.vue";
 
+const game = useGameStore();
+
 const mapCanvas = ref(null);
 const nextCanvas = ref(null);
 
-const shape = useShapeStore();
+const { map, currentShape, nextShape } = storeToRefs(game);
 
-const map = new Array(20).fill(0).map(() => new Array(10).fill(0));
 const score = ref(0);
 const hi_score = ref(0);
 const level = ref(1);
@@ -23,10 +25,72 @@ let gamePlay = ref(false);
 
 function playGame() {
   gamePlay.value = !gamePlay.value;
-  shape.currentShape = shape.nextShape;
-  shape.nextShape = getShape();
-  mapCanvas.value.drawShape(shape.currentShape);
-  nextCanvas.value.drawShape(shape.nextShape);
+
+  addShape();
+  gameLoop();
+}
+
+function addShape() {
+  currentShape.value = nextShape.value;
+  nextShape.value = getShape();
+
+  mapCanvas.value.drawShape(currentShape);
+  nextCanvas.value.drawShape(nextShape);
+}
+
+function rotateShape() {
+  const currentRotation = currentShape.rotation;
+  const tempRotation = (currentShape.rotation += 1);
+
+  const resultRotation = tempRotation % currentShape.pieces.length;
+
+  currentShape.rotation = resultRotation;
+  mapCanvas.value.drawShape(currentShape);
+}
+
+function moveShape(xStep, yStep) {
+  const cs = currentShape.value.pieces[currentShape.value.rotation];
+  const w = map.value[0].length;
+  const h = map.value.length;
+
+  currentShape.value.x += xStep;
+  currentShape.value.y += yStep;
+
+  for (let i = 0; i < cs.length; i++) {
+    let x = cs[i][1] + currentShape.value.x;
+    let y = cs[i][0] + currentShape.value.y;
+
+    if (x < 0 || x >= w) {
+      currentShape.value.x -= xStep;
+      return;
+    }
+
+    if (y >= h || map.value[y] && map.value[y][x]) {
+      currentShape.value.y -= yStep;
+      mergeShape()
+      addShape()
+    }
+  }
+
+  mapCanvas.value.drawShape(currentShape);
+}
+
+function gameLoop() {
+  const animationId = requestAnimationFrame(() => {
+    moveShape(0, 1);
+    gameLoop();
+  });
+}
+
+function mergeShape() {
+  const cs = currentShape.value.pieces[currentShape.value.rotation];
+
+  for (let i = 0; i < cs.length; i++) {
+    const x = cs[i][1] + currentShape.value.x;
+    const y = cs[i][0] + currentShape.value.y;
+
+    if (y >= 0) map.value[y][x] = currentShape.value.type + 1;
+  }
 }
 
 onMounted(() => {
@@ -44,6 +108,7 @@ onMounted(() => {
       <Canvas
         ref="mapCanvas"
         class="border-2 border-text rounded bg-mantle"
+        id="map"
         width="200"
         height="400"
       />
@@ -55,7 +120,7 @@ onMounted(() => {
           <span>{{ hi_score }}</span>
         </Info>
         <Info title="NEXT">
-          <Canvas ref="nextCanvas" class="bg-surface0" width="80" height="40" />
+          <Canvas ref="nextCanvas" id="next" class="bg-surface0" width="80" height="40" />
         </Info>
         <Info title="LEVEL">
           <span>{{ level }}</span>
@@ -76,15 +141,18 @@ onMounted(() => {
         <Button
           description="direction"
           icon="icon-[material-symbols--arrow-left-rounded]"
+          @click="moveShape(-1, 0, 0)"
         />
         <Button
           description="direction"
           icon="icon-[material-symbols--arrow-right-rounded]"
+          @click="moveShape(1, 0, 0)"
         />
       </div>
       <Button
         description="direction"
         icon="icon-[material-symbols--arrow-drop-down-rounded]"
+        @click="moveShape(0, 1, 0)"
       />
     </div>
     <div class="flex flex-col justify-between items-end w-1/2">
@@ -110,6 +178,7 @@ onMounted(() => {
       <Button
         description="rotate"
         icon="icon-[material-symbols--rotate-right-rounded]"
+        @click="rotateShape"
       />
     </div>
   </div>

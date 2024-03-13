@@ -136,6 +136,6 @@ export function getShape() {
     y: type === 1 ? -1 : -2,
     type,
     rotation: 0,
-    piece: shapeTable[type],
+    pieces: shapeTable[type],
   };
 }
