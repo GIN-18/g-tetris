@@ -10,14 +10,15 @@ import { options } from "@/assets/js/options.js";
 import Logo from "@/components/Logo.vue";
 import Info from "@/components/Info.vue";
 import Button from "@/components/Button.vue";
-import nextCanvas from "@/components/nextCanvas.vue";
+import MapCanvas from "@/components/MapCanvas.vue";
+import NextCanvas from "@/components/NextCanvas.vue";
 
 const game = useGameStore();
-
-
 const { map, currentShape, nextShape } = storeToRefs(game);
 
-const block = 20
+const mapCanvas = ref(null);
+const nextCanvas = ref(null);
+
 const score = ref(0);
 const hi_score = ref(0);
 const level = ref(1);
@@ -25,9 +26,9 @@ const level = ref(1);
 let gamePlay = ref(false);
 let gameOver = ref(false);
 
-let dropTimer = ref(0)
+let dropTimer = ref(0);
 
-let fastForward = 0
+let fastForward = 0;
 
 function playGame() {
   gamePlay.value = !gamePlay.value;
@@ -37,7 +38,7 @@ function playGame() {
   }
 
   addShape();
-  setDropTimer()
+  setDropTimer();
 }
 
 function addShape() {
@@ -64,31 +65,31 @@ function addShape() {
 function setDropTimer() {
   let timestep = Math.round(80 + 800 * Math.pow(0.75, level.value - 1));
 
-  fastForward ? timestep = 80 : timestep = Math.max(10, timestep);
+  fastForward ? (timestep = 80) : (timestep = Math.max(10, timestep));
 
-  if(dropTimer.value) {
+  if (dropTimer.value) {
     clearTimeout(dropTimer.value);
   }
 
   dropTimer.value = setTimeout(() => {
-    fallToLand()
+    fallToLand();
   }, timestep);
 }
 
 function fallToLand() {
-  if (moveShape(0, 1)) return
-  landShape()
+  if (moveShape(0, 1)) return;
+  landShape();
 }
 
 function landShape() {
-  mergeShape()
+  mergeShape();
 
-  const filledRows = getFilledRows()
+  const filledRows = getFilledRows();
 
   if (filledRows.length > 0) {
-    cleanFilledRows()
+    cleanFilledRows();
   } else {
-    addShape()
+    addShape();
   }
 }
 
@@ -106,7 +107,7 @@ function moveShape(xStep, yStep) {
   const w = map.value[0].length;
   const h = map.value.length;
 
-  let canMove = true
+  let canMove = true;
 
   forEachShape((cs, x, y) => {
     for (let i = 0; i < cs.length; i++) {
@@ -114,13 +115,13 @@ function moveShape(xStep, yStep) {
       const y = cs[i][0] + currentShape.value.y + yStep;
 
       if (x < 0 || x >= w || y >= h || (map.value[y] && map.value[y][x])) {
-        canMove = false
-        return canMove
+        canMove = false;
+        return canMove;
       }
     }
   });
 
-  if(canMove) {
+  if (canMove) {
     currentShape.value.x += xStep;
     currentShape.value.y += yStep;
     mapCanvas.value.drawShape(currentShape);
@@ -153,7 +154,7 @@ function updateScore(filledRows) {
 }
 
 function updateLevel() {
-  if(level.value >= 40) return
+  if (level.value >= 40) return;
 
   let nextLevelScore = level.value + 1 + 100 * level.value;
 
@@ -199,6 +200,7 @@ onMounted(() => {
 
   <main>
     <div class="flex justify-around items-center w-full h-full">
+      <mapCanvas ref="mapCanvas" />
       <div class="flex flex-col justify-between items-center h-full">
         <Info title="SCORE">
           <span>{{ score }}</span>
@@ -207,7 +209,7 @@ onMounted(() => {
           <span>{{ hi_score }}</span>
         </Info>
         <Info title="NEXT">
-          <nextCanvas ref="nextCanvas" />
+          <NextCanvas ref="nextCanvas" />
         </Info>
         <Info title="LEVEL">
           <span>{{ level }}</span>
@@ -240,7 +242,8 @@ onMounted(() => {
       <Button
         description="direction"
         icon="icon-[material-symbols--arrow-drop-down-rounded]"
-        @touchstart.prevent="moveShapeDown('down')" @touchend.prevent="moveShapeDown('stop')"
+        @touchstart.prevent="moveShapeDown('down')"
+        @touchend.prevent="moveShapeDown('stop')"
       />
     </div>
     <div class="flex flex-col justify-between items-end w-1/2">

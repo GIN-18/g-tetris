@@ -24,7 +24,7 @@ function drawShape() {
   let yStep = 0;
 
   ctx.value.clearRect(0, 0, W, H);
-  ctx.value.fillStyle = options.palette.mocha.shapeColor[type - 1];
+  ctx.value.fillStyle = options.palette.mocha.shapeColor[t - 1];
 
   if (t === 0) {
     xStep = 0;
