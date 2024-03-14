@@ -4,9 +4,9 @@ import { storeToRefs } from "pinia";
 import { useGameStore } from "@/stores/game.js";
 
 import { options } from "@/assets/js/options.js";
+import { forEachShape } from "@/assets/js/utils.js";
 
 const game = useGameStore();
-
 const { block, currentShape } = storeToRefs(game);
 
 const canvas = ref(null);
@@ -25,11 +25,14 @@ function drawShape() {
   ctx.value.clearRect(0, 0, W, H);
   ctx.value.fillStyle = options.palette.mocha.shapeColor[t - 1];
 
-  for (let i = 0; i < cs.length; i++) {
-    const x = cs[i][1] + xStep;
-    const y = cs[i][0] + yStep;
-    ctx.value.fillRect(x * b, y * b, b, b);
-  }
+  forEachShape(
+    currentShape,
+    (cs, x, y) => {
+      ctx.value.fillRect(x * b, y * b, b, b);
+    },
+    xStep,
+    yStep
+  );
 }
 
 defineExpose({
@@ -42,5 +45,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <canvas ref="canvas" class="border-2 border-text rounded bg-crust" :width="W" :height="H"></canvas>
+  <canvas
+    ref="canvas"
+    class="border-2 border-text rounded bg-crust"
+    :width="W"
+    :height="H"
+  ></canvas>
 </template>

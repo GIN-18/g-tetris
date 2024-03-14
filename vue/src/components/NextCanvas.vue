@@ -4,9 +4,9 @@ import { storeToRefs } from "pinia";
 import { useGameStore } from "@/stores/game.js";
 
 import { options } from "@/assets/js/options.js";
+import { forEachShape } from "@/assets/js/utils.js";
 
 const game = useGameStore();
-
 const { block, nextShape } = storeToRefs(game);
 
 const canvas = ref(null);
@@ -16,7 +16,6 @@ const W = 80;
 const H = 40;
 
 function drawShape() {
-  const ns = nextShape.value.pieces[nextShape.value.rotation];
   const b = block.value;
   const t = nextShape.value.type;
 
@@ -24,7 +23,7 @@ function drawShape() {
   let yStep = 0;
 
   ctx.value.clearRect(0, 0, W, H);
-  ctx.value.fillStyle = options.palette.mocha.shapeColor[t - 1];
+  ctx.value.fillStyle = options.palette.mocha.shapeColor[t];
 
   if (t === 0) {
     xStep = 0;
@@ -37,11 +36,14 @@ function drawShape() {
     yStep = 0;
   }
 
-  for (let i = 0; i < ns.length; i++) {
-    const x = ns[i][1] + xStep;
-    const y = ns[i][0] + yStep;
-    ctx.value.fillRect(x * b, y * b, b, b);
-  }
+  forEachShape(
+    nextShape,
+    (ns, x, y) => {
+      ctx.value.fillRect(x * b, y * b, b, b);
+    },
+    xStep,
+    yStep
+  );
 }
 
 defineExpose({
@@ -49,10 +51,15 @@ defineExpose({
 });
 
 onMounted(() => {
-  drawShape()
+  drawShape();
 });
 </script>
 
 <template>
-  <canvas ref="canvas" class="bg-crust" :width="W" :height="H"></canvas>
+  <canvas
+    ref="canvas"
+    class="bg-surface0"
+    :width="W"
+    :height="H"
+  ></canvas>
 </template>
