@@ -4,7 +4,7 @@ import { storeToRefs } from "pinia";
 import { useGameStore } from "./stores/game.js";
 
 import { getShape } from "@/assets/js/shape.js";
-import { preventZoom } from "@/assets/js/utils.js";
+import { preventZoom, forEachShape } from "@/assets/js/utils.js";
 import { options } from "@/assets/js/options.js";
 
 import Logo from "@/components/Logo.vue";
@@ -26,6 +26,9 @@ const level = ref(1);
 let gamePlay = ref(false);
 let gameOver = ref(false);
 
+let canMove = true;
+let shapeLand = false
+
 let dropTimer = ref(0);
 
 let fastForward = 0;
@@ -46,14 +49,16 @@ function addShape() {
   nextShape.value = getShape();
 
   forEachShape(
-    (cs, x, y) => {
+    currentShape,
+    (shape, x, y) => {
       // game over
       if (map.value[y] && map.value[y][x]) {
         gameOver.value = true;
+        console.log('game over')
       }
     },
-    0,
-    1
+    currentShape.value.x,
+    currentShape.value.y + 1,
   );
 
   if (gameOver.value) return;
@@ -71,26 +76,31 @@ function setDropTimer() {
     clearTimeout(dropTimer.value);
   }
 
-  dropTimer.value = setTimeout(() => {
-    fallToLand();
+  dropTimer.value = setInterval(() => {
+    fallShape();
   }, timestep);
 }
 
-function fallToLand() {
-  if (moveShape(0, 1)) return;
+function fallShape() {
+  if (!shapeLand) {
+    moveShape(0, 1);
+    return;
+  }
   landShape();
 }
 
 function landShape() {
+  shapeLand = false
   mergeShape();
+  addShape();
 
-  const filledRows = getFilledRows();
-
-  if (filledRows.length > 0) {
-    cleanFilledRows();
-  } else {
-    addShape();
-  }
+  // const filledRows = getFilledRows();
+  //
+  // if (filledRows.length > 0) {
+  //   cleanFilledRows();
+  // } else {
+  //   addShape();
+  // }
 }
 
 function rotateShape() {
@@ -107,19 +117,22 @@ function moveShape(xStep, yStep) {
   const w = map.value[0].length;
   const h = map.value.length;
 
-  let canMove = true;
+  canMove = true
 
-  forEachShape((cs, x, y) => {
-    for (let i = 0; i < cs.length; i++) {
-      const x = cs[i][1] + currentShape.value.x + xStep;
-      const y = cs[i][0] + currentShape.value.y + yStep;
-
+  forEachShape(
+    currentShape,
+    (shape, x, y) => {
       if (x < 0 || x >= w || y >= h || (map.value[y] && map.value[y][x])) {
         canMove = false;
-        return canMove;
       }
-    }
-  });
+
+      if(y >= h || (map.value[y] && map.value[y][x])) {
+        shapeLand = true
+      }
+    },
+    currentShape.value.x + xStep,
+    currentShape.value.y + yStep
+  )
 
   if (canMove) {
     currentShape.value.x += xStep;
@@ -129,9 +142,16 @@ function moveShape(xStep, yStep) {
 }
 
 function mergeShape() {
-  forEachShape((cs, x, y) => {
-    if (y >= 0) map.value[y][x] = currentShape.value.type + 1;
-  });
+  const t = currentShape.value.type;
+
+  forEachShape(
+    currentShape,
+    (shape, x, y) => {
+      if (y >= 0) map.value[y][x] = t + 1;
+    },
+    currentShape.value.x,
+    currentShape.value.y,
+  );
 }
 
 function cleanFilledRows() {
@@ -174,22 +194,9 @@ function getFilledRows() {
   return filledRows;
 }
 
-function drawMap() {}
-
-function forEachShape(fn, xStep = 0, yStep = 0) {
-  const cs = currentShape.value.pieces[currentShape.value.rotation];
-
-  for (let i = 0; i < cs.length; i++) {
-    const x = cs[i][1] + currentShape.value.x + xStep;
-    const y = cs[i][0] + currentShape.value.y + yStep;
-
-    fn(cs, x, y);
-  }
-}
-
 onMounted(() => {
   document.body.classList.add("mocha");
-  preventZoom();
+  // preventZoom();
 });
 </script>
 
@@ -231,12 +238,12 @@ onMounted(() => {
         <Button
           description="direction"
           icon="icon-[material-symbols--arrow-left-rounded]"
-          @click.prevent="moveShape(-1, 0, 0)"
+          @click.prevent="moveShape(-1, 0)"
         />
         <Button
           description="direction"
           icon="icon-[material-symbols--arrow-right-rounded]"
-          @click.prevent="moveShape(1, 0, 0)"
+          @click.prevent="moveShape(1, 0)"
         />
       </div>
       <Button

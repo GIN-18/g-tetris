@@ -3,7 +3,6 @@ import { getShape } from "@/assets/js/shape.js";
 
 export const useGameStore = defineStore("game", {
   state: () => ({
-    block: 20,
     map: new Array(20).fill(0).map(() => new Array(10).fill(0)),
     currentShape: null,
     nextShape: getShape(),

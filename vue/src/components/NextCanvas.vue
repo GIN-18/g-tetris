@@ -12,11 +12,11 @@ const { block, nextShape } = storeToRefs(game);
 const canvas = ref(null);
 const ctx = computed(() => canvas.value.getContext("2d"));
 
+const BLOCK = 20;
 const W = 80;
 const H = 40;
 
 function drawShape() {
-  const b = block.value;
   const t = nextShape.value.type;
 
   let xStep = 0;
@@ -39,7 +39,7 @@ function drawShape() {
   forEachShape(
     nextShape,
     (ns, x, y) => {
-      ctx.value.fillRect(x * b, y * b, b, b);
+      ctx.value.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
     },
     xStep,
     yStep
