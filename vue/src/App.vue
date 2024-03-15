@@ -35,9 +35,26 @@ let down = false;
 function playGame() {
   gamePlay.value = !gamePlay.value;
 
-  if(!dropTimer) addShape()
-  if(gamePlay.value) setDropTimer();
+  if (!dropTimer) addShape();
+  if (gamePlay.value) setDropTimer();
   if (!gamePlay.value && dropTimer) clearInterval(dropTimer);
+}
+
+function replayGame() {
+  if (dropTimer) clearInterval(dropTimer);
+
+  map.value = new Array(20).fill(0).map(() => new Array(10).fill(0));
+  currentShape.value = null;
+  previewShape.value = null;
+  nextShape.value = getShape();
+  score.value = 0;
+  level.value = 1;
+  filledRows.length = 0;
+  gamePlay.value = false;
+  gameOver.value = false;
+
+  mapCanvas.value.clearMap();
+  nextCanvas.value.drawShape(nextShape);
 }
 
 function moveShapeDown(direction, enable) {
@@ -304,6 +321,7 @@ onMounted(() => {
         <Button
           description="box"
           icon="icon-[material-symbols--replay-rounded]"
+          @click.prevent="replayGame"
         />
         <Button
           description="box"

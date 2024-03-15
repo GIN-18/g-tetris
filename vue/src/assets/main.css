@@ -8,9 +8,9 @@
 }
 
 html, body {
-  @apply h-full;
+  @apply w-full h-full;
 }
 
 #app {
-  @apply flex flex-col justify-between h-full p-2 bg-base text-text;
+  @apply flex flex-col justify-between w-full h-full p-2 bg-base text-text;
 }

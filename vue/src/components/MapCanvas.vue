@@ -31,17 +31,15 @@ function drawShape() {
   ctx.value.clearRect(0, 0, W, H);
 
   // draw preview shape
-  if (currentY < previewFinalY) {
-    ctx.value.fillStyle = options.palette.mocha.previewShapeColor;
-    forEachShape(
-      previewShape,
-      (shape, x, y) => {
-        ctx.value.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
-      },
-      previewX,
-      previewFinalY
-    );
-  }
+  ctx.value.fillStyle = options.palette.mocha.previewShapeColor;
+  forEachShape(
+    previewShape,
+    (shape, x, y) => {
+      ctx.value.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
+    },
+    previewX,
+    previewFinalY
+  );
 
   // draw current shape
   ctx.value.fillStyle = options.palette.mocha.shapeColor[type];
