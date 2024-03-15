@@ -4,7 +4,6 @@ import { storeToRefs } from "pinia";
 import { useGameStore } from "./stores/game.js";
 
 import { getShape } from "@/assets/js/shape.js";
-import { preventZoom, forEachShape } from "@/assets/js/utils.js";
 import { options } from "@/assets/js/options.js";
 
 import Logo from "@/components/Logo.vue";
@@ -26,19 +25,12 @@ const level = ref(1);
 let gamePlay = ref(false);
 let gameOver = ref(false);
 
-let canMove = true;
-let shapeLand = false;
-
 let dropTimer = 0;
 let drop = false;
 let down = false;
 
 function playGame() {
-  gamePlay.value = !gamePlay.value;
-
-  if (!gamePlay.value) {
-    return;
-  }
+  // gamePlay.value = !gamePlay.value;
 
   addShape();
   setDropTimer();
@@ -58,20 +50,20 @@ function addShape() {
   currentShape.value = nextShape.value;
   nextShape.value = getShape();
 
-  forEachShape(
-    currentShape,
-    (shape, x, y) => {
-      // game over
-      if (map.value[y] && map.value[y][x]) {
-        gameOver.value = true;
-        console.log("game over");
-      }
-    },
-    currentShape.value.x,
-    currentShape.value.y + 1
-  );
+  // forEachShape(
+  //   currentShape,
+  //   (shape, x, y) => {
+  //     // game over
+  //     if (map.value[y] && map.value[y][x]) {
+  //       gameOver.value = true;
+  //       console.log("game over");
+  //     }
+  //   },
+  //   currentShape.value.x,
+  //   currentShape.value.y
+  // );
 
-  if (gameOver.value) return;
+  // if (gameOver.value) return;
 
   mapCanvas.value.drawShape(currentShape);
   nextCanvas.value.drawShape(nextShape);
@@ -98,28 +90,23 @@ function setDropTimer() {
 }
 
 function fallShape() {
-  if (!shapeLand) {
-    moveShape(0, 1);
-    return;
-  }
+  if (moveShape(0, 1)) return;
   landShape();
 }
 
 function landShape() {
-  shapeLand = false;
-  drop = false;
-
-  setDropTimer();
+  if (drop) drop = false;
 
   mergeShape();
 
   const filledRows = getFilledRows();
 
   if (filledRows.length > 0) {
-    cleanFilledRows();
-  } else {
-    addShape();
+    cleanFilledRows(filledRows);
   }
+
+  addShape();
+  setDropTimer();
 }
 
 function rotateShape() {
@@ -133,56 +120,49 @@ function rotateShape() {
 }
 
 function moveShape(xStep, yStep) {
+  const cs = currentShape.value.pieces[currentShape.value.rotation];
+  const m = map.value;
   const w = map.value[0].length;
   const h = map.value.length;
 
-  canMove = true;
+  let canMove = true;
 
-  forEachShape(
-    currentShape,
-    (shape, x, y) => {
-      if (x < 0 || x >= w || y >= h || (map.value[y] && map.value[y][x])) {
-        canMove = false;
-      }
+  for (let i = 0; i < cs.length; i++) {
+    const x = cs[i][1] + currentShape.value.x + xStep;
+    const y = cs[i][0] + currentShape.value.y + yStep;
 
-      if (y >= h || (map.value[y] && map.value[y][x])) {
-        shapeLand = true;
-      }
-    },
-    currentShape.value.x + xStep,
-    currentShape.value.y + yStep
-  );
+    if (x < 0 || x >= w || y >= h || (m[y] && m[y][x])) {
+      canMove = false;
+      return canMove;
+    }
+  }
 
   if (canMove) {
     currentShape.value.x += xStep;
     currentShape.value.y += yStep;
     mapCanvas.value.drawShape(currentShape);
   }
+
+  return canMove
 }
 
 function mergeShape() {
+  const cs = currentShape.value.pieces[currentShape.value.rotation];
   const t = currentShape.value.type;
 
-  forEachShape(
-    currentShape,
-    (shape, x, y) => {
-      if (y >= 0) map.value[y][x] = t + 1;
-    },
-    currentShape.value.x,
-    currentShape.value.y
-  );
+  for (let i = 0; i < cs.length; i++) {
+    const x = cs[i][1] + currentShape.value.x;
+    const y = cs[i][0] + currentShape.value.y;
+
+    if (y >= 0) map.value[y][x] = t + 1;
+  }
 }
 
-function cleanFilledRows() {
-  const filledRows = getFilledRows();
-
+function cleanFilledRows(filledRows) {
   for (let i = 0; i < filledRows.length; i++) {
     map.value.splice(filledRows[i], 1);
-    map.value.unshift(new Array(map.value[0].length).fill(0));
+    map.value.unshift(new Array(10).fill(0));
   }
-
-  updateScore(filledRows);
-  updateLevel();
 }
 
 function updateScore(filledRows) {
@@ -204,12 +184,15 @@ function updateLevel() {
 }
 
 function getFilledRows() {
-  let filledRows = [];
-  for (let i = 0; i < map.value.length; i++) {
-    if (map.value[i].every((item) => !!item)) {
+  const m = map.value;
+  const filledRows = [];
+
+  for (let i = 0; i < m.length; i++) {
+    if (m[i].every((item) => !!item)) {
       filledRows.push(i);
     }
   }
+
   return filledRows;
 }
 
