@@ -23,6 +23,8 @@ const score = ref(0);
 const hi_score = ref(0);
 const level = ref(1);
 
+const filledRows = []
+
 let gamePlay = ref(false);
 let gameOver = ref(false);
 
@@ -98,11 +100,10 @@ function landShape() {
   if (drop) drop = false;
 
   mergeShape();
-
-  const filledRows = getFilledRows();
+  getFilledRows()
 
   if (filledRows.length > 0) {
-    cleanFilledRows(filledRows);
+    cleanFilledRows();
   }
 
   addShape();
@@ -110,21 +111,20 @@ function landShape() {
 }
 
 function rotateShape() {
-  let {
+  const {
     x: currentX,
     y: currentY,
     pieces: currentPieces,
     rotation: currentRotation,
   } = currentShape.value;
 
-  const currentPiece = currentPieces[currentRotation];
-
   const nowRotation = currentRotation;
-  const tempRotation = (currentRotation += 1);
-  const resultRotation = tempRotation % currentPieces.length;
+  const resultRotation = (currentRotation + 1) % currentPieces.length;
 
   currentShape.value.rotation = resultRotation;
   previewShape.value.rotation = resultRotation;
+
+  const currentPiece = currentShape.value.pieces[currentShape.value.rotation];
 
   for (let i = 0; i < currentPiece.length; i++) {
     const x = currentPiece[i][1] + currentX;
@@ -146,7 +146,14 @@ function rotateShape() {
 }
 
 function moveShape(xStep, yStep) {
-  const cs = currentShape.value.pieces[currentShape.value.rotation];
+  const {
+    x: currentX,
+    y: currentY,
+    pieces: currentPieces,
+    rotation: currentRotation,
+  } = currentShape.value;
+
+  const cs = currentPieces[currentRotation];
   const m = map.value;
   const w = map.value[0].length;
   const h = map.value.length;
@@ -154,8 +161,8 @@ function moveShape(xStep, yStep) {
   let canMove = true;
 
   for (let i = 0; i < cs.length; i++) {
-    const x = cs[i][1] + currentShape.value.x + xStep;
-    const y = cs[i][0] + currentShape.value.y + yStep;
+    const x = cs[i][1] + currentX + xStep;
+    const y = cs[i][0] + currentY + yStep;
 
     if (x < 0 || x >= w || y >= h || (m[y] && m[y][x])) {
       canMove = false;
@@ -174,25 +181,26 @@ function moveShape(xStep, yStep) {
 }
 
 function mergeShape() {
-  const cs = currentShape.value.pieces[currentShape.value.rotation];
-  const t = currentShape.value.type;
+  const { type, x, y } = currentShape.value;
 
-  for (let i = 0; i < cs.length; i++) {
-    const x = cs[i][1] + currentShape.value.x;
-    const y = cs[i][0] + currentShape.value.y;
-
-    if (y >= 0) map.value[y][x] = t + 1;
-  }
+  forEachShape(
+    currentShape,
+    (shape, x, y) => {
+      if (y >= 0) map.value[y][x] = type + 1;
+    },
+    x,
+    y
+  );
 }
 
-function cleanFilledRows(filledRows) {
+function cleanFilledRows() {
   for (let i = 0; i < filledRows.length; i++) {
     map.value.splice(filledRows[i], 1);
     map.value.unshift(new Array(10).fill(0));
   }
 }
 
-function updateScore(filledRows) {
+function updateScore() {
   if (filledRows.length > 0) {
     score.value +=
       (filledRows.length * level.value + (filledRows.length - 1)) * 10;
@@ -212,15 +220,14 @@ function updateLevel() {
 
 function getFilledRows() {
   const m = map.value;
-  const filledRows = [];
+
+  filledRows.length = 0; // clear array
 
   for (let i = 0; i < m.length; i++) {
     if (m[i].every((item) => !!item)) {
       filledRows.push(i);
     }
   }
-
-  return filledRows;
 }
 
 onMounted(() => {
