@@ -27,11 +27,11 @@ let gamePlay = ref(false);
 let gameOver = ref(false);
 
 let canMove = true;
-let shapeLand = false
+let shapeLand = false;
 
-let dropTimer = ref(0);
-
-let fastForward = 0;
+let dropTimer = 0;
+let drop = false;
+let down = false;
 
 function playGame() {
   gamePlay.value = !gamePlay.value;
@@ -41,6 +41,16 @@ function playGame() {
   }
 
   addShape();
+  setDropTimer();
+}
+
+function moveShapeDown(direction, enable) {
+  if (direction === "down") {
+    down = enable;
+  } else {
+    drop = enable;
+  }
+
   setDropTimer();
 }
 
@@ -54,11 +64,11 @@ function addShape() {
       // game over
       if (map.value[y] && map.value[y][x]) {
         gameOver.value = true;
-        console.log('game over')
+        console.log("game over");
       }
     },
     currentShape.value.x,
-    currentShape.value.y + 1,
+    currentShape.value.y + 1
   );
 
   if (gameOver.value) return;
@@ -70,13 +80,19 @@ function addShape() {
 function setDropTimer() {
   let timestep = Math.round(80 + 800 * Math.pow(0.75, level.value - 1));
 
-  fastForward ? (timestep = 80) : (timestep = Math.max(10, timestep));
-
-  if (dropTimer.value) {
-    clearTimeout(dropTimer.value);
+  if (drop) {
+    timestep = 10;
+  } else if (down) {
+    timestep = 80;
+  } else {
+    timestep = Math.max(10, timestep);
   }
 
-  dropTimer.value = setInterval(() => {
+  if (dropTimer) {
+    clearTimeout(dropTimer);
+  }
+
+  dropTimer = setInterval(() => {
     fallShape();
   }, timestep);
 }
@@ -90,17 +106,20 @@ function fallShape() {
 }
 
 function landShape() {
-  shapeLand = false
-  mergeShape();
-  addShape();
+  shapeLand = false;
+  drop = false;
 
-  // const filledRows = getFilledRows();
-  //
-  // if (filledRows.length > 0) {
-  //   cleanFilledRows();
-  // } else {
-  //   addShape();
-  // }
+  setDropTimer();
+
+  mergeShape();
+
+  const filledRows = getFilledRows();
+
+  if (filledRows.length > 0) {
+    cleanFilledRows();
+  } else {
+    addShape();
+  }
 }
 
 function rotateShape() {
@@ -117,7 +136,7 @@ function moveShape(xStep, yStep) {
   const w = map.value[0].length;
   const h = map.value.length;
 
-  canMove = true
+  canMove = true;
 
   forEachShape(
     currentShape,
@@ -126,13 +145,13 @@ function moveShape(xStep, yStep) {
         canMove = false;
       }
 
-      if(y >= h || (map.value[y] && map.value[y][x])) {
-        shapeLand = true
+      if (y >= h || (map.value[y] && map.value[y][x])) {
+        shapeLand = true;
       }
     },
     currentShape.value.x + xStep,
     currentShape.value.y + yStep
-  )
+  );
 
   if (canMove) {
     currentShape.value.x += xStep;
@@ -150,7 +169,7 @@ function mergeShape() {
       if (y >= 0) map.value[y][x] = t + 1;
     },
     currentShape.value.x,
-    currentShape.value.y,
+    currentShape.value.y
   );
 }
 
@@ -232,7 +251,7 @@ onMounted(() => {
       <Button
         description="direction"
         icon="icon-[material-symbols--arrow-downward-alt-rounded]"
-        @touchstart.prevent="moveShapeDown('drop')"
+        @click.prevent="moveShapeDown('drop', true)"
       />
       <div class="flex justify-between w-full">
         <Button
@@ -249,8 +268,8 @@ onMounted(() => {
       <Button
         description="direction"
         icon="icon-[material-symbols--arrow-drop-down-rounded]"
-        @touchstart.prevent="moveShapeDown('down')"
-        @touchend.prevent="moveShapeDown('stop')"
+        @touchstart.prevent="moveShapeDown('down', true)"
+        @touchend.prevent="moveShapeDown('down', false)"
       />
     </div>
     <div class="flex flex-col justify-between items-end w-1/2">
