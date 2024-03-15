@@ -23,7 +23,7 @@ const score = ref(0);
 const hi_score = ref(0);
 const level = ref(1);
 
-const filledRows = []
+const filledRows = [];
 
 let gamePlay = ref(false);
 let gameOver = ref(false);
@@ -33,10 +33,11 @@ let drop = false;
 let down = false;
 
 function playGame() {
-  // gamePlay.value = !gamePlay.value;
+  gamePlay.value = !gamePlay.value;
 
-  addShape();
-  setDropTimer();
+  if(!dropTimer) addShape()
+  if(gamePlay.value) setDropTimer();
+  if (!gamePlay.value && dropTimer) clearInterval(dropTimer);
 }
 
 function moveShapeDown(direction, enable) {
@@ -100,7 +101,7 @@ function landShape() {
   if (drop) drop = false;
 
   mergeShape();
-  getFilledRows()
+  getFilledRows();
 
   if (filledRows.length > 0) {
     cleanFilledRows();
