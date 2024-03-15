@@ -110,13 +110,39 @@ function landShape() {
 }
 
 function rotateShape() {
-  const currentRotation = currentShape.value.rotation;
-  const tempRotation = (currentShape.value.rotation += 1);
+  let {
+    x: currentX,
+    y: currentY,
+    pieces: currentPieces,
+    rotation: currentRotation,
+  } = currentShape.value;
 
-  const resultRotation = tempRotation % currentShape.value.pieces.length;
+  const currentPiece = currentPieces[currentRotation];
+
+  const nowRotation = currentRotation;
+  const tempRotation = (currentRotation += 1);
+  const resultRotation = tempRotation % currentPieces.length;
 
   currentShape.value.rotation = resultRotation;
+  previewShape.value.rotation = resultRotation;
+
+  for (let i = 0; i < currentPiece.length; i++) {
+    const x = currentPiece[i][1] + currentX;
+    const y = currentPiece[i][0] + currentY;
+
+    if (
+      y >= 0 &&
+      (map.value[y] === undefined ||
+        map.value[y][x] === undefined ||
+        map.value[y][x] > 0)
+    ) {
+      currentShape.value.rotation = nowRotation;
+      previewShape.value.rotation = nowRotation;
+    }
+  }
+
   mapCanvas.value.drawShape(currentShape);
+  mapCanvas.value.drawShape(previewShape);
 }
 
 function moveShape(xStep, yStep) {

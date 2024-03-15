@@ -31,21 +31,23 @@ function drawShape() {
   ctx.value.clearRect(0, 0, W, H);
 
   // draw preview shape
-  forEachShape(
-    previewShape,
-    (shape, x, y) => {
-      ctx.value.fillStyle = options.palette.mocha.previewShapeColor;
-      ctx.value.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
-    },
-    previewX,
-    previewFinalY
-  );
+  if (currentY < previewFinalY) {
+    ctx.value.fillStyle = options.palette.mocha.previewShapeColor;
+    forEachShape(
+      previewShape,
+      (shape, x, y) => {
+        ctx.value.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
+      },
+      previewX,
+      previewFinalY
+    );
+  }
 
   // draw current shape
+  ctx.value.fillStyle = options.palette.mocha.shapeColor[type];
   forEachShape(
     currentShape,
     (shape, x, y) => {
-      ctx.value.fillStyle = options.palette.mocha.shapeColor[type];
       ctx.value.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
     },
     currentX,
@@ -59,8 +61,8 @@ function drawShape() {
       const y = previewPiece[i][0] + offset;
 
       if (
-        (offset >= currentShape.value.y && y > map.value.length - 2) ||
-        (map.value[y] && map.value[y + 1][x])
+        offset >= currentShape.value.y &&
+        (y > map.value.length - 2 || (map.value[y] && map.value[y + 1][x]))
       ) {
         return offset;
       }
