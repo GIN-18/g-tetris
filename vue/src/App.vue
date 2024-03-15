@@ -5,6 +5,7 @@ import { useGameStore } from "./stores/game.js";
 
 import { getShape } from "@/assets/js/shape.js";
 import { options } from "@/assets/js/options.js";
+import { forEachShape } from "@/assets/js/utils.js";
 
 import Logo from "@/components/Logo.vue";
 import Info from "@/components/Info.vue";
@@ -13,7 +14,7 @@ import MapCanvas from "@/components/MapCanvas.vue";
 import NextCanvas from "@/components/NextCanvas.vue";
 
 const game = useGameStore();
-const { map, currentShape, nextShape } = storeToRefs(game);
+const { map, currentShape, previewShape, nextShape } = storeToRefs(game);
 
 const mapCanvas = ref(null);
 const nextCanvas = ref(null);
@@ -48,24 +49,23 @@ function moveShapeDown(direction, enable) {
 
 function addShape() {
   currentShape.value = nextShape.value;
+  previewShape.value = { ...currentShape.value };
   nextShape.value = getShape();
 
-  // forEachShape(
-  //   currentShape,
-  //   (shape, x, y) => {
-  //     // game over
-  //     if (map.value[y] && map.value[y][x]) {
-  //       gameOver.value = true;
-  //       console.log("game over");
-  //     }
-  //   },
-  //   currentShape.value.x,
-  //   currentShape.value.y
-  // );
-
-  // if (gameOver.value) return;
+  // game over
+  forEachShape(
+    currentShape,
+    (shape, x, y) => {
+      if (map.value[y] && map.value[y][x]) {
+        gameOver.value = true;
+      }
+    },
+    currentShape.value.x,
+    currentShape.value.y
+  );
 
   mapCanvas.value.drawShape(currentShape);
+  mapCanvas.value.drawShape(previewShape);
   nextCanvas.value.drawShape(nextShape);
 }
 
@@ -140,10 +140,11 @@ function moveShape(xStep, yStep) {
   if (canMove) {
     currentShape.value.x += xStep;
     currentShape.value.y += yStep;
+    previewShape.value.x += xStep;
     mapCanvas.value.drawShape(currentShape);
   }
 
-  return canMove
+  return canMove;
 }
 
 function mergeShape() {

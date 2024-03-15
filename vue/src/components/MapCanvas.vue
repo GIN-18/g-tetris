@@ -7,7 +7,7 @@ import { options } from "@/assets/js/options.js";
 import { forEachShape } from "@/assets/js/utils.js";
 
 const game = useGameStore();
-const { block, map, currentShape } = storeToRefs(game);
+const { block, map, currentShape, previewShape } = storeToRefs(game);
 
 const canvas = ref(null);
 const ctx = computed(() => canvas.value.getContext("2d"));
@@ -17,21 +17,57 @@ const W = 200;
 const H = 400;
 
 function drawShape() {
-  const t = currentShape.value.type;
-  const xStep = currentShape.value.x;
-  const yStep = currentShape.value.y;
+  const { type, x: currentX, y: currentY } = currentShape.value;
+  const {
+    pieces: previewPieces,
+    rotation: previewRotation,
+    x: previewX,
+    y: previewY,
+  } = previewShape.value;
+
+  const previewPiece = previewPieces[previewRotation];
+  const previewFinalY = getPreviewYOffset(previewY);
 
   ctx.value.clearRect(0, 0, W, H);
-  ctx.value.fillStyle = options.palette.mocha.shapeColor[t];
 
+  // draw preview shape
+  forEachShape(
+    previewShape,
+    (shape, x, y) => {
+      ctx.value.fillStyle = options.palette.mocha.previewShapeColor;
+      ctx.value.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
+    },
+    previewX,
+    previewFinalY
+  );
+
+  // draw current shape
   forEachShape(
     currentShape,
     (shape, x, y) => {
+      ctx.value.fillStyle = options.palette.mocha.shapeColor[type];
       ctx.value.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
     },
-    xStep,
-    yStep
+    currentX,
+    currentY
   );
+
+  // get preview y offset
+  function getPreviewYOffset(offset) {
+    for (let i = 0; i < previewPiece.length; i++) {
+      const x = previewPiece[i][1] + previewShape.value.x;
+      const y = previewPiece[i][0] + offset;
+
+      if (
+        (offset >= currentShape.value.y && y > map.value.length - 2) ||
+        (map.value[y] && map.value[y + 1][x])
+      ) {
+        return offset;
+      }
+    }
+
+    return getPreviewYOffset(offset + 1);
+  }
 
   drawMap();
 }
