@@ -23,22 +23,20 @@ onMounted(() => {
 
 function addClass(btn) {
   if (props.description === 'rotate') {
-    btn.classList.add('w-32', 'h-32', 'rounded-full', 'text-4xl')
+    btn.classList.add('w-28', 'h-28', 'text-4xl')
     return
   }
 
   if(props.description === 'direction') {
-    btn.classList.add('w-16', 'h-16', 'rounded-full', 'text-2xl')
+    btn.classList.add('w-14', 'h-14', 'text-2xl')
     return
   }
-
-  btn.classList.add('p-2', 'rounded', 'text-sm')
 }
 </script>
 
 <template>
-  <button ref="button" class="flex justify-center items-center border-2 border-text">
-    <span>{{ props.text }}</span>
+  <button ref="button" class="nes-btn !flex justify-center items-center" type="button">
     <span :class="props.icon"></span>
+    <span>{{ props.text }}</span>
   </button>
 </template>

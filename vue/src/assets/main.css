@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: "Dubtronic-Inline";
-  src: url("/fonts/Dubtronic-Inline.woff") format("woff");
+  font-family: "press-start-2p";
+  src: url("/fonts/PressStart2P-Regular.ttf") format("truetype");
 }
 
 html, body {
@@ -12,5 +12,5 @@ html, body {
 }
 
 #app {
-  @apply flex flex-col justify-between w-full h-full p-2 bg-base text-text;
+  @apply flex flex-col justify-between w-full h-full p-2;
 }

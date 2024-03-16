@@ -32,6 +32,8 @@ let dropTimer = 0;
 let drop = false;
 let down = false;
 
+let volumeUp = true;
+
 function playGame() {
   gamePlay.value = !gamePlay.value;
 
@@ -55,16 +57,6 @@ function replayGame() {
 
   mapCanvas.value.clearMap();
   nextCanvas.value.drawShape(nextShape);
-}
-
-function moveShapeDown(direction, enable) {
-  if (direction === "down") {
-    down = enable;
-  } else {
-    drop = enable;
-  }
-
-  setDropTimer();
 }
 
 function addShape() {
@@ -128,7 +120,21 @@ function landShape() {
   setDropTimer();
 }
 
+function moveShapeDown(direction, enable) {
+  if (!gamePlay.value) return;
+
+  if (direction === "down") {
+    down = enable;
+  } else {
+    drop = enable;
+  }
+
+  setDropTimer();
+}
+
 function rotateShape() {
+  if (!gamePlay.value) return;
+
   const {
     x: currentX,
     y: currentY,
@@ -164,6 +170,8 @@ function rotateShape() {
 }
 
 function moveShape(xStep, yStep) {
+  if (!gamePlay.value) return;
+
   const {
     x: currentX,
     y: currentY,
@@ -249,7 +257,7 @@ function getFilledRows() {
 }
 
 onMounted(() => {
-  document.body.classList.add("mocha");
+  document.body.classList.add("latte");
   // preventZoom();
 });
 </script>
@@ -279,30 +287,30 @@ onMounted(() => {
     </div>
   </main>
 
-  <hr class="w-full border-t-2 border-dashed border-text" />
+  <hr class="w-full border-t-2 border-dashed border-black" />
 
   <div class="flex">
     <div class="flex flex-col justify-center items-center w-1/2">
       <Button
         description="direction"
-        icon="icon-[material-symbols--arrow-downward-alt-rounded]"
+        icon="icon-[pixelarticons--arrow-bar-down]"
         @click.prevent="moveShapeDown('drop', true)"
       />
       <div class="flex justify-between w-full">
         <Button
           description="direction"
-          icon="icon-[material-symbols--arrow-left-rounded]"
+          icon="icon-[pixelarticons--chevron-left]"
           @click.prevent="moveShape(-1, 0)"
         />
         <Button
           description="direction"
-          icon="icon-[material-symbols--arrow-right-rounded]"
+          icon="icon-[pixelarticons--chevron-right]"
           @click.prevent="moveShape(1, 0)"
         />
       </div>
       <Button
         description="direction"
-        icon="icon-[material-symbols--arrow-drop-down-rounded]"
+        icon="icon-[pixelarticons--chevron-down]"
         @touchstart.prevent="moveShapeDown('down', true)"
         @touchend.prevent="moveShapeDown('down', false)"
       />
@@ -313,24 +321,28 @@ onMounted(() => {
           description="box"
           :icon="
             gamePlay
-              ? 'icon-[material-symbols--pause-rounded]'
-              : 'icon-[material-symbols--play-arrow-rounded]'
+              ? 'icon-[pixelarticons--play]'
+              : 'icon-[pixelarticons--pause]'
           "
           @click.prevent="playGame"
         />
         <Button
           description="box"
-          icon="icon-[material-symbols--replay-rounded]"
+          icon="icon-[pixelarticons--reload]"
           @click.prevent="replayGame"
         />
         <Button
           description="box"
-          icon="icon-[material-symbols--volume-up-rounded]"
+          :icon="
+            volumeUp
+              ? 'icon-[pixelarticons--volume-vibrate]'
+              : 'icon-[pixelarticons--volume-x]'
+          "
         />
       </div>
       <Button
         description="rotate"
-        icon="icon-[material-symbols--rotate-right-rounded]"
+        icon="icon-[pixelarticons--redo]"
         @click.prevent="rotateShape"
       />
     </div>

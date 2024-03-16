@@ -1,17 +1,16 @@
-const { addDynamicIconSelectors } = require('@iconify/tailwind');
+const { addDynamicIconSelectors } = require("@iconify/tailwind");
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    './index.html',
-    './src/**/*.{vue,js,ts,jsx,tsx}',
-  ],
+  content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        "nes-dark": "#1E1E1E",
+      },
+    },
   },
-  plugins: [
-    require('@catppuccin/tailwindcss'),
-    addDynamicIconSelectors()
-  ],
-}
-
+  plugins: [require("@catppuccin/tailwindcss", {
+    "defaultFlavour": "latte",
+  }), addDynamicIconSelectors()],
+};

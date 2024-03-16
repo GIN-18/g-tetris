@@ -26,14 +26,11 @@ function drawShape() {
   ctx.value.fillStyle = options.palette.mocha.shapeColor[t];
 
   if (t === 0) {
-    xStep = 0;
+    xStep = -1;
     yStep = 0;
   } else if (t === 1) {
     xStep = 0;
     yStep = 1 / 2;
-  } else {
-    xStep = 1 / 2;
-    yStep = 0;
   }
 
   forEachShape(
@@ -56,10 +53,5 @@ onMounted(() => {
 </script>
 
 <template>
-  <canvas
-    ref="canvas"
-    class="bg-surface0"
-    :width="W"
-    :height="H"
-  ></canvas>
+  <canvas ref="canvas" :width="W" :height="H"></canvas>
 </template>

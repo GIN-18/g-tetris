@@ -28,7 +28,7 @@ function drawShape() {
   const previewPiece = previewPieces[previewRotation];
   const previewFinalY = getPreviewYOffset(previewY);
 
-  ctx.value.clearRect(0, 0, W, H);
+  clearMap();
 
   // draw preview shape
   ctx.value.fillStyle = options.palette.mocha.previewShapeColor;
@@ -84,16 +84,18 @@ function drawMap() {
   }
 }
 
+function clearMap() {
+  ctx.value.clearRect(0, 0, W, H);
+}
+
 defineExpose({
   drawShape,
+  clearMap,
 });
 </script>
 
 <template>
-  <canvas
-    ref="canvas"
-    class="border-2 border-text rounded bg-crust"
-    :width="W"
-    :height="H"
-  ></canvas>
+  <div class="nes-container !p-0 border-2 !border-black">
+    <canvas ref="canvas" class="bg-white" :width="W" :height="H"></canvas>
+  </div>
 </template>
