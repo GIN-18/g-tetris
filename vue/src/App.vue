@@ -4,7 +4,7 @@ import { storeToRefs } from "pinia";
 import { useGameStore } from "./stores/game.js";
 
 import { getShape } from "@/assets/js/shape.js";
-import { options } from "@/assets/js/options.js";
+import { palettes } from "@/assets/js/palettes.js";
 import { forEachShape } from "@/assets/js/utils.js";
 
 import Logo from "@/components/Logo.vue";
@@ -114,6 +114,8 @@ function landShape() {
 
   if (filledRows.length > 0) {
     cleanFilledRows();
+    updateScore();
+    updateLevel();
   }
 
   addShape();
@@ -234,13 +236,11 @@ function updateScore() {
 }
 
 function updateLevel() {
-  if (level.value >= 40) return;
-
-  let nextLevelScore = level.value + 1 + 100 * level.value;
+  let nextLevelScore = (level.value + 1) * 100 * level.value;
 
   while (score.value >= nextLevelScore) {
     level.value++;
-    nextLevelScore = level.value + 1 + 100 * level.value;
+    nextLevelScore = (level.value + 1) * 100 * level.value;
   }
 }
 
@@ -267,27 +267,25 @@ onMounted(() => {
     <Logo />
   </header>
 
-  <main>
-    <div class="flex justify-around items-center w-full h-full">
-      <mapCanvas ref="mapCanvas" />
-      <div class="flex flex-col justify-between items-center h-full">
-        <Info title="SCORE">
-          <span>{{ score }}</span>
-        </Info>
-        <Info title="HI-SCORE">
-          <span>{{ hi_score }}</span>
-        </Info>
-        <Info title="NEXT">
-          <NextCanvas ref="nextCanvas" />
-        </Info>
-        <Info title="LEVEL">
-          <span>{{ level }}</span>
-        </Info>
-      </div>
+  <main class="flex justify-between items-center w-full">
+    <mapCanvas ref="mapCanvas" />
+    <div class="flex flex-col justify-between items-center h-full">
+      <Info title="SCORE">
+        <span>{{ score }}</span>
+      </Info>
+      <Info title="HI-SCORE">
+        <span>{{ hi_score }}</span>
+      </Info>
+      <Info title="NEXT">
+        <NextCanvas ref="nextCanvas" />
+      </Info>
+      <Info title="LEVEL">
+        <span>{{ level }}</span>
+      </Info>
     </div>
   </main>
 
-  <hr class="w-full border-t-2 border-dashed border-black" />
+  <hr class="w-full border-t-4 border-dashed border-black" />
 
   <div class="flex">
     <div class="flex flex-col justify-center items-center w-1/2">
@@ -296,7 +294,7 @@ onMounted(() => {
         icon="icon-[pixelarticons--arrow-bar-down]"
         @click.prevent="moveShapeDown('drop', true)"
       />
-      <div class="flex justify-between w-full">
+      <div class="flex justify-between items-center w-full">
         <Button
           description="direction"
           icon="icon-[pixelarticons--chevron-left]"
@@ -321,8 +319,8 @@ onMounted(() => {
           description="box"
           :icon="
             gamePlay
-              ? 'icon-[pixelarticons--play]'
-              : 'icon-[pixelarticons--pause]'
+              ? 'icon-[pixelarticons--pause]'
+              : 'icon-[pixelarticons--play]'
           "
           @click.prevent="playGame"
         />

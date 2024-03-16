@@ -35,7 +35,7 @@ function addClass(btn) {
 </script>
 
 <template>
-  <button ref="button" class="nes-btn !flex justify-center items-center" type="button">
+  <button ref="button" class="nes-btn !flex justify-center items-center my-theme" type="button">
     <span :class="props.icon"></span>
     <span>{{ props.text }}</span>
   </button>

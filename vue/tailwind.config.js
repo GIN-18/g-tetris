@@ -6,11 +6,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        "nes-dark": "#1E1E1E",
+        "nes-gray": "#d8d8d8",
       },
     },
   },
-  plugins: [require("@catppuccin/tailwindcss", {
-    "defaultFlavour": "latte",
-  }), addDynamicIconSelectors()],
+  plugins: [
+    addDynamicIconSelectors(),
+  ],
 };

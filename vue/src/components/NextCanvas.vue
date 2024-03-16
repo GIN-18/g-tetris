@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useGameStore } from "@/stores/game.js";
 
-import { options } from "@/assets/js/options.js";
+import { palettes } from "@/assets/js/palettes.js";
 import { forEachShape } from "@/assets/js/utils.js";
 
 const game = useGameStore();
@@ -23,7 +23,7 @@ function drawShape() {
   let yStep = 0;
 
   ctx.value.clearRect(0, 0, W, H);
-  ctx.value.fillStyle = options.palette.mocha.shapeColor[t];
+  ctx.value.fillStyle = palettes.frappe.shapeColor[t];
 
   if (t === 0) {
     xStep = -1;
