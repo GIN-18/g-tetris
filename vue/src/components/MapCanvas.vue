@@ -7,7 +7,7 @@ import { palettes } from "@/assets/js/palettes.js";
 import { forEachShape } from "@/assets/js/utils.js";
 
 const game = useGameStore();
-const { block, map, currentShape, previewShape } = storeToRefs(game);
+const { block, map, currentShape, previewShape, palette } = storeToRefs(game);
 
 const canvas = ref(null);
 const ctx = computed(() => canvas.value.getContext("2d"));
@@ -31,7 +31,7 @@ function drawShape() {
   clearMap();
 
   // draw preview shape
-  ctx.value.fillStyle = palettes.mocha.previewShapeColor;
+  ctx.value.fillStyle = palettes[palette.value].previewShapeColor;
   forEachShape(
     previewShape,
     (shape, x, y) => {
@@ -42,7 +42,7 @@ function drawShape() {
   );
 
   // draw current shape
-  ctx.value.fillStyle = palettes.mocha.shapeColor[type];
+  ctx.value.fillStyle = palettes[palette.value].shapeColor[type];
   forEachShape(
     currentShape,
     (shape, x, y) => {
@@ -78,7 +78,7 @@ function drawMap() {
   for (let i = 0; i < m.length; i++) {
     for (let j = 0; j < m[i].length; j++) {
       if (!m[i][j]) continue;
-      ctx.value.fillStyle = palettes.mocha.shapeColor[m[i][j] - 1];
+      ctx.value.fillStyle = palettes[palette.value].shapeColor[m[i][j] - 1];
       ctx.value.fillRect(j * BLOCK, i * BLOCK, BLOCK, BLOCK);
     }
   }

@@ -8,13 +8,15 @@ import { palettes } from "@/assets/js/palettes.js";
 import { forEachShape } from "@/assets/js/utils.js";
 
 import Logo from "@/components/Logo.vue";
+import Menu from "@/components/Menu.vue";
 import Info from "@/components/Info.vue";
 import Button from "@/components/Button.vue";
 import MapCanvas from "@/components/MapCanvas.vue";
 import NextCanvas from "@/components/NextCanvas.vue";
+import Sparator from "@/components/Sparator.vue"
 
 const game = useGameStore();
-const { map, currentShape, previewShape, nextShape } = storeToRefs(game);
+const { map, currentShape, previewShape, nextShape, showSparator } = storeToRefs(game);
 
 const mapCanvas = ref(null);
 const nextCanvas = ref(null);
@@ -70,6 +72,8 @@ function addShape() {
     (shape, x, y) => {
       if (map.value[y] && map.value[y][x]) {
         gameOver.value = true;
+        showSparator.value = true
+        gamePlay.value = false
       }
     },
     currentShape.value.x,
@@ -263,8 +267,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <header>
+  <header class="flex justify-between items-center">
     <Logo />
+    <Menu />
   </header>
 
   <main class="flex justify-between items-center w-full">
@@ -345,4 +350,6 @@ onMounted(() => {
       />
     </div>
   </div>
+
+  <Sparator />
 </template>

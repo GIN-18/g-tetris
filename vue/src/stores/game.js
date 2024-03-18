@@ -7,5 +7,7 @@ export const useGameStore = defineStore("game", {
     currentShape: null,
     previewShape: null,
     nextShape: getShape(),
+    palette: 'nes',
+    showSparator: false,
   }),
 });

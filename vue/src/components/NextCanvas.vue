@@ -7,7 +7,7 @@ import { palettes } from "@/assets/js/palettes.js";
 import { forEachShape } from "@/assets/js/utils.js";
 
 const game = useGameStore();
-const { block, nextShape } = storeToRefs(game);
+const { block, nextShape, palette } = storeToRefs(game);
 
 const canvas = ref(null);
 const ctx = computed(() => canvas.value.getContext("2d"));
@@ -23,7 +23,7 @@ function drawShape() {
   let yStep = 0;
 
   ctx.value.clearRect(0, 0, W, H);
-  ctx.value.fillStyle = palettes.frappe.shapeColor[t];
+  ctx.value.fillStyle = palettes[palette.value].shapeColor[t];
 
   if (t === 0) {
     xStep = -1;
