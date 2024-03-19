@@ -13,16 +13,18 @@ import Info from "@/components/Info.vue";
 import Button from "@/components/Button.vue";
 import MapCanvas from "@/components/MapCanvas.vue";
 import NextCanvas from "@/components/NextCanvas.vue";
-import Sparator from "@/components/Sparator.vue"
+import Sparator from "@/components/Sparator.vue";
+import GameOverInfo from "@/components/GameOverInfo.vue";
 
 const game = useGameStore();
-const { map, currentShape, previewShape, nextShape, showSparator } = storeToRefs(game);
+const { map, currentShape, previewShape, nextShape, showSparator } =
+  storeToRefs(game);
 
 const mapCanvas = ref(null);
 const nextCanvas = ref(null);
 
 const score = ref(0);
-const hi_score = ref(0);
+const highScore = ref(0);
 const level = ref(1);
 
 const filledRows = [];
@@ -30,7 +32,7 @@ const filledRows = [];
 let gamePlay = ref(false);
 let gameOver = ref(false);
 
-let dropTimer = 0;
+let dropTimer = null;
 let drop = false;
 let down = false;
 
@@ -41,11 +43,17 @@ function playGame() {
 
   if (!dropTimer) addShape();
   if (gamePlay.value) setDropTimer();
-  if (!gamePlay.value && dropTimer) clearInterval(dropTimer);
+  if (!gamePlay.value && dropTimer) {
+    clearInterval(dropTimer);
+    dropTimer = null;
+  }
 }
 
 function replayGame() {
-  if (dropTimer) clearInterval(dropTimer);
+  if (dropTimer) {
+    clearInterval(dropTimer);
+    dropTimer = null;
+  }
 
   map.value = new Array(20).fill(0).map(() => new Array(10).fill(0));
   currentShape.value = null;
@@ -58,7 +66,7 @@ function replayGame() {
   gameOver.value = false;
 
   mapCanvas.value.clearMap();
-  nextCanvas.value.drawShape(nextShape);
+  nextCanvas.value.drawShape();
 }
 
 function addShape() {
@@ -66,26 +74,43 @@ function addShape() {
   previewShape.value = { ...currentShape.value };
   nextShape.value = getShape();
 
-  // game over
-  forEachShape(
-    currentShape,
-    (shape, x, y) => {
-      if (map.value[y] && map.value[y][x]) {
-        gameOver.value = true;
-        showSparator.value = true
-        gamePlay.value = false
-      }
-    },
-    currentShape.value.x,
-    currentShape.value.y
-  );
+  const {
+    type,
+    pieces,
+    rotation,
+    x: currentX,
+    y: currentY,
+  } = currentShape.value;
 
-  mapCanvas.value.drawShape(currentShape);
-  mapCanvas.value.drawShape(previewShape);
-  nextCanvas.value.drawShape(nextShape);
+  const cs = pieces[rotation];
+
+  // game over
+  for (let i = 0; i < cs.length; i++) {
+    const x = cs[i][1] + currentX;
+    const y = cs[i][0] + currentY + (type === 1 ? 1 : 2);
+
+    if (map.value[y][x]) {
+      gameOver.value = true;
+      gamePlay.value = false;
+
+      currentShape.value = null;
+      previewShape.value = null;
+      nextShape.value = null;
+
+      clearInterval(dropTimer);
+      dropTimer = null;
+
+      return;
+    }
+  }
+
+  mapCanvas.value.drawShape();
+  nextCanvas.value.drawShape();
 }
 
 function setDropTimer() {
+  if (gameOver.value) return;
+
   let timestep = Math.round(80 + 800 * Math.pow(0.75, level.value - 1));
 
   if (drop) {
@@ -97,7 +122,8 @@ function setDropTimer() {
   }
 
   if (dropTimer) {
-    clearTimeout(dropTimer);
+    clearInterval(dropTimer);
+    dropTimer = null;
   }
 
   dropTimer = setInterval(() => {
@@ -171,8 +197,8 @@ function rotateShape() {
     }
   }
 
-  mapCanvas.value.drawShape(currentShape);
-  mapCanvas.value.drawShape(previewShape);
+  mapCanvas.value.drawShape();
+  mapCanvas.value.drawShape();
 }
 
 function moveShape(xStep, yStep) {
@@ -206,7 +232,7 @@ function moveShape(xStep, yStep) {
     currentShape.value.x += xStep;
     currentShape.value.y += yStep;
     previewShape.value.x += xStep;
-    mapCanvas.value.drawShape(currentShape);
+    mapCanvas.value.drawShape();
   }
 
   return canMove;
@@ -267,89 +293,106 @@ onMounted(() => {
 </script>
 
 <template>
-  <header class="flex justify-between items-center">
-    <Logo />
-    <Menu />
-  </header>
+  <div
+    :class="[
+      'flex',
+      'flex-col',
+      'justify-between',
+      'w-full',
+      'h-full',
+      'p-2',
+      'bg-nes-gray',
+      showSparator ? 'blur-sm' : '',
+    ]"
+  >
+    <header class="flex justify-between items-center">
+      <Logo />
+      <Menu />
+    </header>
 
-  <main class="flex justify-between items-center w-full">
-    <mapCanvas ref="mapCanvas" />
-    <div class="flex flex-col justify-between items-center h-full">
-      <Info title="SCORE">
-        <span>{{ score }}</span>
-      </Info>
-      <Info title="HI-SCORE">
-        <span>{{ hi_score }}</span>
-      </Info>
-      <Info title="NEXT">
-        <NextCanvas ref="nextCanvas" />
-      </Info>
-      <Info title="LEVEL">
-        <span>{{ level }}</span>
-      </Info>
-    </div>
-  </main>
+    <main class="flex justify-between items-center w-full">
+      <mapCanvas ref="mapCanvas" />
+      <div class="flex flex-col justify-between items-center h-full">
+        <Info title="SCORE">
+          <span>{{ score }}</span>
+        </Info>
+        <Info title="HI-SCORE">
+          <span>{{ highScore }}</span>
+        </Info>
+        <Info title="NEXT">
+          <NextCanvas ref="nextCanvas" />
+        </Info>
+        <Info title="LEVEL">
+          <span>{{ level }}</span>
+        </Info>
+      </div>
+    </main>
 
-  <hr class="w-full border-t-4 border-dashed border-black" />
+    <hr class="w-full border-t-4 border-dashed border-black" />
 
-  <div class="flex">
-    <div class="flex flex-col justify-center items-center w-1/2">
-      <Button
-        description="direction"
-        icon="icon-[pixelarticons--arrow-bar-down]"
-        @click.prevent="moveShapeDown('drop', true)"
-      />
-      <div class="flex justify-between items-center w-full">
+    <div class="flex">
+      <div class="flex flex-col justify-center items-center w-1/2">
         <Button
           description="direction"
-          icon="icon-[pixelarticons--chevron-left]"
-          @click.prevent="moveShape(-1, 0)"
+          icon="icon-[pixelarticons--arrow-bar-down]"
+          @click.prevent="moveShapeDown('drop', true)"
         />
+        <div class="flex justify-between items-center w-full">
+          <Button
+            description="direction"
+            icon="icon-[pixelarticons--chevron-left]"
+            @click.prevent="moveShape(-1, 0)"
+          />
+          <Button
+            description="direction"
+            icon="icon-[pixelarticons--chevron-right]"
+            @click.prevent="moveShape(1, 0)"
+          />
+        </div>
         <Button
           description="direction"
-          icon="icon-[pixelarticons--chevron-right]"
-          @click.prevent="moveShape(1, 0)"
+          icon="icon-[pixelarticons--chevron-down]"
+          @touchstart.prevent="moveShapeDown('down', true)"
+          @touchend.prevent="moveShapeDown('down', false)"
         />
       </div>
-      <Button
-        description="direction"
-        icon="icon-[pixelarticons--chevron-down]"
-        @touchstart.prevent="moveShapeDown('down', true)"
-        @touchend.prevent="moveShapeDown('down', false)"
-      />
-    </div>
-    <div class="flex flex-col justify-between items-end w-1/2">
-      <div class="flex gap-4">
+      <div class="flex flex-col justify-between items-end w-1/2">
+        <div class="flex gap-4">
+          <Button
+            description="box"
+            :icon="
+              gamePlay
+                ? 'icon-[pixelarticons--pause]'
+                : 'icon-[pixelarticons--play]'
+            "
+            @click.prevent="playGame"
+          />
+          <Button
+            description="box"
+            icon="icon-[pixelarticons--reload]"
+            @click.prevent="replayGame"
+          />
+          <Button
+            description="box"
+            :icon="
+              volumeUp
+                ? 'icon-[pixelarticons--volume-vibrate]'
+                : 'icon-[pixelarticons--volume-x]'
+            "
+          />
+        </div>
         <Button
-          description="box"
-          :icon="
-            gamePlay
-              ? 'icon-[pixelarticons--pause]'
-              : 'icon-[pixelarticons--play]'
-          "
-          @click.prevent="playGame"
-        />
-        <Button
-          description="box"
-          icon="icon-[pixelarticons--reload]"
-          @click.prevent="replayGame"
-        />
-        <Button
-          description="box"
-          :icon="
-            volumeUp
-              ? 'icon-[pixelarticons--volume-vibrate]'
-              : 'icon-[pixelarticons--volume-x]'
-          "
+          description="rotate"
+          icon="icon-[pixelarticons--redo]"
+          @click.prevent="rotateShape"
         />
       </div>
-      <Button
-        description="rotate"
-        icon="icon-[pixelarticons--redo]"
-        @click.prevent="rotateShape"
-      />
     </div>
   </div>
-
-  <Sparator />
+  <!-- <Sparator /> -->
+  <!-- <GameOverInfo -->
+  <!--   :score="score" -->
+  <!--   :highScore="highScore" -->
+  <!--   :gameOver="gameOver" -->
+  <!-- /> -->
 </template>

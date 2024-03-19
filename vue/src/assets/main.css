@@ -8,14 +8,11 @@
 }
 
 html,
-body {
+body,
+#app {
   @apply w-full h-full;
 }
 
-body {
-  @apply flex flex-col justify-center items-center;
-}
-
 #app {
-  @apply flex flex-col justify-between w-full h-full p-2 bg-nes-gray;
+  @apply flex flex-col justify-center items-center;
 }

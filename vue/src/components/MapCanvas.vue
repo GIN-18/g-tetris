@@ -95,7 +95,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="nes-container !p-0 border-2 !border-black">
-    <canvas ref="canvas" class="bg-white" :width="W" :height="H"></canvas>
+  <div class="p-0 border-4 border-black">
+    <canvas ref="canvas" class="bg-black" :width="W" :height="H"></canvas>
   </div>
 </template>
