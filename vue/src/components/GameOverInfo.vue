@@ -1,4 +1,5 @@
 <script setup>
+import { defineEmits } from 'vue'
 import Button from "@/components/Button.vue";
 
 const props = defineProps({
@@ -13,6 +14,12 @@ const props = defineProps({
     required: true,
   },
 });
+
+const emit = defineEmits(['replay'])
+
+function replayGame() {
+  emit('replay')
+}
 </script>
 
 <template>
@@ -33,7 +40,7 @@ const props = defineProps({
         </div>
       </div>
       <div class="flex gap-12">
-        <Button description="again" text="AGAIN" />
+        <Button description="again" text="AGAIN" @click="replayGame"/>
         <Button description="quit" text="QUIT" />
       </div>
     </div>

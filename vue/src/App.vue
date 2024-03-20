@@ -24,7 +24,7 @@ const mapCanvas = ref(null);
 const nextCanvas = ref(null);
 
 const score = ref(0);
-const highScore = ref(0);
+const highScore = localStorage.getItem('highScore') || 0;
 const level = ref(1);
 
 const filledRows = [];
@@ -55,6 +55,7 @@ function replayGame() {
     dropTimer = null;
   }
 
+  showSparator.value = false
   map.value = new Array(20).fill(0).map(() => new Array(10).fill(0));
   currentShape.value = null;
   previewShape.value = null;
@@ -90,6 +91,8 @@ function addShape() {
     const y = cs[i][0] + currentY + (type === 1 ? 1 : 2);
 
     if (map.value[y][x]) {
+      showSparator.value = true
+
       gameOver.value = true;
       gamePlay.value = false;
 
@@ -100,11 +103,13 @@ function addShape() {
       clearInterval(dropTimer);
       dropTimer = null;
 
+      updateHighScore()
+
       return;
     }
   }
 
-  mapCanvas.value.drawShape();
+  if(currentShape.value) mapCanvas.value.drawShape();
   nextCanvas.value.drawShape();
 }
 
@@ -265,6 +270,12 @@ function updateScore() {
   }
 }
 
+function updateHighScore() {
+  if(score.value >= highScore) {
+    highScore = localStorage.setItem('highScore', score.value)
+  }
+}
+
 function updateLevel() {
   let nextLevelScore = (level.value + 1) * 100 * level.value;
 
@@ -389,10 +400,11 @@ onMounted(() => {
       </div>
     </div>
   </div>
-  <!-- <Sparator /> -->
-  <!-- <GameOverInfo -->
-  <!--   :score="score" -->
-  <!--   :highScore="highScore" -->
-  <!--   :gameOver="gameOver" -->
-  <!-- /> -->
+  <Sparator />
+  <GameOverInfo
+    :score="score"
+    :highScore="highScore"
+    :gameOver="gameOver"
+    @replay="replayGame"
+  />
 </template>
