@@ -1,10 +1,9 @@
 <script setup>
-import { defineEmits } from 'vue'
 import Button from "@/components/Button.vue";
 
 const props = defineProps({
   score: {
-    type: String,
+    type: Number,
   },
   highScore: {
     type: String,

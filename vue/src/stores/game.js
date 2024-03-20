@@ -9,5 +9,6 @@ export const useGameStore = defineStore("game", {
     nextShape: getShape(),
     palette: 'nes',
     showSparator: false,
+    highScore: localStorage.getItem('highScore') || 0
   }),
 });

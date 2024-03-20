@@ -17,14 +17,13 @@ import Sparator from "@/components/Sparator.vue";
 import GameOverInfo from "@/components/GameOverInfo.vue";
 
 const game = useGameStore();
-const { map, currentShape, previewShape, nextShape, showSparator } =
+const { map, currentShape, previewShape, nextShape, showSparator, highScore } =
   storeToRefs(game);
 
 const mapCanvas = ref(null);
 const nextCanvas = ref(null);
 
 const score = ref(0);
-const highScore = localStorage.getItem('highScore') || 0;
 const level = ref(1);
 
 const filledRows = [];
@@ -55,7 +54,7 @@ function replayGame() {
     dropTimer = null;
   }
 
-  showSparator.value = false
+  showSparator.value = false;
   map.value = new Array(20).fill(0).map(() => new Array(10).fill(0));
   currentShape.value = null;
   previewShape.value = null;
@@ -91,11 +90,10 @@ function addShape() {
     const y = cs[i][0] + currentY + (type === 1 ? 1 : 2);
 
     if (map.value[y][x]) {
-      showSparator.value = true
-
       gameOver.value = true;
       gamePlay.value = false;
 
+      showSparator.value = true;
       currentShape.value = null;
       previewShape.value = null;
       nextShape.value = null;
@@ -103,13 +101,13 @@ function addShape() {
       clearInterval(dropTimer);
       dropTimer = null;
 
-      updateHighScore()
+      updateHighScore();
 
       return;
     }
   }
 
-  if(currentShape.value) mapCanvas.value.drawShape();
+  if (currentShape.value) mapCanvas.value.drawShape();
   nextCanvas.value.drawShape();
 }
 
@@ -271,9 +269,10 @@ function updateScore() {
 }
 
 function updateHighScore() {
-  if(score.value >= highScore) {
-    highScore = localStorage.setItem('highScore', score.value)
+  if (score.value >= highScore.value) {
+    localStorage.setItem("highScore", score.value);
   }
+  highScore.value = localStorage.getItem("highScore");
 }
 
 function updateLevel() {
