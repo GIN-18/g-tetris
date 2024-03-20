@@ -1,14 +1,14 @@
 export const palettes = {
   nes: {
-    previewShapeColor: "#d8d8d8",
+    previewShapeColor: "#787878",
     shapeColor: [
-      "#d8f878",
-      "#b8b8f8",
-      "#fbdfa6",
-      "#f8a4c0",
-      "#b8f8d8",
-      "#a4e4fc",
-      "#d8b8f8",
+      "#f85898",
+      "#f878f8",
+      "#f87858",
+      "#f8b800",
+      "#58d854",
+      "#3cbcfc",
+      "#9878f8",
     ],
   },
   latte: {

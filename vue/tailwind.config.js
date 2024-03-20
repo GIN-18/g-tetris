@@ -7,6 +7,7 @@ export default {
     extend: {
       colors: {
         "nes-gray": "#d8d8d8",
+        "nes-dark": "#212529"
       },
     },
   },

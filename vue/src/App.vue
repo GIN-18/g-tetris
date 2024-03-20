@@ -54,16 +54,20 @@ function replayGame() {
     dropTimer = null;
   }
 
-  showSparator.value = false;
-  map.value = new Array(20).fill(0).map(() => new Array(10).fill(0));
-  currentShape.value = null;
-  previewShape.value = null;
-  nextShape.value = getShape();
-  score.value = 0;
-  level.value = 1;
-  filledRows.length = 0;
+  game.$patch({
+    map: new Array(20).fill(0).map(() => new Array(10).fill(0)),
+    currentShape: null,
+    previewShape: null,
+    nextShape: getShape(),
+    showSparator: false,
+  })
+
   gamePlay.value = false;
   gameOver.value = false;
+  score.value = 0;
+  level.value = 1;
+
+  filledRows.length = 0;
 
   mapCanvas.value.clearMap();
   nextCanvas.value.drawShape();
@@ -93,10 +97,12 @@ function addShape() {
       gameOver.value = true;
       gamePlay.value = false;
 
-      showSparator.value = true;
-      currentShape.value = null;
-      previewShape.value = null;
-      nextShape.value = null;
+      game.$patch({
+        showSparator: true,
+        currentShape: null,
+        previewShape: null,
+        nextShape: null,
+      });
 
       clearInterval(dropTimer);
       dropTimer = null;
