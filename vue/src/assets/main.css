@@ -7,12 +7,10 @@
   src: url("/fonts/PressStart2P-Regular.ttf") format("truetype");
 }
 
-html,
-body,
-#app {
+html, body{
   @apply w-full h-full;
 }
 
 #app {
-  @apply flex flex-col justify-center items-center;
+  @apply flex flex-col justify-between items-center w-full h-full p-2 bg-nes-gray;
 }

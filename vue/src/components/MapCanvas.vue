@@ -7,7 +7,8 @@ import { palettes } from "@/assets/js/palettes.js";
 import { forEachShape } from "@/assets/js/utils.js";
 
 const game = useGameStore();
-const { block, map, currentShape, previewShape, palette } = storeToRefs(game);
+const { block, map, currentShape, previewShape, palette, isPreview } =
+  storeToRefs(game);
 
 const canvas = ref(null);
 const ctx = computed(() => canvas.value.getContext("2d"));
@@ -31,15 +32,17 @@ function drawShape() {
   clearMap();
 
   // draw preview shape
-  ctx.value.fillStyle = palettes[palette.value].previewShapeColor;
-  forEachShape(
-    previewShape,
-    (shape, x, y) => {
-      ctx.value.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
-    },
-    previewX,
-    previewFinalY
-  );
+  if (isPreview.value) {
+    ctx.value.fillStyle = palettes[palette.value].previewShapeColor;
+    forEachShape(
+      previewShape,
+      (shape, x, y) => {
+        ctx.value.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
+      },
+      previewX,
+      previewFinalY
+    );
+  }
 
   // draw current shape
   ctx.value.fillStyle = palettes[palette.value].shapeColor[type];
