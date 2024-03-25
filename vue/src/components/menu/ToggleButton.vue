@@ -10,8 +10,6 @@ const props = defineProps({
   },
 });
 
-game[props.option] = JSON.parse(localStorage.getItem(props.option));
-
 function changeStatus(enable) {
   localStorage.setItem(props.option, enable);
   game[props.option] = JSON.parse(localStorage.getItem(props.option));
@@ -19,7 +17,7 @@ function changeStatus(enable) {
 </script>
 
 <template>
-  <button v-if="game[props.option]" @click.prevent="changeStatus(false)">
+  <button v-if="JSON.parse(game[props.option])" @click.prevent="changeStatus(false)">
     <span
       class="text-2xl icon-[pixelarticons--toggle-right] bg-nes-green"
     ></span>

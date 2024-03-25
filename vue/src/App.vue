@@ -11,8 +11,7 @@ import Logo from "@/components/Logo.vue";
 import Menu from "@/components/menu/Menu.vue";
 import Info from "@/components/Info.vue";
 import Button from "@/components/Button.vue";
-import MapCanvas from "@/components/MapCanvas.vue";
-import NextCanvas from "@/components/NextCanvas.vue";
+import Canvas from "@/components/Canvas.vue";
 import Sparator from "@/components/Sparator.vue";
 import GameOverInfo from "@/components/GameOverInfo.vue";
 
@@ -72,7 +71,7 @@ function replayGame() {
   filledRows.length = 0;
 
   mapCanvas.value.clearMap();
-  nextCanvas.value.drawShape();
+  nextCanvas.value.drawNextShape();
 }
 
 function addShape() {
@@ -115,8 +114,8 @@ function addShape() {
     }
   }
 
-  if (currentShape.value) mapCanvas.value.drawShape();
-  nextCanvas.value.drawShape();
+  if (currentShape.value) mapCanvas.value.drawGame();
+  nextCanvas.value.drawNextShape();
 }
 
 function setDropTimer() {
@@ -208,8 +207,7 @@ function rotateShape() {
     }
   }
 
-  mapCanvas.value.drawShape();
-  mapCanvas.value.drawShape();
+  mapCanvas.value.drawGame();
 }
 
 function moveShape(xStep, yStep) {
@@ -243,7 +241,7 @@ function moveShape(xStep, yStep) {
     currentShape.value.x += xStep;
     currentShape.value.y += yStep;
     previewShape.value.x += xStep;
-    mapCanvas.value.drawShape();
+    mapCanvas.value.drawGame();
   }
 
   return canMove;
@@ -317,7 +315,7 @@ onMounted(() => {
   </header>
 
   <main class="flex justify-between items-center w-full">
-    <mapCanvas ref="mapCanvas" />
+    <Canvas ref="mapCanvas" type="map" width="200" height="400" />
     <div class="flex flex-col justify-between items-center h-full">
       <Info title="SCORE">
         <span>{{ score }}</span>
@@ -326,7 +324,7 @@ onMounted(() => {
         <span>{{ highScore }}</span>
       </Info>
       <Info title="NEXT">
-        <NextCanvas ref="nextCanvas" />
+        <Canvas ref="nextCanvas" type="next" width="80" height="40" />
       </Info>
       <Info title="LEVEL">
         <span>{{ level }}</span>
