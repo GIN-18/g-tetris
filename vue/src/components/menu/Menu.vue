@@ -7,7 +7,9 @@ import MenuItem from "./MenuItem.vue";
 import ToggleButton from "./ToggleButton.vue";
 
 const game = useGameStore();
-const { showSparator, showMenu } = storeToRefs(game);
+const { showSparator } = storeToRefs(game);
+
+const showMenu = ref(false);
 
 const emit = defineEmits(['play'])
 
