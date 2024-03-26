@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useGameStore } from "@/stores/game.js";
 
@@ -32,11 +32,15 @@ const BLOCK = 20;
 const W = width;
 const H = height;
 
-if (name === "next") {
-  onMounted(() => {
+watch(isPreview, () => {
+  if (previewShape.value && name === "map") drawGame();
+});
+
+onMounted(() => {
+  if (name === "next") {
     drawNextShape();
-  });
-}
+  }
+});
 
 function drawGame() {
   clearMap();

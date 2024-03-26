@@ -12,7 +12,7 @@ const props = defineProps({
   },
 });
 
-const { description, text, icon } = props;
+const { description } = props;
 
 const classList = {
   "nes-btn !flex justify-center items-center": true,
@@ -26,7 +26,7 @@ const classList = {
 
 <template>
   <button ref="button" :class="classList" type="button">
-    <span :class="icon"></span>
-    <span>{{ text }}</span>
+    <span :class="props.icon"></span>
+    <span>{{ props.text }}</span>
   </button>
 </template>
