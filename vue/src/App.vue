@@ -16,14 +16,8 @@ import Sparator from "@/components/Sparator.vue";
 import GameOverInfo from "@/components/GameOverInfo.vue";
 
 const game = useGameStore();
-const {
-  map,
-  currentShape,
-  previewShape,
-  nextShape,
-  showSparator,
-  highScore,
-} = storeToRefs(game);
+const { map, currentShape, previewShape, nextShape, showSparator, highScore } =
+  storeToRefs(game);
 
 const mapCanvas = ref(null);
 const nextCanvas = ref(null);
@@ -315,7 +309,7 @@ onMounted(() => {
   </header>
 
   <main class="flex justify-between items-center w-full">
-    <Canvas ref="mapCanvas" type="map" width="200" height="400" />
+    <Canvas ref="mapCanvas" name="map" width="200" height="400" />
     <div class="flex flex-col justify-between items-center h-full">
       <Info title="SCORE">
         <span>{{ score }}</span>
@@ -324,7 +318,7 @@ onMounted(() => {
         <span>{{ highScore }}</span>
       </Info>
       <Info title="NEXT">
-        <Canvas ref="nextCanvas" type="next" width="80" height="40" />
+        <Canvas ref="nextCanvas" name="next" width="80" height="40" />
       </Info>
       <Info title="LEVEL">
         <span>{{ level }}</span>

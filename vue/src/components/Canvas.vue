@@ -13,12 +13,8 @@ const { map, nextShape, currentShape, previewShape, palette, isPreview } =
 const canvas = ref(null);
 const ctx = computed(() => canvas.value.getContext("2d"));
 
-const BLOCK = 20;
-const W = 200;
-const H = 400;
-
 const props = defineProps({
-  type: {
+  name: {
     type: String,
     required: true,
   },
@@ -30,7 +26,13 @@ const props = defineProps({
   },
 });
 
-if(props.type === 'next') {
+const { name, width, height } = props;
+
+const BLOCK = 20;
+const W = width;
+const H = height;
+
+if (name === "next") {
   onMounted(() => {
     drawNextShape();
   });
@@ -148,12 +150,12 @@ defineExpose({
 </script>
 
 <template>
-  <div :class="{ 'p-0 border-4 border-black': props.type === 'map' }">
+  <div :class="{ 'p-0 border-4 border-black': name === 'map' }">
     <canvas
       ref="canvas"
-      :class="{ 'bg-black': props.type === 'map' }"
-      :width="props.width"
-      :height="props.height"
+      :class="{ 'bg-black': name === 'map' }"
+      :width="W"
+      :height="H"
     ></canvas>
   </div>
 </template>
