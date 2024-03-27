@@ -1,20 +1,22 @@
 <script setup>
+import { socket } from "@/assets/js/socket.js";
+
 import LinkBox from "@/components/LinkBox.vue";
 </script>
 
 <template>
   <div class="flex flex-col justify-center items-center gap-24 h-full">
-    <h1 class="text-5xl">TETRIS</h1>
+    <h1 class="text-3xl">ROOM</h1>
     <div class="flex flex-col gap-10">
       <LinkBox
         link="/game"
-        icon="icon-[pixelarticons--user]"
-        text="1 PLAYER"
+        icon="icon-[pixelarticons--building-community]"
+        text="Create Room"
       />
       <LinkBox
-        link="/room"
-        icon="icon-[pixelarticons--users]"
-        text="2 PLAYER"
+        link="#"
+        icon="icon-[pixelarticons--user-plus]"
+        text="Join Room"
       />
     </div>
   </div>

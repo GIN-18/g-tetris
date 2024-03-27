@@ -1,5 +1,9 @@
 <script setup>
+import { useRouter } from "vue-router";
+
 import Button from "@/components/Button.vue";
+
+const router = useRouter()
 
 const props = defineProps({
   score: {
@@ -14,10 +18,17 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['replay'])
+const emit = defineEmits(["replay"]);
 
 function replayGame() {
-  emit('replay')
+  emit("replay");
+}
+
+function quitGame() {
+  emit("replay");
+  router.push({
+    path: "/",
+  })
 }
 </script>
 
@@ -39,8 +50,8 @@ function replayGame() {
         </div>
       </div>
       <div class="flex gap-12">
-        <Button description="again" text="AGAIN" @click="replayGame"/>
-        <Button description="quit" text="QUIT" />
+        <Button description="again" text="AGAIN" @click.prevent="replayGame" />
+        <Button description="quit" text="QUIT" @click.prevent="quitGame" />
       </div>
     </div>
   </div>
