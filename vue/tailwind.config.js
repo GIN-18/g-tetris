@@ -10,7 +10,9 @@ export default {
         "nes-gray": "#d8d8d8",
         "nes-deep-gray": "#787878",
         "nes-dark": "#212529",
-        "nes-green":"#58d854"
+        "nes-red": "#e76e55",
+        "nes-yellow": "#f7d51d",
+        "nes-green": "#92cc41",
       },
     },
   },

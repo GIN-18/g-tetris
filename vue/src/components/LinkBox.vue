@@ -3,6 +3,8 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
+const model = defineModel()
+
 const props = defineProps({
   link: {
     type: String,
@@ -18,6 +20,7 @@ const props = defineProps({
 
 function jumpToLink() {
   if(props.link === "#") {
+    model.value = !model.value
     return
   }
 

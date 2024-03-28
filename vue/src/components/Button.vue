@@ -19,8 +19,8 @@ const classList = {
   "w-28 h-28 text-4xl is-error": description === "rotate",
   "w-14 h-14 text-2xl is-error": description === "direction",
   "is-primary": description === "box",
-  "is-success": description === "again",
-  "is-warning": description === "quit"
+  "is-success": description === "again" || description === "join",
+  "is-warning": description === "quit" || description === "cancel",
 };
 </script>
 

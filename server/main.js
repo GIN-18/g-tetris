@@ -125,15 +125,12 @@ io.on('connection', (socket) => {
     rooms[room][socket.id].gameStart = gameStart; // 更新游戏开始状态
     rooms[room][socket.id].gameOver = gameOver; // 更新游戏结束状态
     rooms[room][socket.id].again = again; // 更新再来一局状态
-    console.log(rooms[room][socket.id]);
     socket.to(room).emit('restartGame', rooms[room]);
   })
 
   // 玩家离开房间
   socket.on('disconnect', () => {
     console.log('user disconnected');
-
-    console.log(rooms)
 
     // 玩家离开房间就从房间中删除玩家
     for (const room in rooms) {
