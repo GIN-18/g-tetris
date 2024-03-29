@@ -7,7 +7,7 @@ import LinkBox from "@/components/LinkBox.vue";
     <h1 class="text-5xl">TETRIS</h1>
     <div class="flex flex-col gap-10">
       <LinkBox
-        link="/game"
+        link="/game/1p"
         icon="icon-[pixelarticons--user]"
         text="1 PLAYER"
       />

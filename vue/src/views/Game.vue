@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useGameStore } from "@/stores/game.js";
 
@@ -7,13 +8,15 @@ import { getShape } from "@/assets/js/shape.js";
 import { palettes } from "@/assets/js/palettes.js";
 import { preventZoom, forEachShape } from "@/assets/js/utils.js";
 
-import Logo from "@/components/Logo.vue";
+import Header from "@/components/Header.vue";
 import Menu from "@/components/menu/Menu.vue";
 import Info from "@/components/Info.vue";
 import Button from "@/components/Button.vue";
 import Canvas from "@/components/Canvas.vue";
 import Sparator from "@/components/Sparator.vue";
 import GameOverInfo from "@/components/GameOverInfo.vue";
+
+const route = useRoute();
 
 const game = useGameStore();
 const { map, currentShape, previewShape, nextShape, showSparator, highScore } =
@@ -303,10 +306,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <header class="flex justify-between items-center w-full">
-    <Logo />
+  <Header>
     <Menu :playStatus="gamePlay" @play="playGame" />
-  </header>
+  </Header>
 
   <main class="flex justify-between items-center w-full">
     <Canvas ref="mapCanvas" name="map" width="200" height="400" />

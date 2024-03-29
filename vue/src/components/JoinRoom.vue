@@ -1,4 +1,6 @@
 <script setup>
+import { ref } from "vue";
+import _ from "lodash";
 import { useMessageStore } from "@/stores/message.js";
 
 import { socket } from "@/assets/js/socket.js";
@@ -7,17 +9,41 @@ import Button from "@/components/Button.vue";
 
 const message = useMessageStore();
 
-const model = defineModel()
+const model = defineModel();
+
+const roomId = ref("");
 
 function cancelJoinRoom() {
   model.value = !model.value;
 }
 
-function joinRoom() {
-  message.messageType = "warning";
-  message.messageText = "Joining room...";
+const joinRoom = _.debounce(
+  () => {
+    if (!roomId.value) {
+      message.messageType = "warning";
+      message.messageText = "Please enter room ID";
+      message.showMessage = !message.showMessage;
+      return
+    }
+    socket.emit('joinRoom', {
+      action: 0,
+      room: roomId.value,
+      ready: 0,
+      score: 0,
+    });
+  },
+  2000,
+  {
+    leading: true,
+    trailing: false,
+  }
+);
+
+socket.on("roomNotFound", () => {
+  message.messageType = "error";
+  message.messageText = "Room not found";
   message.showMessage = !message.showMessage;
-}
+})
 </script>
 
 <template>
@@ -31,6 +57,7 @@ function joinRoom() {
         type="text"
         placeholder="Room ID"
         class="nes-input bg-nes-gray outline-none"
+        v-model="roomId"
       />
       <div class="flex gap-12">
         <Button description="join" text="Join" @click.prevent="joinRoom" />
