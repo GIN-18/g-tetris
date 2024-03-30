@@ -9,14 +9,31 @@ import LinkBox from "@/components/LinkBox.vue";
 import JoinRoom from "@/components/JoinRoom.vue";
 
 const router = useRouter();
+
 const showJoinRoom = ref(false);
 const serverStatus = ref(true);
 
-socket.on("roomCreated", () => {
+socket.on("roomCreated", (data) => {
+  console.log(data[socket.id]);
   router.push({
     path: "/game/2p",
   });
 });
+
+socket.on("roomJoined", (data) => {
+  console.log('room joined');
+  router.push({
+    path: "/game/2p",
+  });
+})
+
+socket.on("roomFull", () => {
+  console.log('room full');
+})
+
+socket.on("roomNotFound", () => {
+  console.log('room not found');
+})
 
 function createRoom() {
   socket.emit("createRoom");

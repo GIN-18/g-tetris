@@ -10,7 +10,7 @@ import { preventZoom, forEachShape } from "@/assets/js/utils.js";
 
 import Header from "@/components/Header.vue";
 import Menu from "@/components/menu/Menu.vue";
-import Info from "@/components/Info.vue";
+import GameInfo from "@/components/GameInfo.vue";
 import Button from "@/components/Button.vue";
 import Canvas from "@/components/Canvas.vue";
 import Sparator from "@/components/Sparator.vue";
@@ -313,18 +313,18 @@ onMounted(() => {
   <main class="flex justify-between items-center w-full">
     <Canvas ref="mapCanvas" name="map" width="200" height="400" />
     <div class="flex flex-col justify-between items-center h-full">
-      <Info title="SCORE">
+      <GameInfo title="SCORE">
         <span>{{ score }}</span>
-      </Info>
-      <Info title="HI-SCORE">
+      </GameInfo>
+      <GameInfo title="HI-SCORE">
         <span>{{ highScore }}</span>
-      </Info>
-      <Info title="NEXT">
+      </GameInfo>
+      <GameInfo title="NEXT">
         <Canvas ref="nextCanvas" name="next" width="80" height="40" />
-      </Info>
-      <Info title="LEVEL">
+      </GameInfo>
+      <GameInfo title="LEVEL">
         <span>{{ level }}</span>
-      </Info>
+      </GameInfo>
     </div>
   </main>
 

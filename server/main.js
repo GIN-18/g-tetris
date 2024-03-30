@@ -36,18 +36,6 @@ io.on("connection", (socket) => {
   socket.on("joinRoom", ({ action, room, ready, score }) => {
     const clients = io.sockets.adapter.rooms.get(room);
 
-    socket.join(room);
-
-    try {
-      rooms[room][socket.id] = {
-        room,
-        ready,
-        score,
-      };
-    } catch (error) { }
-
-    socket.emit("roomJoined", rooms[room]);
-
     //  玩家刷新时提醒玩家加入房间
     if (action) {
       socket.to(room).emit("playerJoined", rooms[room]);
@@ -65,6 +53,16 @@ io.on("connection", (socket) => {
       socket.emit("roomFull");
       return;
     }
+
+    try {
+      socket.join(room);
+      rooms[room][socket.id] = {
+        room,
+        ready,
+        score,
+      };
+      socket.emit("roomJoined", rooms[room]);
+    } catch (error) { }
   });
 
   // 玩家准备
