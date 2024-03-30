@@ -11,5 +11,6 @@ export const useGameStore = defineStore("game", {
     showSparator: false,
     highScore: localStorage.getItem('highScore') || 0,
     isPreview: localStorage.getItem('isPreview') || true,
+    room: '',
   }),
 });

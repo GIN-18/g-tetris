@@ -10,13 +10,14 @@ import { preventZoom, forEachShape } from "@/assets/js/utils.js";
 
 import Header from "@/components/Header.vue";
 import Menu from "@/components/menu/Menu.vue";
+import GamePrepare from "@/components/GamePrepare.vue";
 import GameInfo from "@/components/GameInfo.vue";
 import Button from "@/components/Button.vue";
 import Canvas from "@/components/Canvas.vue";
-import Sparator from "@/components/Sparator.vue";
 import GameOverInfo from "@/components/GameOverInfo.vue";
 
 const route = useRoute();
+const gameMode = ref(route.params.mode);
 
 const game = useGameStore();
 const { map, currentShape, previewShape, nextShape, showSparator, highScore } =
@@ -316,7 +317,10 @@ onMounted(() => {
       <GameInfo title="SCORE">
         <span>{{ score }}</span>
       </GameInfo>
-      <GameInfo title="HI-SCORE">
+      <GameInfo title="HI-SCORE" v-if="gameMode === '1p'">
+        <span>{{ highScore }}</span>
+      </GameInfo>
+      <GameInfo title="ROOM" v-if="gameMode === '2p'">
         <span>{{ highScore }}</span>
       </GameInfo>
       <GameInfo title="NEXT">
@@ -365,11 +369,13 @@ onMounted(() => {
               ? 'icon-[pixelarticons--pause]'
               : 'icon-[pixelarticons--play]'
           "
+          v-if="gameMode === '1p'"
           @click.prevent="playGame"
         />
         <Button
           description="box"
           icon="icon-[pixelarticons--reload]"
+          v-if="gameMode === '1p'"
           @click.prevent="replayGame"
         />
         <Button
@@ -388,7 +394,6 @@ onMounted(() => {
       />
     </div>
   </div>
-  <Sparator />
   <GameOverInfo
     :score="score"
     :highScore="highScore"

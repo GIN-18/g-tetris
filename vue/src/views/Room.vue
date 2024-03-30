@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import { useGameStore} from "@/stores/game.js";
 import { useRouter } from "vue-router";
 import { socket } from "@/assets/js/socket.js";
 
@@ -8,13 +9,15 @@ import ServerInfo from "@/components/ServerInfo.vue";
 import LinkBox from "@/components/LinkBox.vue";
 import JoinRoom from "@/components/JoinRoom.vue";
 
+const game = useGameStore();
 const router = useRouter();
 
 const showJoinRoom = ref(false);
 const serverStatus = ref(true);
 
 socket.on("roomCreated", (data) => {
-  console.log(data[socket.id]);
+  game.room = data[socket.id].room
+
   router.push({
     path: "/game/2p",
   });

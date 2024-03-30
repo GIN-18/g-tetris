@@ -19,12 +19,12 @@ function changeStatus(enable) {
 <template>
   <button v-if="JSON.parse(game[props.option])" @click.prevent="changeStatus(false)">
     <span
-      class="text-2xl icon-[pixelarticons--toggle-right] bg-nes-green"
+      class="text-2xl icon-[pixelarticons--toggle-right] text-nes-deep-green"
     ></span>
   </button>
   <button v-else @click.prevent="changeStatus(true)">
     <span
-      class="text-2xl icon-[pixelarticons--toggle-left] bg-nes-deep-gray"
+      class="text-2xl icon-[pixelarticons--toggle-left] text-nes-deep-gray"
     ></span>
   </button>
 </template>

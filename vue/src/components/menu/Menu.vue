@@ -11,20 +11,20 @@ const { showSparator } = storeToRefs(game);
 
 const showMenu = ref(false);
 
-const emit = defineEmits(['play'])
+const emit = defineEmits(["play"]);
 
 const props = defineProps({
   playStatus: {
     type: Boolean,
     required: true,
   },
-})
+});
 
 function toggleMenu() {
   showMenu.value = !showMenu.value;
   showSparator.value = !showSparator.value;
 
-  if(props.playStatus) emit('play')
+  if (props.playStatus) emit("play");
 }
 </script>
 
@@ -33,8 +33,13 @@ function toggleMenu() {
     <span class="text-4xl icon-[pixelarticons--menu]"></span>
   </button>
 
+  <div
+    class="z-10 fixed top-0 right-0 w-full h-full bg-black/50"
+    v-show="showMenu"
+  ></div>
+
   <aside
-    class="nes-container is-dark z-20 !fixed !top-0 !right-0 w-2/3 h-full !p-2 !border-0"
+    class="z-20 fixed top-0 right-0 w-2/3 h-full p-3 bg-nes-dark text-white"
     v-show="showMenu"
   >
     <header class="flex justify-between items-center mb-4">
@@ -42,7 +47,10 @@ function toggleMenu() {
         <span class="text-3xl icon-[pixelarticons--gamepad]"></span>
         Menu
       </h2>
-      <button class="flex justify-center items-center" @click.prevent="toggleMenu">
+      <button
+        class="flex justify-center items-center"
+        @click.prevent="toggleMenu"
+      >
         <span class="text-3xl icon-[pixelarticons--close]"></span>
       </button>
     </header>

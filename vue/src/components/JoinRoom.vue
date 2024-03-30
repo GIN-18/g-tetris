@@ -5,6 +5,7 @@ import { debounce } from "lodash";
 import { socket } from "@/assets/js/socket.js";
 
 import Button from "@/components/Button.vue";
+import Dialogs from "@/components/Dialogs.vue";
 
 const model = defineModel();
 
@@ -13,7 +14,7 @@ const roomId = ref("");
 const joinRoom = debounce(
   () => {
     if (!roomId.value) {
-      console.log('room id is empty'); // show message here
+      console.log("room id is empty"); // show message here
       return;
     }
     socket.emit("joinRoom", {
@@ -36,11 +37,8 @@ function cancelJoinRoom() {
 </script>
 
 <template>
-  <div
-    class="z-10 fixed top-0 right-0 flex flex-col justify-center items-center gap-16 w-full h-full p-8 bg-nes-gray"
-    v-if="model"
-  >
-    <h2 class="text-2xl">Join Room</h2>
+  <Dialogs :show="model">
+    <h2 class="text-3xl">Join Room</h2>
     <div class="flex flex-col justify-center items-center gap-12">
       <input
         type="text"
@@ -57,5 +55,5 @@ function cancelJoinRoom() {
         />
       </div>
     </div>
-  </div>
+  </Dialogs>
 </template>
