@@ -47,6 +47,7 @@ const volumeUp = ref(true);
 const readyStatus = ref(false);
 const showPrepare = ref(false);
 const prepared = ref(0);
+const scoreDiff = ref(0);
 
 let drop = false;
 let down = false;
@@ -81,6 +82,20 @@ socket.on("twoStartGame", () => {
   showPrepare.value = false;
 
   playGame();
+});
+
+socket.on("scoreUpdated", (data) => {
+  const scoreArray = [];
+
+  for (let item in data) {
+    if (item === socket.id) {
+      scoreArray[0] = data[item].score;
+    } else {
+      scoreArray[1] = data[item].score;
+    }
+  }
+
+  scoreDiff.value = scoreArray[0] - scoreArray[1];
 });
 
 function playGame() {
@@ -149,6 +164,14 @@ function addShape() {
 
       clearInterval(dropTimer);
       dropTimer = null;
+
+      if(checkGameMode('2p')) {
+        socket.emit("gameOver", {
+          room: game.room,
+          gameOver: true,
+        })
+        return
+      }
 
       updateHighScore();
 
@@ -313,6 +336,13 @@ function updateScore() {
   if (filledRows.length > 0) {
     score.value +=
       (filledRows.length * level.value + (filledRows.length - 1)) * 10;
+
+    if (checkGameMode("2p")) {
+      socket.emit("updateScore", {
+        room: game.room,
+        score: score.value,
+      });
+    }
   }
 }
 
@@ -374,8 +404,13 @@ function readyGame(status) {
       <GameInfo title="HI-SCORE" v-if="checkGameMode('1p')">
         <span>{{ highScore }}</span>
       </GameInfo>
-      <GameInfo title="ROOM" v-if="checkGameMode('2p')">
-        <span>{{ room }}</span>
+      <GameInfo title="SCORE DIFF" v-if="checkGameMode('2p')">
+        <div
+          :class="scoreDiff >= 0 ? 'text-nes-deep-green' : 'text-nes-deep-red'"
+          v-if="checkGameMode('2p')"
+        >
+          {{ scoreDiff >= 0 ? `+${scoreDiff}` : scoreDiff }}
+        </div>
       </GameInfo>
       <GameInfo title="NEXT">
         <Canvas ref="nextCanvas" name="next" width="80" height="40" />

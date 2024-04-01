@@ -81,7 +81,7 @@ io.on("connection", (socket) => {
   // 更新分数
   socket.on("updateScore", ({ room, score }) => {
     rooms[room][socket.id].score = score;
-    io.to(room).emit("updateScore", rooms[room]);
+    io.to(room).emit("scoreUpdated", rooms[room]);
   });
 
   // 开始游戏
