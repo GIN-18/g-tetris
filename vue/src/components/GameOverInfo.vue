@@ -13,10 +13,6 @@ const props = defineProps({
   highScore: {
     type: String,
   },
-  gameOver: {
-    type: Boolean,
-    required: true,
-  },
 });
 
 const emit = defineEmits(["replay"]);
@@ -26,7 +22,6 @@ function replayGame() {
 }
 
 function quitGame() {
-  emit("replay");
   router.push({
     path: "/",
   });
@@ -34,8 +29,7 @@ function quitGame() {
 </script>
 
 <template>
-  <Dialogs :show="gameOver">
-    <h2 class="text-3xl">GAME OVER</h2>
+  <Dialogs title="GAME OVER">
     <div class="flex flex-col gap-4 text-sm">
       <div class="flex justify-between w-full">
         <span class="font-semibold">Your Score:</span>
@@ -47,8 +41,8 @@ function quitGame() {
       </div>
     </div>
     <div class="flex gap-12">
-      <Button description="again" text="AGAIN" @click.prevent="replayGame" />
-      <Button description="quit" text="QUIT" @click.prevent="quitGame" />
+      <Button description="success" text="AGAIN" @click.prevent="replayGame" />
+      <Button description="warning" text="QUIT" @click.prevent="quitGame" />
     </div>
   </Dialogs>
 </template>

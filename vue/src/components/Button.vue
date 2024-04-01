@@ -18,9 +18,9 @@ const classList = {
   "nes-btn !flex justify-center items-center": true,
   "w-28 h-28 text-4xl is-error": description === "rotate",
   "w-14 h-14 text-2xl is-error": description === "direction",
-  "is-primary": description === "box",
-  "is-success": description === "again" || description === "join",
-  "is-warning": description === "quit" || description === "cancel",
+  "is-primary": description === "primary",
+  "is-success": description === "success",
+  "is-warning": description === "warning"
 };
 </script>
 

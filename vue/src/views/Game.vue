@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, onBeforeRouteLeave } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useGameStore } from "@/stores/game.js";
 
@@ -20,8 +20,15 @@ const route = useRoute();
 const gameMode = ref(route.params.mode);
 
 const game = useGameStore();
-const { map, currentShape, previewShape, nextShape, showSparator, highScore } =
-  storeToRefs(game);
+const {
+  map,
+  currentShape,
+  previewShape,
+  nextShape,
+  showSparator,
+  highScore,
+  room,
+} = storeToRefs(game);
 
 const mapCanvas = ref(null);
 const nextCanvas = ref(null);
@@ -39,6 +46,14 @@ const volumeUp = ref(true);
 let drop = false;
 let down = false;
 let dropTimer = null;
+
+onMounted(() => {
+  // preventZoom();
+});
+
+onBeforeRouteLeave(() => {
+  replayGame()
+})
 
 function playGame() {
   gamePlay.value = !gamePlay.value;
@@ -300,10 +315,6 @@ function getFilledRows() {
     }
   }
 }
-
-onMounted(() => {
-  // preventZoom();
-});
 </script>
 
 <template>
@@ -321,7 +332,7 @@ onMounted(() => {
         <span>{{ highScore }}</span>
       </GameInfo>
       <GameInfo title="ROOM" v-if="gameMode === '2p'">
-        <span>{{ highScore }}</span>
+        <span>{{ room }}</span>
       </GameInfo>
       <GameInfo title="NEXT">
         <Canvas ref="nextCanvas" name="next" width="80" height="40" />
@@ -363,7 +374,7 @@ onMounted(() => {
     <div class="flex flex-col justify-between items-end w-1/2">
       <div class="flex gap-4">
         <Button
-          description="box"
+          description="primary"
           :icon="
             gamePlay
               ? 'icon-[pixelarticons--pause]'
@@ -373,13 +384,13 @@ onMounted(() => {
           @click.prevent="playGame"
         />
         <Button
-          description="box"
+          description="primary"
           icon="icon-[pixelarticons--reload]"
           v-if="gameMode === '1p'"
           @click.prevent="replayGame"
         />
         <Button
-          description="box"
+          description="primary"
           :icon="
             volumeUp
               ? 'icon-[pixelarticons--volume-vibrate]'
@@ -394,10 +405,11 @@ onMounted(() => {
       />
     </div>
   </div>
+  <GamePrepare v-if="gameMode === '2p'" />
   <GameOverInfo
     :score="score"
     :highScore="highScore"
-    :gameOver="gameOver"
+    v-if="gameOver"
     @replay="replayGame"
   />
 </template>

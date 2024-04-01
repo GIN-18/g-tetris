@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-import { useGameStore} from "@/stores/game.js";
+import { useGameStore } from "@/stores/game.js";
 import { useRouter } from "vue-router";
 import { socket } from "@/assets/js/socket.js";
 
@@ -16,7 +16,7 @@ const showJoinRoom = ref(false);
 const serverStatus = ref(true);
 
 socket.on("roomCreated", (data) => {
-  game.room = data[socket.id].room
+  game.room = data[socket.id].room;
 
   router.push({
     path: "/game/2p",
@@ -24,19 +24,19 @@ socket.on("roomCreated", (data) => {
 });
 
 socket.on("roomJoined", (data) => {
-  console.log('room joined');
+  console.log("room joined");
   router.push({
     path: "/game/2p",
   });
-})
+});
 
 socket.on("roomFull", () => {
-  console.log('room full');
-})
+  console.log("room full");
+});
 
 socket.on("roomNotFound", () => {
-  console.log('room not found');
-})
+  console.log("room not found");
+});
 
 function createRoom() {
   socket.emit("createRoom");
@@ -69,5 +69,5 @@ function joinRoom() {
       />
     </div>
   </div>
-  <JoinRoom v-model="showJoinRoom" />
+  <JoinRoom v-if="showJoinRoom" v-model="showJoinRoom" title="Join Room" />
 </template>
