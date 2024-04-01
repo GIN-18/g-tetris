@@ -53,6 +53,22 @@ let drop = false;
 let down = false;
 let dropTimer = null;
 
+const playIcon = computed(() =>
+  gamePlay.value ? "icon-[pixelarticons--pause]" : "icon-[pixelarticons--play]"
+);
+
+const volumeIcon = computed(() =>
+  volumeUp ? "icon-[pixelarticons--volume-vibrate]" : "icon-[pixelarticons--volume-x]"
+);
+
+const formatScoreDiff = computed(() =>
+  scoreDiff.value >= 0 ? `+${scoreDiff.value}` : scoreDiff.value
+);
+
+const scoreDiffColor = computed(() =>
+  scoreDiff.value >= 0 ? "text-nes-deep-green" : "text-nes-deep-red"
+);
+
 onMounted(() => {
   // preventZoom();
 
@@ -96,6 +112,14 @@ socket.on("scoreUpdated", (data) => {
   }
 
   scoreDiff.value = scoreArray[0] - scoreArray[1];
+});
+
+socket.on("onePlayerGameOver", () => {
+  console.log("one player game over");
+});
+
+socket.on("twoPlayerGameOver", () => {
+  console.log("two player game over");
 });
 
 function playGame() {
@@ -165,12 +189,12 @@ function addShape() {
       clearInterval(dropTimer);
       dropTimer = null;
 
-      if(checkGameMode('2p')) {
+      if (checkGameMode("2p")) {
         socket.emit("gameOver", {
           room: game.room,
           gameOver: true,
-        })
-        return
+        });
+        return;
       }
 
       updateHighScore();
@@ -405,12 +429,9 @@ function readyGame(status) {
         <span>{{ highScore }}</span>
       </GameInfo>
       <GameInfo title="SCORE DIFF" v-if="checkGameMode('2p')">
-        <div
-          :class="scoreDiff >= 0 ? 'text-nes-deep-green' : 'text-nes-deep-red'"
-          v-if="checkGameMode('2p')"
-        >
-          {{ scoreDiff >= 0 ? `+${scoreDiff}` : scoreDiff }}
-        </div>
+        <span :class="scoreDiffColor">
+          {{ formatScoreDiff }}
+        </span>
       </GameInfo>
       <GameInfo title="NEXT">
         <Canvas ref="nextCanvas" name="next" width="80" height="40" />
@@ -453,11 +474,7 @@ function readyGame(status) {
       <div class="flex gap-4">
         <Button
           description="primary"
-          :icon="
-            gamePlay
-              ? 'icon-[pixelarticons--pause]'
-              : 'icon-[pixelarticons--play]'
-          "
+          :icon="playIcon"
           v-if="checkGameMode('1p')"
           @click.prevent="playGame"
         />
@@ -467,14 +484,7 @@ function readyGame(status) {
           v-if="checkGameMode('1p')"
           @click.prevent="replayGame"
         />
-        <Button
-          description="primary"
-          :icon="
-            volumeUp
-              ? 'icon-[pixelarticons--volume-vibrate]'
-              : 'icon-[pixelarticons--volume-x]'
-          "
-        />
+        <Button description="primary" :icon="volumeIcon" />
       </div>
       <Button
         description="rotate"
@@ -492,8 +502,10 @@ function readyGame(status) {
     @cancel="readyGame(false)"
   />
   <GameOverInfo
+    :gameMode="gameMode"
     :score="score"
     :highScore="highScore"
+    :scoreDiff="scoreDiff"
     v-if="gameOver"
     @replay="replayGame"
   />
