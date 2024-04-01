@@ -1,8 +1,9 @@
 <script setup>
 import { useRouter } from "vue-router";
 
+import DialogsBox from "@/components/DialogsBox.vue";
+import LabelBox from "@/components/LabelBox.vue"
 import Button from "@/components/Button.vue";
-import Dialogs from "@/components/Dialogs.vue";
 
 const router = useRouter();
 
@@ -29,20 +30,18 @@ function quitGame() {
 </script>
 
 <template>
-  <Dialogs title="GAME OVER">
+  <DialogsBox title="GAME OVER">
     <div class="flex flex-col gap-4 text-sm">
-      <div class="flex justify-between w-full">
-        <span class="font-semibold">Your Score:</span>
+      <LabelBox label="Your Score:">
         <span>{{ props.score }}</span>
-      </div>
-      <div class="flex justify-between w-full">
-        <span class="font-semibold">High Score:</span>
+      </LabelBox>
+      <LabelBox label="High Score:">
         <span>{{ props.highScore }}</span>
-      </div>
+      </LabelBox>
     </div>
     <div class="flex gap-12">
       <Button description="success" text="AGAIN" @click.prevent="replayGame" />
       <Button description="warning" text="QUIT" @click.prevent="quitGame" />
     </div>
-  </Dialogs>
+  </DialogsBox>
 </template>

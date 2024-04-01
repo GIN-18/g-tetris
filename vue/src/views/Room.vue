@@ -24,7 +24,10 @@ socket.on("roomCreated", (data) => {
 });
 
 socket.on("roomJoined", (data) => {
-  console.log("room joined");
+  console.log("room joined");  // TODO: show message here
+
+  game.room = data[socket.id].room
+
   router.push({
     path: "/game/2p",
   });
@@ -69,5 +72,5 @@ function joinRoom() {
       />
     </div>
   </div>
-  <JoinRoom v-if="showJoinRoom" v-model="showJoinRoom" title="Join Room" />
+  <JoinRoom v-if="showJoinRoom" v-model="showJoinRoom" />
 </template>

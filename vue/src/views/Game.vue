@@ -1,9 +1,10 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { useRoute, onBeforeRouteLeave } from "vue-router";
 import { storeToRefs } from "pinia";
+import { useRoute, onBeforeRouteLeave } from "vue-router";
 import { useGameStore } from "@/stores/game.js";
 
+import { socket } from "@/assets/js/socket.js";
 import { getShape } from "@/assets/js/shape.js";
 import { palettes } from "@/assets/js/palettes.js";
 import { preventZoom, forEachShape } from "@/assets/js/utils.js";
@@ -43,17 +44,44 @@ const filledRows = [];
 
 const volumeUp = ref(true);
 
+const readyStatus = ref(false);
+const showPrepare = ref(false);
+const prepared = ref(0);
+
 let drop = false;
 let down = false;
 let dropTimer = null;
 
 onMounted(() => {
   // preventZoom();
+
+  if (checkGameMode("2p")) {
+    showPrepare.value = true;
+  }
 });
 
 onBeforeRouteLeave(() => {
-  replayGame()
-})
+  replayGame();
+});
+
+socket.on("onePlayerReady", () => {
+  prepared.value = 1;
+});
+
+socket.on("twoPlayerReady", () => {
+  prepared.value = 2;
+
+  socket.emit("startGame", {
+    room: game.room,
+    gameStart: true,
+  });
+});
+
+socket.on("twoStartGame", () => {
+  showPrepare.value = false;
+
+  playGame();
+});
 
 function playGame() {
   gamePlay.value = !gamePlay.value;
@@ -315,6 +343,21 @@ function getFilledRows() {
     }
   }
 }
+
+function checkGameMode(mode) {
+  return gameMode.value === mode;
+}
+
+function readyGame(status) {
+  if (!status) prepared.value = 0;
+
+  readyStatus.value = status;
+
+  socket.emit("ready", {
+    room: room.value,
+    ready: readyStatus.value,
+  });
+}
 </script>
 
 <template>
@@ -328,10 +371,10 @@ function getFilledRows() {
       <GameInfo title="SCORE">
         <span>{{ score }}</span>
       </GameInfo>
-      <GameInfo title="HI-SCORE" v-if="gameMode === '1p'">
+      <GameInfo title="HI-SCORE" v-if="checkGameMode('1p')">
         <span>{{ highScore }}</span>
       </GameInfo>
-      <GameInfo title="ROOM" v-if="gameMode === '2p'">
+      <GameInfo title="ROOM" v-if="checkGameMode('2p')">
         <span>{{ room }}</span>
       </GameInfo>
       <GameInfo title="NEXT">
@@ -380,13 +423,13 @@ function getFilledRows() {
               ? 'icon-[pixelarticons--pause]'
               : 'icon-[pixelarticons--play]'
           "
-          v-if="gameMode === '1p'"
+          v-if="checkGameMode('1p')"
           @click.prevent="playGame"
         />
         <Button
           description="primary"
           icon="icon-[pixelarticons--reload]"
-          v-if="gameMode === '1p'"
+          v-if="checkGameMode('1p')"
           @click.prevent="replayGame"
         />
         <Button
@@ -405,7 +448,14 @@ function getFilledRows() {
       />
     </div>
   </div>
-  <GamePrepare v-if="gameMode === '2p'" />
+
+  <GamePrepare
+    :status="readyStatus"
+    :prepared="prepared"
+    v-if="showPrepare"
+    @ready="readyGame(true)"
+    @cancel="readyGame(false)"
+  />
   <GameOverInfo
     :score="score"
     :highScore="highScore"

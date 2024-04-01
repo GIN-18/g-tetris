@@ -24,7 +24,7 @@ io.on("connection", (socket) => {
     rooms[room] = {
       [socket.id]: {
         room,
-        ready: 0,
+        ready: false,
         score: 0,
       },
     };
@@ -73,7 +73,8 @@ io.on("connection", (socket) => {
       "ready",
       ready,
       "onePlayerReady",
-      "twoPlayerReady"
+      "twoPlayerReady",
+      "zeroPlayerReady"
     );
   });
 
@@ -154,12 +155,12 @@ function generateRoomId() {
 }
 
 // 根据属性值发出事件
-function emitByAttr(playerId, room, attr, attrValue, oneEvent, twoEvent) {
+function emitByAttr(playerId, room, attr, attrValue, oneEvent, twoEvent, zeroEvent) {
   try {
-    const status = (rooms[room][playerId][attr] = Number(attrValue));
+    const status = (rooms[room][playerId][attr] = attrValue);
 
     const twoCheck = Object.keys(rooms[room]).every(
-      (key) => rooms[room][key][attr] == 1
+      (key) => rooms[room][key][attr] === true
     );
 
     if (twoCheck && Object.keys(rooms[room]).length > 1) {
