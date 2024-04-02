@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useGameStore } from "@/stores/game.js";
 import { useRouter } from "vue-router";
 import { socket } from "@/assets/js/socket.js";
@@ -13,10 +13,10 @@ const game = useGameStore();
 const router = useRouter();
 
 const showJoinRoom = ref(false);
-const serverStatus = ref(true);
 
 socket.on("roomCreated", (data) => {
-  game.room = data[socket.id].room;
+  localStorage.setItem("room", data[socket.id].room);
+  // game.room = data[socket.id].room;
 
   router.push({
     path: "/game/2p",
@@ -24,9 +24,10 @@ socket.on("roomCreated", (data) => {
 });
 
 socket.on("roomJoined", (data) => {
-  console.log("room joined");  // TODO: show message here
+  console.log("room joined"); // TODO: show message here
 
-  game.room = data[socket.id].room
+  localStorage.setItem("room", data[socket.id].room);
+  // game.room = data[socket.id].room;
 
   router.push({
     path: "/game/2p",
@@ -53,10 +54,10 @@ function joinRoom() {
 <template>
   <Header></Header>
   <div class="flex flex-col justify-center items-center gap-24 h-full">
-    <div class="flex justify-center items-center gap-2">
-      <h1 class="text-3xl">Server</h1>
-      <ServerInfo :status="serverStatus" />
-    </div>
+    <!-- <div class="flex justify-center items-center gap-4"> -->
+    <!--   <h2 class="mb-0 text-4xl">SERVER</h2> -->
+    <!--   <ServerInfo :status="serverStatus" /> -->
+    <!-- </div> -->
     <div class="flex flex-col gap-10">
       <LinkBox
         link="#"

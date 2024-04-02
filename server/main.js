@@ -62,7 +62,7 @@ io.on("connection", (socket) => {
         score,
       };
       socket.emit("roomJoined", rooms[room]);
-    } catch (error) { }
+    } catch (error) {}
   });
 
   // 玩家准备
@@ -74,7 +74,6 @@ io.on("connection", (socket) => {
       ready,
       "onePlayerReady",
       "twoPlayerReady",
-      "zeroPlayerReady"
     );
   });
 
@@ -92,7 +91,7 @@ io.on("connection", (socket) => {
       "gameStart",
       gameStart,
       "oneStartGame",
-      "twoStartGame"
+      "twoStartGame",
     );
   });
 
@@ -104,7 +103,7 @@ io.on("connection", (socket) => {
       "gameOver",
       gameOver,
       "onePlayerGameOver",
-      "twoPlayerGameOver"
+      "twoPlayerGameOver",
     );
   });
 
@@ -116,7 +115,7 @@ io.on("connection", (socket) => {
       "again",
       again,
       "onePlayerAgain",
-      "twoPlayerAgain"
+      "twoPlayerAgain",
     );
   });
 
@@ -129,7 +128,7 @@ io.on("connection", (socket) => {
       rooms[room][socket.id].gameOver = gameOver; // 更新游戏结束状态
       rooms[room][socket.id].again = again; // 更新再来一局状态
       socket.to(room).emit("restartGame", rooms[room]);
-    }
+    },
   );
 
   // 玩家离开房间
@@ -155,12 +154,12 @@ function generateRoomId() {
 }
 
 // 根据属性值发出事件
-function emitByAttr(playerId, room, attr, attrValue, oneEvent, twoEvent, zeroEvent) {
+function emitByAttr(playerId, room, attr, attrValue, oneEvent, twoEvent) {
   try {
     const status = (rooms[room][playerId][attr] = attrValue);
 
     const twoCheck = Object.keys(rooms[room]).every(
-      (key) => rooms[room][key][attr] === true
+      (key) => rooms[room][key][attr] === true,
     );
 
     if (twoCheck && Object.keys(rooms[room]).length > 1) {
@@ -174,5 +173,5 @@ function emitByAttr(playerId, room, attr, attrValue, oneEvent, twoEvent, zeroEve
         return;
       }
     });
-  } catch (error) { }
+  } catch (error) {}
 }

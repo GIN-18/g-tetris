@@ -21,15 +21,8 @@ const route = useRoute();
 const gameMode = ref(route.params.mode);
 
 const game = useGameStore();
-const {
-  map,
-  currentShape,
-  previewShape,
-  nextShape,
-  showSparator,
-  highScore,
-  room,
-} = storeToRefs(game);
+const { map, currentShape, previewShape, nextShape, showSparator, highScore } =
+  storeToRefs(game);
 
 const mapCanvas = ref(null);
 const nextCanvas = ref(null);
@@ -39,6 +32,7 @@ const level = ref(1);
 
 const gamePlay = ref(false);
 const gameOver = ref(false);
+const gameOverTitle = ref("GAME OVER");
 
 const filledRows = [];
 
@@ -54,19 +48,21 @@ let down = false;
 let dropTimer = null;
 
 const playIcon = computed(() =>
-  gamePlay.value ? "icon-[pixelarticons--pause]" : "icon-[pixelarticons--play]"
+  gamePlay.value ? "icon-[pixelarticons--pause]" : "icon-[pixelarticons--play]",
 );
 
 const volumeIcon = computed(() =>
-  volumeUp ? "icon-[pixelarticons--volume-vibrate]" : "icon-[pixelarticons--volume-x]"
+  volumeUp
+    ? "icon-[pixelarticons--volume-vibrate]"
+    : "icon-[pixelarticons--volume-x]",
 );
 
 const formatScoreDiff = computed(() =>
-  scoreDiff.value >= 0 ? `+${scoreDiff.value}` : scoreDiff.value
+  scoreDiff.value >= 0 ? `+${scoreDiff.value}` : scoreDiff.value,
 );
 
 const scoreDiffColor = computed(() =>
-  scoreDiff.value >= 0 ? "text-nes-deep-green" : "text-nes-deep-red"
+  scoreDiff.value >= 0 ? "text-nes-deep-green" : "text-nes-deep-red",
 );
 
 onMounted(() => {
@@ -88,10 +84,7 @@ socket.on("onePlayerReady", () => {
 socket.on("twoPlayerReady", () => {
   prepared.value = 2;
 
-  socket.emit("startGame", {
-    room: game.room,
-    gameStart: true,
-  });
+  emitEvent("startGame", "gameStart", true);
 });
 
 socket.on("twoStartGame", () => {
@@ -119,7 +112,20 @@ socket.on("onePlayerGameOver", () => {
 });
 
 socket.on("twoPlayerGameOver", () => {
-  console.log("two player game over");
+  if (scoreDiff.value > 0) {
+    gameOverTitle.value = "VICTORY";
+  } else if (scoreDiff.value < 0) {
+    gameOverTitle.value = "TRY AGAIN";
+  }
+});
+
+socket.on("onePlayerAgain", (data) => {
+  console.log("one player again");
+});
+
+socket.on("twoPlayerAgain", () => {
+  replayGame();
+  playGame();
 });
 
 function playGame() {
@@ -190,10 +196,7 @@ function addShape() {
       dropTimer = null;
 
       if (checkGameMode("2p")) {
-        socket.emit("gameOver", {
-          room: game.room,
-          gameOver: true,
-        });
+        emitEvent("gameOver", "gameOver", true);
         return;
       }
 
@@ -345,7 +348,7 @@ function mergeShape() {
       if (y >= 0) map.value[y][x] = type + 1;
     },
     x,
-    y
+    y,
   );
 }
 
@@ -362,10 +365,7 @@ function updateScore() {
       (filledRows.length * level.value + (filledRows.length - 1)) * 10;
 
     if (checkGameMode("2p")) {
-      socket.emit("updateScore", {
-        room: game.room,
-        score: score.value,
-      });
+      emitEvent("updateScore", "score", score.value);
     }
   }
 }
@@ -402,21 +402,29 @@ function checkGameMode(mode) {
   return gameMode.value === mode;
 }
 
-function readyGame(status) {
-  if (!status) prepared.value = 0;
+function readyGame(params) {
+  if (!params) prepared.value = 0;
 
-  readyStatus.value = status;
+  readyStatus.value = params;
 
-  socket.emit("ready", {
-    room: room.value,
-    ready: readyStatus.value,
+  emitEvent("ready", "ready", params);
+}
+
+function againGame(params) {
+  emitEvent("again", "again", true);
+}
+
+function emitEvent(event, attr, value) {
+  socket.emit(event, {
+    room: localStorage.getItem("room"),
+    [attr]: value,
   });
 }
 </script>
 
 <template>
   <Header>
-    <Menu :playStatus="gamePlay" @play="playGame" />
+    <Menu :playStatus="gamePlay" @play="playGame" v-if="checkGameMode('1p')" />
   </Header>
 
   <main class="flex justify-between items-center w-full">
@@ -502,11 +510,14 @@ function readyGame(status) {
     @cancel="readyGame(false)"
   />
   <GameOverInfo
+    :socket="socket"
+    :title="gameOverTitle"
     :gameMode="gameMode"
     :score="score"
     :highScore="highScore"
     :scoreDiff="scoreDiff"
     v-if="gameOver"
     @replay="replayGame"
+    @again="againGame"
   />
 </template>

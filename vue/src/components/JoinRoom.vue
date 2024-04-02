@@ -28,7 +28,7 @@ const joinRoom = debounce(
   {
     leading: true,
     trailing: false,
-  }
+  },
 );
 
 function cancelJoinRoom() {

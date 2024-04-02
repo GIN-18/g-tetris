@@ -14,30 +14,19 @@ const canvas = ref(null);
 const ctx = computed(() => canvas.value.getContext("2d"));
 
 const props = defineProps({
-  name: {
-    type: String,
-    required: true,
-  },
-  width: {
-    required: true,
-  },
-  height: {
-    required: true,
-  },
+  name: String,
+  width: String,
+  height: String,
 });
 
-const { name, width, height } = props;
-
 const BLOCK = 20;
-const W = width;
-const H = height;
 
 watch(isPreview, () => {
-  if (previewShape.value && name === "map") drawGame();
+  if (previewShape.value && props.name === "map") drawGame();
 });
 
 onMounted(() => {
-  if (name === "next") {
+  if (props.name === "next") {
     drawNextShape();
   }
 });
@@ -50,7 +39,7 @@ function drawGame() {
 }
 
 function clearMap() {
-  ctx.value.clearRect(0, 0, W, H);
+  ctx.value.clearRect(0, 0, props.width, props.height);
 }
 
 function drawMap() {
@@ -84,7 +73,7 @@ function drawPreviewShape() {
         ctx.value.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
       },
       previewX,
-      previewFinalY
+      previewFinalY,
     );
   }
 
@@ -115,7 +104,7 @@ function drawCurrentShape() {
       ctx.value.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
     },
     currentX,
-    currentY
+    currentY,
   );
 }
 
@@ -125,7 +114,7 @@ function drawNextShape() {
   let xStep = 0;
   let yStep = 0;
 
-  ctx.value.clearRect(0, 0, W, H);
+  ctx.value.clearRect(0, 0, props.width, props.height);
   ctx.value.fillStyle = palettes[palette.value].shapeColor[type];
 
   if (type === 0) {
@@ -142,7 +131,7 @@ function drawNextShape() {
       ctx.value.fillRect(x * BLOCK, y * BLOCK, BLOCK, BLOCK);
     },
     xStep,
-    yStep
+    yStep,
   );
 }
 
@@ -154,12 +143,12 @@ defineExpose({
 </script>
 
 <template>
-  <div :class="{ 'p-0 border-4 border-black': name === 'map' }">
+  <div :class="{ 'p-0 border-4 border-black': props.name === 'map' }">
     <canvas
       ref="canvas"
-      :class="{ 'bg-black': name === 'map' }"
-      :width="W"
-      :height="H"
+      :class="{ 'bg-black': props.name === 'map' }"
+      :width="props.width"
+      :height="props.height"
     ></canvas>
   </div>
 </template>

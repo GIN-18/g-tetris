@@ -7,10 +7,9 @@ export const useGameStore = defineStore("game", {
     currentShape: null,
     previewShape: null,
     nextShape: getShape(),
-    palette: 'nes',
+    palette: "nes",
     showSparator: false,
-    highScore: localStorage.getItem('highScore') || 0,
-    isPreview: localStorage.getItem('isPreview') || true,
-    room: '',
+    highScore: localStorage.getItem("highScore") || 0,
+    isPreview: localStorage.getItem("isPreview") || true,
   }),
 });

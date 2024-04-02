@@ -20,7 +20,7 @@ const classList = {
   "w-14 h-14 text-2xl is-error": description === "direction",
   "is-primary": description === "primary",
   "is-success": description === "success",
-  "is-warning": description === "warning"
+  "is-warning": description === "warning",
 };
 </script>
 

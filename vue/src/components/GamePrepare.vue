@@ -13,6 +13,8 @@ const props = defineProps({
   prepared: Number,
 });
 
+const room = localStorage.getItem("room");
+
 const statusClass = computed(() => ({
   "text-nes-deep-red": !props.status,
   "text-nes-deep-green": props.status,
@@ -23,7 +25,7 @@ const statusClass = computed(() => ({
   <DialogsBox title="PREPARE">
     <div class="flex flex-col gap-4 text-sm w-72">
       <LabelBox label="Room ID:">
-        <span>{{ game.room }}</span>
+        <span>{{ room }}</span>
       </LabelBox>
       <LabelBox label="Status:">
         <span :class="statusClass">{{
