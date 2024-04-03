@@ -13,7 +13,8 @@ import Header from "@/components/Header.vue";
 import Menu from "@/components/menu/Menu.vue";
 import GamePrepare from "@/components/GamePrepare.vue";
 import GameInfo from "@/components/GameInfo.vue";
-import Button from "@/components/Button.vue";
+// import Button from "@/components/button/Button.vue";
+import PlayButton from "@/components/button/PlayButton.vue";
 import Canvas from "@/components/Canvas.vue";
 import GameOverInfo from "@/components/GameOverInfo.vue";
 
@@ -34,8 +35,6 @@ const gamePlay = ref(false);
 const gameOver = ref(false);
 const gameOverTitle = ref("GAME OVER");
 
-const filledRows = [];
-
 const volumeUp = ref(true);
 
 const readyStatus = ref(false);
@@ -43,13 +42,11 @@ const showPrepare = ref(false);
 const prepared = ref(0);
 const scoreDiff = ref(0);
 
+const filledRows = [];
+
 let drop = false;
 let down = false;
 let dropTimer = null;
-
-const playIcon = computed(() =>
-  gamePlay.value ? "icon-[pixelarticons--pause]" : "icon-[pixelarticons--play]",
-);
 
 const volumeIcon = computed(() =>
   volumeUp
@@ -452,55 +449,57 @@ function emitEvent(event, attr, value) {
 
   <hr class="w-full border-t-4 border-dashed border-black" />
 
-  <div class="flex w-full">
-    <div class="flex flex-col justify-center items-center w-1/2">
-      <Button
-        description="direction"
-        icon="icon-[pixelarticons--arrow-bar-down]"
-        @click.prevent="moveShapeDown('drop', true)"
-      />
-      <div class="flex justify-between items-center w-full">
-        <Button
-          description="direction"
-          icon="icon-[pixelarticons--chevron-left]"
-          @click.prevent="moveShape(-1, 0)"
-        />
-        <Button
-          description="direction"
-          icon="icon-[pixelarticons--chevron-right]"
-          @click.prevent="moveShape(1, 0)"
-        />
-      </div>
-      <Button
-        description="direction"
-        icon="icon-[pixelarticons--chevron-down]"
-        @touchstart.prevent="moveShapeDown('down', true)"
-        @touchend.prevent="moveShapeDown('down', false)"
-      />
-    </div>
-    <div class="flex flex-col justify-between items-end w-1/2">
-      <div class="flex gap-4">
-        <Button
-          description="primary"
-          :icon="playIcon"
-          v-if="checkGameMode('1p')"
-          @click.prevent="playGame"
-        />
-        <Button
-          description="primary"
-          icon="icon-[pixelarticons--reload]"
-          v-if="checkGameMode('1p')"
-          @click.prevent="replayGame"
-        />
-        <Button description="primary" :icon="volumeIcon" />
-      </div>
-      <Button
-        description="rotate"
-        icon="icon-[pixelarticons--redo]"
-        @click.prevent="rotateShape"
-      />
-    </div>
-  </div>
+  <PlayButton :play="gamePlay" @play="playGame" />
+
+  <!-- <div class="flex w-full"> -->
+  <!--   <div class="flex flex-col justify-center items-center w-1/2"> -->
+  <!--     <Button -->
+  <!--       type="direction" -->
+  <!--       icon="icon-[pixelarticons--arrow-bar-down]" -->
+  <!--       @click.prevent="moveShapeDown('drop', true)" -->
+  <!--     /> -->
+  <!--     <div class="flex justify-between items-center w-full"> -->
+  <!--       <Button -->
+  <!--         type="direction" -->
+  <!--         icon="icon-[pixelarticons--chevron-left]" -->
+  <!--         @click.prevent="moveShape(-1, 0)" -->
+  <!--       /> -->
+  <!--       <Button -->
+  <!--         type="direction" -->
+  <!--         icon="icon-[pixelarticons--chevron-right]" -->
+  <!--         @click.prevent="moveShape(1, 0)" -->
+  <!--       /> -->
+  <!--     </div> -->
+  <!--     <Button -->
+  <!--       type="direction" -->
+  <!--       icon="icon-[pixelarticons--chevron-down]" -->
+  <!--       @touchstart.prevent="moveShapeDown('down', true)" -->
+  <!--       @touchend.prevent="moveShapeDown('down', false)" -->
+  <!--     /> -->
+  <!--   </div> -->
+  <!--   <div class="flex flex-col justify-between items-end w-1/2"> -->
+  <!--     <div class="flex gap-4"> -->
+  <!--       <Button -->
+  <!--         type="primary" -->
+  <!--         :icon="playIcon" -->
+  <!--         v-if="checkGameMode('1p')" -->
+  <!--         @click.prevent="playGame" -->
+  <!--       /> -->
+  <!--       <Button -->
+  <!--         type="primary" -->
+  <!--         icon="icon-[pixelarticons--reload]" -->
+  <!--         v-if="checkGameMode('1p')" -->
+  <!--         @click.prevent="replayGame" -->
+  <!--       /> -->
+  <!--       <Button type="primary" :icon="volumeIcon" /> -->
+  <!--     </div> -->
+  <!--     <Button -->
+  <!--       type="rotate" -->
+  <!--       icon="icon-[pixelarticons--redo]" -->
+  <!--       @click.prevent="rotateShape" -->
+  <!--     /> -->
+  <!--   </div> -->
+  <!-- </div> -->
 
   <GamePrepare
     :status="readyStatus"
@@ -510,7 +509,6 @@ function emitEvent(event, attr, value) {
     @cancel="readyGame(false)"
   />
   <GameOverInfo
-    :socket="socket"
     :title="gameOverTitle"
     :gameMode="gameMode"
     :score="score"

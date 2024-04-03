@@ -4,7 +4,7 @@ import { useGameStore } from "@/stores/game.js";
 
 import DialogsBox from "@/components/DialogsBox.vue";
 import LabelBox from "@/components/LabelBox.vue";
-import Button from "@/components/Button.vue";
+import Button from "@/components/button/Button.vue";
 
 const game = useGameStore();
 const emit = defineEmits(["ready", "cancel"]);

@@ -4,7 +4,7 @@ import { debounce } from "lodash";
 
 import { socket } from "@/assets/js/socket.js";
 
-import Button from "@/components/Button.vue";
+import Button from "@/components/button/Button.vue";
 import DialogsBox from "@/components/DialogsBox.vue";
 
 const model = defineModel();
