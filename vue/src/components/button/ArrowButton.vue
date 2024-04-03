@@ -12,11 +12,17 @@ const icon = computed(() => ({
   "icon-[pixelarticons--chevron-right]": props.type === "right",
   "icon-[pixelarticons--chevron-left]": props.type === "left",
   "icon-[pixelarticons--chevron-down]": props.type === "down",
+  "icon-[pixelarticons--redo]": props.type === "rotate",
 }));
+
+function checkType() {
+  const arr = ["drop", "right", "left", "down"];
+  return arr.includes(props.type) ? "arrow" : "rotate";
+}
 </script>
 
 <template>
   <div>
-    <Button type="arrow" :icon="icon" />
+    <Button :type="checkType()" :icon="icon" />
   </div>
 </template>

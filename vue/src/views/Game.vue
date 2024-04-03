@@ -488,12 +488,8 @@ function emitEvent(event, attr, value) {
         />
       </div>
 
-      <!-- rotate butron -->
-      <Button
-        type="rotate"
-        icon="icon-[pixelarticons--redo]"
-        @click.prevent="rotateShape"
-      />
+      <!-- rotate button -->
+      <ArrowButton type="rotate" @click.prevent="rotateShape" />
     </div>
   </div>
 
@@ -504,6 +500,7 @@ function emitEvent(event, attr, value) {
     @ready="readyGame(true)"
     @cancel="readyGame(false)"
   />
+
   <GameOverInfo
     :title="gameOverTitle"
     :gameMode="gameMode"
