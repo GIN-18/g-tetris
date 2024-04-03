@@ -1,33 +1,36 @@
 <script setup>
+import { computed, watch } from "vue";
 import { useGameStore } from "@/stores/game.js";
 
 const game = useGameStore();
 
 const props = defineProps({
-  option: {
-    type: String,
-    required: true,
-  },
+  option: String,
 });
 
-function changeStatus(enable) {
-  localStorage.setItem(props.option, enable);
-  game[props.option] = JSON.parse(localStorage.getItem(props.option));
+const classList = computed(() => ({
+  "text-2xl": true,
+  "icon-[pixelarticons--toggle-right] text-nes-deep-green": JSON.parse(
+    game[props.option],
+  ),
+  "icon-[pixelarticons--toggle-left] text-nes-deep-gray": !JSON.parse(
+    game[props.option],
+  ),
+}));
+
+watch(
+  () => game[props.option],
+  (newValue, oldValue) => {
+    classList.value;
+    localStorage.setItem(props.option, JSON.stringify(newValue));
+  },
+);
+
+function toggleOption() {
+  game[props.option] = !JSON.parse(game[props.option]);
 }
 </script>
 
 <template>
-  <button
-    v-if="JSON.parse(game[props.option])"
-    @click.prevent="changeStatus(false)"
-  >
-    <span
-      class="text-2xl icon-[pixelarticons--toggle-right] text-nes-deep-green"
-    ></span>
-  </button>
-  <button v-else @click.prevent="changeStatus(true)">
-    <span
-      class="text-2xl icon-[pixelarticons--toggle-left] text-nes-deep-gray"
-    ></span>
-  </button>
+  <button :class="classList" @click.prevent="toggleOption"></button>
 </template>
