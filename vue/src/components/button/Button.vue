@@ -9,6 +9,8 @@ const props = defineProps({
 
 const classList = computed(() => ({
   "nes-btn !flex justify-center items-center": true,
+  "w-28 h-28 text-4xl is-error": props.type === "rotate",
+  "w-14 h-14 text-2xl is-error": props.type === "arrow",
   "is-primary": props.type === "primary",
   "is-success": props.type === "success",
   "is-warning": props.type === "warning",
