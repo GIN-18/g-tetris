@@ -14,6 +14,7 @@ import Menu from "@/components/menu/Menu.vue";
 import GamePrepare from "@/components/GamePrepare.vue";
 import GameInfo from "@/components/GameInfo.vue";
 import Button from "@/components/button/Button.vue";
+import ArrowButton from "@/components/button/ArrowButton.vue";
 import StatusButton from "@/components/button/StatusButton.vue";
 import Canvas from "@/components/Canvas.vue";
 import GameOverInfo from "@/components/GameOverInfo.vue";
@@ -47,12 +48,6 @@ const filledRows = [];
 let drop = false;
 let down = false;
 let dropTimer = null;
-
-const volumeIcon = computed(() =>
-  volumeUp
-    ? "icon-[pixelarticons--volume-vibrate]"
-    : "icon-[pixelarticons--volume-x]",
-);
 
 const formatScoreDiff = computed(() =>
   scoreDiff.value >= 0 ? `+${scoreDiff.value}` : scoreDiff.value,
@@ -455,32 +450,22 @@ function emitEvent(event, attr, value) {
   <hr class="w-full border-t-4 border-dashed border-black" />
 
   <div class="flex w-full">
+    <!-- arrow button -->
     <div class="flex flex-col justify-center items-center w-1/2">
-      <Button
-        type="arrow"
-        icon="icon-[pixelarticons--arrow-bar-down]"
-        @click.prevent="moveShapeDown('drop', true)"
-      />
+      <ArrowButton type="drop" @click.prevent="moveShapeDown('drop', true)" />
       <div class="flex justify-between items-center w-full">
-        <Button
-          type="arrow"
-          icon="icon-[pixelarticons--chevron-left]"
-          @click.prevent="moveShape(-1, 0)"
-        />
-        <Button
-          type="arrow"
-          icon="icon-[pixelarticons--chevron-right]"
-          @click.prevent="moveShape(1, 0)"
-        />
+        <ArrowButton type="left" @click.prevent="moveShape(-1, 0)" />
+        <ArrowButton type="right" @click.prevent="moveShape(1, 0)" />
       </div>
-      <Button
-        type="arrow"
-        icon="icon-[pixelarticons--chevron-down]"
+      <ArrowButton
+        type="down"
         @touchstart.prevent="moveShapeDown('down', true)"
         @touchend.prevent="moveShapeDown('down', false)"
       />
     </div>
+
     <div class="flex flex-col justify-between items-end w-1/2">
+      <!-- feature button -->
       <div class="flex gap-4">
         <StatusButton
           :status="gamePlay"
@@ -502,6 +487,8 @@ function emitEvent(event, attr, value) {
           @toggle="toggleVolume"
         />
       </div>
+
+      <!-- rotate butron -->
       <Button
         type="rotate"
         icon="icon-[pixelarticons--redo]"

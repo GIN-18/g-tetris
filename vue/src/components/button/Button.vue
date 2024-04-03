@@ -3,8 +3,10 @@ import { computed } from "vue";
 
 const props = defineProps({
   type: String,
-  icon: String,
   text: String,
+  icon: {
+    type: [String, Object],
+  },
 });
 
 const classList = computed(() => ({
