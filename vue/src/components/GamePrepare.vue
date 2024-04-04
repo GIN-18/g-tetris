@@ -23,7 +23,7 @@ const statusClass = computed(() => ({
 </script>
 
 <template>
-  <DialogsBox title="PREPARE" :show="props.showPrepare">
+  <DialogsBox title="PREPARE" :isShow="props.showPrepare">
     <div class="flex flex-col gap-4 text-sm w-72">
       <LabelBox label="Room ID:">
         <span>{{ room }}</span>
@@ -38,16 +38,8 @@ const statusClass = computed(() => ({
       </LabelBox>
     </div>
     <div class="flex gap-12">
-      <Button
-        description="success"
-        text="Ready"
-        @click.prevent="emit('ready')"
-      />
-      <Button
-        description="warning"
-        text="Cancel"
-        @click.prevent="emit('cancel')"
-      />
+      <Button type="success" text="Ready" @click.prevent="emit('ready')" />
+      <Button type="warning" text="Cancel" @click.prevent="emit('cancel')" />
     </div>
   </DialogsBox>
 </template>

@@ -70,5 +70,4 @@ function joinRoom() {
     </div>
   </div>
   <JoinRoom v-model="showJoinRoom" />
-  <!-- <JoinRoom v-if="showJoinRoom" v-model="showJoinRoom" /> -->
 </template>

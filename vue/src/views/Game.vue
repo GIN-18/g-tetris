@@ -23,7 +23,7 @@ const route = useRoute();
 const gameMode = ref(route.params.mode);
 
 const game = useGameStore();
-const { map, currentShape, previewShape, nextShape, showSparator, highScore } =
+const { map, currentShape, previewShape, nextShape, highScore } =
   storeToRefs(game);
 
 const mapCanvas = ref(null);
@@ -139,7 +139,6 @@ function replayGame() {
     currentShape: null,
     previewShape: null,
     nextShape: getShape(),
-    showSparator: false,
   });
 
   gamePlay.value = false;
@@ -178,7 +177,6 @@ function addShape() {
       gamePlay.value = false;
 
       game.$patch({
-        showSparator: true,
         currentShape: null,
         previewShape: null,
         nextShape: null,

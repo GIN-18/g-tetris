@@ -9,7 +9,7 @@ const props = defineProps({
 
 <template>
   <li class="flex justify-between items-center">
-    <span> {{ text }} </span>
+    <p class="!mb-0">{{ text }}</p>
     <slot></slot>
   </li>
 </template>

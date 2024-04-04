@@ -18,10 +18,72 @@ export default {
         "nes-deep-green": "#76c442",
       },
       animation: {
-        "scale-in-right": "scale-in-right 0.5s ease both",
-        "scale-out-right": "scale-out-right 0.5s ease both",
+        "fade-in": "fade-in 0.4s ease both",
+        "fade-out": "fade-out 0.4s ease both",
+        "slide-in-right": "slide-in-right 0.4s ease both",
+        "slide-out-right": "slide-out-right 0.4s ease both",
+        "scale-in-center": "scale-in-center 0.4s ease both",
+        "scale-out-center": "scale-out-center 0.4s ease both",
+        "scale-in-right": "scale-in-right 0.4s ease both",
+        "scale-out-right": "scale-out-right 0.4s ease both",
       },
       keyframes: {
+        "fade-in": {
+          "0%": {
+            opacity: "0",
+          },
+          to: {
+            opacity: "1",
+          },
+        },
+        "fade-out": {
+          "0%": {
+            opacity: "1",
+          },
+          to: {
+            opacity: "0",
+          },
+        },
+        "slide-in-right": {
+          "0%": {
+            transform: "translateX(1000px)",
+            opacity: "0",
+          },
+          to: {
+            transform: "translateX(0)",
+            opacity: "1",
+          },
+        },
+        "slide-out-right": {
+          "0%": {
+            transform: "translateX(0)",
+            opacity: "1",
+          },
+          to: {
+            transform: "translateX(1000px)",
+            opacity: "0",
+          },
+        },
+        "scale-in-center": {
+          "0%": {
+            transform: "scale(0)",
+            opacity: "1",
+          },
+          to: {
+            transform: "scale(1)",
+            opacity: "1",
+          },
+        },
+        "scale-out-center": {
+          "0%": {
+            transform: "scale(1)",
+            opacity: "1",
+          },
+          to: {
+            transform: "scale(0)",
+            opacity: "1",
+          },
+        },
         "scale-in-right": {
           "0%": {
             transform: "scale(0)",

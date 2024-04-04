@@ -13,6 +13,7 @@
     "nes.css": "^2.3.0",
     "pinia": "^2.1.7",
     "socket.io-client": "^4.7.5",
+    "velocity-animate": "^2.0.6",
     "vue": "^3.4.15",
     "vue-router": "^4.3.0"
   },
