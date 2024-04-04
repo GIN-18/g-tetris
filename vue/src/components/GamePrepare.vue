@@ -11,6 +11,7 @@ const emit = defineEmits(["ready", "cancel"]);
 const props = defineProps({
   status: Boolean,
   prepared: Number,
+  showPrepare: Boolean,
 });
 
 const room = localStorage.getItem("room");
@@ -22,7 +23,7 @@ const statusClass = computed(() => ({
 </script>
 
 <template>
-  <DialogsBox title="PREPARE">
+  <DialogsBox title="PREPARE" :show="props.showPrepare">
     <div class="flex flex-col gap-4 text-sm w-72">
       <LabelBox label="Room ID:">
         <span>{{ room }}</span>

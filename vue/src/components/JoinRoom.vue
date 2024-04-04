@@ -37,7 +37,7 @@ function cancelJoinRoom() {
 </script>
 
 <template>
-  <DialogsBox title="JOIN ROOM">
+  <DialogsBox title="JOIN ROOM" :isShow="model">
     <div class="flex flex-col justify-center items-center gap-12">
       <input
         type="text"
@@ -46,12 +46,8 @@ function cancelJoinRoom() {
         v-model="roomId"
       />
       <div class="flex gap-12">
-        <Button description="success" text="Join" @click.prevent="joinRoom" />
-        <Button
-          description="warning"
-          text="Cancel"
-          @click.prevent="cancelJoinRoom"
-        />
+        <Button type="success" text="Join" @click.prevent="joinRoom" />
+        <Button type="warning" text="Cancel" @click.prevent="cancelJoinRoom" />
       </div>
     </div>
   </DialogsBox>

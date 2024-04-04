@@ -10,6 +10,7 @@ const router = useRouter();
 const props = defineProps({
   title: String,
   gameMode: String,
+  gameOver: Boolean,
   score: Number,
   highScore: String,
   scoreDiff: Number,
@@ -38,7 +39,7 @@ function checkGameMode(mode) {
 </script>
 
 <template>
-  <DialogsBox :title="title">
+  <DialogsBox :title="title" :isShow="props.gameOver">
     <div class="flex flex-col gap-4 w-64 text-sm">
       <LabelBox label="Your Score:">
         <span>{{ props.score }}</span>
@@ -51,8 +52,8 @@ function checkGameMode(mode) {
       </LabelBox>
     </div>
     <div class="flex gap-12">
-      <Button description="success" text="AGAIN" @click.prevent="replayGame" />
-      <Button description="warning" text="QUIT" @click.prevent="quitGame" />
+      <Button type="success" text="AGAIN" @click.prevent="replayGame" />
+      <Button type="warning" text="QUIT" @click.prevent="quitGame" />
     </div>
   </DialogsBox>
 </template>

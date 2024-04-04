@@ -496,7 +496,7 @@ function emitEvent(event, attr, value) {
   <GamePrepare
     :status="readyStatus"
     :prepared="prepared"
-    v-if="showPrepare"
+    :showPrepare="showPrepare"
     @ready="readyGame(true)"
     @cancel="readyGame(false)"
   />
@@ -504,10 +504,10 @@ function emitEvent(event, attr, value) {
   <GameOverInfo
     :title="gameOverTitle"
     :gameMode="gameMode"
+    :gameOver="gameOver"
     :score="score"
     :highScore="highScore"
     :scoreDiff="scoreDiff"
-    v-if="gameOver"
     @replay="replayGame"
     @again="againGame"
   />

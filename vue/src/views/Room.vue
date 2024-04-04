@@ -54,10 +54,6 @@ function joinRoom() {
 <template>
   <Header></Header>
   <div class="flex flex-col justify-center items-center gap-24 h-full">
-    <!-- <div class="flex justify-center items-center gap-4"> -->
-    <!--   <h2 class="mb-0 text-4xl">SERVER</h2> -->
-    <!--   <ServerInfo :status="serverStatus" /> -->
-    <!-- </div> -->
     <div class="flex flex-col gap-10">
       <LinkBox
         link="#"
@@ -73,5 +69,6 @@ function joinRoom() {
       />
     </div>
   </div>
-  <JoinRoom v-if="showJoinRoom" v-model="showJoinRoom" />
+  <JoinRoom v-model="showJoinRoom" />
+  <!-- <JoinRoom v-if="showJoinRoom" v-model="showJoinRoom" /> -->
 </template>
