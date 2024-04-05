@@ -45,9 +45,9 @@ function toggleMenu() {
           v-show="showMenu"
         >
           <header class="flex justify-between items-center mb-4">
-            <h2 class="flex justify-start items-center gap-2 m-0 text-xl">
-              <span class="text-3xl icon-[pixelarticons--gamepad]"></span>
-              Menu
+            <h2 class="flex justify-start items-center gap-2 mb-0 text-xl">
+              <span class="text-4xl icon-[pixelarticons--gamepad]"></span>
+              MENU
             </h2>
             <button
               class="icon-[pixelarticons--close] text-3xl"

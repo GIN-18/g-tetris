@@ -5,8 +5,8 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="flex justify-between w-full">
-    <span class="font-semibold">{{ props.label }}</span>
+  <div class="flex justify-between items-center w-full">
+    <span>{{ props.label }}</span>
     <slot></slot>
   </div>
 </template>

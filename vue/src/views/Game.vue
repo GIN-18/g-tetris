@@ -500,9 +500,9 @@ function emitEvent(event, attr, value) {
   />
 
   <GameOverInfo
+    :gameOver="gameOver"
     :title="gameOverTitle"
     :gameMode="gameMode"
-    :gameOver="gameOver"
     :score="score"
     :highScore="highScore"
     :scoreDiff="scoreDiff"

@@ -1,39 +1,13 @@
 <script setup>
 import { ref } from "vue";
-import { debounce } from "lodash";
-
-import { socket } from "@/assets/js/socket.js";
 
 import Button from "@/components/button/Button.vue";
 import DialogsBox from "@/components/DialogsBox.vue";
 
 const model = defineModel();
+const emit = defineEmits(["join", "cancel"]);
 
 const roomId = ref("");
-
-const joinRoom = debounce(
-  () => {
-    if (!roomId.value) {
-      console.log("room id is empty"); // TODO: show message here
-      return;
-    }
-    socket.emit("joinRoom", {
-      action: 0,
-      room: roomId.value,
-      ready: 0,
-      score: 0,
-    });
-  },
-  2000,
-  {
-    leading: true,
-    trailing: false,
-  },
-);
-
-function cancelJoinRoom() {
-  model.value = false;
-}
 </script>
 
 <template>
@@ -46,8 +20,12 @@ function cancelJoinRoom() {
         v-model="roomId"
       />
       <div class="flex gap-12">
-        <Button type="success" text="Join" @click.prevent="joinRoom" />
-        <Button type="warning" text="Cancel" @click.prevent="cancelJoinRoom" />
+        <Button
+          type="success"
+          text="JOIN"
+          @click.prevent="emit('join', roomId)"
+        />
+        <Button type="warning" text="CANCEL" @click.prevent="emit('cancel')" />
       </div>
     </div>
   </DialogsBox>

@@ -8,9 +8,9 @@ import Button from "@/components/button/Button.vue";
 const router = useRouter();
 
 const props = defineProps({
+  gameOver: Boolean,
   title: String,
   gameMode: String,
-  gameOver: Boolean,
   score: Number,
   highScore: String,
   scoreDiff: Number,
@@ -40,7 +40,7 @@ function checkGameMode(mode) {
 
 <template>
   <DialogsBox :title="title" :isShow="props.gameOver">
-    <div class="flex flex-col gap-4 w-64 text-sm">
+    <div class="flex flex-col gap-4 w-80">
       <LabelBox label="Your Score:">
         <span>{{ props.score }}</span>
       </LabelBox>
