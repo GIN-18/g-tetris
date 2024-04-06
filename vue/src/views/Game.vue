@@ -8,6 +8,7 @@ import { getShape } from "@/assets/js/shape.js";
 import { socket, emitEvent } from "@/assets/js/socket.js";
 import { notify } from "@/assets/js/notify.js";
 import { preventZoom, forEachShape } from "@/assets/js/utils.js";
+import { playConfetti } from "@/assets/js/confetti.js";
 
 import Header from "@/components/Header.vue";
 import Menu from "@/components/menu/Menu.vue";
@@ -24,7 +25,7 @@ const router = useRouter();
 const gameMode = ref(route.params.mode);
 
 const game = useGameStore();
-const { map, currentShape, previewShape, nextShape, highScore } =
+const { map, currentShape, previewShape, nextShape, highScore, palette } =
   storeToRefs(game);
 
 const mapCanvas = ref(null);
@@ -104,6 +105,7 @@ socket.on("onePlayerGameOver", (data) => {
 socket.on("twoPlayerGameOver", () => {
   if (scoreDiff.value > 0) {
     gameOverTitle.value = "VICTORY";
+    playConfetti(palette.value);
   } else if (scoreDiff.value < 0) {
     gameOverTitle.value = "TRY AGAIN";
   }
@@ -180,7 +182,7 @@ function addShape() {
     const x = cs[i][1] + currentX;
     const y = cs[i][0] + currentY + (type === 1 ? 1 : 2);
 
-    if (map.value[y][x]) {
+    if (game.map[y][x]) {
       gameOver.value = true;
       gamePlay.value = false;
 
@@ -290,9 +292,9 @@ function rotateShape() {
 
     if (
       y >= 0 &&
-      (map.value[y] === undefined ||
-        map.value[y][x] === undefined ||
-        map.value[y][x] > 0)
+      (game.map[y] === undefined ||
+        game.map[y][x] === undefined ||
+        game.map[y][x] > 0)
     ) {
       currentShape.value.rotation = nowRotation;
       previewShape.value.rotation = nowRotation;
@@ -313,9 +315,9 @@ function moveShape(xStep, yStep) {
   } = currentShape.value;
 
   const cs = currentPieces[currentRotation];
-  const m = map.value;
-  const w = map.value[0].length;
-  const h = map.value.length;
+  const m = game.map;
+  const w = game.map[0].length;
+  const h = game.map.length;
 
   let canMove = true;
 
@@ -345,7 +347,7 @@ function mergeShape() {
   forEachShape(
     currentShape,
     (shape, x, y) => {
-      if (y >= 0) map.value[y][x] = type + 1;
+      if (y >= 0) game.map[y][x] = type + 1;
     },
     x,
     y,
@@ -354,8 +356,8 @@ function mergeShape() {
 
 function cleanFilledRows() {
   for (let i = 0; i < filledRows.length; i++) {
-    map.value.splice(filledRows[i], 1);
-    map.value.unshift(new Array(10).fill(0));
+    game.map.splice(filledRows[i], 1);
+    game.map.unshift(new Array(10).fill(0));
   }
 }
 
@@ -389,8 +391,8 @@ function updateLevel() {
 function getFilledRows() {
   filledRows.length = 0;
 
-  for (let i = 0; i < map.value.length; i++) {
-    if (map.value[i].every((item) => !!item)) {
+  for (let i = 0; i < game.map.length; i++) {
+    if (game.map[i].every((item) => !!item)) {
       filledRows.push(i);
     }
   }
