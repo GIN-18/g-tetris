@@ -1,13 +1,12 @@
 <script setup>
 import { computed } from "vue";
-import { useGameStore } from "@/stores/game.js";
 
 import DialogsBox from "@/components/DialogsBox.vue";
 import LabelBox from "@/components/LabelBox.vue";
 import Button from "@/components/button/Button.vue";
+import StatusButton from "@/components/button/StatusButton.vue";
 
-const game = useGameStore();
-const emit = defineEmits(["ready", "cancel"]);
+const emit = defineEmits(["ready", "quit"]);
 const props = defineProps({
   status: Boolean,
   prepared: Number,
@@ -38,8 +37,13 @@ const statusClass = computed(() => ({
       </LabelBox>
     </div>
     <div class="flex gap-12">
-      <Button type="success" text="Ready" @click.prevent="emit('ready')" />
-      <Button type="warning" text="Cancel" @click.prevent="emit('cancel')" />
+      <StatusButton
+        :status="props.status"
+        trueText="CANCEL"
+        falseText="READY"
+        @click.prevent="emit('ready')"
+      />
+      <Button type="warning" text="QUIT" @click.prevent="emit('quit')" />
     </div>
   </DialogsBox>
 </template>

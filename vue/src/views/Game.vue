@@ -1,12 +1,12 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
-import { useRoute, onBeforeRouteLeave } from "vue-router";
+import { useRoute, useRouter, onBeforeRouteLeave } from "vue-router";
 import { useGameStore } from "@/stores/game.js";
 
-import { socket } from "@/assets/js/socket.js";
 import { getShape } from "@/assets/js/shape.js";
-import { palettes } from "@/assets/js/palettes.js";
+import { socket, emitEvent } from "@/assets/js/socket.js";
+import { notify } from "@/assets/js/notify.js";
 import { preventZoom, forEachShape } from "@/assets/js/utils.js";
 
 import Header from "@/components/Header.vue";
@@ -20,6 +20,7 @@ import Canvas from "@/components/Canvas.vue";
 import GameOverInfo from "@/components/GameOverInfo.vue";
 
 const route = useRoute();
+const router = useRouter();
 const gameMode = ref(route.params.mode);
 
 const game = useGameStore();
@@ -42,6 +43,7 @@ const readyStatus = ref(false);
 const showPrepare = ref(false);
 const prepared = ref(0);
 const scoreDiff = ref(0);
+const againStatus = ref(0);
 
 const filledRows = [];
 
@@ -66,6 +68,8 @@ onMounted(() => {
 });
 
 onBeforeRouteLeave(() => {
+  if (checkGameMode("2p")) return;
+
   replayGame();
 });
 
@@ -75,13 +79,7 @@ socket.on("onePlayerReady", () => {
 
 socket.on("twoPlayerReady", () => {
   prepared.value = 2;
-
-  emitEvent("startGame", "gameStart", true);
-});
-
-socket.on("twoStartGame", () => {
   showPrepare.value = false;
-
   playGame();
 });
 
@@ -99,8 +97,8 @@ socket.on("scoreUpdated", (data) => {
   scoreDiff.value = scoreArray[0] - scoreArray[1];
 });
 
-socket.on("onePlayerGameOver", () => {
-  console.log("one player game over");
+socket.on("onePlayerGameOver", (data) => {
+  if (!data[socket.id].gameOver) notify("warning", "1P GAME OVER!!");
 });
 
 socket.on("twoPlayerGameOver", () => {
@@ -111,12 +109,12 @@ socket.on("twoPlayerGameOver", () => {
   }
 });
 
-socket.on("onePlayerAgain", (data) => {
-  console.log("one player again");
+socket.on("onePlayerAgain", () => {
+  againStatus.value = 1;
 });
 
 socket.on("twoPlayerAgain", () => {
-  replayGame();
+  againStatus.value = 2;
   playGame();
 });
 
@@ -126,6 +124,10 @@ function playGame() {
   if (!dropTimer) addShape();
   if (gamePlay.value) setDropTimer();
   if (!gamePlay.value && dropTimer) clearInterval(dropTimer);
+
+  if (checkGameMode("2p")) {
+    emitEvent("again", "again", false);
+  }
 }
 
 function replayGame() {
@@ -146,10 +148,16 @@ function replayGame() {
   score.value = 0;
   level.value = 1;
 
+  scoreDiff.value = 0;
+
   filledRows.length = 0;
 
   mapCanvas.value.clearMap();
   nextCanvas.value.drawNextShape();
+
+  if (checkGameMode("2p")) {
+    emitEvent("again", "again", true);
+  }
 }
 
 function addShape() {
@@ -186,6 +194,7 @@ function addShape() {
       dropTimer = null;
 
       if (checkGameMode("2p")) {
+        againStatus.value = 0;
         emitEvent("gameOver", "gameOver", true);
         return;
       }
@@ -256,6 +265,7 @@ function moveShapeDown(direction, enable) {
   setDropTimer();
 }
 
+// HACK: rotate shape against the wall
 function rotateShape() {
   if (!gamePlay.value) return;
 
@@ -377,19 +387,17 @@ function updateLevel() {
 }
 
 function getFilledRows() {
-  const m = map.value;
+  filledRows.length = 0;
 
-  filledRows.length = 0; // clear array
-
-  for (let i = 0; i < m.length; i++) {
-    if (m[i].every((item) => !!item)) {
+  for (let i = 0; i < map.value.length; i++) {
+    if (map.value[i].every((item) => !!item)) {
       filledRows.push(i);
     }
   }
 }
 
+// TODO: toggle volume
 function toggleVolume() {
-  // TODO: toggle volume
   volumeUp.value = !volumeUp.value;
 }
 
@@ -397,22 +405,18 @@ function checkGameMode(mode) {
   return gameMode.value === mode;
 }
 
-function readyGame(params) {
-  if (!params) prepared.value = 0;
+// HACK: client and server all not good
+function readyGame() {
+  readyStatus.value = !readyStatus.value;
 
-  readyStatus.value = params;
+  if (!readyStatus.value) prepared.value = 0;
 
-  emitEvent("ready", "ready", params);
+  emitEvent("ready", "ready", readyStatus.value);
 }
 
-function againGame(params) {
-  emitEvent("again", "again", true);
-}
-
-function emitEvent(event, attr, value) {
-  socket.emit(event, {
-    room: localStorage.getItem("room"),
-    [attr]: value,
+function quitGame() {
+  router.push({
+    path: "/",
   });
 }
 </script>
@@ -495,8 +499,8 @@ function emitEvent(event, attr, value) {
     :status="readyStatus"
     :prepared="prepared"
     :showPrepare="showPrepare"
-    @ready="readyGame(true)"
-    @cancel="readyGame(false)"
+    @ready="readyGame"
+    @quit="quitGame"
   />
 
   <GameOverInfo
@@ -506,7 +510,8 @@ function emitEvent(event, attr, value) {
     :score="score"
     :highScore="highScore"
     :scoreDiff="scoreDiff"
+    :again="againStatus"
     @replay="replayGame"
-    @again="againGame"
+    @quit="quitGame"
   />
 </template>
