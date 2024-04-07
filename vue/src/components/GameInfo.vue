@@ -8,8 +8,10 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="nes-container with-title w-full !px-3 !py-4">
-    <p class="title !text-sm whitespace-nowrap">{{ title }}</p>
+  <div class="nes-container with-title w-full !px-3">
+    <p class="title !text-sm whitespace-nowrap !bg-nes-gray">
+      {{ props.title }}
+    </p>
     <slot></slot>
   </div>
 </template>

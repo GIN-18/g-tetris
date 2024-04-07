@@ -22,11 +22,12 @@ import GameOverInfo from "@/components/GameOverInfo.vue";
 
 const route = useRoute();
 const router = useRouter();
-const gameMode = ref(route.params.mode);
 
 const game = useGameStore();
-const { map, currentShape, previewShape, nextShape, highScore, palette } =
+const { currentShape, previewShape, nextShape, isPreview, highScore, palette } =
   storeToRefs(game);
+
+const gameMode = route.params.mode;
 
 const mapCanvas = ref(null);
 const nextCanvas = ref(null);
@@ -40,7 +41,7 @@ const gameOverTitle = ref("GAME OVER");
 
 const volumeUp = ref(true);
 
-const readyStatus = ref(false);
+const isReady = ref(false);
 const showPrepare = ref(false);
 const prepared = ref(0);
 const scoreDiff = ref(0);
@@ -66,6 +67,7 @@ onMounted(() => {
   // preventZoom();
 
   if (checkGameMode("2p")) {
+    isPreview.value = false; // 2p mode is always not preview
     showPrepare.value = true;
   }
 });
@@ -369,6 +371,7 @@ function cleanFilledRows() {
   }
 }
 
+// HACK: limit the number of score
 function updateScore() {
   if (score.value >= 99999999) return;
 
@@ -389,6 +392,7 @@ function updateHighScore() {
   highScore.value = localStorage.getItem("highScore");
 }
 
+// HACK: limit the number of level
 function updateLevel() {
   let nextLevelScore = (level.value + 1) * 100 * level.value;
 
@@ -414,16 +418,16 @@ function toggleVolume() {
 }
 
 function checkGameMode(mode) {
-  return gameMode.value === mode;
+  return gameMode === mode;
 }
 
 // HACK: client and server all not good
 function readyGame() {
-  readyStatus.value = !readyStatus.value;
+  isReady.value = !isReady.value;
 
-  if (!readyStatus.value) prepared.value = 0;
+  if (!isReady.value) prepared.value = 0;
 
-  emitEvent("ready", "ready", readyStatus.value);
+  emitEvent("ready", "ready", isReady.value);
 }
 
 function quitGame() {
@@ -498,6 +502,7 @@ function quitGame() {
     <div class="flex flex-col justify-between items-end w-1/2">
       <!-- feature button -->
       <div class="flex gap-4">
+        <!-- play game button -->
         <StatusButton
           :status="gamePlay"
           trueIcon="icon-[pixelarticons--pause]"
@@ -505,12 +510,16 @@ function quitGame() {
           v-if="checkGameMode('1p')"
           @toggle="playGame"
         />
+
+        <!-- replay game button -->
         <Button
           type="primary"
           icon="icon-[pixelarticons--reload]"
           v-if="checkGameMode('1p')"
           @click.prevent="replayGame"
         />
+
+        <!-- toggle volume button -->
         <StatusButton
           :status="volumeUp"
           trueIcon="icon-[pixelarticons--volume-vibrate]"
@@ -525,7 +534,7 @@ function quitGame() {
   </div>
 
   <GamePrepare
-    :status="readyStatus"
+    :isReady="isReady"
     :prepared="prepared"
     :showPrepare="showPrepare"
     @ready="readyGame"

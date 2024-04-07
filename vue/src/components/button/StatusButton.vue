@@ -5,6 +5,10 @@ import Button from "./Button.vue";
 
 const props = defineProps({
   status: Boolean,
+  type: {
+    type: String,
+    default: "primary",
+  },
   trueIcon: String,
   falseIcon: String,
   trueText: String,
@@ -20,6 +24,6 @@ const text = computed(() => (props.status ? props.trueText : props.falseText));
 
 <template>
   <div>
-    <Button type="primary" :icon="icon" :text="text" @click="emit('toggle')" />
+    <Button :type="type" :icon="icon" :text="text" @click="emit('toggle')" />
   </div>
 </template>
