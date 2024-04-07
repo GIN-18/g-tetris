@@ -23,7 +23,7 @@ const statusClass = computed(() => ({
 
 <template>
   <DialogsBox title="PREPARE" :isShow="props.showPrepare">
-    <div class="flex flex-col gap-4 w-80">
+    <div class="flex flex-col gap-4 w-72">
       <LabelBox label="Room ID:">
         <span>{{ room }}</span>
       </LabelBox>

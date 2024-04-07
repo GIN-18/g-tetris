@@ -12,7 +12,7 @@ const roomId = ref("");
 
 <template>
   <DialogsBox title="JOIN ROOM" :isShow="model">
-    <div class="flex flex-col justify-center items-center gap-12">
+    <div class="flex flex-col justify-center items-center gap-12 w-72">
       <input
         type="text"
         placeholder="Room ID"

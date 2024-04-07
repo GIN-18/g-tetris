@@ -45,6 +45,8 @@ const showPrepare = ref(false);
 const prepared = ref(0);
 const scoreDiff = ref(0);
 const againStatus = ref(0);
+const win = ref(false);
+const lose = ref(false);
 
 const filledRows = [];
 
@@ -105,9 +107,11 @@ socket.on("onePlayerGameOver", (data) => {
 socket.on("twoPlayerGameOver", () => {
   if (scoreDiff.value > 0) {
     gameOverTitle.value = "VICTORY";
+    win.value = true;
     playConfetti(palette.value);
   } else if (scoreDiff.value < 0) {
     gameOverTitle.value = "TRY AGAIN";
+    lose.value = true;
   }
 });
 
@@ -151,6 +155,8 @@ function replayGame() {
   level.value = 1;
 
   scoreDiff.value = 0;
+  win.value = false;
+  lose.value = false;
 
   filledRows.length = 0;
 
@@ -362,6 +368,8 @@ function cleanFilledRows() {
 }
 
 function updateScore() {
+  if (score.value >= 99999999) return;
+
   if (filledRows.length > 0) {
     score.value +=
       (filledRows.length * level.value + (filledRows.length - 1)) * 10;
@@ -437,7 +445,7 @@ function quitGame() {
       <GameInfo title="HI-SCORE" v-if="checkGameMode('1p')">
         <span>{{ highScore }}</span>
       </GameInfo>
-      <GameInfo title="SCORE DIFF" v-if="checkGameMode('2p')">
+      <GameInfo title="DIFF" v-if="checkGameMode('2p')">
         <span :class="scoreDiffColor">
           {{ formatScoreDiff }}
         </span>
@@ -513,6 +521,8 @@ function quitGame() {
     :highScore="highScore"
     :scoreDiff="scoreDiff"
     :again="againStatus"
+    :win="win"
+    :lose="lose"
     @replay="replayGame"
     @quit="quitGame"
   />
