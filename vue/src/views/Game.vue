@@ -261,15 +261,17 @@ function landShape() {
   setDropTimer();
 }
 
-function moveShapeDown(direction, enable) {
-  if (!gamePlay.value) return;
+// FIXME: shape can not be added when shape landed
+function moveDown(enable) {
+  clearInterval(dropTimer);
+  if (enable && !moveShape(0, 1)) return;
 
-  if (direction === "down") {
-    down = enable;
-  } else {
-    drop = enable;
-  }
+  down = enable;
+  setDropTimer();
+}
 
+function dropShape() {
+  drop = true;
   setDropTimer();
 }
 
@@ -438,21 +440,33 @@ function quitGame() {
 
   <main class="flex justify-between items-center w-full">
     <Canvas ref="mapCanvas" name="map" width="200" height="400" />
-    <div class="flex flex-col justify-between items-center h-full">
+
+    <!-- game info -->
+    <div class="flex flex-col justify-between items-center w-max-40 h-full">
+      <!-- game score -->
       <GameInfo title="SCORE">
         <span>{{ score }}</span>
       </GameInfo>
+
+      <!-- HACK: component or v-if here (high score and score difference) -->
+      <!-- high score -->
       <GameInfo title="HI-SCORE" v-if="checkGameMode('1p')">
         <span>{{ highScore }}</span>
       </GameInfo>
+
+      <!-- socre difference -->
       <GameInfo title="DIFF" v-if="checkGameMode('2p')">
         <span :class="scoreDiffColor">
           {{ formatScoreDiff }}
         </span>
       </GameInfo>
+
+      <!-- next shape -->
       <GameInfo title="NEXT">
         <Canvas ref="nextCanvas" name="next" width="80" height="40" />
       </GameInfo>
+
+      <!-- game level -->
       <GameInfo title="LEVEL">
         <span>{{ level }}</span>
       </GameInfo>
@@ -464,15 +478,20 @@ function quitGame() {
   <div class="flex w-full">
     <!-- arrow button -->
     <div class="flex flex-col justify-center items-center w-1/2">
-      <ArrowButton type="drop" @click.prevent="moveShapeDown('drop', true)" />
+      <!-- drop button -->
+      <ArrowButton type="drop" @click.prevent="dropShape" />
+
+      <!-- left and right button -->
       <div class="flex justify-between items-center w-full">
         <ArrowButton type="left" @click.prevent="moveShape(-1, 0)" />
         <ArrowButton type="right" @click.prevent="moveShape(1, 0)" />
       </div>
+
+      <!-- down button -->
       <ArrowButton
         type="down"
-        @touchstart.prevent="moveShapeDown('down', true)"
-        @touchend.prevent="moveShapeDown('down', false)"
+        @touchstart.prevent="moveDown(true)"
+        @touchend.prevent="moveDown(false)"
       />
     </div>
 
