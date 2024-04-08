@@ -31,7 +31,6 @@ onMounted(() => {
 
   socket.on("zeroReady", () => {
     prepared.value = 0;
-    console.log("zero player ready");
   });
 
   socket.on("oneReady", () => {
@@ -47,7 +46,7 @@ onMounted(() => {
 
 clipboard.on("success", (e) => {
   e.clearSelection();
-  notify("success", "Copied!");
+  notify("success", "Room ID copied");
 });
 </script>
 

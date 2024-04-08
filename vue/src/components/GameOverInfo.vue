@@ -85,11 +85,7 @@ function checkGameMode(mode) {
     <!-- button -->
     <div class="flex gap-12">
       <!-- again button -->
-      <EmitEventButton
-        event="again"
-        v-model:attr="isAgain"
-        v-model:sum="again"
-      />
+      <EmitEventButton event="again" v-model:attr="isAgain" />
 
       <!-- quit button -->
       <Button type="warning" text="QUIT" @click.prevent="emit('quit')" />

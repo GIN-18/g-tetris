@@ -79,8 +79,8 @@ onMounted(() => {
       scoreDiff.value = scoreArray[0] - scoreArray[1];
     });
 
-    socket.on("oneGameOver", (data) => {
-      if (!data[socket.id].gameOver) notify("warning", "1P GAME OVER!!");
+    socket.on("oneGameOver", () => {
+      if (!data[socket.id].gameOver) notify("warning", "2P GAME OVER!!");
     });
 
     socket.on("twoGameOver", () => {
@@ -113,10 +113,6 @@ function playGame() {
   if (!dropTimer) addShape();
   if (gamePlay.value) setDropTimer();
   if (!gamePlay.value && dropTimer) clearInterval(dropTimer);
-
-  if (checkGameMode("2p")) {
-    socketEmit("again", "again", false);
-  }
 }
 
 function replayGame() {
@@ -179,12 +175,7 @@ function addShape() {
       clearInterval(dropTimer);
       dropTimer = null;
 
-      if (checkGameMode("2p")) {
-        socketEmit("gameOver", "gameOver", true);
-        return;
-      }
-
-      updateHighScore();
+      if (checkGameMode("1p")) updateHighScore();
 
       return;
     }

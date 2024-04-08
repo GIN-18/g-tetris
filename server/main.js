@@ -142,14 +142,14 @@ function emitByAttr(id, room, attr, attrValue, zeroEvent, oneEvent, twoEvent) {
 
   const length = Object.keys(rooms[room]).length;
 
+  if (checkAttr(false)) {
+    io.to(room).emit(zeroEvent);
+    return;
+  }
+
   if (length > 1) {
     if (checkAttr(true)) {
-      io.to(room).emit(twoEvent, rooms[room]);
-      return;
-    }
-
-    if (checkAttr(false)) {
-      io.to(room).emit(zeroEvent, rooms[room]);
+      io.to(room).emit(twoEvent);
       return;
     }
   }
@@ -158,7 +158,7 @@ function emitByAttr(id, room, attr, attrValue, zeroEvent, oneEvent, twoEvent) {
     const key = Object.keys(rooms[room])[i];
 
     if (rooms[room][key][attr]) {
-      io.to(room).emit(oneEvent, rooms[room]);
+      io.to(room).emit(oneEvent);
       return;
     }
   }
