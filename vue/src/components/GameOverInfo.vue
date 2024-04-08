@@ -1,10 +1,16 @@
 <script setup>
-import { computed } from "vue";
+import { ref, watch, onMounted } from "vue";
+import { socket } from "@/assets/js/socket.js";
 
 import DialogsBox from "@/components/DialogsBox.vue";
 import LabelBox from "@/components/LabelBox.vue";
 import Button from "@/components/button/Button.vue";
+import EmitEventButton from "@/components/button/EmitEventButton.vue";
 
+const isAgain = ref(false);
+const again = ref(0);
+
+const emit = defineEmits(["replay", "quit"]);
 const props = defineProps({
   title: String,
   gameOver: Boolean,
@@ -12,13 +18,35 @@ const props = defineProps({
   score: Number,
   highScore: String,
   scoreDiff: Number,
-  isAgain: Boolean,
-  again: Number,
   win: Boolean,
   lose: Boolean,
 });
 
-const emit = defineEmits(["replay", "quit"]);
+watch(
+  () => props.gameOver,
+  () => {
+    if (!props.gameOver) {
+      isAgain.value = false;
+    }
+  },
+);
+
+onMounted(() => {
+  socket.on("zeroAgain", () => {
+    again.value = 0;
+  });
+
+  socket.on("oneAgain", () => {
+    again.value = 1;
+  });
+
+  socket.on("twoAgain", () => {
+    again.value = 2;
+    socket.emit("replay", {
+      room: localStorage.getItem("room"),
+    });
+  });
+});
 
 function checkGameMode(mode) {
   return props.gameMode === mode;
@@ -50,14 +78,18 @@ function checkGameMode(mode) {
 
       <!-- number of again -->
       <LabelBox label="Again:" v-if="checkGameMode('2p')">
-        <span>{{ props.again }} / 2</span>
+        <span>{{ again }} / 2</span>
       </LabelBox>
     </div>
 
     <!-- button -->
     <div class="flex gap-12">
       <!-- again button -->
-      <Button type="success" text="AGAIN" @click.prevent="emit('replay')" />
+      <EmitEventButton
+        event="again"
+        v-model:attr="isAgain"
+        v-model:sum="again"
+      />
 
       <!-- quit button -->
       <Button type="warning" text="QUIT" @click.prevent="emit('quit')" />

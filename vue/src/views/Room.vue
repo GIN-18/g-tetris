@@ -54,8 +54,6 @@ function joinRoom(roomId) {
   socket.emit("joinRoom", {
     action: 0,
     room: roomId,
-    ready: 0,
-    score: 0,
   });
 }
 </script>

@@ -5,7 +5,6 @@ import { socketEmit } from "@/assets/js/socket.js";
 import StatusButton from "./StatusButton.vue";
 
 const attr = defineModel("attr");
-const sum = defineModel("sum");
 const props = defineProps({
   event: String,
 });
@@ -17,7 +16,6 @@ async function emitEvent() {
   await nextTick(() => {
     attr.value = !attr.value;
   });
-  if (!attr.value) sum.value = 0;
   socketEmit(props.event, props.event, attr.value);
 }
 </script>

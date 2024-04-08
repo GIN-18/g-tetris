@@ -41,8 +41,6 @@ const gameOverTitle = ref("GAME OVER");
 
 const volumeUp = ref(true);
 
-const isAgain = ref(false);
-const again = ref(0);
 const scoreDiff = ref(0);
 const win = ref(false);
 const lose = ref(false);
@@ -81,11 +79,11 @@ onMounted(() => {
       scoreDiff.value = scoreArray[0] - scoreArray[1];
     });
 
-    socket.on("onePlayerGameOver", (data) => {
+    socket.on("oneGameOver", (data) => {
       if (!data[socket.id].gameOver) notify("warning", "1P GAME OVER!!");
     });
 
-    socket.on("twoPlayerGameOver", () => {
+    socket.on("twoGameOver", () => {
       if (scoreDiff.value > 0) {
         gameOverTitle.value = "VICTORY";
         win.value = true;
@@ -96,13 +94,7 @@ onMounted(() => {
       }
     });
 
-    socket.on("onePlayerAgain", () => {
-      again.value = 1;
-    });
-
-    socket.on("twoPlayerAgain", () => {
-      again.value = 2;
-      // gameOver.value = false;
+    socket.on("replay", () => {
       replayGame();
       playGame();
     });
@@ -188,7 +180,6 @@ function addShape() {
       dropTimer = null;
 
       if (checkGameMode("2p")) {
-        isAgain.value = 0;
         socketEmit("gameOver", "gameOver", true);
         return;
       }
@@ -405,6 +396,11 @@ function checkGameMode(mode) {
   return gameMode === mode;
 }
 
+function againGame() {
+  replayGame();
+  playGame();
+}
+
 function quitGame() {
   router.push({
     path: "/",
@@ -517,8 +513,6 @@ function quitGame() {
     :score="score"
     :highScore="highScore"
     :scoreDiff="scoreDiff"
-    :isAgain="isAgain"
-    :again="again"
     :win="win"
     :lose="lose"
     @replay="againGame"
