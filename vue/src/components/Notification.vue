@@ -17,6 +17,7 @@ onMounted(() => {
   emitter.on("add", addMessage);
 });
 
+// FIXME: have to clear setTimerOut or clear messages
 function addMessage({ type, message }) {
   messageType.value = type;
   messages.value.push(message);

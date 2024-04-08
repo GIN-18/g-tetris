@@ -62,6 +62,7 @@ function joinRoom(roomId) {
 
 <template>
   <Header></Header>
+
   <div class="flex flex-col justify-center items-center gap-24 h-full">
     <div class="flex flex-col gap-10">
       <LinkBox
@@ -78,5 +79,6 @@ function joinRoom(roomId) {
       />
     </div>
   </div>
+
   <JoinRoom v-model="showJoinRoom" @join="joinRoom" @cancel="showRoomBox" />
 </template>

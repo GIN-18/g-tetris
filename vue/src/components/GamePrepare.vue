@@ -1,29 +1,45 @@
 <script setup>
-import { computed } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
+import { socket } from "@/assets/js/socket.js";
 
 import DialogsBox from "@/components/DialogsBox.vue";
 import LabelBox from "@/components/LabelBox.vue";
 import Button from "@/components/button/Button.vue";
-import StatusButton from "@/components/button/StatusButton.vue";
+import EmitEventButton from "@/components/button/EmitEventButton.vue";
+
+const room = localStorage.getItem("room");
+const isReady = ref(false);
+const prepared = ref(0);
+const showPrepare = ref(false);
 
 const emit = defineEmits(["ready", "quit"]);
 const props = defineProps({
-  isReady: Boolean,
-  prepared: Number,
-  showPrepare: Boolean,
+  gameMode: String,
 });
 
-const room = localStorage.getItem("room");
-
 const statusClass = computed(() => ({
-  "text-nes-deep-red": !props.isReady,
-  "text-nes-deep-green": props.isReady,
+  "text-nes-deep-red": !isReady.value,
+  "text-nes-deep-green": isReady.value,
 }));
-const type = computed(() => (props.isReady ? "error" : "success"));
+const statusText = computed(() => (isReady.value ? "Ready" : "Not Ready"));
+
+onMounted(() => {
+  if (props.gameMode === "2p") showPrepare.value = true;
+
+  socket.on("onePlayerReady", () => {
+    prepared.value = 1;
+  });
+
+  socket.on("twoPlayerReady", () => {
+    prepared.value = 2;
+    showPrepare.value = false;
+    emit("ready");
+  });
+});
 </script>
 
 <template>
-  <DialogsBox title="PREPARE" :isShow="props.showPrepare">
+  <DialogsBox title="PREPARE" :isShow="showPrepare">
     <div class="flex flex-col gap-4 w-72">
       <!-- room id -->
       <LabelBox label="Room ID:">
@@ -32,9 +48,7 @@ const type = computed(() => (props.isReady ? "error" : "success"));
 
       <!-- prepare status -->
       <LabelBox label="Status:">
-        <span :class="statusClass">{{
-          props.isReady ? "Ready" : "Not Ready"
-        }}</span>
+        <span :class="statusClass">{{ statusText }}</span>
       </LabelBox>
 
       <!-- number of prepared -->
@@ -45,12 +59,10 @@ const type = computed(() => (props.isReady ? "error" : "success"));
 
     <div class="flex gap-12">
       <!-- ready or cancel button -->
-      <StatusButton
-        :type="type"
-        :status="props.isReady"
-        trueText="CANCEL"
-        falseText="READY"
-        @click.prevent="emit('ready')"
+      <EmitEventButton
+        event="ready"
+        v-model:attr="isReady"
+        v-model:sum="prepared"
       />
 
       <!-- quit button -->

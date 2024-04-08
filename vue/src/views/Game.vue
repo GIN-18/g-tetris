@@ -1,23 +1,23 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { storeToRefs } from "pinia";
 import { useRoute, useRouter, onBeforeRouteLeave } from "vue-router";
+import { storeToRefs } from "pinia";
 import { useGameStore } from "@/stores/game.js";
 
 import { getShape } from "@/assets/js/shape.js";
-import { socket, emitEvent } from "@/assets/js/socket.js";
+import { socket, socketEmit } from "@/assets/js/socket.js";
 import { notify } from "@/assets/js/notify.js";
 import { preventZoom, forEachShape } from "@/assets/js/utils.js";
 import { playConfetti } from "@/assets/js/confetti.js";
 
 import Header from "@/components/Header.vue";
 import Menu from "@/components/menu/Menu.vue";
-import GamePrepare from "@/components/GamePrepare.vue";
+import Canvas from "@/components/Canvas.vue";
 import GameInfo from "@/components/GameInfo.vue";
 import Button from "@/components/button/Button.vue";
 import ArrowButton from "@/components/button/ArrowButton.vue";
 import StatusButton from "@/components/button/StatusButton.vue";
-import Canvas from "@/components/Canvas.vue";
+import GamePrepare from "@/components/GamePrepare.vue";
 import GameOverInfo from "@/components/GameOverInfo.vue";
 
 const route = useRoute();
@@ -41,11 +41,9 @@ const gameOverTitle = ref("GAME OVER");
 
 const volumeUp = ref(true);
 
-const isReady = ref(false);
-const showPrepare = ref(false);
-const prepared = ref(0);
+const isAgain = ref(false);
+const again = ref(0);
 const scoreDiff = ref(0);
-const againStatus = ref(0);
 const win = ref(false);
 const lose = ref(false);
 
@@ -68,7 +66,46 @@ onMounted(() => {
 
   if (checkGameMode("2p")) {
     isPreview.value = false; // 2p mode is always not preview
-    showPrepare.value = true;
+
+    socket.on("scoreUpdated", (data) => {
+      const scoreArray = [];
+
+      for (let item in data) {
+        if (item === socket.id) {
+          scoreArray[0] = data[item].score;
+        } else {
+          scoreArray[1] = data[item].score;
+        }
+      }
+
+      scoreDiff.value = scoreArray[0] - scoreArray[1];
+    });
+
+    socket.on("onePlayerGameOver", (data) => {
+      if (!data[socket.id].gameOver) notify("warning", "1P GAME OVER!!");
+    });
+
+    socket.on("twoPlayerGameOver", () => {
+      if (scoreDiff.value > 0) {
+        gameOverTitle.value = "VICTORY";
+        win.value = true;
+        playConfetti(palette.value);
+      } else if (scoreDiff.value < 0) {
+        gameOverTitle.value = "TRY AGAIN";
+        lose.value = true;
+      }
+    });
+
+    socket.on("onePlayerAgain", () => {
+      again.value = 1;
+    });
+
+    socket.on("twoPlayerAgain", () => {
+      again.value = 2;
+      // gameOver.value = false;
+      replayGame();
+      playGame();
+    });
   }
 });
 
@@ -76,54 +113,6 @@ onBeforeRouteLeave(() => {
   if (checkGameMode("2p")) return;
 
   replayGame();
-});
-
-socket.on("onePlayerReady", () => {
-  prepared.value = 1;
-});
-
-socket.on("twoPlayerReady", () => {
-  prepared.value = 2;
-  showPrepare.value = false;
-  playGame();
-});
-
-socket.on("scoreUpdated", (data) => {
-  const scoreArray = [];
-
-  for (let item in data) {
-    if (item === socket.id) {
-      scoreArray[0] = data[item].score;
-    } else {
-      scoreArray[1] = data[item].score;
-    }
-  }
-
-  scoreDiff.value = scoreArray[0] - scoreArray[1];
-});
-
-socket.on("onePlayerGameOver", (data) => {
-  if (!data[socket.id].gameOver) notify("warning", "1P GAME OVER!!");
-});
-
-socket.on("twoPlayerGameOver", () => {
-  if (scoreDiff.value > 0) {
-    gameOverTitle.value = "VICTORY";
-    win.value = true;
-    playConfetti(palette.value);
-  } else if (scoreDiff.value < 0) {
-    gameOverTitle.value = "TRY AGAIN";
-    lose.value = true;
-  }
-});
-
-socket.on("onePlayerAgain", () => {
-  againStatus.value = 1;
-});
-
-socket.on("twoPlayerAgain", () => {
-  againStatus.value = 2;
-  playGame();
 });
 
 function playGame() {
@@ -134,7 +123,7 @@ function playGame() {
   if (!gamePlay.value && dropTimer) clearInterval(dropTimer);
 
   if (checkGameMode("2p")) {
-    emitEvent("again", "again", false);
+    socketEmit("again", "again", false);
   }
 }
 
@@ -143,7 +132,6 @@ function replayGame() {
     clearInterval(dropTimer);
     dropTimer = null;
   }
-
   game.$patch({
     map: new Array(20).fill(0).map(() => new Array(10).fill(0)),
     currentShape: null,
@@ -164,10 +152,6 @@ function replayGame() {
 
   mapCanvas.value.clearMap();
   nextCanvas.value.drawNextShape();
-
-  if (checkGameMode("2p")) {
-    emitEvent("again", "again", true);
-  }
 }
 
 function addShape() {
@@ -204,8 +188,8 @@ function addShape() {
       dropTimer = null;
 
       if (checkGameMode("2p")) {
-        againStatus.value = 0;
-        emitEvent("gameOver", "gameOver", true);
+        isAgain.value = 0;
+        socketEmit("gameOver", "gameOver", true);
         return;
       }
 
@@ -380,7 +364,7 @@ function updateScore() {
       (filledRows.length * level.value + (filledRows.length - 1)) * 10;
 
     if (checkGameMode("2p")) {
-      emitEvent("updateScore", "score", score.value);
+      socketEmit("updateScore", "score", score.value);
     }
   }
 }
@@ -419,15 +403,6 @@ function toggleVolume() {
 
 function checkGameMode(mode) {
   return gameMode === mode;
-}
-
-// HACK: client and server all not good
-function readyGame() {
-  isReady.value = !isReady.value;
-
-  if (!isReady.value) prepared.value = 0;
-
-  emitEvent("ready", "ready", isReady.value);
 }
 
 function quitGame() {
@@ -533,13 +508,7 @@ function quitGame() {
     </div>
   </div>
 
-  <GamePrepare
-    :isReady="isReady"
-    :prepared="prepared"
-    :showPrepare="showPrepare"
-    @ready="readyGame"
-    @quit="quitGame"
-  />
+  <GamePrepare :gameMode="gameMode" @ready="playGame" @quit="quitGame" />
 
   <GameOverInfo
     :gameOver="gameOver"
@@ -548,10 +517,11 @@ function quitGame() {
     :score="score"
     :highScore="highScore"
     :scoreDiff="scoreDiff"
-    :again="againStatus"
+    :isAgain="isAgain"
+    :again="again"
     :win="win"
     :lose="lose"
-    @replay="replayGame"
+    @replay="againGame"
     @quit="quitGame"
   />
 </template>
