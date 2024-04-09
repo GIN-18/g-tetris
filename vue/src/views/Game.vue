@@ -65,6 +65,12 @@ onMounted(() => {
   if (checkGameMode("2p")) {
     isPreview.value = false; // 2p mode is always not preview
 
+    // refresh to join the room
+    socket.emit("joinRoom", {
+      room: localStorage.getItem("room"),
+      action: "refresh",
+    });
+
     socket.on("scoreUpdated", (data) => {
       const scoreArray = [];
 
@@ -80,7 +86,7 @@ onMounted(() => {
     });
 
     socket.on("oneGameOver", () => {
-      if (!data[socket.id].gameOver) notify("warning", "2P GAME OVER!!");
+      if (!gameOver.value) notify("warning", "2P GAME OVER!!");
     });
 
     socket.on("twoGameOver", () => {
@@ -101,8 +107,13 @@ onMounted(() => {
   }
 });
 
+// TODO: player leave the room
 onBeforeRouteLeave(() => {
-  if (checkGameMode("2p")) return;
+  if (checkGameMode("2p")) {
+    console.log("leave room");
+    // socket.emit("leaveRoom");
+    return;
+  }
 
   replayGame();
 });
@@ -175,7 +186,12 @@ function addShape() {
       clearInterval(dropTimer);
       dropTimer = null;
 
-      if (checkGameMode("1p")) updateHighScore();
+      if (checkGameMode("2p")) {
+        socketEmit("gameOver", "gameOver", true);
+        return;
+      }
+
+      updateHighScore();
 
       return;
     }

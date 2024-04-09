@@ -13,21 +13,9 @@ const router = useRouter();
 
 const showJoinRoom = ref(false);
 
-socket.on("roomCreated", (data) => {
-  localStorage.setItem("room", data[socket.id].room);
+socket.on("roomCreated", handleRoomEvent);
 
-  router.push({
-    path: "/game/2p",
-  });
-});
-
-socket.on("roomJoined", (data) => {
-  localStorage.setItem("room", data[socket.id].room);
-
-  router.push({
-    path: "/game/2p",
-  });
-});
+socket.on("roomJoined", handleRoomEvent);
 
 socket.on("roomFull", () => {
   notify("warning", "Room is full.");
@@ -41,7 +29,7 @@ function createRoom() {
   socket.emit("createRoom");
 }
 
-function showRoomBox() {
+function toggleRoomBox() {
   showJoinRoom.value = !showJoinRoom.value;
 }
 
@@ -52,8 +40,16 @@ function joinRoom(roomId) {
   }
 
   socket.emit("joinRoom", {
-    action: 0,
     room: roomId,
+    action: "join",
+  });
+}
+
+function handleRoomEvent(data) {
+  localStorage.setItem("room", data[socket.id].room);
+
+  router.push({
+    path: "/game/2p",
   });
 }
 </script>
@@ -69,14 +65,16 @@ function joinRoom(roomId) {
         text="Create Room"
         @click.prevent="createRoom"
       />
+
       <LinkBox
         link="#"
         icon="icon-[pixelarticons--user-plus]"
         text="Join Room"
-        @click.prevent="showRoomBox"
+        @click.prevent="toggleRoomBox"
       />
     </div>
   </div>
 
-  <JoinRoom v-model="showJoinRoom" @join="joinRoom" @cancel="showRoomBox" />
+  <!-- join room box -->
+  <JoinRoom v-model="showJoinRoom" @join="joinRoom" @cancel="toggleRoomBox" />
 </template>

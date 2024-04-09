@@ -57,6 +57,7 @@ clipboard.on("success", (e) => {
       <LabelBox label="Room ID:">
         <span
           id="room-id"
+          title="click to copy room ID"
           data-clipboard-target="#room-id"
           data-clipboard-action="copy"
           >{{ room }}</span

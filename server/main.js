@@ -14,8 +14,6 @@ const io = new Server(httpServer, {
 const rooms = {};
 
 io.on("connection", (socket) => {
-  console.log("user connected");
-
   socket.on("createRoom", () => {
     const room = generateRoomId();
     socket.join(room);
@@ -34,12 +32,20 @@ io.on("connection", (socket) => {
     socket.emit("roomCreated", rooms[room]);
   });
 
-  socket.on("joinRoom", ({ action, room }) => {
+  socket.on("joinRoom", ({ room, action }) => {
     const clients = io.sockets.adapter.rooms.get(room);
 
-    // message on player joined the room
-    if (action) {
-      socket.to(room).emit("playerJoined", rooms[room]);
+    // add player to room while refresh
+    if (action === "refresh") {
+      socket.join(room);
+      rooms[room][socket.id] = {
+        room,
+        ready: false,
+        again: false,
+        gameOver: false,
+        score: 0,
+      };
+      socket.emit("roomJoined", rooms[room]);
       return;
     }
 
@@ -117,9 +123,15 @@ io.on("connection", (socket) => {
     io.to(room).emit("replay");
   });
 
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
+  // TODO: player leave them room and diconnect
+  socket.on("leaveRoom", () => {
+    // remove player while disconnect
+    for (const room in rooms) {
+      delete rooms[room][socket.id];
+    }
+  });
 
+  socket.on("disconnect", () => {
     // remove player while disconnect
     for (const room in rooms) {
       delete rooms[room][socket.id];

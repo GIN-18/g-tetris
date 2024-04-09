@@ -22,11 +22,13 @@ const props = defineProps({
   lose: Boolean,
 });
 
+// reset isAgain and again while replay the game
 watch(
   () => props.gameOver,
   () => {
     if (!props.gameOver) {
       isAgain.value = false;
+      again.value = 0;
     }
   },
 );
