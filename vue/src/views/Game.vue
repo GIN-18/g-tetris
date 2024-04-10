@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { useRoute, useRouter, onBeforeRouteLeave } from "vue-router";
+import { useRoute, onBeforeRouteLeave } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useGameStore } from "@/stores/game.js";
 
@@ -21,8 +21,6 @@ import GamePrepare from "@/components/GamePrepare.vue";
 import GameOverInfo from "@/components/GameOverInfo.vue";
 
 const route = useRoute();
-const router = useRouter();
-
 const game = useGameStore();
 const { currentShape, previewShape, nextShape, isPreview, highScore, palette } =
   storeToRefs(game);
@@ -54,7 +52,6 @@ let dropTimer = null;
 const formatScoreDiff = computed(() =>
   scoreDiff.value >= 0 ? `+${scoreDiff.value}` : scoreDiff.value,
 );
-
 const scoreDiffColor = computed(() =>
   scoreDiff.value >= 0 ? "text-nes-deep-green" : "text-nes-deep-red",
 );
@@ -110,8 +107,7 @@ onMounted(() => {
 // TODO: player leave the room
 onBeforeRouteLeave(() => {
   if (checkGameMode("2p")) {
-    console.log("leave room");
-    // socket.emit("leaveRoom");
+    socket.emit("leaveRoom");
     return;
   }
 
@@ -402,17 +398,6 @@ function toggleVolume() {
 function checkGameMode(mode) {
   return gameMode === mode;
 }
-
-function againGame() {
-  replayGame();
-  playGame();
-}
-
-function quitGame() {
-  router.push({
-    path: "/",
-  });
-}
 </script>
 
 <template>
@@ -511,7 +496,7 @@ function quitGame() {
     </div>
   </div>
 
-  <GamePrepare :gameMode="gameMode" @ready="playGame" @quit="quitGame" />
+  <GamePrepare :gameMode="gameMode" @ready="playGame" />
 
   <GameOverInfo
     :gameOver="gameOver"
@@ -522,7 +507,5 @@ function quitGame() {
     :scoreDiff="scoreDiff"
     :win="win"
     :lose="lose"
-    @replay="againGame"
-    @quit="quitGame"
   />
 </template>

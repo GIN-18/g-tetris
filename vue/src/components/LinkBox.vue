@@ -20,10 +20,10 @@ function jumpToLink() {
 
 <template>
   <button
-    class="flex justify-between items-center w-56"
+    class="flex justify-between items-center w-52"
     @click.prevent="jumpToLink"
   >
-    <span :class="[props.icon, 'text-2xl']"></span>
-    <span>{{ props.text }}</span>
+    <span :class="[props.icon, 'text-xl']"></span>
+    <span class="text-sm">{{ props.text }}</span>
   </button>
 </template>

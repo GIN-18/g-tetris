@@ -125,13 +125,15 @@ io.on("connection", (socket) => {
 
   // TODO: player leave them room and diconnect
   socket.on("leaveRoom", () => {
-    // remove player while disconnect
+    console.log("leave room");
+    // remove player while leave room
     for (const room in rooms) {
       delete rooms[room][socket.id];
     }
   });
 
   socket.on("disconnect", () => {
+    console.log(rooms);
     // remove player while disconnect
     for (const room in rooms) {
       delete rooms[room][socket.id];

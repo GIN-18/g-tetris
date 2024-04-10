@@ -6,8 +6,8 @@ import Clipboard from "clipboard";
 
 import DialogsBox from "@/components/DialogsBox.vue";
 import LabelBox from "@/components/LabelBox.vue";
-import Button from "@/components/button/Button.vue";
 import EmitEventButton from "@/components/button/EmitEventButton.vue";
+import QuitButton from "@/components/button/QuitButton.vue";
 
 const room = localStorage.getItem("room");
 const isReady = ref(false);
@@ -15,7 +15,7 @@ const prepared = ref(0);
 const showPrepare = ref(false);
 const clipboard = new Clipboard("#room-id");
 
-const emit = defineEmits(["ready", "quit"]);
+const emit = defineEmits(["ready"]);
 const props = defineProps({
   gameMode: String,
 });
@@ -80,7 +80,7 @@ clipboard.on("success", (e) => {
       <EmitEventButton event="ready" v-model:attr="isReady" />
 
       <!-- quit button -->
-      <Button type="warning" text="QUIT" @click.prevent="emit('quit')" />
+      <QuitButton />
     </div>
   </DialogsBox>
 </template>

@@ -4,19 +4,18 @@ import { socket } from "@/assets/js/socket.js";
 
 import DialogsBox from "@/components/DialogsBox.vue";
 import LabelBox from "@/components/LabelBox.vue";
-import Button from "@/components/button/Button.vue";
 import EmitEventButton from "@/components/button/EmitEventButton.vue";
+import QuitButton from "@/components/button/QuitButton.vue";
 
 const isAgain = ref(false);
 const again = ref(0);
 
-const emit = defineEmits(["replay", "quit"]);
 const props = defineProps({
   title: String,
   gameOver: Boolean,
   gameMode: String,
   score: Number,
-  highScore: String,
+  highScore: [String, Number],
   scoreDiff: Number,
   win: Boolean,
   lose: Boolean,
@@ -90,7 +89,7 @@ function checkGameMode(mode) {
       <EmitEventButton event="again" v-model:attr="isAgain" />
 
       <!-- quit button -->
-      <Button type="warning" text="QUIT" @click.prevent="emit('quit')" />
+      <QuitButton />
     </div>
   </DialogsBox>
 </template>

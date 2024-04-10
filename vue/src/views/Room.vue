@@ -14,16 +14,7 @@ const router = useRouter();
 const showJoinRoom = ref(false);
 
 socket.on("roomCreated", handleRoomEvent);
-
 socket.on("roomJoined", handleRoomEvent);
-
-socket.on("roomFull", () => {
-  notify("warning", "Room is full.");
-});
-
-socket.on("roomNotFound", () => {
-  notify("error", "Room not found!");
-});
 
 function createRoom() {
   socket.emit("createRoom");
@@ -31,18 +22,6 @@ function createRoom() {
 
 function toggleRoomBox() {
   showJoinRoom.value = !showJoinRoom.value;
-}
-
-function joinRoom(roomId) {
-  if (!roomId) {
-    notify("warning", "Please enter room ID.");
-    return;
-  }
-
-  socket.emit("joinRoom", {
-    room: roomId,
-    action: "join",
-  });
 }
 
 function handleRoomEvent(data) {
@@ -76,5 +55,5 @@ function handleRoomEvent(data) {
   </div>
 
   <!-- join room box -->
-  <JoinRoom v-model="showJoinRoom" @join="joinRoom" @cancel="toggleRoomBox" />
+  <JoinRoom v-model="showJoinRoom" @cancel="toggleRoomBox" />
 </template>

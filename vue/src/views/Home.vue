@@ -4,7 +4,11 @@ import LinkBox from "@/components/LinkBox.vue";
 
 <template>
   <div class="flex flex-col justify-center items-center gap-24 h-full">
-    <h1 class="text-5xl">TETRIS</h1>
+    <h1 class="text-5xl">
+      <span class="text-nes-deep-primary">TE</span>
+      <span class="text-nes-deep-red">TR</span>
+      <span class="text-nes-deep-yellow">IS</span>
+    </h1>
     <div class="flex flex-col gap-10">
       <LinkBox
         link="/game/1p"
