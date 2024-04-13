@@ -5,7 +5,6 @@ import { socket } from "@/assets/js/socket.js";
 import { notify } from "@/assets/js/notify.js";
 
 import Header from "@/components/Header.vue";
-import ServerInfo from "@/components/ServerInfo.vue";
 import LinkBox from "@/components/LinkBox.vue";
 import JoinRoom from "@/components/JoinRoom.vue";
 

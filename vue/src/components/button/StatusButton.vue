@@ -18,7 +18,6 @@ const props = defineProps({
 const emit = defineEmits(["toggle"]);
 
 const icon = computed(() => (props.status ? props.trueIcon : props.falseIcon));
-
 const text = computed(() => (props.status ? props.trueText : props.falseText));
 </script>
 

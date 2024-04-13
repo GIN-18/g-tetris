@@ -59,6 +59,39 @@ const scoreDiffColor = computed(() =>
 onMounted(() => {
   // preventZoom();
 
+  // keybinding
+  window.document.addEventListener("keydown", (e) => {
+    switch (e.key) {
+      case "w":
+        dropShape();
+        break;
+      case "d":
+        moveShape(1, 0);
+        break;
+      case "s":
+        moveDown(true);
+        break;
+      case "a":
+        moveShape(-1, 0);
+        break;
+      case "i":
+        playGame();
+        break;
+      case "o":
+        replayGame();
+        break;
+      case "p":
+        toggleVolume();
+        break;
+      case "k":
+        rotateShape();
+        break;
+    }
+  });
+  window.document.addEventListener("keyup", (e) => {
+    if (e.key === "s") moveDown(false);
+  });
+
   if (checkGameMode("2p")) {
     isPreview.value = false; // 2p mode is always not preview
 
@@ -123,6 +156,8 @@ function playGame() {
 }
 
 function replayGame() {
+  if (!dropTimer) return;
+
   if (dropTimer) {
     clearInterval(dropTimer);
     dropTimer = null;
@@ -200,14 +235,12 @@ function addShape() {
 function setDropTimer() {
   if (gameOver.value) return;
 
-  let timestep = Math.round(80 + 800 * Math.pow(0.75, level.value - 1));
+  let timestep = Math.round(10 + 800 * Math.pow(0.92, level.value - 1));
 
   if (drop) {
     timestep = 10;
   } else if (down) {
-    timestep = 80;
-  } else {
-    timestep = Math.max(10, timestep);
+    timestep = Math.min(timestep, 80);
   }
 
   if (dropTimer) {
@@ -232,7 +265,7 @@ function landShape() {
   getFilledRows();
 
   if (filledRows.length > 0) {
-    cleanFilledRows();
+    clearFilledRows();
     updateScore();
     updateLevel();
   }
@@ -243,7 +276,10 @@ function landShape() {
 
 // FIXME: shape can not be added when shape landed
 function moveDown(enable) {
+  if (!gamePlay.value) return;
+
   clearInterval(dropTimer);
+
   if (enable && !moveShape(0, 1)) return;
 
   down = enable;
@@ -251,7 +287,10 @@ function moveDown(enable) {
 }
 
 function dropShape() {
+  if (!gamePlay.value) return;
+
   drop = true;
+
   setDropTimer();
 }
 
@@ -342,7 +381,7 @@ function mergeShape() {
   );
 }
 
-function cleanFilledRows() {
+function clearFilledRows() {
   for (let i = 0; i < filledRows.length; i++) {
     game.map.splice(filledRows[i], 1);
     game.map.unshift(new Array(10).fill(0));
@@ -351,8 +390,6 @@ function cleanFilledRows() {
 
 // HACK: limit the number of score
 function updateScore() {
-  if (score.value >= 99999999) return;
-
   if (filledRows.length > 0) {
     score.value +=
       (filledRows.length * level.value + (filledRows.length - 1)) * 10;
@@ -370,7 +407,7 @@ function updateHighScore() {
   highScore.value = localStorage.getItem("highScore");
 }
 
-// HACK: limit the number of level
+// HACK: the value of next level score
 function updateLevel() {
   let nextLevelScore = (level.value + 1) * 100 * level.value;
 

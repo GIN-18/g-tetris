@@ -40,6 +40,7 @@ function joinRoom() {
         placeholder="Room ID"
         class="nes-input bg-nes-gray outline-none"
         v-model="roomId"
+        @keydown.enter="joinRoom"
       />
       <div class="flex gap-12">
         <Button type="success" text="JOIN" @click.prevent="joinRoom" />

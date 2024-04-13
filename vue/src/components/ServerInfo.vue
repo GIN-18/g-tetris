@@ -1,18 +1,20 @@
 <script setup>
-import { ref, computed } from "vue";
-import { useGameStore } from "@/stores/game.js";
+import { ref, computed, onMounted } from "vue";
+import { socket } from "@/assets/js/socket.js";
 
-const game = useGameStore();
-
-const props = defineProps({
-  status: Boolean,
-});
+const socketStatus = ref(null);
 
 const iconClassList = computed(() => ({
   "text-5xl": true,
-  "icon-[pixelarticons--cloud-done] text-nes-deep-green": props.status,
-  "icon-[pixelarticons--cloud] text-nes-deep-gray": !props.status,
+  "icon-[pixelarticons--cloud-done] text-nes-deep-green": socketStatus.value,
+  "icon-[pixelarticons--cloud] text-nes-deep-gray": !socketStatus.value,
 }));
+
+onMounted(() => {
+  socket.on("connect", () => {
+    socketStatus.value = true;
+  });
+});
 </script>
 
 <template>
