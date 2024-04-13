@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
 import { notify } from "@/assets/js/notify.js";
-import { socket } from "@/assets/js/socket.js";
+import { socket, socketEmit } from "@/assets/js/socket.js";
 import Clipboard from "clipboard";
 
 import DialogsBox from "@/components/DialogsBox.vue";
@@ -28,6 +28,8 @@ const statusText = computed(() => (isReady.value ? "Ready" : "Not Ready"));
 
 onMounted(() => {
   if (props.gameMode === "2p") showPrepare.value = true;
+
+  socketEmit("ready", "ready", false);
 
   socket.on("zeroReady", () => {
     prepared.value = 0;

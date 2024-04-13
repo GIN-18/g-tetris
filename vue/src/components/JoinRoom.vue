@@ -26,7 +26,7 @@ function joinRoom() {
   }
 
   socket.emit("joinRoom", {
-    room: roomId,
+    room: roomId.value,
     action: "join",
   });
 }

@@ -123,17 +123,16 @@ io.on("connection", (socket) => {
     io.to(room).emit("replay");
   });
 
-  // TODO: player leave them room and diconnect
-  socket.on("leaveRoom", () => {
-    console.log("leave room");
-    // remove player while leave room
-    for (const room in rooms) {
-      delete rooms[room][socket.id];
-    }
+  socket.on("leaveRoom", (room) => {
+    socket.leave(room); // remove the room in socket
+    delete rooms[room][socket.id]; // remove the room in rooms
+
+    // remove the room when no one in the room
+    const clients = io.sockets.adapter.rooms.get(room);
+    if (!clients) delete rooms[room];
   });
 
   socket.on("disconnect", () => {
-    console.log(rooms);
     // remove player while disconnect
     for (const room in rooms) {
       delete rooms[room][socket.id];

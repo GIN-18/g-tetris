@@ -137,10 +137,10 @@ onMounted(() => {
   }
 });
 
-// TODO: player leave the room
+// handle when player leave the game page
 onBeforeRouteLeave(() => {
   if (checkGameMode("2p")) {
-    socket.emit("leaveRoom");
+    socket.emit("leaveRoom", localStorage.getItem("room"));
     return;
   }
 
@@ -205,6 +205,8 @@ function addShape() {
     const y = cs[i][0] + currentY + (type === 1 ? 1 : 2);
 
     if (game.map[y][x]) {
+      clearInterval(dropTimer);
+
       gameOver.value = true;
       gamePlay.value = false;
 
@@ -213,9 +215,6 @@ function addShape() {
         previewShape: null,
         nextShape: null,
       });
-
-      clearInterval(dropTimer);
-      dropTimer = null;
 
       if (checkGameMode("2p")) {
         socketEmit("gameOver", "gameOver", true);
@@ -452,7 +451,6 @@ function checkGameMode(mode) {
         <span>{{ score }}</span>
       </GameInfo>
 
-      <!-- HACK: component or v-if here (high score and score difference) -->
       <!-- high score -->
       <GameInfo title="HI-SCORE" v-if="checkGameMode('1p')">
         <span>{{ highScore }}</span>

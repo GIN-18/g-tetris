@@ -22,11 +22,8 @@ function addMessage({ type, message }) {
   messageType.value = type;
   messages.value.push(message);
 
-  console.log(messages.value);
-
   setTimeout(() => {
     messages.value.shift();
-    console.log(messages.value);
   }, 3000);
 }
 </script>
