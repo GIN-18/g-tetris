@@ -129,11 +129,18 @@ io.on("connection", (socket) => {
 
     // remove the room when no one in the room
     const clients = io.sockets.adapter.rooms.get(room);
-    if (!clients) delete rooms[room];
+
+    if (!clients) {
+      delete rooms[room];
+      return;
+    }
+
+    if (clients.size === 1) {
+      io.to(room).emit("oneLeaveRoom");
+    }
   });
 
   socket.on("disconnect", () => {
-    // remove player while disconnect
     for (const room in rooms) {
       delete rooms[room][socket.id];
     }
@@ -151,6 +158,7 @@ function generateRoomId() {
 }
 
 function emitByAttr(id, room, attr, attrValue, zeroEvent, oneEvent, twoEvent) {
+  console.log(attr);
   rooms[room][id][attr] = attrValue;
 
   const length = Object.keys(rooms[room]).length;

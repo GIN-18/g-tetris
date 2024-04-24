@@ -1,2 +1,0 @@
-<image class="img" wx:if="{{ status }}" src="{{ trueSrc }}"></image>
-<image class="img"  wx:else src="{{ falseSrc }}"></image>

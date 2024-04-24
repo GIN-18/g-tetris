@@ -3,6 +3,7 @@ import { ref, watch, onMounted } from "vue";
 import { socket } from "@/assets/js/socket.js";
 
 import DialogsBox from "@/components/DialogsBox.vue";
+import RoomID from "@/components/RoomID.vue";
 import LabelBox from "@/components/LabelBox.vue";
 import EmitEventButton from "@/components/button/EmitEventButton.vue";
 import QuitButton from "@/components/button/QuitButton.vue";
@@ -62,6 +63,8 @@ function checkGameMode(mode) {
 
     <!-- info -->
     <div class="flex flex-col gap-4 w-72">
+      <RoomID v-if="checkGameMode('2p')" />
+
       <!-- your score -->
       <LabelBox label="Your Score:">
         <span>{{ props.score }}</span>

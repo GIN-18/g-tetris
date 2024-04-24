@@ -134,6 +134,10 @@ onMounted(() => {
       replayGame();
       playGame();
     });
+
+    socket.on("oneLeaveRoom", () => {
+      notify("warning", "2P Leave The Room");
+    });
   }
 });
 

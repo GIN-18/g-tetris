@@ -1,4 +1,0 @@
-<view class="container">
-  <text>{{ key }}</text>
-  <text>{{ value }}</text>
-</view>

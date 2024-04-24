@@ -1,7 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { emitter } from "@/assets/js/emitter.js";
-import { notify } from "@/assets/js/notify.js";
 
 const messages = ref([]);
 const messageType = ref(null);

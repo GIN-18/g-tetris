@@ -1,19 +1,16 @@
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
-import { notify } from "@/assets/js/notify.js";
 import { socket, socketEmit } from "@/assets/js/socket.js";
-import Clipboard from "clipboard";
 
 import DialogsBox from "@/components/DialogsBox.vue";
+import RoomID from "@/components/RoomID.vue";
 import LabelBox from "@/components/LabelBox.vue";
 import EmitEventButton from "@/components/button/EmitEventButton.vue";
 import QuitButton from "@/components/button/QuitButton.vue";
 
-const room = localStorage.getItem("room");
 const isReady = ref(false);
 const prepared = ref(0);
 const showPrepare = ref(false);
-const clipboard = new Clipboard("#room-id");
 
 const emit = defineEmits(["ready"]);
 const props = defineProps({
@@ -27,9 +24,10 @@ const statusClass = computed(() => ({
 const statusText = computed(() => (isReady.value ? "Ready" : "Not Ready"));
 
 onMounted(() => {
-  if (props.gameMode === "2p") showPrepare.value = true;
-
-  socketEmit("ready", "ready", false);
+  if (props.gameMode === "2p") {
+    showPrepare.value = true;
+    socketEmit("ready", "ready", false);
+  }
 
   socket.on("zeroReady", () => {
     prepared.value = 0;
@@ -45,26 +43,12 @@ onMounted(() => {
     emit("ready");
   });
 });
-
-clipboard.on("success", (e) => {
-  e.clearSelection();
-  notify("success", "Room ID copied");
-});
 </script>
 
 <template>
   <DialogsBox title="PREPARE" :isShow="showPrepare">
     <div class="flex flex-col gap-4 w-72">
-      <!-- room id -->
-      <LabelBox label="Room ID:">
-        <span
-          id="room-id"
-          title="click to copy room ID"
-          data-clipboard-target="#room-id"
-          data-clipboard-action="copy"
-          >{{ room }}</span
-        >
-      </LabelBox>
+      <RoomID />
 
       <!-- prepare status -->
       <LabelBox label="Status:">

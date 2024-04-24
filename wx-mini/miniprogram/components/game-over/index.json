@@ -1,6 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "game-over-info-item": "/components/game-over-info-item"
-  }
-}

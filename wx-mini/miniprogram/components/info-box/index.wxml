@@ -1,4 +1,0 @@
-<view class="info-box">
-  <view class="info-label">{{ title }}</view> 
-  <slot></slot>
-</view>
