@@ -11,6 +11,8 @@ export const useGameStore = defineStore("game", {
     nextShape: createShape(),
     gamePlay: false,
     gameOver: false,
+    score: 0,
+    level: 1,
     highScore: localStorage.getItem("highScore") || 0,
     isPreview: localStorage.getItem("isPreview") || true,
   }),

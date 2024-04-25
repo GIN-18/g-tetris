@@ -11,15 +11,13 @@ import { playConfetti } from "@/assets/js/confetti.js";
 
 import Header from "@/components/Header.vue";
 import Menu from "@/components/menu/Menu.vue";
-import Canvas from "@/components/Canvas.vue";
-import GameInfo from "@/components/GameInfo.vue";
 import Button from "@/components/button/Button.vue";
 import ArrowButton from "@/components/button/ArrowButton.vue";
 import StatusButton from "@/components/button/StatusButton.vue";
 import GamePrepare from "@/components/GamePrepare.vue";
 import GameOverInfo from "@/components/GameOverInfo.vue";
 import MapCanvas from "@/components/canvas/MapCanvas.vue";
-import NextPieceCanvas from "@/components/canvas/NextPieceCanvas.vue";
+import GameBaseInfo from "@/components/info/GameBaseInfo.vue";
 
 const route = useRoute();
 const game = useGameStore();
@@ -27,9 +25,6 @@ const { currentShape, previewShape, nextShape, isPreview, highScore, palette } =
   storeToRefs(game);
 
 const gameMode = route.params.mode;
-
-const mapCanvas = ref(null);
-const nextCanvas = ref(null);
 
 const score = ref(0);
 const level = ref(1);
@@ -182,9 +177,6 @@ function resetGame() {
   lose.value = false;
 
   filledRows.length = 0;
-
-  mapCanvas.value.clearMap();
-  nextCanvas.value.drawNextShape();
 }
 
 function addShape() {
@@ -222,9 +214,6 @@ function addShape() {
       return;
     }
   }
-
-  if (currentShape.value) mapCanvas.value.drawGame();
-  nextCanvas.value.drawNextShape();
 }
 
 function setDropTimer() {
@@ -326,8 +315,6 @@ function rotatePiece() {
       previewShape.value.rotation = currentRotation;
     }
   }
-
-  mapCanvas.value.drawGame();
 }
 
 function movePiece(xStep, yStep) {
@@ -358,7 +345,6 @@ function movePiece(xStep, yStep) {
     currentShape.value.x += xStep;
     currentShape.value.y += yStep;
     previewShape.value.x += xStep;
-    mapCanvas.value.drawGame();
   }
 
   return canMove;
@@ -438,40 +424,9 @@ function checkGameMode(mode) {
   </Header>
 
   <main class="flex justify-between items-center w-full">
-    <Canvas ref="mapCanvas" name="map" width="200" height="400" />
-
     <MapCanvas />
 
-    <!-- game info -->
-    <div class="flex flex-col justify-between items-center w-max-40 h-full">
-      <!-- game score -->
-      <GameInfo title="SCORE">
-        <span>{{ score }}</span>
-      </GameInfo>
-
-      <!-- high score -->
-      <GameInfo title="HI-SCORE" v-if="checkGameMode('1p')">
-        <span>{{ highScore }}</span>
-      </GameInfo>
-
-      <!-- socre difference -->
-      <GameInfo title="DIFF" v-if="checkGameMode('2p')">
-        <span :class="scoreDiffColor">
-          {{ formatScoreDiff }}
-        </span>
-      </GameInfo>
-
-      <!-- next shape -->
-      <GameInfo title="NEXT">
-        <Canvas ref="nextCanvas" name="next" width="80" height="40" />
-        <NextPieceCanvas />
-      </GameInfo>
-
-      <!-- game level -->
-      <GameInfo title="LEVEL">
-        <span>{{ level }}</span>
-      </GameInfo>
-    </div>
+    <GameBaseInfo />
   </main>
 
   <hr class="w-full border-t-4 border-dashed border-black" />
