@@ -1,4 +1,4 @@
-export function getShape() {
+export function createShape() {
   const shapeTable = {
     0: [
       [
@@ -134,7 +134,6 @@ export function getShape() {
   return {
     x: 3,
     y: type === 1 ? -1 : -2,
-    // y: 0,
     type,
     rotation: 0,
     pieces: shapeTable[type],

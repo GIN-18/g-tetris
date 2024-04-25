@@ -4,10 +4,9 @@ import { useRoute, onBeforeRouteLeave } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useGameStore } from "@/stores/game.js";
 
-import { getShape } from "@/assets/js/shape.js";
+import { createShape } from "@/assets/js/shape.js";
 import { socket, socketEmit } from "@/assets/js/socket.js";
 import { notify } from "@/assets/js/notify.js";
-import { preventZoom, forEachShape } from "@/assets/js/utils.js";
 import { playConfetti } from "@/assets/js/confetti.js";
 
 import Header from "@/components/Header.vue";
@@ -19,6 +18,8 @@ import ArrowButton from "@/components/button/ArrowButton.vue";
 import StatusButton from "@/components/button/StatusButton.vue";
 import GamePrepare from "@/components/GamePrepare.vue";
 import GameOverInfo from "@/components/GameOverInfo.vue";
+import MapCanvas from "@/components/canvas/MapCanvas.vue";
+import NextPieceCanvas from "@/components/canvas/NextPieceCanvas.vue";
 
 const route = useRoute();
 const game = useGameStore();
@@ -57,39 +58,37 @@ const scoreDiffColor = computed(() =>
 );
 
 onMounted(() => {
-  // preventZoom();
-
   // keybinding
   window.document.addEventListener("keydown", (e) => {
     switch (e.key) {
       case "w":
-        dropShape();
+        dropPiece();
         break;
       case "d":
-        moveShape(1, 0);
+        movePiece(1, 0);
         break;
       case "s":
-        moveDown(true);
+        movePieceDown(true);
         break;
       case "a":
-        moveShape(-1, 0);
+        movePiece(-1, 0);
         break;
       case "i":
         playGame();
         break;
       case "o":
-        replayGame();
+        resetGame();
         break;
       case "p":
         toggleVolume();
         break;
       case "k":
-        rotateShape();
+        rotatePiece();
         break;
     }
   });
   window.document.addEventListener("keyup", (e) => {
-    if (e.key === "s") moveDown(false);
+    if (e.key === "s") movePieceDown(false);
   });
 
   if (checkGameMode("2p")) {
@@ -131,7 +130,7 @@ onMounted(() => {
     });
 
     socket.on("replay", () => {
-      replayGame();
+      resetGame();
       playGame();
     });
 
@@ -148,7 +147,7 @@ onBeforeRouteLeave(() => {
     return;
   }
 
-  replayGame();
+  resetGame();
 });
 
 function playGame() {
@@ -159,7 +158,7 @@ function playGame() {
   if (!gamePlay.value && dropTimer) clearInterval(dropTimer);
 }
 
-function replayGame() {
+function resetGame() {
   if (!dropTimer) return;
 
   if (dropTimer) {
@@ -170,7 +169,7 @@ function replayGame() {
     map: new Array(20).fill(0).map(() => new Array(10).fill(0)),
     currentShape: null,
     previewShape: null,
-    nextShape: getShape(),
+    nextShape: createShape(),
   });
 
   gamePlay.value = false;
@@ -191,24 +190,17 @@ function replayGame() {
 function addShape() {
   currentShape.value = nextShape.value;
   previewShape.value = { ...currentShape.value };
-  nextShape.value = getShape();
-
-  const {
-    type,
-    pieces,
-    rotation,
-    x: currentX,
-    y: currentY,
-  } = currentShape.value;
-
-  const cs = pieces[rotation];
+  nextShape.value = createShape();
 
   // game over
-  for (let i = 0; i < cs.length; i++) {
-    const x = cs[i][1] + currentX;
-    const y = cs[i][0] + currentY + (type === 1 ? 1 : 2);
+  const { x, y, type, pieces, rotation } = currentShape.value;
+  const piece = pieces[rotation];
 
-    if (game.map[y][x]) {
+  for (let i = 0; i < piece.length; i++) {
+    const tmp_x = piece[i][1] + x;
+    const tmp_y = piece[i][0] + y + (type === 1 ? 1 : 2);
+
+    if (game.map[tmp_y][tmp_x]) {
       clearInterval(dropTimer);
 
       gameOver.value = true;
@@ -257,14 +249,14 @@ function setDropTimer() {
 }
 
 function fallShape() {
-  if (moveShape(0, 1)) return;
+  if (movePiece(0, 1)) return;
   landShape();
 }
 
 function landShape() {
   if (drop) drop = false;
 
-  mergeShape();
+  mergePiece();
   getFilledRows();
 
   if (filledRows.length > 0) {
@@ -277,19 +269,7 @@ function landShape() {
   setDropTimer();
 }
 
-// FIXME: shape can not be added when shape landed
-function moveDown(enable) {
-  if (!gamePlay.value) return;
-
-  clearInterval(dropTimer);
-
-  if (enable && !moveShape(0, 1)) return;
-
-  down = enable;
-  setDropTimer();
-}
-
-function dropShape() {
+function dropPiece() {
   if (!gamePlay.value) return;
 
   drop = true;
@@ -297,65 +277,78 @@ function dropShape() {
   setDropTimer();
 }
 
-// HACK: rotate shape against the wall
-function rotateShape() {
+// FIXME: shape can not be added when shape landed
+function movePieceDown(enable) {
   if (!gamePlay.value) return;
 
-  const {
-    x: currentX,
-    y: currentY,
-    pieces: currentPieces,
-    rotation: currentRotation,
-  } = currentShape.value;
+  clearInterval(dropTimer);
 
-  const nowRotation = currentRotation;
-  const resultRotation = (currentRotation + 1) % currentPieces.length;
+  if (enable && !movePiece(0, 1)) return;
+
+  down = enable;
+  setDropTimer();
+}
+
+function movePieceLeft() {
+  if (!gamePlay.value) return;
+  movePiece(-1, 0);
+}
+
+function movePieceRight() {
+  if (!gamePlay.value) return;
+  movePiece(1, 0);
+}
+
+// HACK: rotate shape against the wall
+function rotatePiece() {
+  if (!gamePlay.value) return;
+
+  const { x, y, pieces, rotation } = currentShape.value;
+  const currentRotation = rotation;
+  const resultRotation = (rotation + 1) % pieces.length;
 
   currentShape.value.rotation = resultRotation;
   previewShape.value.rotation = resultRotation;
 
-  const currentPiece = currentShape.value.pieces[currentShape.value.rotation];
+  const piece = currentShape.value.pieces[currentShape.value.rotation];
 
-  for (let i = 0; i < currentPiece.length; i++) {
-    const x = currentPiece[i][1] + currentX;
-    const y = currentPiece[i][0] + currentY;
+  for (let i = 0; i < piece.length; i++) {
+    const tmp_x = piece[i][1] + x;
+    const tmp_y = piece[i][0] + y;
 
     if (
-      y >= 0 &&
-      (game.map[y] === undefined ||
-        game.map[y][x] === undefined ||
-        game.map[y][x] > 0)
+      tmp_y >= 0 &&
+      (game.map[tmp_y] === undefined ||
+        game.map[tmp_y][tmp_x] === undefined ||
+        game.map[tmp_y][tmp_x] > 0)
     ) {
-      currentShape.value.rotation = nowRotation;
-      previewShape.value.rotation = nowRotation;
+      currentShape.value.rotation = currentRotation;
+      previewShape.value.rotation = currentRotation;
     }
   }
 
   mapCanvas.value.drawGame();
 }
 
-function moveShape(xStep, yStep) {
-  if (!gamePlay.value) return;
-
-  const {
-    x: currentX,
-    y: currentY,
-    pieces: currentPieces,
-    rotation: currentRotation,
-  } = currentShape.value;
-
-  const cs = currentPieces[currentRotation];
-  const m = game.map;
-  const w = game.map[0].length;
-  const h = game.map.length;
+function movePiece(xStep, yStep) {
+  const { x, y, pieces, rotation } = currentShape.value;
+  const piece = pieces[rotation];
+  const map = game.map;
+  const w = map[0].length;
+  const h = map.length;
 
   let canMove = true;
 
-  for (let i = 0; i < cs.length; i++) {
-    const x = cs[i][1] + currentX + xStep;
-    const y = cs[i][0] + currentY + yStep;
+  for (let i = 0; i < piece.length; i++) {
+    const tmp_x = piece[i][1] + x + xStep;
+    const tmp_y = piece[i][0] + y + yStep;
 
-    if (x < 0 || x >= w || y >= h || (m[y] && m[y][x])) {
+    if (
+      tmp_x < 0 ||
+      tmp_x >= w ||
+      tmp_y >= h ||
+      (map[tmp_y] && map[tmp_y][tmp_x])
+    ) {
       canMove = false;
       return canMove;
     }
@@ -371,17 +364,16 @@ function moveShape(xStep, yStep) {
   return canMove;
 }
 
-function mergeShape() {
-  const { type, x, y } = currentShape.value;
+function mergePiece() {
+  const { x, y, type, pieces, rotation } = currentShape.value;
+  const piece = pieces[rotation];
 
-  forEachShape(
-    currentShape,
-    (shape, x, y) => {
-      if (y >= 0) game.map[y][x] = type + 1;
-    },
-    x,
-    y,
-  );
+  for (let i = 0; i < piece.length; i++) {
+    const tmp_x = piece[i][1] + x;
+    const tmp_y = piece[i][0] + y;
+
+    if (tmp_y >= 0) game.map[tmp_y][tmp_x] = type + 1;
+  }
 }
 
 function clearFilledRows() {
@@ -448,6 +440,8 @@ function checkGameMode(mode) {
   <main class="flex justify-between items-center w-full">
     <Canvas ref="mapCanvas" name="map" width="200" height="400" />
 
+    <MapCanvas />
+
     <!-- game info -->
     <div class="flex flex-col justify-between items-center w-max-40 h-full">
       <!-- game score -->
@@ -470,6 +464,7 @@ function checkGameMode(mode) {
       <!-- next shape -->
       <GameInfo title="NEXT">
         <Canvas ref="nextCanvas" name="next" width="80" height="40" />
+        <NextPieceCanvas />
       </GameInfo>
 
       <!-- game level -->
@@ -485,19 +480,19 @@ function checkGameMode(mode) {
     <!-- arrow button -->
     <div class="flex flex-col justify-center items-center w-1/2">
       <!-- drop button -->
-      <ArrowButton type="drop" @click.prevent="dropShape" />
+      <ArrowButton type="drop" @click.prevent="dropPiece" />
 
       <!-- left and right button -->
       <div class="flex justify-between items-center w-full">
-        <ArrowButton type="left" @click.prevent="moveShape(-1, 0)" />
-        <ArrowButton type="right" @click.prevent="moveShape(1, 0)" />
+        <ArrowButton type="left" @click.prevent="movePieceLeft" />
+        <ArrowButton type="right" @click.prevent="movePieceRight" />
       </div>
 
       <!-- down button -->
       <ArrowButton
         type="down"
-        @touchstart.prevent="moveDown(true)"
-        @touchend.prevent="moveDown(false)"
+        @touchstart.prevent="movePieceDown(true)"
+        @touchend.prevent="movePieceDown(false)"
       />
     </div>
 
@@ -518,7 +513,7 @@ function checkGameMode(mode) {
           type="primary"
           icon="icon-[pixelarticons--reload]"
           v-if="checkGameMode('1p')"
-          @click.prevent="replayGame"
+          @click.prevent="resetGame"
         />
 
         <!-- toggle volume button -->
@@ -531,7 +526,7 @@ function checkGameMode(mode) {
       </div>
 
       <!-- rotate button -->
-      <ArrowButton type="rotate" @click.prevent="rotateShape" />
+      <ArrowButton type="rotate" @click.prevent="rotatePiece" />
     </div>
   </div>
 
