@@ -1,12 +1,12 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { socket } from "@/assets/js/socket.js";
-import { notify } from "@/assets/js/notify.js";
 
 import Header from "@/components/Header.vue";
 import LinkBox from "@/components/LinkBox.vue";
 import JoinRoom from "@/components/JoinRoom.vue";
+import Footer from "@/components/Footer.vue";
 
 const router = useRouter();
 
@@ -55,4 +55,6 @@ function handleRoomEvent(data) {
 
   <!-- join room box -->
   <JoinRoom v-model="showJoinRoom" @cancel="toggleRoomBox" />
+
+  <Footer />
 </template>

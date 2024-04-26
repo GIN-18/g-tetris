@@ -1,5 +1,6 @@
 <script setup>
 import LinkBox from "@/components/LinkBox.vue";
+import Footer from "@/components/Footer.vue";
 </script>
 
 <template>
@@ -22,4 +23,6 @@ import LinkBox from "@/components/LinkBox.vue";
       />
     </div>
   </div>
+
+  <Footer />
 </template>
