@@ -11,6 +11,11 @@ const ctx = computed(() => canvas.value.getContext("2d"));
 
 const game = useGameStore();
 
+// clear canvas while reset game
+watch(
+  () => game.map,
+  () => clearCanvas(),
+);
 watch(
   [
     () => game.map,

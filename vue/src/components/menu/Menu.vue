@@ -3,6 +3,7 @@ import { ref } from "vue";
 
 import MenuItem from "./MenuItem.vue";
 import ToggleButton from "./ToggleButton.vue";
+import KeyOperation from "@/components/operation/KeyOperation.vue";
 
 const emit = defineEmits(["play"]);
 const props = defineProps({
@@ -57,11 +58,13 @@ function toggleMenu() {
             ></button>
           </header>
 
-          <ul class="flex flex-col gap-2">
+          <ul class="flex flex-col gap-2 mb-6">
             <MenuItem text="Preview">
               <ToggleButton option="isPreview" />
             </MenuItem>
           </ul>
+
+          <KeyOperation />
         </aside>
       </Transition>
     </div>

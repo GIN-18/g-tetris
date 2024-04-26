@@ -1,33 +1,39 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useRoute, onBeforeRouteLeave } from "vue-router";
+import { ref, onMounted } from "vue";
 import { storeToRefs } from "pinia";
+import { useRoute, onBeforeRouteLeave } from "vue-router";
 import { useGameStore } from "@/stores/game.js";
-
 import { createShape } from "@/assets/js/shape.js";
 import { socket, socketEmit } from "@/assets/js/socket.js";
 import { notify } from "@/assets/js/notify.js";
+import { emitter } from "@/assets/js/emitter.js";
 import { playConfetti } from "@/assets/js/confetti.js";
 
 import Header from "@/components/Header.vue";
 import Menu from "@/components/menu/Menu.vue";
+import MapCanvas from "@/components/canvas/MapCanvas.vue";
+import GameBaseInfo from "@/components/info/GameBaseInfo.vue";
 import Button from "@/components/button/Button.vue";
 import ArrowButton from "@/components/button/ArrowButton.vue";
 import StatusButton from "@/components/button/StatusButton.vue";
 import GamePrepare from "@/components/GamePrepare.vue";
 import GameOverInfo from "@/components/GameOverInfo.vue";
-import MapCanvas from "@/components/canvas/MapCanvas.vue";
-import GameBaseInfo from "@/components/info/GameBaseInfo.vue";
 
 const route = useRoute();
 const game = useGameStore();
-const { currentShape, previewShape, nextShape, isPreview, highScore, palette } =
-  storeToRefs(game);
+const {
+  currentShape,
+  previewShape,
+  nextShape,
+  isPreview,
+  score,
+  level,
+  highScore,
+  scoreDiff,
+  palette,
+} = storeToRefs(game);
 
 const gameMode = route.params.mode;
-
-const score = ref(0);
-const level = ref(1);
 
 const gamePlay = ref(false);
 const gameOver = ref(false);
@@ -35,7 +41,6 @@ const gameOverTitle = ref("GAME OVER");
 
 const volumeUp = ref(true);
 
-const scoreDiff = ref(0);
 const win = ref(false);
 const lose = ref(false);
 
@@ -45,46 +50,15 @@ let drop = false;
 let down = false;
 let dropTimer = null;
 
-const formatScoreDiff = computed(() =>
-  scoreDiff.value >= 0 ? `+${scoreDiff.value}` : scoreDiff.value,
-);
-const scoreDiffColor = computed(() =>
-  scoreDiff.value >= 0 ? "text-nes-deep-green" : "text-nes-deep-red",
-);
-
 onMounted(() => {
-  // keybinding
-  window.document.addEventListener("keydown", (e) => {
-    switch (e.key) {
-      case "w":
-        dropPiece();
-        break;
-      case "d":
-        movePiece(1, 0);
-        break;
-      case "s":
-        movePieceDown(true);
-        break;
-      case "a":
-        movePiece(-1, 0);
-        break;
-      case "i":
-        playGame();
-        break;
-      case "o":
-        resetGame();
-        break;
-      case "p":
-        toggleVolume();
-        break;
-      case "k":
-        rotatePiece();
-        break;
-    }
-  });
-  window.document.addEventListener("keyup", (e) => {
-    if (e.key === "s") movePieceDown(false);
-  });
+  emitter.on("play", playGame);
+  emitter.on("reset", resetGame);
+  emitter.on("volume", toggleVolume);
+  emitter.on("drop", dropPiece);
+  emitter.on("left", movePieceLeft);
+  emitter.on("right", movePieceRight);
+  emitter.on("down", (enable) => movePieceDown(enable));
+  emitter.on("rotate", rotatePiece);
 
   if (checkGameMode("2p")) {
     isPreview.value = false; // 2p mode is always not preview
@@ -169,8 +143,6 @@ function resetGame() {
 
   gamePlay.value = false;
   gameOver.value = false;
-  score.value = 0;
-  level.value = 1;
 
   scoreDiff.value = 0;
   win.value = false;
@@ -426,7 +398,7 @@ function checkGameMode(mode) {
   <main class="flex justify-between items-center w-full">
     <MapCanvas />
 
-    <GameBaseInfo />
+    <GameBaseInfo :gameMode="gameMode" />
   </main>
 
   <hr class="w-full border-t-4 border-dashed border-black" />
