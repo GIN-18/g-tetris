@@ -1,11 +1,6 @@
 <script setup>
 import { computed } from "vue";
-
 import Button from "./Button.vue";
-
-const props = defineProps({
-  type: String,
-});
 
 const icon = computed(() => ({
   "icon-[pixelarticons--arrow-bar-down]": props.type === "drop",
@@ -14,6 +9,10 @@ const icon = computed(() => ({
   "icon-[pixelarticons--chevron-down]": props.type === "down",
   "icon-[pixelarticons--redo]": props.type === "rotate",
 }));
+
+const props = defineProps({
+  type: String,
+});
 
 function checkType() {
   const arr = ["drop", "right", "left", "down"];

@@ -14,6 +14,8 @@ const game = useGameStore();
 watch(
   () => game.nextShape,
   () => {
+    if (!game.nextShape) return;
+
     clearCanvas();
     drawNextPiece();
   },

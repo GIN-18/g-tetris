@@ -1,20 +1,17 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { emitter } from "@/assets/js/emitter.js";
-import KeyInfoBox from "./KeyInfoBox.vue";
 
-const keyMap = {
+const keys = ref({
+  play: "i",
+  reset: "o",
+  volume: "p",
+  rotate: "k",
   drop: "w",
   right: "d",
   left: "a",
   down: "s",
-  rotate: "k",
-  play: "i",
-  reset: "o",
-  volume: "p",
-};
-
-const keys = ref(keyMap);
+});
 
 onMounted(() => {
   document.addEventListener("keydown", handleKeyDown);
@@ -47,7 +44,7 @@ function handleKeyDown(e) {
     case keys.value.right:
       emitter.emit("right");
       break;
-    case "s":
+    case keys.value.down:
       emitter.emit("down", true);
       break;
     case keys.value.rotate:
@@ -67,13 +64,13 @@ function handleKeyUp(e) {
     <p class="mb-0">Key Bindings</p>
   </h2>
   <ul class="flex flex-col gap-3 w-full mb-0">
-    <KeyInfoBox title="PLAY" v-model="keys.play" />
-    <KeyInfoBox title="RESET" v-model="keys.reset" />
-    <KeyInfoBox title="VOLUME" v-model="keys.volume" />
-    <KeyInfoBox title="ROTATE" v-model="keys.rotate" />
-    <KeyInfoBox title="DROP" v-model="keys.drop" />
-    <KeyInfoBox title="LEFT" v-model="keys.left" />
-    <KeyInfoBox title="RIGHT" v-model="keys.right" />
-    <KeyInfoBox title="DOWN" v-model="keys.down" />
+    <li
+      class="flex justify-between items-center w-2/3 text-xs"
+      v-for="key in Object.keys(keys)"
+      :key="key"
+    >
+      <p class="mb-0">{{ key.toUpperCase() }}:</p>
+      <p class="mb-0">{{ keys[key] }}</p>
+    </li>
   </ul>
 </template>

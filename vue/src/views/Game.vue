@@ -16,8 +16,8 @@ import GameBaseInfo from "@/components/info/GameBaseInfo.vue";
 import Button from "@/components/button/Button.vue";
 import ArrowButton from "@/components/button/ArrowButton.vue";
 import StatusButton from "@/components/button/StatusButton.vue";
-import GamePrepare from "@/components/GamePrepare.vue";
-import GameOverInfo from "@/components/GameOverInfo.vue";
+import GameOverInfo from "@/components/info/GameOverInfo.vue";
+import GamePrepareInfo from "@/components/info/GamePrepareInfo.vue";
 
 const route = useRoute();
 const game = useGameStore();
@@ -397,7 +397,6 @@ function checkGameMode(mode) {
 
   <main class="flex justify-between items-center w-full">
     <MapCanvas />
-
     <GameBaseInfo :gameMode="gameMode" />
   </main>
 
@@ -457,7 +456,7 @@ function checkGameMode(mode) {
     </div>
   </div>
 
-  <GamePrepare :gameMode="gameMode" @ready="playGame" />
+  <GamePrepareInfo :gameMode="gameMode" @ready="playGame" />
 
   <GameOverInfo
     :gameOver="gameOver"

@@ -1,16 +1,18 @@
 <script setup>
 import { ref, watch, onMounted } from "vue";
+import { useGameStore } from "@/stores/game";
 import { socket } from "@/assets/js/socket.js";
 
 import DialogsBox from "@/components/DialogsBox.vue";
 import RoomID from "@/components/RoomID.vue";
-import LabelBox from "@/components/LabelBox.vue";
+import LabelBox from "@/components/info/LabelBox.vue";
 import EmitEventButton from "@/components/button/EmitEventButton.vue";
 import QuitButton from "@/components/button/QuitButton.vue";
 
 const isAgain = ref(false);
 const again = ref(0);
 
+const game = useGameStore();
 const props = defineProps({
   title: String,
   gameOver: Boolean,
@@ -67,17 +69,17 @@ function checkGameMode(mode) {
 
       <!-- your score -->
       <LabelBox label="Your Score:">
-        <span>{{ props.score }}</span>
+        <span>{{ game.score }}</span>
       </LabelBox>
 
       <!-- high score -->
       <LabelBox label="High Score:" v-if="checkGameMode('1p')">
-        <span>{{ props.highScore }}</span>
+        <span>{{ game.highScore }}</span>
       </LabelBox>
 
       <!-- player 2's score -->
       <LabelBox label="2P's Score:" v-if="checkGameMode('2p')">
-        <span>{{ props.score - props.scoreDiff }}</span>
+        <span>{{ game.score - game.scoreDiff }}</span>
       </LabelBox>
 
       <!-- number of again -->

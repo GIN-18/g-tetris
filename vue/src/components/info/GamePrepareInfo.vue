@@ -1,10 +1,10 @@
 <script setup>
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { socket, socketEmit } from "@/assets/js/socket.js";
 
 import DialogsBox from "@/components/DialogsBox.vue";
 import RoomID from "@/components/RoomID.vue";
-import LabelBox from "@/components/LabelBox.vue";
+import LabelBox from "@/components/info/LabelBox.vue";
 import EmitEventButton from "@/components/button/EmitEventButton.vue";
 import QuitButton from "@/components/button/QuitButton.vue";
 
