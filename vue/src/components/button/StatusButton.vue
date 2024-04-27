@@ -1,21 +1,20 @@
 <script setup>
 import { computed } from "vue";
-
+import { emitter } from "@/assets/js/emitter.js";
 import Button from "./Button.vue";
 
 const props = defineProps({
-  status: Boolean,
   type: {
     type: String,
     default: "primary",
   },
+  status: Boolean,
+  event: String,
   trueIcon: String,
   falseIcon: String,
   trueText: String,
   falseText: String,
 });
-
-const emit = defineEmits(["toggle"]);
 
 const icon = computed(() => (props.status ? props.trueIcon : props.falseIcon));
 const text = computed(() => (props.status ? props.trueText : props.falseText));
@@ -23,6 +22,11 @@ const text = computed(() => (props.status ? props.trueText : props.falseText));
 
 <template>
   <div>
-    <Button :type="type" :icon="icon" :text="text" @click="emit('toggle')" />
+    <Button
+      :type="type"
+      :icon="icon"
+      :text="text"
+      @click.prevent="emitter.emit(event)"
+    />
   </div>
 </template>

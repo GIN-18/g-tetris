@@ -1,22 +1,20 @@
 <script setup>
 import { ref } from "vue";
+import { useGameStore } from "@/stores/game.js";
+import { emitter } from "@/assets/js/emitter.js";
 
 import MenuItem from "./MenuItem.vue";
 import ToggleButton from "./ToggleButton.vue";
 import KeyOperation from "@/components/operation/KeyOperation.vue";
 import Footer from "@/components/Footer.vue";
 
-const emit = defineEmits(["play"]);
-const props = defineProps({
-  playStatus: Boolean,
-});
-
+const game = useGameStore();
 const showMenu = ref(false);
 
 function toggleMenu() {
   showMenu.value = !showMenu.value;
 
-  if (props.playStatus) emit("play");
+  if (game.gamePlay) emitter.emit("play");
 }
 </script>
 
