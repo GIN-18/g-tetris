@@ -4,7 +4,7 @@ import { useGameStore } from "@/stores/game.js";
 import { emitter } from "@/assets/js/emitter.js";
 
 import MenuItem from "./MenuItem.vue";
-import ToggleButton from "./ToggleButton.vue";
+import ToggleOption from "./ToggleOption.vue";
 import KeyOperation from "@/components/operation/KeyOperation.vue";
 import Footer from "@/components/Footer.vue";
 
@@ -60,7 +60,7 @@ function toggleMenu() {
           <main class="grow">
             <ul class="flex flex-col gap-2 mb-6">
               <MenuItem text="Preview">
-                <ToggleButton option="isPreview" />
+                <ToggleOption option="isPreview" />
               </MenuItem>
             </ul>
 

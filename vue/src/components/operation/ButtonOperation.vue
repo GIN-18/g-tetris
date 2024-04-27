@@ -1,11 +1,18 @@
 <script setup>
+import { useRoute } from "vue-router";
 import { useGameStore } from "@/stores/game.js";
 import { emitter } from "@/assets/js/emitter.js";
 import Button from "@/components/button/Button.vue";
 import ArrowButton from "@/components/button/ArrowButton.vue";
-import StatusButton from "@/components/button/StatusButton.vue";
+import ToggleButton from "@/components/button/ToggleButton.vue";
 
 const game = useGameStore();
+const route = useRoute();
+const gameMode = route.params.mode;
+
+function checkGameMode(mode) {
+  return gameMode === mode;
+}
 </script>
 
 <template>
@@ -33,11 +40,12 @@ const game = useGameStore();
       <!-- feature button -->
       <div class="flex gap-4">
         <!-- play game button -->
-        <StatusButton
+        <ToggleButton
           :status="game.gamePlay"
           event="play"
           trueIcon="icon-[pixelarticons--pause]"
           falseIcon="icon-[pixelarticons--play]"
+          v-if="checkGameMode('1p')"
         />
 
         <!-- reset game button -->
@@ -45,10 +53,11 @@ const game = useGameStore();
           type="primary"
           icon="icon-[pixelarticons--reload]"
           @click.prevent="emitter.emit('reset')"
+          v-if="checkGameMode('1p')"
         />
 
         <!-- toggle volume button -->
-        <StatusButton
+        <ToggleButton
           :status="game.volumeUp"
           event="volume"
           trueIcon="icon-[pixelarticons--volume-vibrate]"

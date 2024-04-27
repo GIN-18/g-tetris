@@ -1,7 +1,9 @@
 <script setup>
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, computed, watch, onMounted, onUnmounted } from "vue";
+import { useRoute } from "vue-router";
 import { useGameStore } from "@/stores/game.js";
 import { createShape } from "@/assets/js/shape.js";
+import { socketEmit } from "@/assets/js/socket.js";
 import { emitter } from "@/assets/js/emitter.js";
 import { palettes } from "@/assets/js/palettes.js";
 
@@ -11,7 +13,9 @@ const canvasWidth = computed(() => canvas.value.width);
 const canvasHeight = computed(() => canvas.value.height);
 const ctx = computed(() => canvas.value.getContext("2d"));
 
+const route = useRoute();
 const game = useGameStore();
+const gameMode = route.params.mode;
 const block = 20;
 const filledRows = [];
 let map = new Array(20).fill(0).map(() => new Array(10).fill(0));
@@ -21,7 +25,7 @@ let dropTimer = null;
 let drop = false;
 let down = false;
 
-// clear canvas while reset game
+// redraw canvas when preview toggles
 watch(
   () => game.isPreview,
   () => {
@@ -35,14 +39,25 @@ watch(
 );
 
 onMounted(() => {
-  emitter.on("play", playGame);
-  emitter.on("reset", resetGame);
-  emitter.on("volume", toggleVolume);
   emitter.on("drop", dropPiece);
   emitter.on("left", movePieceLeft);
   emitter.on("right", movePieceRight);
   emitter.on("down", (enable) => movePieceDown(enable));
+  emitter.on("play", playGame);
+  emitter.on("reset", resetGame);
+  emitter.on("volume", toggleVolume);
   emitter.on("rotate", rotatePiece);
+});
+
+onUnmounted(() => {
+  emitter.off("drop", dropPiece);
+  emitter.off("left", movePieceLeft);
+  emitter.off("right", movePieceRight);
+  emitter.off("down", (enable) => movePieceDown(enable));
+  emitter.off("play", playGame);
+  emitter.off("reset", resetGame);
+  emitter.off("volume", toggleVolume);
+  emitter.off("rotate", rotatePiece);
 });
 
 function playGame() {
@@ -73,10 +88,6 @@ function resetGame() {
   map = new Array(20).fill(0).map(() => new Array(10).fill(0));
   currentShape = null;
   previewShape = null;
-
-  // win.value = false;
-  // lose.value = false;
-
   filledRows.length = 0;
 
   clearCanvas();
@@ -108,10 +119,11 @@ function addShape() {
       currentShape = null;
       previewShape = null;
 
-      // if (checkGameMode("2p")) {
-      //   socketEmit("gameOver", "gameOver", true);
-      //   return;
-      // }
+      // NOTE: socket emit game over
+      if (checkGameMode("2p")) {
+        socketEmit("gameOver", "gameOver", true);
+        return;
+      }
 
       updateHighScore();
 
@@ -172,6 +184,16 @@ function dropPiece() {
   setDropTimer();
 }
 
+function movePieceLeft() {
+  if (!game.gamePlay) return;
+  movePiece(-1, 0);
+}
+
+function movePieceRight() {
+  if (!game.gamePlay) return;
+  movePiece(1, 0);
+}
+
 // FIXME: shape can not be added when shape landed
 function movePieceDown(enable) {
   if (!game.gamePlay) return;
@@ -182,16 +204,6 @@ function movePieceDown(enable) {
 
   down = enable;
   setDropTimer();
-}
-
-function movePieceLeft() {
-  if (!game.gamePlay) return;
-  movePiece(-1, 0);
-}
-
-function movePieceRight() {
-  if (!game.gamePlay) return;
-  movePiece(1, 0);
 }
 
 // HACK: rotate shape against the wall
@@ -283,9 +295,10 @@ function updateScore() {
     game.score +=
       (filledRows.length * game.level + (filledRows.length - 1)) * 10;
 
-    // if (checkGameMode("2p")) {
-    //   socketEmit("updateScore", "score", game.score);
-    // }
+    // NOTE: socket emit update score
+    if (checkGameMode("2p")) {
+      socketEmit("updateScore", "score", game.score);
+    }
   }
 }
 
@@ -382,8 +395,13 @@ function drawPreviewPiece() {
   }
 }
 
+// TODO: play the sound
 function toggleVolume() {
   game.volumeUp = !game.volumeUp;
+}
+
+function checkGameMode(mode) {
+  return gameMode === mode;
 }
 </script>
 

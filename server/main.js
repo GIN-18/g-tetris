@@ -158,7 +158,6 @@ function generateRoomId() {
 }
 
 function emitByAttr(id, room, attr, attrValue, zeroEvent, oneEvent, twoEvent) {
-  console.log(attr);
   rooms[room][id][attr] = attrValue;
 
   const length = Object.keys(rooms[room]).length;

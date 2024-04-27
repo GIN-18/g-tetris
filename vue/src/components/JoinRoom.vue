@@ -1,22 +1,28 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { socket } from "@/assets/js/socket.js";
 import { notify } from "@/assets/js/notify.js";
 
 import Button from "@/components/button/Button.vue";
 import DialogsBox from "@/components/DialogsBox.vue";
 
+const roomId = ref("");
 const model = defineModel();
 const emit = defineEmits(["cancel"]);
 
-const roomId = ref("");
+onMounted(() => {
+  socket.on("roomFull", () => {
+    notify("warning", "Room is full.");
+  });
 
-socket.on("roomFull", () => {
-  notify("warning", "Room is full.");
+  socket.on("roomNotFound", () => {
+    notify("error", "Room not found!");
+  });
 });
 
-socket.on("roomNotFound", () => {
-  notify("error", "Room not found!");
+onUnmounted(() => {
+  socket.off("roomFull");
+  socket.off("roomNotFound");
 });
 
 function joinRoom() {

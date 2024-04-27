@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { socket } from "@/assets/js/socket.js";
 
@@ -9,11 +9,12 @@ import JoinRoom from "@/components/JoinRoom.vue";
 import Footer from "@/components/Footer.vue";
 
 const router = useRouter();
-
 const showJoinRoom = ref(false);
 
-socket.on("roomCreated", handleRoomEvent);
-socket.on("roomJoined", handleRoomEvent);
+onMounted(() => {
+  socket.on("roomCreated", handleRoomEvent);
+  socket.on("roomJoined", handleRoomEvent);
+});
 
 function createRoom() {
   socket.emit("createRoom");
