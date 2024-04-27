@@ -1,10 +1,11 @@
 <script setup>
 import { onMounted } from "vue";
-import { useRoute, onBeforeRouteLeave } from "vue-router";
+import { onBeforeRouteLeave } from "vue-router";
 import { useGameStore } from "@/stores/game.js";
 import { socket } from "@/assets/js/socket.js";
 import { notify } from "@/assets/js/notify.js";
 import { emitter } from "@/assets/js/emitter.js";
+import { checkGameMode } from "@/assets/js/utils.js";
 
 import Header from "@/components/Header.vue";
 import Menu from "@/components/menu/Menu.vue";
@@ -14,8 +15,6 @@ import GameOverInfo from "@/components/info/GameOverInfo.vue";
 import GamePrepareInfo from "@/components/info/GamePrepareInfo.vue";
 import ButtonOperation from "@/components/operation/ButtonOperation.vue";
 
-const route = useRoute();
-const gameMode = route.params.mode;
 const game = useGameStore();
 
 onMounted(() => {
@@ -48,10 +47,6 @@ onBeforeRouteLeave(() => {
 
   emitter.emit("reset");
 });
-
-function checkGameMode(mode) {
-  return gameMode === mode;
-}
 </script>
 
 <template>
@@ -61,13 +56,13 @@ function checkGameMode(mode) {
 
   <main class="flex justify-between items-center w-full">
     <GameCanvas />
-    <GameBaseInfo :gameMode="gameMode" />
+    <GameBaseInfo />
   </main>
 
   <hr class="w-full border-t-4 border-dashed border-black" />
 
-  <GamePrepareInfo :gameMode="gameMode" />
-  <GameOverInfo :gameMode="gameMode" />
+  <GamePrepareInfo />
+  <GameOverInfo />
 
   <ButtonOperation />
 </template>

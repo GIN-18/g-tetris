@@ -1,13 +1,12 @@
 <script setup>
 import { computed } from "vue";
 import { useGameStore } from "@/stores/game";
+import { checkGameMode } from "@/assets/js/utils.js";
+
 import InfoBox from "./InfoBox.vue";
 import NextPieceCanvas from "@/components/canvas/NextPieceCanvas.vue";
 
 const game = useGameStore();
-const props = defineProps({
-  gameMode: String,
-});
 
 const formatScoreDiff = computed(() =>
   game.scoreDiff >= 0 ? `+${game.scoreDiff}` : game.scoreDiff,
@@ -15,10 +14,6 @@ const formatScoreDiff = computed(() =>
 const scoreDiffColor = computed(() =>
   game.scoreDiff >= 0 ? "text-nes-deep-green" : "text-nes-deep-red",
 );
-
-function checkGameMode(mode) {
-  return props.gameMode === mode;
-}
 </script>
 
 <template>

@@ -1,3 +1,5 @@
+import { useRoute } from "vue-router";
+
 export function preventZoom() {
   document.addEventListener("gesturestart", function (e) {
     e.preventDefault();
@@ -18,13 +20,8 @@ export function preventZoom() {
   });
 }
 
-export function forEachShape(shape, fn, xStep = 0, yStep = 0) {
-  const cs = shape.value.pieces[shape.value.rotation];
-
-  for (let i = 0; i < cs.length; i++) {
-    const x = cs[i][1] + xStep;
-    const y = cs[i][0] + yStep;
-
-    fn(cs, x, y);
-  }
+export function checkGameMode(mode) {
+  const route = useRoute();
+  const gameMode = route.params.mode;
+  return gameMode === mode;
 }

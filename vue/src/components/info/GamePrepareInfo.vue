@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from "vue";
 import { socket, socketEmit } from "@/assets/js/socket.js";
 import { emitter } from "@/assets/js/emitter.js";
+import { checkGameMode } from "@/assets/js/utils.js";
 
 import DialogsBox from "@/components/DialogsBox.vue";
 import RoomID from "@/components/RoomID.vue";
@@ -14,12 +15,9 @@ const prepared = ref(0);
 const showPrepare = ref(false);
 
 const info = computed(() => getStatusInfo(isReady.value));
-const props = defineProps({
-  gameMode: String,
-});
 
 onMounted(() => {
-  if (props.gameMode === "2p") {
+  if (checkGameMode("2p")) {
     showPrepare.value = true;
     socketEmit("ready", "ready", false);
 

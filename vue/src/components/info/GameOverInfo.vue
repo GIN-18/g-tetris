@@ -4,6 +4,7 @@ import { useGameStore } from "@/stores/game";
 import { socket, socketEmit } from "@/assets/js/socket.js";
 import { emitter } from "@/assets/js/emitter.js";
 import { playConfetti } from "@/assets/js/confetti.js";
+import { checkGameMode } from "@/assets/js/utils.js";
 
 import DialogsBox from "@/components/DialogsBox.vue";
 import RoomID from "@/components/RoomID.vue";
@@ -20,9 +21,6 @@ const win = ref(false);
 const lose = ref(false);
 
 const buttonType = computed(() => (isAgain.value ? "error" : "success"));
-const props = defineProps({
-  gameMode: String,
-});
 
 // reset isAgain and again while replay the game
 watch(
@@ -90,10 +88,6 @@ onMounted(() => {
     });
   });
 });
-
-function checkGameMode(mode) {
-  return props.gameMode === mode;
-}
 </script>
 
 <template>

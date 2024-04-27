@@ -1,11 +1,11 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
-import { useRoute } from "vue-router";
 import { useGameStore } from "@/stores/game.js";
 import { createShape } from "@/assets/js/shape.js";
 import { socketEmit } from "@/assets/js/socket.js";
 import { emitter } from "@/assets/js/emitter.js";
 import { palettes } from "@/assets/js/palettes.js";
+import { checkGameMode } from "@/assets/js/utils.js";
 
 // get canvas info
 const canvas = ref(null);
@@ -13,9 +13,7 @@ const canvasWidth = computed(() => canvas.value.width);
 const canvasHeight = computed(() => canvas.value.height);
 const ctx = computed(() => canvas.value.getContext("2d"));
 
-const route = useRoute();
 const game = useGameStore();
-const gameMode = route.params.mode;
 const block = 20;
 const filledRows = [];
 let map = new Array(20).fill(0).map(() => new Array(10).fill(0));
@@ -398,10 +396,6 @@ function drawPreviewPiece() {
 // TODO: play the sound
 function toggleVolume() {
   game.volumeUp = !game.volumeUp;
-}
-
-function checkGameMode(mode) {
-  return gameMode === mode;
 }
 </script>
 
