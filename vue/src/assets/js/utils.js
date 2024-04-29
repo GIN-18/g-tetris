@@ -1,5 +1,3 @@
-import { useRoute } from "vue-router";
-
 export function preventZoom() {
   document.addEventListener("gesturestart", function (e) {
     e.preventDefault();
@@ -22,6 +20,5 @@ export function preventZoom() {
 
 export function checkGameMode(mode) {
   const route = useRoute();
-  const gameMode = route.params.mode;
-  return gameMode === mode;
+  return route.params.mode === mode;
 }

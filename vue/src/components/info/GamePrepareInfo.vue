@@ -1,8 +1,8 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useRoute } from "vue-router";
 import { socket, socketEmit } from "@/assets/js/socket.js";
 import { emitter } from "@/assets/js/emitter.js";
-import { checkGameMode } from "@/assets/js/utils.js";
 
 import DialogsBox from "@/components/DialogsBox.vue";
 import RoomID from "@/components/RoomID.vue";
@@ -10,6 +10,8 @@ import LabelBox from "@/components/info/LabelBox.vue";
 import ToggleButton from "@/components/button/ToggleButton.vue";
 import QuitButton from "@/components/button/QuitButton.vue";
 
+const route = useRoute();
+const gameMode = route.params.mode;
 const isReady = ref(false);
 const prepared = ref(0);
 const showPrepare = ref(false);
@@ -22,10 +24,10 @@ onMounted(() => {
     socketEmit("ready", "ready", false);
 
     // toggle ready
-    emitter.on("ready", () => {
-      isReady.value = !isReady.value;
-      socketEmit("ready", "ready", isReady.value);
-    });
+    emitter.on("ready", toggleAgain);
+
+    // reset prepared
+    emitter.on("resetPrepared", resetPrepared);
 
     socket.on("zeroReady", () => {
       prepared.value = 0;
@@ -43,6 +45,16 @@ onMounted(() => {
   }
 });
 
+onUnmounted(() => {
+  if (checkGameMode("2p")) {
+    emitter.off("ready", toggleAgain);
+
+    socket.off("zeroReady");
+    socket.off("oneReady");
+    socket.off("twoReady");
+  }
+});
+
 function getStatusInfo(value) {
   return {
     buttonType: value ? "error" : "success",
@@ -52,6 +64,22 @@ function getStatusInfo(value) {
       "text-nes-deep-green": value,
     },
   };
+}
+
+function toggleAgain() {
+  isReady.value = !isReady.value;
+  socketEmit("ready", "ready", isReady.value);
+}
+
+function resetPrepared() {
+  isReady.value = false;
+  prepared.value = 0;
+  showPrepare.value = true;
+  socketEmit("ready", "ready", isReady.value);
+}
+
+function checkGameMode(mode) {
+  return gameMode === mode;
 }
 </script>
 

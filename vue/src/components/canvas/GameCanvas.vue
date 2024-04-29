@@ -1,11 +1,11 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
+import { useRoute } from "vue-router";
 import { useGameStore } from "@/stores/game.js";
 import { createShape } from "@/assets/js/shape.js";
 import { socketEmit } from "@/assets/js/socket.js";
 import { emitter } from "@/assets/js/emitter.js";
 import { palettes } from "@/assets/js/palettes.js";
-import { checkGameMode } from "@/assets/js/utils.js";
 
 // get canvas info
 const canvas = ref(null);
@@ -13,7 +13,9 @@ const canvasWidth = computed(() => canvas.value.width);
 const canvasHeight = computed(() => canvas.value.height);
 const ctx = computed(() => canvas.value.getContext("2d"));
 
+const route = useRoute();
 const game = useGameStore();
+const gameMode = route.params.mode;
 const block = 20;
 const filledRows = [];
 let map = new Array(20).fill(0).map(() => new Array(10).fill(0));
@@ -68,11 +70,7 @@ function playGame() {
 
 function resetGame() {
   if (!dropTimer) return;
-
-  if (dropTimer) {
-    clearInterval(dropTimer);
-    dropTimer = null;
-  }
+  if (dropTimer) clearInterval(dropTimer);
 
   game.$patch({
     gamePlay: false,
@@ -87,6 +85,9 @@ function resetGame() {
   currentShape = null;
   previewShape = null;
   filledRows.length = 0;
+  dropTimer = null;
+  drop = false;
+  down = false;
 
   clearCanvas();
 }
@@ -96,7 +97,11 @@ function addShape() {
   previewShape = { ...currentShape };
   game.nextShape = createShape();
 
-  // game over
+  drawGame();
+  checkGameOver();
+}
+
+function checkGameOver() {
   const { x, y, type, pieces, rotation } = currentShape;
   const piece = pieces[rotation];
 
@@ -107,13 +112,13 @@ function addShape() {
     if (map[tmp_y][tmp_x]) {
       clearInterval(dropTimer);
 
-      game.gameOver = true;
-      game.gamePlay = false;
-
       game.$patch({
+        gamePlay: false,
+        gameOver: true,
         nextShape: null,
       });
 
+      map = null;
       currentShape = null;
       previewShape = null;
 
@@ -125,11 +130,9 @@ function addShape() {
 
       updateHighScore();
 
-      return;
+      break;
     }
   }
-
-  drawGame();
 }
 
 function setDropTimer() {
@@ -396,6 +399,10 @@ function drawPreviewPiece() {
 // TODO: play the sound
 function toggleVolume() {
   game.volumeUp = !game.volumeUp;
+}
+
+function checkGameMode(mode) {
+  return gameMode === mode;
 }
 </script>
 

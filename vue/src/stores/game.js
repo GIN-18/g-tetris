@@ -3,7 +3,6 @@ import { createShape } from "@/assets/js/shape.js";
 
 export const useGameStore = defineStore("game", {
   state: () => ({
-    block: 20,
     palette: "nes",
     gamePlay: false,
     gameOver: false,

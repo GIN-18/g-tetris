@@ -1,13 +1,19 @@
 <script setup>
 import { useGameStore } from "@/stores/game.js";
+import { useRoute } from "vue-router";
 import { emitter } from "@/assets/js/emitter.js";
-import { checkGameMode } from "@/assets/js/utils.js";
 
 import Button from "@/components/button/Button.vue";
 import ArrowButton from "@/components/button/ArrowButton.vue";
 import ToggleButton from "@/components/button/ToggleButton.vue";
 
 const game = useGameStore();
+const route = useRoute();
+const gameMode = route.params.mode;
+
+function checkGameMode(mode) {
+  return gameMode === mode;
+}
 </script>
 
 <template>

@@ -1,11 +1,9 @@
 <script setup>
 import { onMounted } from "vue";
-import { onBeforeRouteLeave } from "vue-router";
-import { useGameStore } from "@/stores/game.js";
+import { useRoute, onBeforeRouteLeave } from "vue-router";
 import { socket } from "@/assets/js/socket.js";
 import { notify } from "@/assets/js/notify.js";
 import { emitter } from "@/assets/js/emitter.js";
-import { checkGameMode } from "@/assets/js/utils.js";
 
 import Header from "@/components/Header.vue";
 import Menu from "@/components/menu/Menu.vue";
@@ -15,12 +13,11 @@ import GameOverInfo from "@/components/info/GameOverInfo.vue";
 import GamePrepareInfo from "@/components/info/GamePrepareInfo.vue";
 import ButtonOperation from "@/components/operation/ButtonOperation.vue";
 
-const game = useGameStore();
+const route = useRoute();
+const gameMode = route.params.mode;
 
 onMounted(() => {
   if (checkGameMode("2p")) {
-    game.isPreview = false; // 2p mode is always not preview
-
     // refresh to join the room
     socket.emit("joinRoom", {
       room: localStorage.getItem("room"),
@@ -32,21 +29,28 @@ onMounted(() => {
       emitter.emit("play");
     });
 
+    // TODO: have to handle on leave room
     socket.on("oneLeaveRoom", () => {
+      emitter.emit("reset");
+      emitter.emit("resetPrepared");
       notify("warning", "2P Leave The Room");
     });
   }
 });
 
-// handle when player leave the game page
 onBeforeRouteLeave(() => {
+  emitter.emit("reset");
+  console.log("reset");
+
   if (checkGameMode("2p")) {
     socket.emit("leaveRoom", localStorage.getItem("room"));
-    return;
+    socket.off("oneLeaveRoom");
   }
-
-  emitter.emit("reset");
 });
+
+function checkGameMode(mode) {
+  return gameMode === mode;
+}
 </script>
 
 <template>
@@ -61,8 +65,8 @@ onBeforeRouteLeave(() => {
 
   <hr class="w-full border-t-4 border-dashed border-black" />
 
+  <ButtonOperation />
+
   <GamePrepareInfo />
   <GameOverInfo />
-
-  <ButtonOperation />
 </template>

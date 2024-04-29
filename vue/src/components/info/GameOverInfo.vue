@@ -1,10 +1,11 @@
 <script setup>
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import { useGameStore } from "@/stores/game";
+import { useRoute } from "vue-router";
 import { socket, socketEmit } from "@/assets/js/socket.js";
 import { emitter } from "@/assets/js/emitter.js";
+import { notify } from "@/assets/js/notify.js";
 import { playConfetti } from "@/assets/js/confetti.js";
-import { checkGameMode } from "@/assets/js/utils.js";
 
 import DialogsBox from "@/components/DialogsBox.vue";
 import RoomID from "@/components/RoomID.vue";
@@ -14,6 +15,8 @@ import ToggleButton from "@/components/button/ToggleButton.vue";
 import QuitButton from "@/components/button/QuitButton.vue";
 
 const game = useGameStore();
+const route = useRoute();
+const gameMode = route.params.mode;
 const isAgain = ref(false);
 const again = ref(0);
 const title = ref("GAME OVER");
@@ -23,22 +26,19 @@ const lose = ref(false);
 const buttonType = computed(() => (isAgain.value ? "error" : "success"));
 
 // reset isAgain and again while replay the game
-watch(
-  () => game.gameOver,
-  () => {
-    if (!game.gameOver) {
-      isAgain.value = false;
-      again.value = 0;
-    }
-  },
-);
+// watch(
+//   () => game.gameOver,
+//   () => {
+//     if (!game.gameOver) {
+//       isAgain.value = false;
+//       again.value = 0;
+//     }
+//   },
+// );
 
 onMounted(() => {
-  // toggle again
-  emitter.on("again", () => {
-    isAgain.value = !isAgain.value;
-    socketEmit("again", "again", isAgain.value);
-  });
+  emitter.on("again", toggleAgain);
+  emitter.on("reset", resetGameOverInfo);
 
   socket.on("scoreUpdated", (data) => {
     const scoreArray = [];
@@ -78,16 +78,40 @@ onMounted(() => {
   });
 
   socket.on("twoAgain", () => {
-    title.value = "GAME OVER";
-    win.value = false;
-    lose.value = false;
-
     again.value = 2;
     socket.emit("replay", {
       room: localStorage.getItem("room"),
     });
   });
 });
+
+onUnmounted(() => {
+  emitter.off("again", toggleAgain);
+  emitter.off("reset", resetGameOverInfo);
+  socket.off("scoreUpdated");
+  socket.off("oneGameOver");
+  socket.off("twoGameOver");
+  socket.off("zeroAgain");
+  socket.off("oneAgain");
+  socket.off("twoAgain");
+});
+
+function toggleAgain() {
+  isAgain.value = !isAgain.value;
+  socketEmit("again", "again", isAgain.value);
+}
+
+function resetGameOverInfo() {
+  isAgain.value = false;
+  again.value = 0;
+  title.value = "GAME OVER";
+  win.value = false;
+  lose.value = false;
+}
+
+function checkGameMode(mode) {
+  return gameMode === mode;
+}
 </script>
 
 <template>
@@ -98,7 +122,7 @@ onMounted(() => {
 
     <!-- info -->
     <div class="flex flex-col gap-4 w-72">
-      <RoomID v-if="checkGameMode('2p')" />
+      <!-- <RoomID v-if="checkGameMode('2p')" /> -->
 
       <!-- your score -->
       <LabelBox label="Your Score:">

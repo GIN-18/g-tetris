@@ -30,7 +30,7 @@ function addMessage({ type, message }) {
 <template>
   <ul class="z-20 fixed top-2 right-2">
     <TransitionGroup
-      class="flex flex-col gap-2"
+      class="flex flex-col gap-2 text-sm"
       name="list"
       tag="ul"
       enter-active-class="animate-[slide-in-right_0.4s_ease_both]"

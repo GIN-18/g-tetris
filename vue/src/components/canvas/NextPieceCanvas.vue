@@ -10,6 +10,7 @@ const height = computed(() => canvas.value.height);
 const ctx = computed(() => canvas.value.getContext("2d"));
 
 const game = useGameStore();
+const block = 20;
 
 watch(
   () => game.nextShape,
@@ -50,12 +51,7 @@ function drawNextPiece() {
   for (let i = 0; i < piece.length; i++) {
     const tmp_x = piece[i][1] + xStep;
     const tmp_y = piece[i][0] + yStep;
-    ctx.value.fillRect(
-      tmp_x * game.block,
-      tmp_y * game.block,
-      game.block,
-      game.block,
-    );
+    ctx.value.fillRect(tmp_x * block, tmp_y * block, block, block);
   }
 }
 </script>
