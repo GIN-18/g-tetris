@@ -39,7 +39,7 @@ function joinRoom() {
 </script>
 
 <template>
-  <DialogsBox title="JOIN ROOM" :isShow="model">
+  <DialogsBox title="JOIN ROOM" :is-show="model">
     <div class="flex flex-col justify-center items-center gap-12 w-72">
       <input
         type="text"

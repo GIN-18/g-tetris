@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, provide } from "vue";
 import { useRoute, onBeforeRouteLeave } from "vue-router";
 import { socket } from "@/assets/js/socket.js";
 import { notify } from "@/assets/js/notify.js";
@@ -15,6 +15,10 @@ import ButtonOperation from "@/components/operation/ButtonOperation.vue";
 
 const route = useRoute();
 const gameMode = route.params.mode;
+provide("gameMode", {
+  mode: gameMode,
+  checkGameMode,
+});
 
 onMounted(() => {
   if (checkGameMode("2p")) {
@@ -40,7 +44,6 @@ onMounted(() => {
 
 onBeforeRouteLeave(() => {
   emitter.emit("reset");
-  console.log("reset");
 
   if (checkGameMode("2p")) {
     socket.emit("leaveRoom", localStorage.getItem("room"));

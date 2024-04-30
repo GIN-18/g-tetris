@@ -1,7 +1,8 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, inject } from "vue";
 import { emitter } from "@/assets/js/emitter.js";
 
+const gameMode = inject("gameMode");
 const keys = ref({
   play: "i",
   reset: "o",
@@ -26,9 +27,11 @@ onUnmounted(() => {
 function handleKeyDown(e) {
   switch (e.key) {
     case keys.value.play:
+      if (gameMode.checkGameMode("2p")) return;
       emitter.emit("play");
       break;
     case keys.value.reset:
+      if (gameMode.checkGameMode("2p")) return;
       emitter.emit("reset");
       break;
     case keys.value.volume:

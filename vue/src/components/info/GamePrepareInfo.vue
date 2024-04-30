@@ -1,6 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
-import { useRoute } from "vue-router";
+import { ref, computed, onMounted, onUnmounted, inject } from "vue";
 import { socket, socketEmit } from "@/assets/js/socket.js";
 import { emitter } from "@/assets/js/emitter.js";
 
@@ -10,8 +9,7 @@ import LabelBox from "@/components/info/LabelBox.vue";
 import ToggleButton from "@/components/button/ToggleButton.vue";
 import QuitButton from "@/components/button/QuitButton.vue";
 
-const route = useRoute();
-const gameMode = route.params.mode;
+const gameMode = inject("gameMode");
 const isReady = ref(false);
 const prepared = ref(0);
 const showPrepare = ref(false);
@@ -19,7 +17,7 @@ const showPrepare = ref(false);
 const info = computed(() => getStatusInfo(isReady.value));
 
 onMounted(() => {
-  if (checkGameMode("2p")) {
+  if (gameMode.checkGameMode("2p")) {
     showPrepare.value = true;
     socketEmit("ready", "ready", false);
 
@@ -46,7 +44,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  if (checkGameMode("2p")) {
+  if (gameMode.checkGameMode("2p")) {
     emitter.off("ready", toggleAgain);
 
     socket.off("zeroReady");
@@ -77,14 +75,10 @@ function resetPrepared() {
   showPrepare.value = true;
   socketEmit("ready", "ready", isReady.value);
 }
-
-function checkGameMode(mode) {
-  return gameMode === mode;
-}
 </script>
 
 <template>
-  <DialogsBox title="PREPARE" :isShow="showPrepare">
+  <DialogsBox title="PREPARE" :is-show="showPrepare">
     <div class="flex flex-col gap-4 w-72">
       <RoomID />
 

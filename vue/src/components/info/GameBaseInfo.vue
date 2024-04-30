@@ -1,14 +1,12 @@
 <script setup>
-import { computed } from "vue";
+import { computed, inject } from "vue";
 import { useGameStore } from "@/stores/game";
-import { useRoute } from "vue-router";
 
 import InfoBox from "./InfoBox.vue";
 import NextPieceCanvas from "@/components/canvas/NextPieceCanvas.vue";
 
 const game = useGameStore();
-const route = useRoute();
-const gameMode = route.params.mode;
+const gameMode = inject("gameMode");
 
 const formatScoreDiff = computed(() =>
   game.scoreDiff >= 0 ? `+${game.scoreDiff}` : game.scoreDiff,
@@ -16,10 +14,6 @@ const formatScoreDiff = computed(() =>
 const scoreDiffColor = computed(() =>
   game.scoreDiff >= 0 ? "text-nes-deep-green" : "text-nes-deep-red",
 );
-
-function checkGameMode(mode) {
-  return gameMode === mode;
-}
 </script>
 
 <template>
@@ -30,12 +24,12 @@ function checkGameMode(mode) {
     </InfoBox>
 
     <!-- high score -->
-    <InfoBox title="HI-SCORE" v-if="checkGameMode('1p')">
+    <InfoBox title="HI-SCORE" v-if="gameMode.checkGameMode('1p')">
       <p>{{ game.highScore }}</p>
     </InfoBox>
 
     <!-- socre difference -->
-    <InfoBox title="DIFF" v-if="checkGameMode('2p')">
+    <InfoBox title="DIFF" v-if="gameMode.checkGameMode('2p')">
       <p :class="scoreDiffColor">
         {{ formatScoreDiff }}
       </p>

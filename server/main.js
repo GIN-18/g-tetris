@@ -127,9 +127,9 @@ io.on("connection", (socket) => {
     socket.leave(room); // remove the room in socket
     delete rooms[room][socket.id]; // remove the room in rooms
 
-    // remove the room when no one in the room
     const clients = io.sockets.adapter.rooms.get(room);
 
+    // remove the room in rooms when none in the room]
     if (!clients) {
       delete rooms[room];
       return;

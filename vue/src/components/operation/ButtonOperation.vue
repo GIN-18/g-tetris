@@ -1,6 +1,6 @@
 <script setup>
+import { inject } from "vue";
 import { useGameStore } from "@/stores/game.js";
-import { useRoute } from "vue-router";
 import { emitter } from "@/assets/js/emitter.js";
 
 import Button from "@/components/button/Button.vue";
@@ -8,12 +8,7 @@ import ArrowButton from "@/components/button/ArrowButton.vue";
 import ToggleButton from "@/components/button/ToggleButton.vue";
 
 const game = useGameStore();
-const route = useRoute();
-const gameMode = route.params.mode;
-
-function checkGameMode(mode) {
-  return gameMode === mode;
-}
+const gameMode = inject("gameMode");
 </script>
 
 <template>
@@ -46,7 +41,7 @@ function checkGameMode(mode) {
           event="play"
           trueIcon="icon-[pixelarticons--pause]"
           falseIcon="icon-[pixelarticons--play]"
-          v-if="checkGameMode('1p')"
+          v-if="gameMode.checkGameMode('1p')"
         />
 
         <!-- reset game button -->
@@ -54,7 +49,7 @@ function checkGameMode(mode) {
           type="primary"
           icon="icon-[pixelarticons--reload]"
           @click.prevent="emitter.emit('reset')"
-          v-if="checkGameMode('1p')"
+          v-if="gameMode.checkGameMode('1p')"
         />
 
         <!-- toggle volume button -->

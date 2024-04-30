@@ -1,7 +1,6 @@
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted, inject } from "vue";
 import { useGameStore } from "@/stores/game";
-import { useRoute } from "vue-router";
 import { socket, socketEmit } from "@/assets/js/socket.js";
 import { emitter } from "@/assets/js/emitter.js";
 import { notify } from "@/assets/js/notify.js";
@@ -15,8 +14,7 @@ import ToggleButton from "@/components/button/ToggleButton.vue";
 import QuitButton from "@/components/button/QuitButton.vue";
 
 const game = useGameStore();
-const route = useRoute();
-const gameMode = route.params.mode;
+const gameMode = inject("gameMode");
 const isAgain = ref(false);
 const again = ref(0);
 const title = ref("GAME OVER");
@@ -24,17 +22,6 @@ const win = ref(false);
 const lose = ref(false);
 
 const buttonType = computed(() => (isAgain.value ? "error" : "success"));
-
-// reset isAgain and again while replay the game
-// watch(
-//   () => game.gameOver,
-//   () => {
-//     if (!game.gameOver) {
-//       isAgain.value = false;
-//       again.value = 0;
-//     }
-//   },
-// );
 
 onMounted(() => {
   emitter.on("again", toggleAgain);
@@ -108,14 +95,10 @@ function resetGameOverInfo() {
   win.value = false;
   lose.value = false;
 }
-
-function checkGameMode(mode) {
-  return gameMode === mode;
-}
 </script>
 
 <template>
-  <DialogsBox :title="title" :isShow="game.gameOver">
+  <DialogsBox :title="title" :is-show="game.gameOver">
     <!-- icon for win and lose -->
     <i class="nes-icon is-large trophy" v-if="win"></i>
     <i class="nes-icon is-large like" v-if="lose"></i>
@@ -130,17 +113,17 @@ function checkGameMode(mode) {
       </LabelBox>
 
       <!-- high score -->
-      <LabelBox label="High Score:" v-if="checkGameMode('1p')">
+      <LabelBox label="High Score:" v-if="gameMode.checkGameMode('1p')">
         <p>{{ game.highScore }}</p>
       </LabelBox>
 
       <!-- player 2's score -->
-      <LabelBox label="2P's Score:" v-if="checkGameMode('2p')">
+      <LabelBox label="2P's Score:" v-if="gameMode.checkGameMode('2p')">
         <p>{{ game.score - game.scoreDiff }}</p>
       </LabelBox>
 
       <!-- number of again -->
-      <LabelBox label="Again:" v-if="checkGameMode('2p')">
+      <LabelBox label="Again:" v-if="gameMode.checkGameMode('2p')">
         <p>{{ again }} / 2</p>
       </LabelBox>
     </div>
@@ -151,7 +134,7 @@ function checkGameMode(mode) {
       <Button
         type="success"
         text="AGAIN"
-        v-if="checkGameMode('1p')"
+        v-if="gameMode.checkGameMode('1p')"
         @click.prevent="emitter.emit('reset')"
       />
       <ToggleButton
@@ -160,7 +143,7 @@ function checkGameMode(mode) {
         event="again"
         trueText="CANCEL"
         falseText="AGAIN"
-        v-if="checkGameMode('2p')"
+        v-if="gameMode.checkGameMode('2p')"
       />
 
       <!-- quit button -->
