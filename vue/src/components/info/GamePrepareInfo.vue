@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, inject } from "vue";
-import { socket, socketEmit } from "@/assets/js/socket.js";
+import { socketEmit } from "@/assets/js/socket.js";
 import { emitter } from "@/assets/js/emitter.js";
 
 import DialogsBox from "@/components/DialogsBox.vue";
@@ -19,37 +19,22 @@ const info = computed(() => getStatusInfo(isReady.value));
 onMounted(() => {
   if (gameMode.checkGameMode("2p")) {
     showPrepare.value = true;
-    socketEmit("ready", "ready", false);
 
-    // toggle ready
     emitter.on("ready", toggleAgain);
-
-    // reset prepared
     emitter.on("resetPrepared", resetPrepared);
-
-    socket.on("zeroReady", () => {
-      prepared.value = 0;
-    });
-
-    socket.on("oneReady", () => {
-      prepared.value = 1;
-    });
-
-    socket.on("twoReady", () => {
-      prepared.value = 2;
-      showPrepare.value = false;
-      emitter.emit("play");
-    });
+    emitter.on("zeroReady", zeroReady);
+    emitter.on("oneReady", oneReady);
+    emitter.on("twoReady", twoReady);
   }
 });
 
 onUnmounted(() => {
   if (gameMode.checkGameMode("2p")) {
     emitter.off("ready", toggleAgain);
-
-    socket.off("zeroReady");
-    socket.off("oneReady");
-    socket.off("twoReady");
+    emitter.off("resetPrepared", resetPrepared);
+    emitter.off("zeroReady", zeroReady);
+    emitter.off("oneReady", oneReady);
+    emitter.off("twoReady", twoReady);
   }
 });
 
@@ -67,6 +52,20 @@ function getStatusInfo(value) {
 function toggleAgain() {
   isReady.value = !isReady.value;
   socketEmit("ready", "ready", isReady.value);
+}
+
+function zeroReady() {
+  prepared.value = 0;
+}
+
+function oneReady() {
+  prepared.value = 1;
+}
+
+function twoReady() {
+  prepared.value = 2;
+  showPrepare.value = false;
+  emitter.emit("play");
 }
 
 function resetPrepared() {

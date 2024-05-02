@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, provide } from "vue";
 import { useRoute, onBeforeRouteLeave } from "vue-router";
-import { socket } from "@/assets/js/socket.js";
+import { socket, socketEmit } from "@/assets/js/socket.js";
 import { notify } from "@/assets/js/notify.js";
 import { emitter } from "@/assets/js/emitter.js";
 
@@ -28,12 +28,50 @@ onMounted(() => {
       action: "refresh",
     });
 
+    // init ready status when first in page game
+    socketEmit("ready", "ready", false);
+
+    socket.on("zeroReady", () => {
+      emitter.emit("zeroReady");
+    });
+
+    socket.on("oneReady", () => {
+      emitter.emit("oneReady");
+    });
+
+    socket.on("twoReady", () => {
+      emitter.emit("twoReady");
+    });
+
+    socket.on("scoreUpdated", (data) => {
+      emitter.emit("scoreUpdated", data);
+    });
+
+    socket.on("oneGameOver", () => {
+      emitter.emit("oneGameOver");
+    });
+
+    socket.on("twoGameOver", () => {
+      emitter.emit("twoGameOver");
+    });
+
+    socket.on("zeroAgain", () => {
+      emitter.emit("zeroAgain");
+    });
+
+    socket.on("oneAgain", () => {
+      emitter.emit("oneAgain");
+    });
+
+    socket.on("twoAgain", () => {
+      emitter.emit("twoAgain");
+    });
+
     socket.on("replay", () => {
       emitter.emit("reset");
       emitter.emit("play");
     });
 
-    // TODO: have to handle on leave room
     socket.on("oneLeaveRoom", () => {
       emitter.emit("reset");
       emitter.emit("resetPrepared");
@@ -47,6 +85,17 @@ onBeforeRouteLeave(() => {
 
   if (checkGameMode("2p")) {
     socket.emit("leaveRoom", localStorage.getItem("room"));
+    socket.off("joinRoom");
+    socket.off("zeroReady");
+    socket.off("oneReady");
+    socket.off("twoReady");
+    socket.off("scoreUpdated");
+    socket.off("oneGameOver");
+    socket.off("twoGameOver");
+    socket.off("zeroAgain");
+    socket.off("oneAgain");
+    socket.off("twoAgain");
+    socket.off("replay");
     socket.off("oneLeaveRoom");
   }
 });

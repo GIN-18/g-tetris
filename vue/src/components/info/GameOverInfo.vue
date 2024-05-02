@@ -26,61 +26,23 @@ const buttonType = computed(() => (isAgain.value ? "error" : "success"));
 onMounted(() => {
   emitter.on("again", toggleAgain);
   emitter.on("reset", resetGameOverInfo);
-
-  socket.on("scoreUpdated", (data) => {
-    const scoreArray = [];
-
-    for (let item in data) {
-      if (item === socket.id) {
-        scoreArray[0] = data[item].score;
-      } else {
-        scoreArray[1] = data[item].score;
-      }
-    }
-
-    game.scoreDiff = scoreArray[0] - scoreArray[1];
-  });
-
-  socket.on("oneGameOver", () => {
-    if (!game.gameOver) notify("warning", "2P GAME OVER!!");
-  });
-
-  socket.on("twoGameOver", () => {
-    if (game.scoreDiff > 0) {
-      title.value = "VICTORY";
-      win.value = true;
-      playConfetti(game.palette);
-    } else if (game.scoreDiff < 0) {
-      title.value = "TRY AGAIN";
-      lose.value = true;
-    }
-  });
-
-  socket.on("zeroAgain", () => {
-    again.value = 0;
-  });
-
-  socket.on("oneAgain", () => {
-    again.value = 1;
-  });
-
-  socket.on("twoAgain", () => {
-    again.value = 2;
-    socket.emit("replay", {
-      room: localStorage.getItem("room"),
-    });
-  });
+  emitter.on("scoreUpdated", scoreUpdated);
+  emitter.on("oneGameOver", oneGameOver);
+  emitter.on("twoGameOver", twoGameOver);
+  emitter.on("zeroAgain", zeroAgain);
+  emitter.on("oneAgain", oneAgain);
+  emitter.on("twoAgain", twoAgain);
 });
 
 onUnmounted(() => {
   emitter.off("again", toggleAgain);
   emitter.off("reset", resetGameOverInfo);
-  socket.off("scoreUpdated");
-  socket.off("oneGameOver");
-  socket.off("twoGameOver");
-  socket.off("zeroAgain");
-  socket.off("oneAgain");
-  socket.off("twoAgain");
+  emitter.off("scoreUpdated", scoreUpdated);
+  emitter.off("oneGameOver", oneGameOver);
+  emitter.off("twoGameOver", twoGameOver);
+  emitter.off("zeroAgain", zeroAgain);
+  emitter.off("oneAgain", oneAgain);
+  emitter.off("twoAgain", twoAgain);
 });
 
 function toggleAgain() {
@@ -94,6 +56,50 @@ function resetGameOverInfo() {
   title.value = "GAME OVER";
   win.value = false;
   lose.value = false;
+}
+
+function scoreUpdated(data) {
+  const scoreArray = [];
+
+  for (let item in data) {
+    if (item === socket.id) {
+      scoreArray[0] = data[item].score;
+    } else {
+      scoreArray[1] = data[item].score;
+    }
+  }
+
+  game.scoreDiff = scoreArray[0] - scoreArray[1];
+}
+
+function oneGameOver() {
+  if (!game.gameOver) notify("warning", "2P GAME OVER!!");
+}
+
+function twoGameOver() {
+  if (game.scoreDiff > 0) {
+    title.value = "VICTORY";
+    win.value = true;
+    playConfetti(game.palette);
+  } else if (game.scoreDiff < 0) {
+    title.value = "TRY AGAIN";
+    lose.value = true;
+  }
+}
+
+function zeroAgain() {
+  again.value = 0;
+}
+
+function oneAgain() {
+  again.value = 1;
+}
+
+function twoAgain() {
+  again.value = 2;
+  socket.emit("replay", {
+    room: localStorage.getItem("room"),
+  });
 }
 </script>
 
