@@ -162,12 +162,13 @@ function fallPieceToLand() {
 }
 
 function landPiece() {
-  if (drop) drop = false;
+  // if (drop) drop = false;
 
   mergePiece();
   getFilledRows();
 
   if (filledRows.length > 0) {
+    clearInterval(dropTimer);
     clearFilledRows();
     updateScore();
     updateLevel();
@@ -180,9 +181,13 @@ function landPiece() {
 function dropPiece() {
   if (!game.gamePlay) return;
 
-  drop = true;
+  while (movePiece(0, 1)) {}
 
-  setDropTimer();
+  landPiece();
+
+  // drop = true;
+
+  // setDropTimer();
 }
 
 function movePieceLeft() {
@@ -284,10 +289,39 @@ function mergePiece() {
 }
 
 function clearFilledRows() {
-  for (let i = 0; i < filledRows.length; i++) {
-    map.splice(filledRows[i], 1);
-    map.unshift(new Array(10).fill(0));
+  const numCols = map[0].length / 2;
+
+  let animationFrame = null;
+  let progress = 0;
+
+  function animate() {
+    const left_x = (numCols - progress) * block;
+    const right_x = (numCols + progress) * block;
+    const yArray = filledRows.map((y) => y * block);
+
+    ctx.value.fillStyle = palettes[game.palette].clearColor;
+    yArray.forEach((y) => {
+      ctx.value.fillRect(left_x, y, block, block);
+      ctx.value.fillRect(right_x, y, block, block);
+    });
+
+    if (progress === numCols) {
+      cancelAnimationFrame(animationFrame);
+
+      for (let i = 0; i < filledRows.length; i++) {
+        map.splice(filledRows[i], 1);
+        map.unshift(new Array(10).fill(0));
+      }
+
+      return;
+    }
+
+    progress += 0.5;
+
+    animationFrame = requestAnimationFrame(animate);
   }
+
+  animate();
 }
 
 // HACK: limit the number of score
