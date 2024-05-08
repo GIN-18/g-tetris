@@ -1,6 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from "vue";
-import { useRoute } from "vue-router";
+import { ref, computed, watch, inject, onMounted, onUnmounted } from "vue";
 import { useGameStore } from "@/stores/game.js";
 import { createShape } from "@/assets/js/shape.js";
 import { socketEmit } from "@/assets/js/socket.js";
@@ -13,16 +12,14 @@ const canvasWidth = computed(() => canvas.value.width);
 const canvasHeight = computed(() => canvas.value.height);
 const ctx = computed(() => canvas.value.getContext("2d"));
 
-const route = useRoute();
 const game = useGameStore();
-const gameMode = route.params.mode;
+const gameMode = inject("gameMode");
 const block = 20;
 const filledRows = [];
 let map = new Array(20).fill(0).map(() => new Array(10).fill(0));
 let currentShape = null;
 let previewShape = null;
 let dropTimer = null;
-let drop = false;
 let down = false;
 
 // redraw canvas when preview toggles
@@ -86,7 +83,6 @@ function resetGame() {
   previewShape = null;
   filledRows.length = 0;
   dropTimer = null;
-  drop = false;
   down = false;
 
   clearCanvas();
@@ -123,7 +119,7 @@ function checkGameOver() {
       previewShape = null;
 
       // NOTE: socket emit game over
-      if (checkGameMode("2p")) {
+      if (gameMode.checkGameMode("2p")) {
         socketEmit("gameOver", "gameOver", true);
         return;
       }
@@ -140,11 +136,7 @@ function setDropTimer() {
 
   let timestep = Math.round(10 + 800 * Math.pow(0.92, game.level - 1));
 
-  if (drop) {
-    timestep = 10;
-  } else if (down) {
-    timestep = Math.min(timestep, 80);
-  }
+  if (down) timestep = Math.min(timestep, 80);
 
   if (dropTimer) {
     clearInterval(dropTimer);
@@ -162,47 +154,40 @@ function fallPieceToLand() {
 }
 
 function landPiece() {
-  // if (drop) drop = false;
-
   mergePiece();
   getFilledRows();
 
   if (filledRows.length > 0) {
-    clearInterval(dropTimer);
     clearFilledRows();
     updateScore();
     updateLevel();
+  } else {
+    addShape();
+    setDropTimer();
   }
-
-  addShape();
-  setDropTimer();
 }
 
 function dropPiece() {
-  if (!game.gamePlay) return;
+  if (!dropTimer || !game.gamePlay) return;
 
   while (movePiece(0, 1)) {}
 
   landPiece();
-
-  // drop = true;
-
-  // setDropTimer();
 }
 
 function movePieceLeft() {
-  if (!game.gamePlay) return;
+  if (!dropTimer || !game.gamePlay) return;
   movePiece(-1, 0);
 }
 
 function movePieceRight() {
-  if (!game.gamePlay) return;
+  if (!dropTimer || !game.gamePlay) return;
   movePiece(1, 0);
 }
 
 // FIXME: shape can not be added when shape landed
 function movePieceDown(enable) {
-  if (!game.gamePlay) return;
+  if (!dropTimer || !game.gamePlay) return;
 
   clearInterval(dropTimer);
 
@@ -214,7 +199,7 @@ function movePieceDown(enable) {
 
 // HACK: rotate shape against the wall
 function rotatePiece() {
-  if (!game.gamePlay) return;
+  if (!dropTimer || !game.gamePlay) return;
 
   const { x, y, pieces, rotation } = currentShape;
   const currentRotation = rotation;
@@ -289,14 +274,20 @@ function mergePiece() {
 }
 
 function clearFilledRows() {
-  const numCols = map[0].length / 2;
+  const numCols = map[0].length;
 
   let animationFrame = null;
   let progress = 0;
 
+  if (dropTimer) {
+    clearInterval(dropTimer);
+    dropTimer = null;
+  }
+
   function animate() {
-    const left_x = (numCols - progress) * block;
-    const right_x = (numCols + progress) * block;
+    const start_x = numCols / 2;
+    const left_x = (start_x - progress) * block;
+    const right_x = (start_x + progress) * block;
     const yArray = filledRows.map((y) => y * block);
 
     ctx.value.fillStyle = palettes[game.palette].clearColor;
@@ -312,6 +303,9 @@ function clearFilledRows() {
         map.splice(filledRows[i], 1);
         map.unshift(new Array(10).fill(0));
       }
+
+      addShape();
+      setDropTimer();
 
       return;
     }
@@ -331,7 +325,7 @@ function updateScore() {
       (filledRows.length * game.level + (filledRows.length - 1)) * 10;
 
     // NOTE: socket emit update score
-    if (checkGameMode("2p")) {
+    if (gameMode.checkGameMode("2p")) {
       socketEmit("updateScore", "score", game.score);
     }
   }
@@ -433,10 +427,6 @@ function drawPreviewPiece() {
 // TODO: play the sound
 function toggleVolume() {
   game.volumeUp = !game.volumeUp;
-}
-
-function checkGameMode(mode) {
-  return gameMode === mode;
 }
 </script>
 
