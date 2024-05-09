@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
+import { useGameStore } from "@/stores/game.js";
 import { useRouter } from "vue-router";
 import { socket } from "@/assets/js/socket.js";
 
@@ -8,6 +9,7 @@ import LinkBox from "@/components/LinkBox.vue";
 import JoinRoom from "@/components/JoinRoom.vue";
 import Footer from "@/components/Footer.vue";
 
+const game = useGameStore();
 const router = useRouter();
 const showJoinRoom = ref(false);
 
@@ -25,7 +27,9 @@ function toggleRoomBox() {
 }
 
 function handleRoomEvent(data) {
-  localStorage.setItem("room", data[socket.id].room);
+  sessionStorage.setItem("room", data[socket.id].room);
+
+  game.players = Object.keys(data).length;
 
   router.push({
     path: "/game/2p",

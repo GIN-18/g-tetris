@@ -45,7 +45,7 @@ io.on("connection", (socket) => {
         gameOver: false,
         score: 0,
       };
-      socket.emit("roomJoined", rooms[room]);
+      io.to(room).emit("roomJoined", rooms[room]);
       return;
     }
 
@@ -70,7 +70,7 @@ io.on("connection", (socket) => {
       gameOver: false,
       score: 0,
     };
-    socket.emit("roomJoined", rooms[room]);
+    io.to(room).emit("roomJoined", rooms[room]);
   });
 
   socket.on("ready", ({ room, ready }) => {
@@ -136,10 +136,12 @@ io.on("connection", (socket) => {
     }
 
     if (clients.size === 1) {
-      io.to(room).emit("oneLeaveRoom");
+      io.to(room).emit("oneLeaveRoom", rooms[room]);
+      return;
     }
   });
 
+  // TODO: remove empty room
   socket.on("disconnect", () => {
     for (const room in rooms) {
       delete rooms[room][socket.id];

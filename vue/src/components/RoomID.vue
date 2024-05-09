@@ -5,7 +5,7 @@ import { notify } from "@/assets/js/notify.js";
 
 import LabelBox from "@/components/info/LabelBox.vue";
 
-const room = localStorage.getItem("room");
+const room = sessionStorage.getItem("room");
 const clipboard = new Clipboard(".room");
 
 onMounted(() => {

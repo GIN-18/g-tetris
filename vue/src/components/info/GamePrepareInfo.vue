@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, inject } from "vue";
+import { useGameStore } from "@/stores/game.js";
 import { socketEmit } from "@/assets/js/socket.js";
 import { emitter } from "@/assets/js/emitter.js";
 
@@ -9,6 +10,7 @@ import LabelBox from "@/components/info/LabelBox.vue";
 import ToggleButton from "@/components/button/ToggleButton.vue";
 import QuitButton from "@/components/button/QuitButton.vue";
 
+const game = useGameStore();
 const gameMode = inject("gameMode");
 const isReady = ref(false);
 const prepared = ref(0);
@@ -88,7 +90,7 @@ function resetPrepared() {
 
       <!-- number of prepared -->
       <LabelBox label="Prepared:">
-        <p>{{ prepared }} / 2</p>
+        <p>{{ prepared }} / {{ game.players }}</p>
       </LabelBox>
     </div>
 

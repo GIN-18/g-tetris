@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, inject } from "vue";
 import { useGameStore } from "@/stores/game.js";
 import { emitter } from "@/assets/js/emitter.js";
 
@@ -9,10 +9,13 @@ import KeyOperation from "@/components/operation/KeyOperation.vue";
 import Footer from "@/components/Footer.vue";
 
 const game = useGameStore();
+const gameMode = inject("gameMode");
 const showMenu = ref(false);
 
 function toggleMenu() {
   showMenu.value = !showMenu.value;
+
+  if (gameMode.checkGameMode("2p")) return;
 
   if (game.gamePlay) emitter.emit("play");
 }

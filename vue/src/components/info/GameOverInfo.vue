@@ -98,7 +98,7 @@ function oneAgain() {
 function twoAgain() {
   again.value = 2;
   socket.emit("replay", {
-    room: localStorage.getItem("room"),
+    room: sessionStorage.getItem("room"),
   });
 }
 </script>
@@ -130,7 +130,7 @@ function twoAgain() {
 
       <!-- number of again -->
       <LabelBox label="Again:" v-if="gameMode.checkGameMode('2p')">
-        <p>{{ again }} / 2</p>
+        <p>{{ again }} / {{ game.players }}</p>
       </LabelBox>
     </div>
 
