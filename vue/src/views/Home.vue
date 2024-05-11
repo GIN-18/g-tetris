@@ -1,5 +1,5 @@
 <script setup>
-import LinkBox from "@/components/LinkBox.vue";
+import SelectionBox from "@/components/SelectionBox.vue";
 import Footer from "@/components/Footer.vue";
 </script>
 
@@ -11,12 +11,12 @@ import Footer from "@/components/Footer.vue";
       <span class="text-nes-deep-yellow">IS</span>
     </h1>
     <div class="flex flex-col gap-10">
-      <LinkBox
+      <SelectionBox
         link="/game/1p"
         icon="icon-[pixelarticons--user]"
         text="1 PLAYER"
       />
-      <LinkBox
+      <SelectionBox
         link="/room"
         icon="icon-[pixelarticons--users]"
         text="2 PLAYER"

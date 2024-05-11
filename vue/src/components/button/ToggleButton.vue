@@ -27,6 +27,7 @@ const text = computed(() => (props.status ? props.trueText : props.falseText));
       :icon="icon"
       :text="text"
       @click.prevent="emitter.emit(event)"
+      @touchstart.prevent="emitter.emit(event)"
     />
   </div>
 </template>

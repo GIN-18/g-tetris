@@ -12,5 +12,10 @@ function quitGame() {
 </script>
 
 <template>
-  <Button type="warning" text="QUIT" @click.prevent="quitGame"></Button>
+  <Button
+    type="warning"
+    text="QUIT"
+    @click.prevent="quitGame"
+    @touchstart.prevent="quitGame"
+  ></Button>
 </template>

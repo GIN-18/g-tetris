@@ -11,5 +11,11 @@ function jumpToHome() {
 </script>
 
 <template>
-  <h1 class="text-3xl" @click.prevent="jumpToHome">TETRIS</h1>
+  <h1
+    class="text-3xl"
+    @click.prevent="jumpToHome"
+    @touchstart.prevent="jumpToHome"
+  >
+    TETRIS
+  </h1>
 </template>

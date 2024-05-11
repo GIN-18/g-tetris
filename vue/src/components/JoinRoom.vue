@@ -49,8 +49,18 @@ function joinRoom() {
         @keydown.enter="joinRoom"
       />
       <div class="flex gap-12">
-        <Button type="success" text="JOIN" @click.prevent="joinRoom" />
-        <Button type="warning" text="CANCEL" @click.prevent="emit('cancel')" />
+        <Button
+          type="success"
+          text="JOIN"
+          @click.prevent="joinRoom"
+          @touchstart.prevent="joinRoom"
+        />
+        <Button
+          type="warning"
+          text="CANCEL"
+          @click.prevent="emit('cancel')"
+          @touchstart.prevent="emit('cancel')"
+        />
       </div>
     </div>
   </DialogsBox>

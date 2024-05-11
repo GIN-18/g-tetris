@@ -16,12 +16,24 @@ const gameMode = inject("gameMode");
     <!-- arrow button -->
     <div class="flex flex-col justify-center items-center w-1/2">
       <!-- drop button -->
-      <ArrowButton type="drop" @click.prevent="emitter.emit('drop')" />
+      <ArrowButton
+        type="drop"
+        @click.prevent="emitter.emit('drop')"
+        @touchstart.prevent="emitter.emit('drop')"
+      />
 
       <!-- left and right button -->
       <div class="flex justify-between items-center w-full">
-        <ArrowButton type="left" @click.prevent="emitter.emit('left')" />
-        <ArrowButton type="right" @click.prevent="emitter.emit('right')" />
+        <ArrowButton
+          type="left"
+          @click.prevent="emitter.emit('left')"
+          @touchstart.prevent="emitter.emit('left')"
+        />
+        <ArrowButton
+          type="right"
+          @click.prevent="emitter.emit('right')"
+          @touchstart.prevent="emitter.emit('right')"
+        />
       </div>
 
       <!-- down button -->
@@ -49,6 +61,7 @@ const gameMode = inject("gameMode");
           type="primary"
           icon="icon-[pixelarticons--reload]"
           @click.prevent="emitter.emit('reset')"
+          @touchstart.prevent="emitter.emit('reset')"
           v-if="gameMode.checkGameMode('1p')"
         />
 
@@ -62,7 +75,11 @@ const gameMode = inject("gameMode");
       </div>
 
       <!-- rotate button -->
-      <ArrowButton type="rotate" @click.prevent="emitter.emit('rotate')" />
+      <ArrowButton
+        type="rotate"
+        @click.prevent="emitter.emit('rotate')"
+        @touchstart.prevent="emitter.emit('rotate')"
+      />
     </div>
   </div>
 </template>

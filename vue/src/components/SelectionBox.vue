@@ -2,7 +2,6 @@
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-
 const props = defineProps({
   link: String,
   icon: String,
@@ -22,6 +21,7 @@ function jumpToLink() {
   <button
     class="flex justify-between items-center w-52"
     @click.prevent="jumpToLink"
+    @touchstart.prevent="jumpToLink"
   >
     <span :class="[props.icon, 'text-xl']"></span>
     <span class="text-sm">{{ props.text }}</span>

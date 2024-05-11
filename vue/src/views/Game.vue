@@ -25,14 +25,14 @@ provide("gameMode", {
 onMounted(() => {
   if (checkGameMode("2p")) {
     // refresh to join the room
-    socket.emit("joinRoom", {
-      room: sessionStorage.getItem("room"),
-      action: "refresh",
-    });
-
-    // socket.on("roomJoined", () => {
-    //   notify("success", "player joined");
+    // socket.emit("joinRoom", {
+    //   room: sessionStorage.getItem("room"),
+    //   action: "refresh",
     // });
+
+    socket.on("roomJoined", () => {
+      notify("success", "2P has joined the room.");
+    });
 
     // init ready status when first in page game
     socketEmit("ready", "ready", false);
@@ -82,14 +82,14 @@ onMounted(() => {
       emitter.emit("reset");
       emitter.emit("resetPrepared");
       game.players = Object.keys(data).length;
-      notify("warning", "2P Leave The Room");
+      notify("warning", "2P has left the room.");
     });
   }
 });
 
 onUnmounted(() => {
   if (checkGameMode("2p")) {
-    // socket.off("roomJoined");
+    socket.off("roomJoined");
     socket.off("zeroReady");
     socket.off("oneReady");
     socket.off("twoReady");

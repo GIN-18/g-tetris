@@ -5,7 +5,7 @@ import { useRouter } from "vue-router";
 import { socket } from "@/assets/js/socket.js";
 
 import Header from "@/components/Header.vue";
-import LinkBox from "@/components/LinkBox.vue";
+import SelectionBox from "@/components/SelectionBox.vue";
 import JoinRoom from "@/components/JoinRoom.vue";
 import Footer from "@/components/Footer.vue";
 
@@ -42,18 +42,20 @@ function handleRoomEvent(data) {
 
   <div class="flex flex-col justify-center items-center gap-24 h-full">
     <div class="flex flex-col gap-10">
-      <LinkBox
+      <SelectionBox
         link="#"
         icon="icon-[pixelarticons--building-community]"
         text="Create Room"
         @click.prevent="createRoom"
+        @touchstart.prevent="createRoom"
       />
 
-      <LinkBox
+      <SelectionBox
         link="#"
         icon="icon-[pixelarticons--user-plus]"
         text="Join Room"
         @click.prevent="toggleRoomBox"
+        @touchstart.prevent="toggleRoomBox"
       />
     </div>
   </div>

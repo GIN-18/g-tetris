@@ -142,6 +142,7 @@ function twoAgain() {
         text="AGAIN"
         v-if="gameMode.checkGameMode('1p')"
         @click.prevent="emitter.emit('reset')"
+        @touchstart.prevent="emitter.emit('reset')"
       />
       <ToggleButton
         :type="buttonType"

@@ -32,5 +32,9 @@ function toggleOption() {
 </script>
 
 <template>
-  <button :class="classList" @click.prevent="toggleOption"></button>
+  <button
+    :class="classList"
+    @click.prevent="toggleOption"
+    @touchstart.prevent="toggleOption"
+  ></button>
 </template>

@@ -25,6 +25,7 @@ function toggleMenu() {
   <button
     class="icon-[pixelarticons--menu] text-4xl"
     @click.prevent="toggleMenu"
+    @touchstart.prevent="toggleMenu"
   ></button>
 
   <Transition
@@ -57,6 +58,7 @@ function toggleMenu() {
             <button
               class="icon-[pixelarticons--close] text-3xl"
               @click.prevent="toggleMenu"
+              @touchstart.prevent="toggleMenu"
             ></button>
           </header>
 
