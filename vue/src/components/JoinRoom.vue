@@ -31,10 +31,7 @@ function joinRoom() {
     return;
   }
 
-  socket.emit("joinRoom", {
-    room: roomId.value,
-    action: "join",
-  });
+  socket.emit("joinRoom", roomId.value);
 }
 </script>
 

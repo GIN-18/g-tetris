@@ -32,22 +32,8 @@ io.on("connection", (socket) => {
     socket.emit("roomCreated", rooms[room]);
   });
 
-  socket.on("joinRoom", ({ room, action }) => {
+  socket.on("joinRoom", (room) => {
     const clients = io.sockets.adapter.rooms.get(room);
-
-    // add player to room while refresh
-    if (action === "refresh") {
-      socket.join(room);
-      rooms[room][socket.id] = {
-        room,
-        ready: false,
-        again: false,
-        gameOver: false,
-        score: 0,
-      };
-      io.to(room).emit("roomJoined", rooms[room]);
-      return;
-    }
 
     // check if room is not exists
     if (!clients) {
@@ -124,21 +110,23 @@ io.on("connection", (socket) => {
   });
 
   socket.on("leaveRoom", (room) => {
-    socket.leave(room); // remove the room in socket
-    delete rooms[room][socket.id]; // remove the room in rooms
+    try {
+      socket.leave(room); // remove the room in socket
+      delete rooms[room][socket.id]; // remove the room in rooms
 
-    const clients = io.sockets.adapter.rooms.get(room);
+      const clients = io.sockets.adapter.rooms.get(room);
 
-    // remove the room in rooms when none in the room]
-    if (!clients) {
-      delete rooms[room];
-      return;
-    }
+      // remove the room in rooms when none in the room]
+      if (!clients) {
+        delete rooms[room];
+        return;
+      }
 
-    if (clients.size === 1) {
-      io.to(room).emit("oneLeaveRoom", rooms[room]);
-      return;
-    }
+      if (clients.size === 1) {
+        io.to(room).emit("oneLeaveRoom", rooms[room]);
+        return;
+      }
+    } catch (error) {}
   });
 
   // TODO: remove empty room
@@ -160,30 +148,32 @@ function generateRoomId() {
 }
 
 function emitByAttr(id, room, attr, attrValue, zeroEvent, oneEvent, twoEvent) {
-  rooms[room][id][attr] = attrValue;
+  try {
+    rooms[room][id][attr] = attrValue;
 
-  const length = Object.keys(rooms[room]).length;
+    const length = Object.keys(rooms[room]).length;
 
-  if (checkAttr(false)) {
-    io.to(room).emit(zeroEvent);
-    return;
-  }
-
-  if (length > 1) {
-    if (checkAttr(true)) {
-      io.to(room).emit(twoEvent);
+    if (checkAttr(false)) {
+      io.to(room).emit(zeroEvent);
       return;
     }
-  }
 
-  for (let i = 0; i < length; i++) {
-    const key = Object.keys(rooms[room])[i];
-
-    if (rooms[room][key][attr]) {
-      io.to(room).emit(oneEvent);
-      return;
+    if (length > 1) {
+      if (checkAttr(true)) {
+        io.to(room).emit(twoEvent);
+        return;
+      }
     }
-  }
+
+    for (let i = 0; i < length; i++) {
+      const key = Object.keys(rooms[room])[i];
+
+      if (rooms[room][key][attr]) {
+        io.to(room).emit(oneEvent);
+        return;
+      }
+    }
+  } catch (error) {}
 
   function checkAttr(value) {
     return Object.keys(rooms[room]).every(

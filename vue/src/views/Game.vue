@@ -1,7 +1,7 @@
 <script setup>
 import { provide, onMounted, onUnmounted } from "vue";
 import { useGameStore } from "@/stores/game.js";
-import { useRoute, onBeforeRouteLeave } from "vue-router";
+import { useRouter, useRoute, onBeforeRouteLeave } from "vue-router";
 import { socket, socketEmit } from "@/assets/js/socket.js";
 import { notify } from "@/assets/js/notify.js";
 import { emitter } from "@/assets/js/emitter.js";
@@ -15,6 +15,7 @@ import GamePrepareInfo from "@/components/info/GamePrepareInfo.vue";
 import ButtonOperation from "@/components/operation/ButtonOperation.vue";
 
 const game = useGameStore();
+const router = useRouter();
 const route = useRoute();
 const gameMode = route.params.mode;
 provide("gameMode", {
@@ -23,19 +24,16 @@ provide("gameMode", {
 });
 
 onMounted(() => {
+  window.addEventListener("beforeunload", handleBeforeUnload);
+  window.addEventListener("load", handleLoad);
+
   if (checkGameMode("2p")) {
-    // refresh to join the room
-    // socket.emit("joinRoom", {
-    //   room: sessionStorage.getItem("room"),
-    //   action: "refresh",
-    // });
+    // init ready status when entering game page
+    socketEmit("ready", "ready", false);
 
     socket.on("roomJoined", () => {
       notify("success", "2P has joined the room.");
     });
-
-    // init ready status when first in page game
-    socketEmit("ready", "ready", false);
 
     socket.on("zeroReady", () => {
       emitter.emit("zeroReady");
@@ -88,6 +86,9 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  window.removeEventListener("beforeunload", handleBeforeUnload);
+  window.removeEventListener("load", handleLoad);
+
   if (checkGameMode("2p")) {
     socket.off("roomJoined");
     socket.off("zeroReady");
@@ -111,6 +112,17 @@ onBeforeRouteLeave(() => {
     socket.emit("leaveRoom", sessionStorage.getItem("room"));
   }
 });
+
+function handleBeforeUnload(e) {
+  e.preventDefault();
+  return "Are you sure you want to leave?";
+}
+
+function handleLoad() {
+  router.push({
+    path: "/",
+  });
+}
 
 function checkGameMode(mode) {
   return gameMode === mode;
