@@ -4,8 +4,18 @@ services:
     container_name: vue-tetris-backend
     ports:
       - "3000:3000"
+    networks:
+      - vue-tetris
+
   frontend:
     build: ./frontend
     container_name: vue-tetris-frontend
     ports:
       - "80:80"
+    networks:
+      - vue-tetris
+
+networks:
+  vue-tetris:
+    name: vue-tetris
+    driver: bridge
