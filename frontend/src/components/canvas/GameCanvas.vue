@@ -14,7 +14,7 @@ const ctx = computed(() => canvas.value.getContext("2d"));
 
 const game = useGameStore();
 const gameMode = inject("gameMode");
-const block = 20;
+const block = 18;
 const filledRows = [];
 let map = new Array(20).fill(0).map(() => new Array(10).fill(0));
 let currentShape = null;
@@ -433,8 +433,8 @@ function toggleVolume() {
 <template>
   <canvas
     class="border-4 border-black bg-black"
-    width="200"
-    height="400"
+    width="180"
+    height="360"
     ref="canvas"
   ></canvas>
 </template>

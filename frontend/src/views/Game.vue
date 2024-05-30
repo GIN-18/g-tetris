@@ -9,7 +9,9 @@ import { emitter } from "@/assets/js/emitter.js";
 import Header from "@/components/Header.vue";
 import Menu from "@/components/menu/Menu.vue";
 import GameCanvas from "@/components/canvas/GameCanvas.vue";
+import HoldTetriminoInfo from "@/components/info/HoldTetriminoInfo.vue";
 import GameBaseInfo from "@/components/info/GameBaseInfo.vue";
+import NexTetriminoInfo from "@/components/info/NextTetriminoInfo.vue";
 import GameOverInfo from "@/components/info/GameOverInfo.vue";
 import GamePrepareInfo from "@/components/info/GamePrepareInfo.vue";
 import ButtonOperation from "@/components/operation/ButtonOperation.vue";
@@ -24,9 +26,6 @@ provide("gameMode", {
 });
 
 onMounted(() => {
-  window.addEventListener("beforeunload", handleBeforeUnload);
-  window.addEventListener("load", handleLoad);
-
   if (checkGameMode("2p")) {
     // init ready status when entering game page
     socketEmit("ready", "ready", false);
@@ -86,9 +85,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  window.removeEventListener("beforeunload", handleBeforeUnload);
-  window.removeEventListener("load", handleLoad);
-
   if (checkGameMode("2p")) {
     socket.off("roomJoined");
     socket.off("zeroReady");
@@ -113,17 +109,6 @@ onBeforeRouteLeave(() => {
   }
 });
 
-function handleBeforeUnload(e) {
-  e.preventDefault();
-  return "Are you sure you want to leave?";
-}
-
-function handleLoad() {
-  router.push({
-    path: "/",
-  });
-}
-
 function checkGameMode(mode) {
   return gameMode === mode;
 }
@@ -135,11 +120,13 @@ function checkGameMode(mode) {
   </Header>
 
   <main class="flex justify-between items-center w-full">
+    <div class="flex flex-col justify-between h-full">
+      <HoldTetriminoInfo />
+      <GameBaseInfo />
+    </div>
     <GameCanvas />
-    <GameBaseInfo />
+    <NexTetriminoInfo />
   </main>
-
-  <hr class="w-full border-t-4 border-dashed border-black" />
 
   <ButtonOperation />
 

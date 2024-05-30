@@ -3,7 +3,6 @@ import { computed, inject } from "vue";
 import { useGameStore } from "@/stores/game";
 
 import InfoBox from "./InfoBox.vue";
-import NextPieceCanvas from "@/components/canvas/NextPieceCanvas.vue";
 
 const game = useGameStore();
 const gameMode = inject("gameMode");
@@ -17,15 +16,10 @@ const scoreDiffColor = computed(() =>
 </script>
 
 <template>
-  <div class="flex flex-col justify-between items-center w-max-40 h-full">
+  <div class="flex flex-col gap-5">
     <!-- game score -->
     <InfoBox title="SCORE">
       <p>{{ game.score }}</p>
-    </InfoBox>
-
-    <!-- high score -->
-    <InfoBox title="HI-SCORE" v-if="gameMode.checkGameMode('1p')">
-      <p>{{ game.highScore }}</p>
     </InfoBox>
 
     <!-- socre difference -->
@@ -35,9 +29,9 @@ const scoreDiffColor = computed(() =>
       </p>
     </InfoBox>
 
-    <!-- next shape -->
-    <InfoBox title="NEXT">
-      <NextPieceCanvas />
+    <!-- lines -->
+    <InfoBox title="LINES" v-if="gameMode.checkGameMode('1p')">
+      <p>{{ game.lines }}</p>
     </InfoBox>
 
     <!-- game level -->

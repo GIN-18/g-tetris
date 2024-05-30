@@ -10,7 +10,6 @@ const height = computed(() => canvas.value.height);
 const ctx = computed(() => canvas.value.getContext("2d"));
 
 const game = useGameStore();
-const block = 18;
 
 watch(
   () => game.nextShape,
@@ -18,24 +17,23 @@ watch(
     if (!game.nextShape) return;
 
     clearCanvas();
-    drawNextPiece();
+    drawHoldTetrimino();
   },
   { deep: true },
 );
 
 onMounted(() => {
-  canvas.value.width = game.block * 4;
-  canvas.value.height = game.block * 2 * 7 + 80;
-
+  canvas.value.width = game.block * 4 + 10;
+  canvas.value.height = game.block * 4 + 10;
   clearCanvas();
-  drawNextPiece();
+  drawHoldTetrimino();
 });
 
 function clearCanvas() {
   ctx.value.clearRect(0, 0, width.value, height.value);
 }
 
-function drawNextPiece() {
+function drawHoldTetrimino() {
   const { type, pieces, rotation } = game.nextShape;
   const piece = pieces[rotation];
 
@@ -54,11 +52,16 @@ function drawNextPiece() {
   for (let i = 0; i < piece.length; i++) {
     const tmp_x = piece[i][1] + xStep;
     const tmp_y = piece[i][0] + yStep;
-    ctx.value.fillRect(tmp_x * block, tmp_y * block, block, block);
+    ctx.value.fillRect(
+      tmp_x * game.block,
+      tmp_y * game.block,
+      game.block,
+      game.block,
+    );
   }
 }
 </script>
 
 <template>
-  <canvas class="bg-black" width="72" height="36" ref="canvas"></canvas>
+  <canvas class="bg-black" ref="canvas"></canvas>
 </template>
