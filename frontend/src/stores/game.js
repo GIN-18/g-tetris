@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { createShape } from "@/assets/js/shape.js";
+import { tetriminoTable } from "@/assets/js/tetrimino.js";
 
 export const useGameStore = defineStore("game", {
   state: () => ({
@@ -14,7 +14,8 @@ export const useGameStore = defineStore("game", {
     scoreDiff: 0,
     highScore: localStorage.getItem("highScore") || 0,
     isPreview: localStorage.getItem("isPreview") || true,
-    nextShape: createShape(),
+    // nextShape: createTetrimino(),
+    nextShape: null,
     players: 0,
   }),
 });

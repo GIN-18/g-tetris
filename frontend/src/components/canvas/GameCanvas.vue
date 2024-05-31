@@ -1,15 +1,15 @@
 <script setup>
 import { ref, computed, watch, inject, onMounted, onUnmounted } from "vue";
 import { useGameStore } from "@/stores/game.js";
-import { createShape } from "@/assets/js/shape.js";
+import { tetriminoTable } from "@/assets/js/tetrimino.js";
 import { socketEmit } from "@/assets/js/socket.js";
 import { emitter } from "@/assets/js/emitter.js";
 import { palettes } from "@/assets/js/palettes.js";
 
 // get canvas info
 const canvas = ref(null);
-const canvasWidth = computed(() => canvas.value.width);
-const canvasHeight = computed(() => canvas.value.height);
+const width = computed(() => canvas.value.width);
+const height = computed(() => canvas.value.height);
 const ctx = computed(() => canvas.value.getContext("2d"));
 
 const game = useGameStore();
@@ -21,6 +21,26 @@ let currentShape = null;
 let previewShape = null;
 let dropTimer = null;
 let down = false;
+
+const x = 3;
+const y = 3;
+
+let currentTetrimino = tetriminoTable.l;
+
+function drawCurrentTetrimino() {
+  ctx.value.fillStyle = currentTetrimino.color;
+
+  for (let i = 0; i < currentTetrimino.tetriminos[index].length; i++) {
+    const tmp_x = currentTetrimino.tetriminos[index][i][0] + x;
+    const tmp_y = currentTetrimino.tetriminos[index][i][1] + y;
+    ctx.value.fillRect(
+      tmp_x * game.block,
+      tmp_y * game.block,
+      game.block,
+      game.block,
+    );
+  }
+}
 
 // redraw canvas when preview toggles
 watch(
@@ -36,6 +56,12 @@ watch(
 );
 
 onMounted(() => {
+  // set canvas size
+  canvas.value.width = game.block * 10;
+  canvas.value.height = game.block * 20;
+
+  drawCurrentTetrimino();
+
   emitter.on("drop", dropPiece);
   emitter.on("left", movePieceLeft);
   emitter.on("right", movePieceRight);
@@ -75,7 +101,7 @@ function resetGame() {
     level: 1,
     score: 0,
     scoreDiff: 0,
-    nextShape: createShape(),
+    nextShape: tetriminoTable(),
   });
 
   map = new Array(20).fill(0).map(() => new Array(10).fill(0));
@@ -91,7 +117,7 @@ function resetGame() {
 function addShape() {
   currentShape = game.nextShape;
   previewShape = { ...currentShape };
-  game.nextShape = createShape();
+  // game.nextShape = createTetrimino();
 
   drawGame();
   checkGameOver();
@@ -197,35 +223,43 @@ function movePieceDown(enable) {
   setDropTimer();
 }
 
+let index = 0;
 // HACK: rotate shape against the wall
 function rotatePiece() {
-  if (!dropTimer || !game.gamePlay) return;
-
-  const { x, y, pieces, rotation } = currentShape;
-  const currentRotation = rotation;
-  const resultRotation = (rotation + 1) % pieces.length;
-
-  currentShape.rotation = resultRotation;
-  previewShape.rotation = resultRotation;
-
-  const piece = currentShape.pieces[currentShape.rotation];
-
-  for (let i = 0; i < piece.length; i++) {
-    const tmp_x = piece[i][1] + x;
-    const tmp_y = piece[i][0] + y;
-
-    if (
-      tmp_y >= 0 &&
-      (map[tmp_y] === undefined ||
-        map[tmp_y][tmp_x] === undefined ||
-        map[tmp_y][tmp_x] > 0)
-    ) {
-      currentShape.rotation = currentRotation;
-      previewShape.rotation = currentRotation;
-    }
+  index += 1;
+  if (index > 3) {
+    index = 0;
   }
 
-  drawGame();
+  clearCanvas();
+  drawCurrentTetrimino();
+  // if (!dropTimer || !game.gamePlay) return;
+  //
+  // const { x, y, pieces, rotation } = currentShape;
+  // const currentRotation = rotation;
+  // const resultRotation = (rotation + 1) % pieces.length;
+  //
+  // currentShape.rotation = resultRotation;
+  // previewShape.rotation = resultRotation;
+  //
+  // const piece = currentShape.pieces[currentShape.rotation];
+  //
+  // for (let i = 0; i < piece.length; i++) {
+  //   const tmp_x = piece[i][1] + x;
+  //   const tmp_y = piece[i][0] + y;
+  //
+  //   if (
+  //     tmp_y >= 0 &&
+  //     (map[tmp_y] === undefined ||
+  //       map[tmp_y][tmp_x] === undefined ||
+  //       map[tmp_y][tmp_x] > 0)
+  //   ) {
+  //     currentShape.rotation = currentRotation;
+  //     previewShape.rotation = currentRotation;
+  //   }
+  // }
+  //
+  // drawGame();
 }
 
 function movePiece(xStep, yStep) {
@@ -366,7 +400,7 @@ function drawGame() {
 }
 
 function clearCanvas() {
-  ctx.value.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
+  ctx.value.clearRect(0, 0, width.value, height.value);
 }
 
 function drawMap() {
@@ -431,10 +465,5 @@ function toggleVolume() {
 </script>
 
 <template>
-  <canvas
-    class="border-4 border-black bg-black"
-    width="180"
-    height="360"
-    ref="canvas"
-  ></canvas>
+  <canvas class="border-4 border-black bg-black" ref="canvas"></canvas>
 </template>

@@ -1,7 +1,7 @@
 <script setup>
 import { provide, onMounted, onUnmounted } from "vue";
 import { useGameStore } from "@/stores/game.js";
-import { useRouter, useRoute, onBeforeRouteLeave } from "vue-router";
+import { useRoute, onBeforeRouteLeave } from "vue-router";
 import { socket, socketEmit } from "@/assets/js/socket.js";
 import { notify } from "@/assets/js/notify.js";
 import { emitter } from "@/assets/js/emitter.js";
@@ -17,7 +17,6 @@ import GamePrepareInfo from "@/components/info/GamePrepareInfo.vue";
 import ButtonOperation from "@/components/operation/ButtonOperation.vue";
 
 const game = useGameStore();
-const router = useRouter();
 const route = useRoute();
 const gameMode = route.params.mode;
 provide("gameMode", {

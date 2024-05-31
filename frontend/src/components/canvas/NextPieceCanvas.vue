@@ -28,7 +28,7 @@ onMounted(() => {
   canvas.value.height = game.block * 2 * 7 + 80;
 
   clearCanvas();
-  drawNextPiece();
+  // drawNextPiece();
 });
 
 function clearCanvas() {
