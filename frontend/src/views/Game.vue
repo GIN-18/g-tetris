@@ -8,7 +8,7 @@ import { emitter } from "@/assets/js/emitter.js";
 
 import Header from "@/components/Header.vue";
 import Menu from "@/components/menu/Menu.vue";
-import GameCanvas from "@/components/canvas/GameCanvas.vue";
+import PlayfieldCanvas from "@/components/canvas/PlayfieldCanvas.vue";
 import HoldTetriminoInfo from "@/components/info/HoldTetriminoInfo.vue";
 import GameBaseInfo from "@/components/info/GameBaseInfo.vue";
 import NexTetriminoInfo from "@/components/info/NextTetriminoInfo.vue";
@@ -123,7 +123,7 @@ function checkGameMode(mode) {
       <HoldTetriminoInfo />
       <GameBaseInfo />
     </div>
-    <GameCanvas />
+    <PlayfieldCanvas />
     <NexTetriminoInfo />
   </main>
 

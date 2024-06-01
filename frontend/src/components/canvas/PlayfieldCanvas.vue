@@ -16,23 +16,24 @@ const game = useGameStore();
 const gameMode = inject("gameMode");
 const block = 18;
 const filledRows = [];
-let map = new Array(20).fill(0).map(() => new Array(10).fill(0));
+let matrix = new Array(20).fill(0).map(() => new Array(10).fill(0));
 let currentShape = null;
 let previewShape = null;
 let dropTimer = null;
 let down = false;
 
-const x = 3;
-const y = 3;
+let xOffset = 3;
+let yOffset = 3;
+let rotation = 0;
 
-let currentTetrimino = tetriminoTable.l;
+let currentTetrimino = tetriminoTable.i;
 
 function drawCurrentTetrimino() {
   ctx.value.fillStyle = currentTetrimino.color;
 
-  for (let i = 0; i < currentTetrimino.tetriminos[index].length; i++) {
-    const tmp_x = currentTetrimino.tetriminos[index][i][0] + x;
-    const tmp_y = currentTetrimino.tetriminos[index][i][1] + y;
+  for (let i = 0; i < currentTetrimino.tetriminos[rotation].length; i++) {
+    const tmp_x = currentTetrimino.tetriminos[rotation][i][0] + xOffset;
+    const tmp_y = currentTetrimino.tetriminos[rotation][i][1] + yOffset;
     ctx.value.fillRect(
       tmp_x * game.block,
       tmp_y * game.block,
@@ -104,7 +105,7 @@ function resetGame() {
     nextShape: tetriminoTable(),
   });
 
-  map = new Array(20).fill(0).map(() => new Array(10).fill(0));
+  matrix = new Array(20).fill(0).map(() => new Array(10).fill(0));
   currentShape = null;
   previewShape = null;
   filledRows.length = 0;
@@ -131,7 +132,7 @@ function checkGameOver() {
     const tmp_x = piece[i][1] + x;
     const tmp_y = piece[i][0] + y + (type === 1 ? 1 : 2);
 
-    if (map[tmp_y][tmp_x]) {
+    if (matrix[tmp_y][tmp_x]) {
       clearInterval(dropTimer);
 
       game.$patch({
@@ -140,7 +141,7 @@ function checkGameOver() {
         nextShape: null,
       });
 
-      map = null;
+      matrix = null;
       currentShape = null;
       previewShape = null;
 
@@ -223,12 +224,11 @@ function movePieceDown(enable) {
   setDropTimer();
 }
 
-let index = 0;
 // HACK: rotate shape against the wall
 function rotatePiece() {
-  index += 1;
-  if (index > 3) {
-    index = 0;
+  rotation += 1;
+  if (rotation > 3) {
+    rotation = 0;
   }
 
   clearCanvas();
@@ -265,8 +265,8 @@ function rotatePiece() {
 function movePiece(xStep, yStep) {
   const { x, y, pieces, rotation } = currentShape;
   const piece = pieces[rotation];
-  const w = map[0].length;
-  const h = map.length;
+  const w = matrix[0].length;
+  const h = matrix.length;
 
   let canMove = true;
 
@@ -278,7 +278,7 @@ function movePiece(xStep, yStep) {
       tmp_x < 0 ||
       tmp_x >= w ||
       tmp_y >= h ||
-      (map[tmp_y] && map[tmp_y][tmp_x])
+      (matrix[tmp_y] && matrix[tmp_y][tmp_x])
     ) {
       canMove = false;
       return canMove;
@@ -303,12 +303,12 @@ function mergePiece() {
     const tmp_x = piece[i][1] + x;
     const tmp_y = piece[i][0] + y;
 
-    if (tmp_y >= 0) map[tmp_y][tmp_x] = type + 1;
+    if (tmp_y >= 0) matrix[tmp_y][tmp_x] = type + 1;
   }
 }
 
 function clearFilledRows() {
-  const numCols = map[0].length;
+  const numCols = matrix[0].length;
 
   let animationFrame = null;
   let progress = 0;
@@ -334,8 +334,8 @@ function clearFilledRows() {
       cancelAnimationFrame(animationFrame);
 
       for (let i = 0; i < filledRows.length; i++) {
-        map.splice(filledRows[i], 1);
-        map.unshift(new Array(10).fill(0));
+        matrix.splice(filledRows[i], 1);
+        matrix.unshift(new Array(10).fill(0));
       }
 
       addShape();
@@ -385,8 +385,8 @@ function updateLevel() {
 function getFilledRows() {
   filledRows.length = 0;
 
-  for (let i = 0; i < map.length; i++) {
-    if (map[i].every((item) => !!item)) {
+  for (let i = 0; i < matrix.length; i++) {
+    if (matrix[i].every((item) => !!item)) {
       filledRows.push(i);
     }
   }
@@ -404,11 +404,11 @@ function clearCanvas() {
 }
 
 function drawMap() {
-  for (let y = 0; y < map.length; y++) {
-    for (let x = 0; x < map[y].length; x++) {
-      if (!map[y][x]) continue;
+  for (let y = 0; y < matrix.length; y++) {
+    for (let x = 0; x < matrix[y].length; x++) {
+      if (!matrix[y][x]) continue;
 
-      ctx.value.fillStyle = palettes[game.palette].shapeColor[map[y][x] - 1];
+      ctx.value.fillStyle = palettes[game.palette].shapeColor[matrix[y][x] - 1];
       ctx.value.fillRect(x * block, y * block, block, block);
     }
   }
@@ -448,7 +448,8 @@ function drawPreviewPiece() {
 
       if (
         offset >= currentShape.y &&
-        (tmp_y > map.length - 2 || (map[tmp_y] && map[tmp_y + 1][tmp_x]))
+        (tmp_y > matrix.length - 2 ||
+          (matrix[tmp_y] && matrix[tmp_y + 1][tmp_x]))
       ) {
         return offset;
       }
