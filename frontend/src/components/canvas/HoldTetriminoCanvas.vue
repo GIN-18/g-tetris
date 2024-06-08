@@ -1,7 +1,6 @@
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
 import { useGameStore } from "@/stores/game.js";
-import { palettes } from "@/assets/js/palettes.js";
 
 // get canvas info
 const canvas = ref(null);
@@ -12,8 +11,8 @@ const ctx = computed(() => canvas.value.getContext("2d"));
 const game = useGameStore();
 
 onMounted(() => {
-  canvas.value.width = game.block * 4 + 10;
-  canvas.value.height = game.block * 4 + 10;
+  canvas.value.width = game.block * 4;
+  canvas.value.height = game.block * 4;
   clearCanvas();
   drawHoldTetrimino();
 });
@@ -26,5 +25,5 @@ function drawHoldTetrimino() {}
 </script>
 
 <template>
-  <canvas class="bg-black" ref="canvas"></canvas>
+  <canvas class="border-4 border-black bg-black" ref="canvas"></canvas>
 </template>

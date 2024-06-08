@@ -8,10 +8,8 @@ const props = defineProps({
 </script>
 
 <template>
-  <div
-    class="flex flex-col justify-center items-center w-full p-1 border-4 border-black text-sm"
-  >
-    <p class="relative top-[-8px] px-1 whitespace-nowrap bg-nes-gray">
+  <div class="flex flex-col justify-center items-center gap-3 w-full text-sm">
+    <p class="whitespace-nowrap">
       {{ props.title }}
     </p>
     <slot></slot>

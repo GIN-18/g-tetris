@@ -16,7 +16,7 @@ const scoreDiffColor = computed(() =>
 </script>
 
 <template>
-  <div class="flex flex-col gap-5">
+  <div class="flex flex-col gap-6">
     <!-- game score -->
     <InfoBox title="SCORE">
       <p>{{ game.score }}</p>

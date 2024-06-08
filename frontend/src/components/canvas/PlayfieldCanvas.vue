@@ -1,10 +1,10 @@
 <script setup>
 import { ref, computed, watch, inject, onMounted, onUnmounted } from "vue";
 import { useGameStore } from "@/stores/game.js";
-import { tetriminoTable } from "@/assets/js/tetrimino.js";
 import { socketEmit } from "@/assets/js/socket.js";
 import { emitter } from "@/assets/js/emitter.js";
 import { palettes } from "@/assets/js/palettes.js";
+// import { getTetrimino } from "@/assets/js/tetrimino.js";
 
 // get canvas info
 const canvas = ref(null);
@@ -17,7 +17,6 @@ const gameMode = inject("gameMode");
 const block = 18;
 const filledRows = [];
 let matrix = new Array(20).fill(0).map(() => new Array(10).fill(0));
-let currentShape = null;
 let previewShape = null;
 let dropTimer = null;
 let down = false;
@@ -26,14 +25,12 @@ let xOffset = 3;
 let yOffset = 3;
 let rotation = 0;
 
-let currentTetrimino = tetriminoTable.i;
-
 function drawCurrentTetrimino() {
-  ctx.value.fillStyle = currentTetrimino.color;
+  ctx.value.fillStyle = game.currentTetrimino.color;
 
-  for (let i = 0; i < currentTetrimino.tetriminos[rotation].length; i++) {
-    const tmp_x = currentTetrimino.tetriminos[rotation][i][0] + xOffset;
-    const tmp_y = currentTetrimino.tetriminos[rotation][i][1] + yOffset;
+  for (let i = 0; i < game.currentTetrimino.tetriminos[rotation].length; i++) {
+    const tmp_x = game.currentTetrimino.tetriminos[rotation][i][0] + xOffset;
+    const tmp_y = game.currentTetrimino.tetriminos[rotation][i][1] + yOffset;
     ctx.value.fillRect(
       tmp_x * game.block,
       tmp_y * game.block,
@@ -61,7 +58,7 @@ onMounted(() => {
   canvas.value.width = game.block * 10;
   canvas.value.height = game.block * 20;
 
-  drawCurrentTetrimino();
+  // drawCurrentTetrimino();
 
   emitter.on("drop", dropPiece);
   emitter.on("left", movePieceLeft);
@@ -70,7 +67,7 @@ onMounted(() => {
   emitter.on("play", playGame);
   emitter.on("reset", resetGame);
   emitter.on("volume", toggleVolume);
-  emitter.on("rotate", rotatePiece);
+  emitter.on("rotate", rotateLeft);
 });
 
 onUnmounted(() => {
@@ -81,7 +78,7 @@ onUnmounted(() => {
   emitter.off("play", playGame);
   emitter.off("reset", resetGame);
   emitter.off("volume", toggleVolume);
-  emitter.off("rotate", rotatePiece);
+  emitter.off("rotate", rotateLeft);
 });
 
 function playGame() {
@@ -102,7 +99,7 @@ function resetGame() {
     level: 1,
     score: 0,
     scoreDiff: 0,
-    nextShape: tetriminoTable(),
+    // nextShape: tetriminoTable(),
   });
 
   matrix = new Array(20).fill(0).map(() => new Array(10).fill(0));
@@ -224,8 +221,18 @@ function movePieceDown(enable) {
   setDropTimer();
 }
 
+function rotateRight() {
+  rotation += 1;
+  if (rotation > 3) {
+    rotation = 0;
+  }
+
+  clearCanvas();
+  drawCurrentTetrimino();
+}
+
 // HACK: rotate shape against the wall
-function rotatePiece() {
+function rotateLeft() {
   rotation += 1;
   if (rotation > 3) {
     rotation = 0;

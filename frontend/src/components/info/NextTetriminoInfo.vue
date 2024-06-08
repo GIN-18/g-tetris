@@ -1,12 +1,12 @@
 <script setup>
 import InfoBox from "./InfoBox.vue";
-import NextPieceCanvas from "@/components/canvas/NextPieceCanvas.vue";
+import NextTetriminoCanvas from "@/components/canvas/NextTetriminoCanvas.vue";
 </script>
 
 <template>
   <div class="h-full">
     <InfoBox title="NEXT">
-      <NextPieceCanvas />
+      <NextTetriminoCanvas />
     </InfoBox>
   </div>
 </template>

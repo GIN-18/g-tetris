@@ -1,7 +1,7 @@
-export const tetriminoTable = {
-  o: {
+const tetriminoTable = {
+  O: {
     color: "#f8b800",
-    tetriminos: [
+    tetriminoes: [
       [
         [0, 0],
         [1, 0],
@@ -28,9 +28,9 @@ export const tetriminoTable = {
       ],
     ],
   },
-  i: {
+  I: {
     color: "#3cbcfc",
-    tetriminos: [
+    tetriminoes: [
       [
         [0, 0],
         [-1, 0],
@@ -57,9 +57,9 @@ export const tetriminoTable = {
       ],
     ],
   },
-  t: {
+  T: {
     color: "#9878f8",
-    tetriminos: [
+    tetriminoes: [
       [
         [0, 0],
         [-1, 0],
@@ -86,9 +86,9 @@ export const tetriminoTable = {
       ],
     ],
   },
-  s: {
+  S: {
     color: "#58d854",
-    tetriminos: [
+    tetriminoes: [
       [
         [0, 0],
         [-1, 0],
@@ -115,9 +115,9 @@ export const tetriminoTable = {
       ],
     ],
   },
-  z: {
+  Z: {
     color: "#f85898",
-    tetriminos: [
+    tetriminoes: [
       [
         [0, 0],
         [-1, -1],
@@ -144,9 +144,9 @@ export const tetriminoTable = {
       ],
     ],
   },
-  j: {
+  J: {
     color: "#6888fc",
-    tetriminos: [
+    tetriminoes: [
       [
         [0, 0],
         [-1, -1],
@@ -173,9 +173,9 @@ export const tetriminoTable = {
       ],
     ],
   },
-  l: {
+  L: {
     color: "#f87858",
-    tetriminos: [
+    tetriminoes: [
       [
         [0, 0],
         [-1, 0],
@@ -203,3 +203,25 @@ export const tetriminoTable = {
     ],
   },
 };
+
+export function shuffleBag() {
+  const arr = ["I", "J", "L", "O", "S", "T", "Z"];
+
+  for (let i = arr.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+
+  return arr;
+}
+
+export function getBags() {
+  const result = [];
+  const bag = shuffleBag();
+
+  for (let i = 0; i < bag.length; i++) {
+    result.push(tetriminoTable[bag[i]]);
+  }
+
+  return result;
+}
