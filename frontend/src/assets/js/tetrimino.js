@@ -1,5 +1,6 @@
 const tetriminoTable = {
   O: {
+    name: "O",
     color: "#f8b800",
     tetriminoes: [
       [
@@ -29,6 +30,7 @@ const tetriminoTable = {
     ],
   },
   I: {
+    name: "I",
     color: "#3cbcfc",
     tetriminoes: [
       [
@@ -58,6 +60,7 @@ const tetriminoTable = {
     ],
   },
   T: {
+    name: "T",
     color: "#9878f8",
     tetriminoes: [
       [
@@ -87,6 +90,7 @@ const tetriminoTable = {
     ],
   },
   S: {
+    name: "S",
     color: "#58d854",
     tetriminoes: [
       [
@@ -116,6 +120,7 @@ const tetriminoTable = {
     ],
   },
   Z: {
+    name: "Z",
     color: "#f85898",
     tetriminoes: [
       [
@@ -145,6 +150,7 @@ const tetriminoTable = {
     ],
   },
   J: {
+    name: "J",
     color: "#6888fc",
     tetriminoes: [
       [
@@ -174,6 +180,7 @@ const tetriminoTable = {
     ],
   },
   L: {
+    name: "L",
     color: "#f87858",
     tetriminoes: [
       [

@@ -9,10 +9,12 @@ const height = computed(() => canvas.value.height);
 const ctx = computed(() => canvas.value.getContext("2d"));
 
 const game = useGameStore();
+const indexArray = [];
+let iIndex;
 
 onMounted(() => {
   canvas.value.width = game.block * 4;
-  canvas.value.height = game.block * 2 * 7 + 80;
+  canvas.value.height = game.block * 2 * 7 + 76;
 
   clearCanvas();
   drawBags();
@@ -28,11 +30,13 @@ function drawBags() {
   for (let i = 0; i < arr.length; i++) {
     const color = arr[i].color;
     const tetrimino = arr[i].tetriminoes[0];
+    const xOffset = setXOffset(arr[i].name);
+    const yOffset = setYOffset(arr[i].name, i);
 
     ctx.value.fillStyle = color;
     for (let j = 0; j < tetrimino.length; j++) {
-      const x = tetrimino[j][0] + 1;
-      const y = tetrimino[j][1] + 1 + i * 2;
+      const x = tetrimino[j][0] + 1 + xOffset;
+      const y = tetrimino[j][1] + 2 + i * 2.5 + yOffset;
 
       ctx.value.fillRect(
         x * game.block,
@@ -42,6 +46,34 @@ function drawBags() {
       );
     }
   }
+}
+
+function setXOffset(name) {
+  const arr = ["T", "L", "J", "S", "Z"];
+
+  if (arr.includes(name)) {
+    return 1 / 2;
+  }
+
+  return 0;
+}
+
+function setYOffset(name, index) {
+  if (name === "I") {
+    iIndex = index;
+  }
+
+  if (iIndex === undefined || iIndex === 0) {
+    indexArray.push(index);
+  }
+
+  for (let i = 0; i < indexArray.length; i++) {
+    if (iIndex !== undefined && index >= iIndex) {
+      return -1;
+    }
+  }
+
+  return 0;
 }
 </script>
 
