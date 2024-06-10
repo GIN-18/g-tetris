@@ -4,7 +4,6 @@ import { getBags } from "@/assets/js/tetrimino.js";
 export const useGameStore = defineStore("game", {
   state: () => ({
     block: 18,
-    palette: "nes",
     gamePlay: false,
     gameOver: false,
     level: 1,
@@ -14,7 +13,8 @@ export const useGameStore = defineStore("game", {
     scoreDiff: 0,
     highScore: localStorage.getItem("highScore") || 0,
     isPreview: localStorage.getItem("isPreview") || true,
-    currentBags: getBags(),
+    currentBags: getBags().reverse(),
+    nextBags: getBags().reverse(),
     players: 0,
   }),
 });

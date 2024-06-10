@@ -16,6 +16,9 @@ onMounted(() => {
   canvas.value.width = game.block * 4;
   canvas.value.height = game.block * 2 * 7 + 76;
 
+  ctx.value.scale(1, -1);
+  ctx.value.translate(0, -canvas.value.height);
+
   clearCanvas();
   drawBags();
 });
@@ -36,7 +39,7 @@ function drawBags() {
     ctx.value.fillStyle = color;
     for (let j = 0; j < tetrimino.length; j++) {
       const x = tetrimino[j][0] + 1 + xOffset;
-      const y = tetrimino[j][1] + 2 + i * 2.5 + yOffset;
+      const y = tetrimino[j][1] + 1 + i * 2.5 + yOffset;
 
       ctx.value.fillRect(
         x * game.block,
@@ -68,7 +71,7 @@ function setYOffset(name, index) {
   }
 
   for (let i = 0; i < indexArray.length; i++) {
-    if (iIndex !== undefined && index >= iIndex) {
+    if (iIndex !== undefined && index > iIndex) {
       return -1;
     }
   }

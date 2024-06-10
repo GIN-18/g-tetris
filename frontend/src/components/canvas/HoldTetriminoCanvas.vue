@@ -13,6 +13,10 @@ const game = useGameStore();
 onMounted(() => {
   canvas.value.width = game.block * 4;
   canvas.value.height = game.block * 4;
+
+  ctx.value.scale(1, -1);
+  ctx.value.translate(0, -canvas.value.height);
+
   clearCanvas();
   drawHoldTetrimino();
 });

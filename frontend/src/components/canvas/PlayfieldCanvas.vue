@@ -1,10 +1,7 @@
 <script setup>
 import { ref, computed, watch, inject, onMounted, onUnmounted } from "vue";
 import { useGameStore } from "@/stores/game.js";
-import { socketEmit } from "@/assets/js/socket.js";
 import { emitter } from "@/assets/js/emitter.js";
-import { palettes } from "@/assets/js/palettes.js";
-// import { getTetrimino } from "@/assets/js/tetrimino.js";
 
 // get canvas info
 const canvas = ref(null);
@@ -14,461 +11,109 @@ const ctx = computed(() => canvas.value.getContext("2d"));
 
 const game = useGameStore();
 const gameMode = inject("gameMode");
-const block = 18;
-const filledRows = [];
+
 let matrix = new Array(20).fill(0).map(() => new Array(10).fill(0));
-let previewShape = null;
-let dropTimer = null;
-let down = false;
-
-let xOffset = 3;
-let yOffset = 3;
+let xOffset = 4;
+let yOffset = 18;
+let rotationXOffset = 0;
+let rotationYOffset = 0;
 let rotation = 0;
-
-function drawCurrentTetrimino() {
-  ctx.value.fillStyle = game.currentTetrimino.color;
-
-  for (let i = 0; i < game.currentTetrimino.tetriminos[rotation].length; i++) {
-    const tmp_x = game.currentTetrimino.tetriminos[rotation][i][0] + xOffset;
-    const tmp_y = game.currentTetrimino.tetriminos[rotation][i][1] + yOffset;
-    ctx.value.fillRect(
-      tmp_x * game.block,
-      tmp_y * game.block,
-      game.block,
-      game.block,
-    );
-  }
-}
-
-// redraw canvas when preview toggles
-watch(
-  () => game.isPreview,
-  () => {
-    if (!previewShape) return;
-
-    clearCanvas();
-    drawMap();
-    drawPreviewPiece();
-    drawCurrentPiece();
-  },
-);
+let currentTetriminoIndex = 0;
 
 onMounted(() => {
   // set canvas size
   canvas.value.width = game.block * 10;
   canvas.value.height = game.block * 20;
 
-  // drawCurrentTetrimino();
+  ctx.value.scale(1, -1);
+  ctx.value.translate(0, -canvas.value.height);
 
-  emitter.on("drop", dropPiece);
-  emitter.on("left", movePieceLeft);
-  emitter.on("right", movePieceRight);
-  emitter.on("down", (enable) => movePieceDown(enable));
-  emitter.on("play", playGame);
-  emitter.on("reset", resetGame);
-  emitter.on("volume", toggleVolume);
-  emitter.on("rotate", rotateLeft);
+  drawCurrentTetrimino();
+
+  // emitter.on("drop", dropPiece);
+  // emitter.on("left", movePieceLeft);
+  // emitter.on("right", movePieceRight);
+  // emitter.on("down", (enable) => movePieceDown(enable));
+  // emitter.on("play", playGame);
+  // emitter.on("reset", resetGame);
+  // emitter.on("volume", toggleVolume);
+  emitter.on("rotate", rotateRight);
 });
 
 onUnmounted(() => {
-  emitter.off("drop", dropPiece);
-  emitter.off("left", movePieceLeft);
-  emitter.off("right", movePieceRight);
-  emitter.off("down", (enable) => movePieceDown(enable));
-  emitter.off("play", playGame);
-  emitter.off("reset", resetGame);
-  emitter.off("volume", toggleVolume);
-  emitter.off("rotate", rotateLeft);
+  // emitter.off("drop", dropPiece);
+  // emitter.off("left", movePieceLeft);
+  // emitter.off("right", movePieceRight);
+  // emitter.off("down", (enable) => movePieceDown(enable));
+  // emitter.off("play", playGame);
+  // emitter.off("reset", resetGame);
+  // emitter.off("volume", toggleVolume);
+  emitter.off("rotate", rotateRight);
 });
 
-function playGame() {
-  game.gamePlay = !game.gamePlay;
-
-  if (!dropTimer) addShape();
-  if (game.gamePlay) setDropTimer();
-  if (!game.gamePlay && dropTimer) clearInterval(dropTimer);
+function getCurrentTetrimino() {
+  return game.currentBags[currentTetriminoIndex];
 }
 
-function resetGame() {
-  if (!dropTimer) return;
-  if (dropTimer) clearInterval(dropTimer);
-
-  game.$patch({
-    gamePlay: false,
-    gameOver: false,
-    level: 1,
-    score: 0,
-    scoreDiff: 0,
-    // nextShape: tetriminoTable(),
-  });
-
-  matrix = new Array(20).fill(0).map(() => new Array(10).fill(0));
-  currentShape = null;
-  previewShape = null;
-  filledRows.length = 0;
-  dropTimer = null;
-  down = false;
-
-  clearCanvas();
-}
-
-function addShape() {
-  currentShape = game.nextShape;
-  previewShape = { ...currentShape };
-  // game.nextShape = createTetrimino();
-
-  drawGame();
-  checkGameOver();
-}
-
-function checkGameOver() {
-  const { x, y, type, pieces, rotation } = currentShape;
-  const piece = pieces[rotation];
-
-  for (let i = 0; i < piece.length; i++) {
-    const tmp_x = piece[i][1] + x;
-    const tmp_y = piece[i][0] + y + (type === 1 ? 1 : 2);
-
-    if (matrix[tmp_y][tmp_x]) {
-      clearInterval(dropTimer);
-
-      game.$patch({
-        gamePlay: false,
-        gameOver: true,
-        nextShape: null,
-      });
-
-      matrix = null;
-      currentShape = null;
-      previewShape = null;
-
-      // NOTE: socket emit game over
-      if (gameMode.checkGameMode("2p")) {
-        socketEmit("gameOver", "gameOver", true);
-        return;
-      }
-
-      updateHighScore();
-
-      break;
-    }
-  }
-}
-
-function setDropTimer() {
-  if (game.gameOver) return;
-
-  let timestep = Math.round(10 + 800 * Math.pow(0.92, game.level - 1));
-
-  if (down) timestep = Math.min(timestep, 80);
-
-  if (dropTimer) {
-    clearInterval(dropTimer);
-    dropTimer = null;
-  }
-
-  dropTimer = setInterval(() => {
-    fallPieceToLand();
-  }, timestep);
-}
-
-function fallPieceToLand() {
-  if (movePiece(0, 1)) return;
-  landPiece();
-}
-
-function landPiece() {
-  mergePiece();
-  getFilledRows();
-
-  if (filledRows.length > 0) {
-    clearFilledRows();
-    updateScore();
-    updateLevel();
-  } else {
-    addShape();
-    setDropTimer();
-  }
-}
-
-function dropPiece() {
-  if (!dropTimer || !game.gamePlay) return;
-
-  while (movePiece(0, 1)) {}
-
-  landPiece();
-}
-
-function movePieceLeft() {
-  if (!dropTimer || !game.gamePlay) return;
-  movePiece(-1, 0);
-}
-
-function movePieceRight() {
-  if (!dropTimer || !game.gamePlay) return;
-  movePiece(1, 0);
-}
-
-// FIXME: shape can not be added when shape landed
-function movePieceDown(enable) {
-  if (!dropTimer || !game.gamePlay) return;
-
-  clearInterval(dropTimer);
-
-  if (enable && !movePiece(0, 1)) return;
-
-  down = enable;
-  setDropTimer();
-}
-
-function rotateRight() {
-  rotation += 1;
-  if (rotation > 3) {
-    rotation = 0;
-  }
-
-  clearCanvas();
-  drawCurrentTetrimino();
-}
-
-// HACK: rotate shape against the wall
-function rotateLeft() {
-  rotation += 1;
-  if (rotation > 3) {
-    rotation = 0;
-  }
-
-  clearCanvas();
-  drawCurrentTetrimino();
-  // if (!dropTimer || !game.gamePlay) return;
-  //
-  // const { x, y, pieces, rotation } = currentShape;
-  // const currentRotation = rotation;
-  // const resultRotation = (rotation + 1) % pieces.length;
-  //
-  // currentShape.rotation = resultRotation;
-  // previewShape.rotation = resultRotation;
-  //
-  // const piece = currentShape.pieces[currentShape.rotation];
-  //
-  // for (let i = 0; i < piece.length; i++) {
-  //   const tmp_x = piece[i][1] + x;
-  //   const tmp_y = piece[i][0] + y;
-  //
-  //   if (
-  //     tmp_y >= 0 &&
-  //     (map[tmp_y] === undefined ||
-  //       map[tmp_y][tmp_x] === undefined ||
-  //       map[tmp_y][tmp_x] > 0)
-  //   ) {
-  //     currentShape.rotation = currentRotation;
-  //     previewShape.rotation = currentRotation;
-  //   }
-  // }
-  //
-  // drawGame();
-}
-
-function movePiece(xStep, yStep) {
-  const { x, y, pieces, rotation } = currentShape;
-  const piece = pieces[rotation];
-  const w = matrix[0].length;
-  const h = matrix.length;
-
-  let canMove = true;
-
-  for (let i = 0; i < piece.length; i++) {
-    const tmp_x = piece[i][1] + x + xStep;
-    const tmp_y = piece[i][0] + y + yStep;
-
-    if (
-      tmp_x < 0 ||
-      tmp_x >= w ||
-      tmp_y >= h ||
-      (matrix[tmp_y] && matrix[tmp_y][tmp_x])
-    ) {
-      canMove = false;
-      return canMove;
-    }
-  }
-
-  if (canMove) {
-    currentShape.x += xStep;
-    currentShape.y += yStep;
-    previewShape.x += xStep;
-    drawGame();
-  }
-
-  return canMove;
-}
-
-function mergePiece() {
-  const { x, y, type, pieces, rotation } = currentShape;
-  const piece = pieces[rotation];
-
-  for (let i = 0; i < piece.length; i++) {
-    const tmp_x = piece[i][1] + x;
-    const tmp_y = piece[i][0] + y;
-
-    if (tmp_y >= 0) matrix[tmp_y][tmp_x] = type + 1;
-  }
-}
-
-function clearFilledRows() {
-  const numCols = matrix[0].length;
-
-  let animationFrame = null;
-  let progress = 0;
-
-  if (dropTimer) {
-    clearInterval(dropTimer);
-    dropTimer = null;
-  }
-
-  function animate() {
-    const start_x = numCols / 2;
-    const left_x = (start_x - progress) * block;
-    const right_x = (start_x + progress) * block;
-    const yArray = filledRows.map((y) => y * block);
-
-    ctx.value.fillStyle = palettes[game.palette].clearColor;
-    yArray.forEach((y) => {
-      ctx.value.fillRect(left_x, y, block, block);
-      ctx.value.fillRect(right_x, y, block, block);
-    });
-
-    if (progress === numCols) {
-      cancelAnimationFrame(animationFrame);
-
-      for (let i = 0; i < filledRows.length; i++) {
-        matrix.splice(filledRows[i], 1);
-        matrix.unshift(new Array(10).fill(0));
-      }
-
-      addShape();
-      setDropTimer();
-
-      return;
-    }
-
-    progress += 0.5;
-
-    animationFrame = requestAnimationFrame(animate);
-  }
-
-  animate();
-}
-
-// HACK: limit the number of score
-function updateScore() {
-  if (filledRows.length > 0) {
-    game.score +=
-      (filledRows.length * game.level + (filledRows.length - 1)) * 10;
-
-    // NOTE: socket emit update score
-    if (gameMode.checkGameMode("2p")) {
-      socketEmit("updateScore", "score", game.score);
-    }
-  }
-}
-
-function updateHighScore() {
-  if (game.score >= game.highScore) {
-    localStorage.setItem("highScore", game.score);
-  }
-  game.highScore = localStorage.getItem("highScore");
-}
-
-// HACK: the value of next level score
-function updateLevel() {
-  let nextLevelScore = (game.level + 1) * 100 * game.level;
-
-  while (game.score >= nextLevelScore) {
-    game.level++;
-    nextLevelScore = (game.level + 1) * 100 * game.level;
-  }
-}
-
-function getFilledRows() {
-  filledRows.length = 0;
-
-  for (let i = 0; i < matrix.length; i++) {
-    if (matrix[i].every((item) => !!item)) {
-      filledRows.push(i);
-    }
-  }
-}
-
-function drawGame() {
-  clearCanvas();
-  drawMap();
-  drawPreviewPiece();
-  drawCurrentPiece();
+function getNextTetrimino() {
+  currentTetriminoIndex += 1;
 }
 
 function clearCanvas() {
   ctx.value.clearRect(0, 0, width.value, height.value);
 }
 
-function drawMap() {
-  for (let y = 0; y < matrix.length; y++) {
-    for (let x = 0; x < matrix[y].length; x++) {
-      if (!matrix[y][x]) continue;
+function drawCurrentTetrimino() {
+  const shape = getCurrentTetrimino();
+  const color = shape.color;
+  const tetrimino = shape.tetriminoes[rotation];
 
-      ctx.value.fillStyle = palettes[game.palette].shapeColor[matrix[y][x] - 1];
-      ctx.value.fillRect(x * block, y * block, block, block);
-    }
+  ctx.value.fillStyle = color;
+  for (let i = 0; i < tetrimino.length; i++) {
+    const x = tetrimino[i][0] + rotationXOffset + xOffset;
+    const y = tetrimino[i][1] + rotationYOffset + yOffset;
+    ctx.value.fillRect(x * game.block, y * game.block, game.block, game.block);
   }
 }
 
-function drawCurrentPiece() {
-  const { x, y, type, pieces, rotation } = currentShape;
-  const piece = pieces[rotation];
+function rotateRight() {
+  const rotationOffset = {
+    O: [
+      [0, 0],
+      [0, -1],
+      [-1, -1],
+      [-1, 0],
 
-  ctx.value.fillStyle = palettes[game.palette].shapeColor[type];
-  for (let i = 0; i < piece.length; i++) {
-    const tmp_x = piece[i][1] + x;
-    const tmp_y = piece[i][0] + y;
-    ctx.value.fillRect(tmp_x * block, tmp_y * block, block, block);
+      [0, 0],
+      [0, -1],
+      [1, -1],
+      [1, 0],
+    ],
+    I: [
+      [0, 0],
+      [-1, 0],
+      [-1, 1],
+      [0, 1],
+    ],
+  };
+  const name = getCurrentTetrimino().name;
+  const previousRotation = rotation;
+
+  rotation += 1;
+  if (rotation > 3) {
+    rotation = 0;
   }
-}
 
-function drawPreviewPiece() {
-  if (!JSON.parse(game.isPreview)) return;
+  if (rotationOffset[name]) {
+    const x = rotationOffset[name][rotation][0];
+    const y = rotationOffset[name][rotation][1];
 
-  const { x, y, pieces, rotation } = previewShape;
-  const piece = pieces[rotation];
-  const previewPieceFinalY = getPreviewPieceYOffset(y);
-
-  ctx.value.fillStyle = palettes[game.palette].previewShapeColor;
-
-  for (let i = 0; i < piece.length; i++) {
-    const tmp_x = piece[i][1] + x;
-    const tmp_y = piece[i][0] + previewPieceFinalY;
-    ctx.value.fillRect(tmp_x * block, tmp_y * block, block, block);
+    rotationXOffset = x;
+    rotationYOffset = y;
   }
 
-  function getPreviewPieceYOffset(offset) {
-    for (let i = 0; i < piece.length; i++) {
-      const tmp_x = piece[i][1] + x;
-      const tmp_y = piece[i][0] + offset;
-
-      if (
-        offset >= currentShape.y &&
-        (tmp_y > matrix.length - 2 ||
-          (matrix[tmp_y] && matrix[tmp_y + 1][tmp_x]))
-      ) {
-        return offset;
-      }
-    }
-
-    return getPreviewPieceYOffset(offset + 1);
-  }
-}
-
-// TODO: play the sound
-function toggleVolume() {
-  game.volumeUp = !game.volumeUp;
+  clearCanvas();
+  drawCurrentTetrimino();
 }
 </script>
 
