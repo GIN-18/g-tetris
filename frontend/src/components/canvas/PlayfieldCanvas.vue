@@ -18,7 +18,7 @@ let yOffset = 18;
 let rotationXOffset = 0;
 let rotationYOffset = 0;
 let rotation = 0;
-let currentTetriminoIndex = 0;
+let currentTetriminoIndex = 6;
 
 onMounted(() => {
   // set canvas size
@@ -31,9 +31,9 @@ onMounted(() => {
   drawCurrentTetrimino();
 
   // emitter.on("drop", dropPiece);
-  // emitter.on("left", movePieceLeft);
-  // emitter.on("right", movePieceRight);
-  // emitter.on("down", (enable) => movePieceDown(enable));
+  emitter.on("left", moveTetriminoLeft);
+  emitter.on("right", moveTetriminoRight);
+  emitter.on("down", moveTetriminoDown);
   // emitter.on("play", playGame);
   // emitter.on("reset", resetGame);
   // emitter.on("volume", toggleVolume);
@@ -42,9 +42,9 @@ onMounted(() => {
 
 onUnmounted(() => {
   // emitter.off("drop", dropPiece);
-  // emitter.off("left", movePieceLeft);
-  // emitter.off("right", movePieceRight);
-  // emitter.off("down", (enable) => movePieceDown(enable));
+  emitter.off("left", moveTetriminoLeft);
+  emitter.off("right", moveTetriminoRight);
+  emitter.off("down", moveTetriminoDown);
   // emitter.off("play", playGame);
   // emitter.off("reset", resetGame);
   // emitter.off("volume", toggleVolume);
@@ -56,24 +56,60 @@ function getCurrentTetrimino() {
 }
 
 function getNextTetrimino() {
-  currentTetriminoIndex += 1;
-}
+  currentTetriminoIndex -= 1;
 
-function clearCanvas() {
-  ctx.value.clearRect(0, 0, width.value, height.value);
-}
-
-function drawCurrentTetrimino() {
-  const shape = getCurrentTetrimino();
-  const color = shape.color;
-  const tetrimino = shape.tetriminoes[rotation];
-
-  ctx.value.fillStyle = color;
-  for (let i = 0; i < tetrimino.length; i++) {
-    const x = tetrimino[i][0] + rotationXOffset + xOffset;
-    const y = tetrimino[i][1] + rotationYOffset + yOffset;
-    ctx.value.fillRect(x * game.block, y * game.block, game.block, game.block);
+  if (currentTetriminoIndex < 0) {
+    currentTetriminoIndex = 6;
   }
+}
+
+function moveTetriminoRight() {
+  moveTetrimino(1, 0);
+}
+
+function moveTetriminoLeft() {
+  moveTetrimino(-1, 0);
+}
+
+function moveTetriminoDown() {
+  if (!moveTetrimino(0, -1)) {
+    mergeMatrix();
+    xOffset = 4;
+    yOffset = 18;
+    getNextTetrimino();
+    clearCanvas();
+    drawMatrix();
+    drawCurrentTetrimino();
+  }
+}
+
+function moveTetrimino(xStep, yStep) {
+  const shape = getCurrentTetrimino();
+  const tetrimino = shape.pieces[rotation];
+  const w = matrix[0].length;
+
+  let canMove = true;
+
+  for (let i = 0; i < tetrimino.length; i++) {
+    const x = tetrimino[i][0] + xOffset + xStep;
+    const y = tetrimino[i][1] + yOffset + yStep;
+
+    if (x < 0 || x >= w || y < 0 || matrix[y][x]) {
+      canMove = false;
+      return canMove;
+    }
+  }
+
+  if (canMove) {
+    xOffset += xStep;
+    yOffset += yStep;
+
+    clearCanvas();
+    drawMatrix();
+    drawCurrentTetrimino();
+  }
+
+  return canMove;
 }
 
 function rotateRight() {
@@ -83,21 +119,9 @@ function rotateRight() {
       [0, -1],
       [-1, -1],
       [-1, 0],
-
-      [0, 0],
-      [0, -1],
-      [1, -1],
-      [1, 0],
-    ],
-    I: [
-      [0, 0],
-      [-1, 0],
-      [-1, 1],
-      [0, 1],
     ],
   };
   const name = getCurrentTetrimino().name;
-  const previousRotation = rotation;
 
   rotation += 1;
   if (rotation > 3) {
@@ -114,6 +138,52 @@ function rotateRight() {
 
   clearCanvas();
   drawCurrentTetrimino();
+}
+
+function mergeMatrix() {
+  const shape = getCurrentTetrimino();
+  const type = shape.type;
+  const tetrimino = shape.pieces[rotation];
+
+  for (let i = 0; i < tetrimino.length; i++) {
+    const x = tetrimino[i][0] + xOffset;
+    const y = tetrimino[i][1] + yOffset;
+
+    matrix[y][x] = type;
+  }
+}
+
+function clearCanvas() {
+  ctx.value.clearRect(0, 0, width.value, height.value);
+}
+
+function drawMatrix() {
+  for (let i = 0; i < matrix.length; i++) {
+    for (let j = 0; j < matrix[i].length; j++) {
+      if (!matrix[i][j]) continue;
+
+      ctx.value.fillStyle = "blue";
+      ctx.value.fillRect(
+        j * game.block,
+        i * game.block,
+        game.block,
+        game.block,
+      );
+    }
+  }
+}
+
+function drawCurrentTetrimino() {
+  const shape = getCurrentTetrimino();
+  const color = shape.color;
+  const tetrimino = shape.pieces[rotation];
+
+  ctx.value.fillStyle = color;
+  for (let i = 0; i < tetrimino.length; i++) {
+    const x = tetrimino[i][0] + xOffset;
+    const y = tetrimino[i][1] + yOffset;
+    ctx.value.fillRect(x * game.block, y * game.block, game.block, game.block);
+  }
 }
 </script>
 

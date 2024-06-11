@@ -1,8 +1,13 @@
-const tetriminoTable = {
+import { palette } from "@/assets/js/palette.js";
+
+const tetriminoColor = palette.tetriminoColor;
+
+const tetriminoes = {
   O: {
     name: "O",
-    color: "#f8b800",
-    tetriminoes: [
+    type: 1,
+    color: tetriminoColor[0],
+    pieces: [
       [
         [0, 0],
         [1, 0],
@@ -31,8 +36,9 @@ const tetriminoTable = {
   },
   I: {
     name: "I",
-    color: "#3cbcfc",
-    tetriminoes: [
+    type: 2,
+    color: tetriminoColor[1],
+    pieces: [
       [
         [0, 0],
         [-1, 0],
@@ -61,8 +67,9 @@ const tetriminoTable = {
   },
   T: {
     name: "T",
-    color: "#9878f8",
-    tetriminoes: [
+    type: 3,
+    color: tetriminoColor[2],
+    pieces: [
       [
         [0, 0],
         [-1, 0],
@@ -91,8 +98,9 @@ const tetriminoTable = {
   },
   S: {
     name: "S",
-    color: "#58d854",
-    tetriminoes: [
+    type: 4,
+    color: tetriminoColor[3],
+    pieces: [
       [
         [0, 0],
         [-1, 0],
@@ -121,8 +129,9 @@ const tetriminoTable = {
   },
   Z: {
     name: "Z",
-    color: "#f85898",
-    tetriminoes: [
+    type: 5,
+    color: tetriminoColor[4],
+    pieces: [
       [
         [0, 0],
         [-1, 1],
@@ -151,8 +160,9 @@ const tetriminoTable = {
   },
   J: {
     name: "J",
-    color: "#6888fc",
-    tetriminoes: [
+    type: 6,
+    color: tetriminoColor[5],
+    pieces: [
       [
         [0, 0],
         [-1, 0],
@@ -181,8 +191,9 @@ const tetriminoTable = {
   },
   L: {
     name: "L",
-    color: "#f87858",
-    tetriminoes: [
+    type: 7,
+    color: tetriminoColor[6],
+    pieces: [
       [
         [0, 0],
         [-1, 0],
@@ -211,7 +222,7 @@ const tetriminoTable = {
   },
 };
 
-export function shuffleBag() {
+function shuffleBag() {
   const arr = ["I", "J", "L", "O", "S", "T", "Z"];
 
   for (let i = arr.length - 1; i > 0; i--) {
@@ -227,7 +238,7 @@ export function getBags() {
   const bag = shuffleBag();
 
   for (let i = 0; i < bag.length; i++) {
-    result.push(tetriminoTable[bag[i]]);
+    result.push(tetriminoes[bag[i]]);
   }
 
   return result;

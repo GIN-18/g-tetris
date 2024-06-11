@@ -32,7 +32,7 @@ function drawBags() {
 
   for (let i = 0; i < arr.length; i++) {
     const color = arr[i].color;
-    const tetrimino = arr[i].tetriminoes[0];
+    const tetrimino = arr[i].pieces[0];
     const xOffset = setXOffset(arr[i].name);
     const yOffset = setYOffset(arr[i].name, i);
 
