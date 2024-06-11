@@ -1,8 +1,15 @@
 import confetti from "canvas-confetti";
-import { palette } from "@/assets/js/palette.js";
 
 export function playConfetti() {
-  const colors = palette.tetriminoColor;
+  const colors = [
+    "#f8b800",
+    "#3cbcfc",
+    "#9878f8",
+    "#58d854",
+    "#f85898",
+    "#6888fc",
+    "#f87858",
+  ];
 
   confetti({
     particleCount: 60,

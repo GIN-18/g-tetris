@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch, inject, onMounted, onUnmounted } from "vue";
 import { useGameStore } from "@/stores/game.js";
+import { tetriminoColor } from "@/assets/js/tetrimino.js";
 import { emitter } from "@/assets/js/emitter.js";
 
 // get canvas info
@@ -108,6 +109,7 @@ function moveTetrimino(xStep, yStep) {
   return canMove;
 }
 
+// TODO: have to rewrite
 function rotateRight() {
   const rotationOffset = {
     O: [
@@ -153,12 +155,13 @@ function clearCanvas() {
 }
 
 function drawMatrix() {
+  const type = currentShape.tetrimino.type;
+
   for (let i = 0; i < matrix.length; i++) {
     for (let j = 0; j < matrix[i].length; j++) {
       if (!matrix[i][j]) continue;
 
-      // TODO: set color
-      ctx.value.fillStyle = "blue";
+      ctx.value.fillStyle = tetriminoColor[type - 1];
       ctx.value.fillRect(
         j * game.block,
         i * game.block,
