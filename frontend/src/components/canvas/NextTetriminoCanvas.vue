@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { useGameStore } from "@/stores/game.js";
 
 // get canvas info
@@ -11,6 +11,17 @@ const ctx = computed(() => canvas.value.getContext("2d"));
 const game = useGameStore();
 const indexArray = [];
 let iIndex;
+
+watch(
+  () => game.currentBags,
+  () => {
+    clearCanvas();
+    drawBags();
+  },
+  {
+    deep: true,
+  },
+);
 
 onMounted(() => {
   canvas.value.width = game.block * 4;

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, watch, inject, onMounted, onUnmounted } from "vue";
 import { useGameStore } from "@/stores/game.js";
-import { tetriminoColor } from "@/assets/js/tetrimino.js";
+import { tetriminoColor, getBags } from "@/assets/js/tetrimino.js";
 import { emitter } from "@/assets/js/emitter.js";
 
 // get canvas info
@@ -27,30 +27,45 @@ onMounted(() => {
   ctx.value.scale(1, -1);
   ctx.value.translate(0, -canvas.value.height);
 
-  currentShape = getCurrentShape();
-
-  drawCurrentTetrimino();
-
+  emitter.on("play", playGame);
+  // emitter.on("reset", resetGame);
+  // emitter.on("volume", toggleVolume);
   // emitter.on("drop", dropPiece);
   emitter.on("left", moveTetriminoLeft);
   emitter.on("right", moveTetriminoRight);
   emitter.on("down", moveTetriminoDown);
-  // emitter.on("play", playGame);
-  // emitter.on("reset", resetGame);
-  // emitter.on("volume", toggleVolume);
   emitter.on("rotate", rotateRight);
 });
 
 onUnmounted(() => {
+  emitter.off("play", playGame);
+  // emitter.off("reset", resetGame);
+  // emitter.off("volume", toggleVolume);
   // emitter.off("drop", dropPiece);
   emitter.off("left", moveTetriminoLeft);
   emitter.off("right", moveTetriminoRight);
   emitter.off("down", moveTetriminoDown);
-  // emitter.off("play", playGame);
-  // emitter.off("reset", resetGame);
-  // emitter.off("volume", toggleVolume);
   emitter.off("rotate", rotateRight);
 });
+
+function playGame() {
+  addShape();
+}
+
+function addShape() {
+  currentShape = getCurrentShape();
+  updateCurrentBags();
+  drawPlayfield();
+}
+
+function updateCurrentBags() {
+  game.currentBags.pop();
+  game.currentBags.unshift(game.nextBags.shift());
+
+  if (!game.nextBags.length) {
+    game.nextBags = getBags();
+  }
+}
 
 function getCurrentShape() {
   const tetriminoIndex = game.currentBags.length - 1;
@@ -77,7 +92,10 @@ function moveTetriminoLeft() {
 
 function moveTetriminoDown() {
   if (!moveTetrimino(0, -1)) {
+    // TODO: land tetrimino
     mergeMatrix();
+    addShape();
+    drawPlayfield();
   }
 }
 
@@ -101,9 +119,7 @@ function moveTetrimino(xStep, yStep) {
     currentShape.x += xStep;
     currentShape.y += yStep;
 
-    clearCanvas();
-    drawMatrix();
-    drawCurrentTetrimino();
+    drawPlayfield();
   }
 
   return canMove;
@@ -119,23 +135,22 @@ function rotateRight() {
       [-1, 0],
     ],
   };
-  const name = getCurrentShape().name;
+  const name = currentShape.tetrimino.name;
 
-  rotation += 1;
-  if (rotation > 3) {
-    rotation = 0;
+  currentShape.rotation += 1;
+  if (currentShape.rotation > 3) {
+    currentShape.rotation = 0;
   }
 
   if (rotationOffset[name]) {
-    const x = rotationOffset[name][rotation][0];
-    const y = rotationOffset[name][rotation][1];
+    const x = rotationOffset[name][currentShape.rotation][0];
+    const y = rotationOffset[name][currentShape.rotation][1];
 
     rotationXOffset = x;
     rotationYOffset = y;
   }
 
-  clearCanvas();
-  drawCurrentTetrimino();
+  drawPlayfield();
 }
 
 function mergeMatrix() {
@@ -150,18 +165,22 @@ function mergeMatrix() {
   }
 }
 
+function drawPlayfield() {
+  clearCanvas();
+  drawCurrentTetrimino();
+  drawMatrix();
+}
+
 function clearCanvas() {
   ctx.value.clearRect(0, 0, width.value, height.value);
 }
 
 function drawMatrix() {
-  const type = currentShape.tetrimino.type;
-
   for (let i = 0; i < matrix.length; i++) {
     for (let j = 0; j < matrix[i].length; j++) {
       if (!matrix[i][j]) continue;
 
-      ctx.value.fillStyle = tetriminoColor[type - 1];
+      ctx.value.fillStyle = tetriminoColor[matrix[i][j] - 1];
       ctx.value.fillRect(
         j * game.block,
         i * game.block,
