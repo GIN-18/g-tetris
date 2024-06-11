@@ -13,12 +13,10 @@ const game = useGameStore();
 const gameMode = inject("gameMode");
 
 let matrix = new Array(20).fill(0).map(() => new Array(10).fill(0));
-let xOffset = 4;
-let yOffset = 18;
+let currentShape = null;
 let rotationXOffset = 0;
 let rotationYOffset = 0;
 let rotation = 0;
-let currentTetriminoIndex = 6;
 
 onMounted(() => {
   // set canvas size
@@ -27,6 +25,8 @@ onMounted(() => {
 
   ctx.value.scale(1, -1);
   ctx.value.translate(0, -canvas.value.height);
+
+  currentShape = getCurrentShape();
 
   drawCurrentTetrimino();
 
@@ -51,16 +51,19 @@ onUnmounted(() => {
   emitter.off("rotate", rotateRight);
 });
 
-function getCurrentTetrimino() {
-  return game.currentBags[currentTetriminoIndex];
+function getCurrentShape() {
+  const tetriminoIndex = game.currentBags.length - 1;
+
+  return {
+    x: 4,
+    y: 18,
+    rotation: 0,
+    tetrimino: game.currentBags[tetriminoIndex],
+  };
 }
 
-function getNextTetrimino() {
-  currentTetriminoIndex -= 1;
-
-  if (currentTetriminoIndex < 0) {
-    currentTetriminoIndex = 6;
-  }
+function getCurrentTetrimino() {
+  return currentShape.tetrimino.pieces[currentShape.rotation];
 }
 
 function moveTetriminoRight() {
@@ -74,25 +77,18 @@ function moveTetriminoLeft() {
 function moveTetriminoDown() {
   if (!moveTetrimino(0, -1)) {
     mergeMatrix();
-    xOffset = 4;
-    yOffset = 18;
-    getNextTetrimino();
-    clearCanvas();
-    drawMatrix();
-    drawCurrentTetrimino();
   }
 }
 
 function moveTetrimino(xStep, yStep) {
-  const shape = getCurrentTetrimino();
-  const tetrimino = shape.pieces[rotation];
+  const tetrimino = getCurrentTetrimino();
   const w = matrix[0].length;
 
   let canMove = true;
 
   for (let i = 0; i < tetrimino.length; i++) {
-    const x = tetrimino[i][0] + xOffset + xStep;
-    const y = tetrimino[i][1] + yOffset + yStep;
+    const x = tetrimino[i][0] + currentShape.x + xStep;
+    const y = tetrimino[i][1] + currentShape.y + yStep;
 
     if (x < 0 || x >= w || y < 0 || matrix[y][x]) {
       canMove = false;
@@ -101,8 +97,8 @@ function moveTetrimino(xStep, yStep) {
   }
 
   if (canMove) {
-    xOffset += xStep;
-    yOffset += yStep;
+    currentShape.x += xStep;
+    currentShape.y += yStep;
 
     clearCanvas();
     drawMatrix();
@@ -121,7 +117,7 @@ function rotateRight() {
       [-1, 0],
     ],
   };
-  const name = getCurrentTetrimino().name;
+  const name = getCurrentShape().name;
 
   rotation += 1;
   if (rotation > 3) {
@@ -141,13 +137,12 @@ function rotateRight() {
 }
 
 function mergeMatrix() {
-  const shape = getCurrentTetrimino();
-  const type = shape.type;
-  const tetrimino = shape.pieces[rotation];
+  const tetrimino = getCurrentTetrimino();
+  const type = currentShape.tetrimino.type;
 
   for (let i = 0; i < tetrimino.length; i++) {
-    const x = tetrimino[i][0] + xOffset;
-    const y = tetrimino[i][1] + yOffset;
+    const x = tetrimino[i][0] + currentShape.x;
+    const y = tetrimino[i][1] + currentShape.y;
 
     matrix[y][x] = type;
   }
@@ -162,6 +157,7 @@ function drawMatrix() {
     for (let j = 0; j < matrix[i].length; j++) {
       if (!matrix[i][j]) continue;
 
+      // TODO: set color
       ctx.value.fillStyle = "blue";
       ctx.value.fillRect(
         j * game.block,
@@ -174,14 +170,13 @@ function drawMatrix() {
 }
 
 function drawCurrentTetrimino() {
-  const shape = getCurrentTetrimino();
-  const color = shape.color;
-  const tetrimino = shape.pieces[rotation];
+  const tetrimino = getCurrentTetrimino();
+  const color = currentShape.tetrimino.color;
 
   ctx.value.fillStyle = color;
   for (let i = 0; i < tetrimino.length; i++) {
-    const x = tetrimino[i][0] + xOffset;
-    const y = tetrimino[i][1] + yOffset;
+    const x = tetrimino[i][0] + currentShape.x;
+    const y = tetrimino[i][1] + currentShape.y;
     ctx.value.fillRect(x * game.block, y * game.block, game.block, game.block);
   }
 }
