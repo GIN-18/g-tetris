@@ -1,18 +1,10 @@
-export const tetriminoColor = [
-  "#f8b800",
-  "#3cbcfc",
-  "#9878f8",
-  "#58d854",
-  "#f85898",
-  "#6888fc",
-  "#f87858",
-];
+import { palette } from "@/assets/js/palette.js";
 
 const tetriminoes = {
   O: {
     name: "O",
     type: 1,
-    color: tetriminoColor[0],
+    color: palette.tetriminoColor[0],
     pieces: [
       [
         [0, 0],
@@ -43,7 +35,7 @@ const tetriminoes = {
   I: {
     name: "I",
     type: 2,
-    color: tetriminoColor[1],
+    color: palette.tetriminoColor[1],
     pieces: [
       [
         [0, 0],
@@ -74,7 +66,7 @@ const tetriminoes = {
   T: {
     name: "T",
     type: 3,
-    color: tetriminoColor[2],
+    color: palette.tetriminoColor[2],
     pieces: [
       [
         [0, 0],
@@ -105,7 +97,7 @@ const tetriminoes = {
   S: {
     name: "S",
     type: 4,
-    color: tetriminoColor[3],
+    color: palette.tetriminoColor[3],
     pieces: [
       [
         [0, 0],
@@ -136,7 +128,7 @@ const tetriminoes = {
   Z: {
     name: "Z",
     type: 5,
-    color: tetriminoColor[4],
+    color: palette.tetriminoColor[4],
     pieces: [
       [
         [0, 0],
@@ -167,7 +159,7 @@ const tetriminoes = {
   J: {
     name: "J",
     type: 6,
-    color: tetriminoColor[5],
+    color: palette.tetriminoColor[5],
     pieces: [
       [
         [0, 0],
@@ -198,7 +190,7 @@ const tetriminoes = {
   L: {
     name: "L",
     type: 7,
-    color: tetriminoColor[6],
+    color: palette.tetriminoColor[6],
     pieces: [
       [
         [0, 0],

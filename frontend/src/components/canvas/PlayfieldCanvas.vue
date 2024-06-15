@@ -1,7 +1,8 @@
 <script setup>
 import { ref, computed, watch, inject, onMounted, onUnmounted } from "vue";
 import { useGameStore } from "@/stores/game.js";
-import { tetriminoColor, getBags } from "@/assets/js/tetrimino.js";
+import { palette } from "@/assets/js/palette.js";
+import { getBags } from "@/assets/js/tetrimino.js";
 import { emitter } from "@/assets/js/emitter.js";
 
 // get canvas info
@@ -27,7 +28,7 @@ onMounted(() => {
   ctx.value.translate(0, -canvas.value.height);
 
   emitter.on("play", playGame);
-  // emitter.on("reset", resetGame);
+  emitter.on("reset", updateHoldTetrimino);
   // emitter.on("volume", toggleVolume);
   emitter.on("drop", fallTetriminoToLand);
   emitter.on("left", moveTetriminoLeft);
@@ -38,7 +39,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   emitter.off("play", playGame);
-  // emitter.off("reset", resetGame);
+  emitter.off("reset", updateHoldTetrimino);
   // emitter.off("volume", toggleVolume);
   emitter.off("drop", fallTetriminoToLand);
   emitter.off("left", moveTetriminoLeft);
@@ -73,6 +74,7 @@ function getCurrentShape() {
     x: 4,
     y: 18,
     rotation: 0,
+    holdLock: false,
     tetrimino: game.currentBags[tetriminoIndex],
   };
 }
@@ -81,8 +83,40 @@ function getCurrentTetrimino() {
   return currentShape.tetrimino.pieces[currentShape.rotation];
 }
 
+function resetCurrentShapeOpsition() {
+  if (!currentShape) return;
+  currentShape.x = 4;
+  currentShape.y = 18;
+  currentShape.rotation = 0;
+}
+
+function updateHoldTetrimino() {
+  let tempShape = null;
+
+  if (!game.holdShape) {
+    resetCurrentShapeOpsition();
+    game.holdShape = currentShape;
+    game.holdShape.holdLock = true;
+    addShape();
+    return;
+  }
+
+  if (game.holdShape.holdLock) return;
+
+  resetCurrentShapeOpsition();
+  tempShape = game.holdShape;
+  game.holdShape = currentShape;
+  currentShape = tempShape;
+  game.holdShape.holdLock = true;
+
+  drawPlayfield();
+}
+
 function fallTetriminoToLand() {
   if (!moveTetrimino(0, -1)) {
+    if (game.holdShape) {
+      game.holdShape.holdLock = false;
+    }
     mergeMatrix();
     clearFilledLines();
     addShape();
@@ -212,7 +246,7 @@ function drawMatrix() {
     for (let j = 0; j < w; j++) {
       if (!matrix[i][j]) continue;
 
-      ctx.value.fillStyle = tetriminoColor[matrix[i][j] - 1];
+      ctx.value.fillStyle = palette.tetriminoColor[matrix[i][j] - 1];
       ctx.value.fillRect(
         j * game.block,
         i * game.block,

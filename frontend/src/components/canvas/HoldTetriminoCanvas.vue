@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
 import { useGameStore } from "@/stores/game.js";
+import { palette } from "@/assets/js/palette.js";
 
 // get canvas info
 const canvas = ref(null);
@@ -10,22 +11,66 @@ const ctx = computed(() => canvas.value.getContext("2d"));
 
 const game = useGameStore();
 
+watch(
+  () => game.holdShape,
+  () => {
+    clearCanvas();
+    drawHoldTetrimino();
+  },
+  {
+    deep: true,
+  },
+);
+
 onMounted(() => {
   canvas.value.width = game.block * 4;
   canvas.value.height = game.block * 4;
 
   ctx.value.scale(1, -1);
   ctx.value.translate(0, -canvas.value.height);
-
-  clearCanvas();
-  drawHoldTetrimino();
 });
 
 function clearCanvas() {
   ctx.value.clearRect(0, 0, width.value, height.value);
 }
 
-function drawHoldTetrimino() {}
+function drawHoldTetrimino() {
+  const shape = game.holdShape;
+  const color = shape.tetrimino.color;
+  const tetrimino = shape.tetrimino.pieces[shape.rotation];
+  const name = shape.tetrimino.name;
+
+  if (game.holdShape.holdLock) {
+    ctx.value.fillStyle = palette.previewColor;
+  } else {
+    ctx.value.fillStyle = color;
+  }
+
+  for (let i = 0; i < tetrimino.length; i++) {
+    const x = tetrimino[i][0] + setXOffset(name);
+    const y = tetrimino[i][1] + setYOffset(name);
+
+    ctx.value.fillRect(x * game.block, y * game.block, game.block, game.block);
+  }
+}
+
+function setXOffset(name) {
+  const arr = ["T", "S", "Z", "J", "L"];
+
+  if (arr.includes(name)) {
+    return 1.5;
+  }
+
+  return 1;
+}
+
+function setYOffset(name) {
+  if (name === "I") {
+    return 1.5;
+  }
+
+  return 1;
+}
 </script>
 
 <template>

@@ -13,6 +13,7 @@ export const useGameStore = defineStore("game", {
     scoreDiff: 0,
     highScore: localStorage.getItem("highScore") || 0,
     isPreview: localStorage.getItem("isPreview") || true,
+    holdShape: null,
     currentBags: getBags(),
     nextBags: getBags(),
     players: 0,
