@@ -25,9 +25,6 @@ watch(
 onMounted(() => {
   canvas.value.width = game.block * 4;
   canvas.value.height = game.block * 4;
-
-  ctx.value.scale(1, -1);
-  ctx.value.translate(0, -canvas.value.height);
 });
 
 function clearCanvas() {
@@ -69,7 +66,7 @@ function setYOffset(name) {
     return 1.5;
   }
 
-  return 1;
+  return 2;
 }
 </script>
 

@@ -9,8 +9,6 @@ const height = computed(() => canvas.value.height);
 const ctx = computed(() => canvas.value.getContext("2d"));
 
 const game = useGameStore();
-const indexArray = [];
-let iIndex;
 
 watch(
   () => game.currentBags,
@@ -25,10 +23,7 @@ watch(
 
 onMounted(() => {
   canvas.value.width = game.block * 4;
-  canvas.value.height = game.block * 2 * 7 + 76;
-
-  ctx.value.scale(1, -1);
-  ctx.value.translate(0, -canvas.value.height);
+  canvas.value.height = game.block * (2 * 4 + 3);
 
   clearCanvas();
   drawBags();
@@ -50,7 +45,7 @@ function drawBags() {
     ctx.value.fillStyle = color;
     for (let j = 0; j < tetrimino.length; j++) {
       const x = tetrimino[j][0] + 1 + xOffset;
-      const y = tetrimino[j][1] + 1 + i * 2.5 + yOffset;
+      const y = tetrimino[j][1] + 1 + i * 3 + yOffset;
 
       ctx.value.fillRect(
         x * game.block,
@@ -72,19 +67,9 @@ function setXOffset(name) {
   return 0;
 }
 
-function setYOffset(name, index) {
+function setYOffset(name) {
   if (name === "I") {
-    iIndex = index;
-  }
-
-  if (iIndex === undefined || iIndex === 0) {
-    indexArray.push(index);
-  }
-
-  for (let i = 0; i < indexArray.length; i++) {
-    if (iIndex !== undefined && index > iIndex) {
-      return -1;
-    }
+    return -1 / 2;
   }
 
   return 0;
