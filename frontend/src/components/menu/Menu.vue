@@ -5,7 +5,6 @@ import { emitter } from "@/assets/js/emitter.js";
 
 import MenuItem from "./MenuItem.vue";
 import ToggleOption from "./ToggleOption.vue";
-import KeyOperation from "@/components/operation/KeyOperation.vue";
 import Footer from "@/components/Footer.vue";
 
 const game = useGameStore();
@@ -68,8 +67,6 @@ function toggleMenu() {
                 <ToggleOption option="isPreview" />
               </MenuItem>
             </ul>
-
-            <KeyOperation />
           </main>
 
           <Footer />

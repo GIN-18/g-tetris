@@ -1,25 +1,19 @@
 <script setup>
-import { inject } from "vue";
-import { useGameStore } from "@/stores/game.js";
 import { emitter } from "@/assets/js/emitter.js";
 
 import Button from "@/components/button/Button.vue";
 import ArrowButton from "@/components/button/ArrowButton.vue";
-import ToggleButton from "@/components/button/ToggleButton.vue";
-
-const game = useGameStore();
-const gameMode = inject("gameMode");
 </script>
 
 <template>
   <div class="flex w-full">
     <!-- arrow button -->
     <div class="flex flex-col justify-center items-center w-1/2">
-      <!-- drop button -->
+      <!-- hard drop button -->
       <ArrowButton
-        type="drop"
-        @click.prevent="emitter.emit('drop')"
-        @touchstart.prevent="emitter.emit('drop')"
+        type="hard-drop"
+        @click.prevent="emitter.emit('hardDrop')"
+        @touchstart.prevent="emitter.emit('hardDrop')"
       />
 
       <!-- left and right button -->
@@ -36,50 +30,48 @@ const gameMode = inject("gameMode");
         />
       </div>
 
-      <!-- down button -->
+      <!-- soft drop button -->
       <ArrowButton
-        type="down"
-        @touchstart.prevent="emitter.emit('down', true)"
-        @touchend.prevent="emitter.emit('down', false)"
+        type="soft-drop"
+        @touchstart.prevent="emitter.emit('softDrop', true)"
+        @touchend.prevent="emitter.emit('softDrop', false)"
       />
     </div>
 
     <div class="flex flex-col justify-between items-end w-1/2">
-      <!-- feature button -->
-      <div class="flex gap-4">
-        <!-- play game button -->
-        <ToggleButton
-          :status="game.gamePlay"
-          event="play"
-          trueIcon="icon-[pixelarticons--pause]"
-          falseIcon="icon-[pixelarticons--play]"
-          v-if="gameMode.checkGameMode('1p')"
-        />
-
-        <!-- reset game button -->
+      <div class="flex gap-10">
+        <!-- rotate 180 degrees button -->
         <Button
           type="primary"
-          icon="icon-[pixelarticons--reload]"
-          @click.prevent="emitter.emit('reset')"
-          @touchstart.prevent="emitter.emit('reset')"
-          v-if="gameMode.checkGameMode('1p')"
+          icon="icon-[pixelarticons--sync]"
+          @click.prevent="emitter.emit('rotateReverse')"
+          @touchstart.prevent="emitter.emit('rotateReverse')"
         />
 
-        <!-- toggle volume button -->
-        <ToggleButton
-          :status="game.volumeUp"
-          event="volume"
-          trueIcon="icon-[pixelarticons--volume-vibrate]"
-          falseIcon="icon-[pixelarticons--volume-x]"
+        <!-- hold tetrimino button -->
+        <Button
+          type="primary"
+          icon="icon-[pixelarticons--login]"
+          @click.prevent="emitter.emit('hold')"
+          @touchstart.prevent="emitter.emit('hold')"
         />
       </div>
 
-      <!-- rotate button -->
-      <ArrowButton
-        type="rotate"
-        @click.prevent="emitter.emit('rotate')"
-        @touchstart.prevent="emitter.emit('rotate')"
-      />
+      <div class="flex flex-col gap-2">
+        <!-- rotate right button -->
+        <ArrowButton
+          type="rotate-right"
+          @click.prevent="emitter.emit('rotateRight')"
+          @touchstart.prevent="emitter.emit('rotateRight')"
+        />
+
+        <!-- rotate left button -->
+        <ArrowButton
+          type="rotate-left"
+          @click.prevent="emitter.emit('rotateLeft')"
+          @touchstart.prevent="emitter.emit('rotateLeft')"
+        />
+      </div>
     </div>
   </div>
 </template>

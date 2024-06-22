@@ -2,7 +2,7 @@
 import { ref, computed, watch, inject, onMounted, onUnmounted } from "vue";
 import { useGameStore } from "@/stores/game.js";
 import { palette } from "@/assets/js/palette.js";
-import { getBags } from "@/assets/js/tetrimino.js";
+import { rotationOffset, getBags } from "@/assets/js/tetrimino.js";
 import { emitter } from "@/assets/js/emitter.js";
 
 // get canvas info
@@ -16,8 +16,6 @@ const gameMode = inject("gameMode");
 
 let matrix = new Array(20).fill(0).map(() => new Array(10).fill(0));
 let currentShape = null;
-let rotationXOffset = 0;
-let rotationYOffset = 0;
 
 onMounted(() => {
   // set canvas size
@@ -28,66 +26,56 @@ onMounted(() => {
   ctx.value.translate(0, -canvas.value.height);
 
   emitter.on("play", playGame);
-  emitter.on("reset", updateHoldTetrimino);
-  // emitter.on("volume", toggleVolume);
-  emitter.on("drop", fallTetriminoToLand);
   emitter.on("left", moveTetriminoLeft);
   emitter.on("right", moveTetriminoRight);
-  // emitter.on("down", moveTetriminoDown);
-  emitter.on("rotate", rotateRight);
+  emitter.on("hardDrop", fallTetriminoToLand);
+  emitter.on("softDrop", moveTetriminoDown);
+  emitter.on("rotateRight", rotateRight);
+  emitter.on("rotateLeft", rotateLeft);
+  emitter.on("rotateReverse", rotateReverse);
+  emitter.on("hold", updateHoldTetrimino);
 });
 
 onUnmounted(() => {
   emitter.off("play", playGame);
-  emitter.off("reset", updateHoldTetrimino);
-  // emitter.off("volume", toggleVolume);
-  emitter.off("drop", fallTetriminoToLand);
   emitter.off("left", moveTetriminoLeft);
   emitter.off("right", moveTetriminoRight);
-  // emitter.off("down", moveTetriminoDown);
-  emitter.off("rotate", rotateRight);
+  emitter.off("hardDrop", fallTetriminoToLand);
+  emitter.off("softDrop", moveTetriminoDown);
+  emitter.off("rotateRight", rotateRight);
+  emitter.off("rotateLeft", rotateLeft);
+  emitter.off("rotateReverse", rotateReverse);
+  emitter.off("hold", updateHoldTetrimino);
 });
 
 function playGame() {
   addShape();
 }
 
-function addShape() {
-  currentShape = getCurrentShape();
-  updateCurrentBags();
-  drawPlayfield();
+function moveTetriminoRight() {
+  moveTetrimino(1, 0);
 }
 
-function updateCurrentBags() {
-  game.currentBags.pop();
-  game.currentBags.unshift(game.nextBags.shift());
-
-  if (!game.nextBags.length) {
-    game.nextBags = getBags();
-  }
+function moveTetriminoLeft() {
+  moveTetrimino(-1, 0);
 }
 
-function getCurrentShape() {
-  const tetriminoIndex = game.currentBags.length - 1;
-
-  return {
-    x: 4,
-    y: 18,
-    rotation: 0,
-    holdLock: false,
-    tetrimino: game.currentBags[tetriminoIndex],
-  };
+// TODO: have to move tetrimino down
+function moveTetriminoDown(enable) {
+  console.log("move tetrimino down");
 }
 
-function getCurrentTetrimino() {
-  return currentShape.tetrimino.pieces[currentShape.rotation];
+// TODO: rotate tetrimino
+function rotateRight() {
+  console.log("rotate right");
 }
 
-function resetCurrentShapeOpsition() {
-  if (!currentShape) return;
-  currentShape.x = 4;
-  currentShape.y = 18;
-  currentShape.rotation = 0;
+function rotateLeft() {
+  console.log("rotate left");
+}
+
+function rotateReverse() {
+  console.log("rotate 180 degrees");
 }
 
 function updateHoldTetrimino() {
@@ -112,8 +100,57 @@ function updateHoldTetrimino() {
   drawPlayfield();
 }
 
+function addShape() {
+  // NOTE: reset rotation offset for wall kick
+  if (currentShape) {
+    currentShape.rotationXOffset = 0;
+    currentShape.rotationYOffset = 0;
+  }
+
+  currentShape = getCurrentShape();
+  updateCurrentBags();
+  drawPlayfield();
+}
+
+function updateCurrentBags() {
+  game.currentBags.pop();
+  game.currentBags.unshift(game.nextBags.shift());
+
+  if (!game.nextBags.length) {
+    game.nextBags = getBags();
+  }
+}
+
+function getCurrentShape() {
+  const tetriminoIndex = game.currentBags.length - 1;
+
+  return {
+    x: 4,
+    y: 18,
+    rotation: 0,
+    rotationXOffset: 0,
+    rotationYOffset: 0,
+    holdLock: false,
+    tetrimino: game.currentBags[tetriminoIndex],
+  };
+}
+
+function getCurrentTetrimino() {
+  return currentShape.tetrimino.pieces[currentShape.rotation];
+}
+
+function resetCurrentShapeOpsition() {
+  if (!currentShape) return;
+  currentShape.x = 4;
+  currentShape.y = 18;
+  currentShape.rotation = 0;
+  currentShape.rotationXOffset = 0;
+  currentShape.rotationYOffset = 0;
+}
+
 function fallTetriminoToLand() {
   if (!moveTetrimino(0, -1)) {
+    // reset locking hold tetrimino
     if (game.holdShape) {
       game.holdShape.holdLock = false;
     }
@@ -124,14 +161,6 @@ function fallTetriminoToLand() {
   }
 }
 
-function moveTetriminoRight() {
-  moveTetrimino(1, 0);
-}
-
-function moveTetriminoLeft() {
-  moveTetrimino(-1, 0);
-}
-
 function moveTetrimino(xStep, yStep) {
   const tetrimino = getCurrentTetrimino();
   const w = matrix[0].length;
@@ -139,8 +168,10 @@ function moveTetrimino(xStep, yStep) {
   let canMove = true;
 
   for (let i = 0; i < tetrimino.length; i++) {
-    const x = tetrimino[i][0] + currentShape.x + xStep;
-    const y = tetrimino[i][1] + currentShape.y + yStep;
+    const x =
+      tetrimino[i][0] + currentShape.x - currentShape.rotationXOffset + xStep;
+    const y =
+      tetrimino[i][1] + currentShape.y - currentShape.rotationYOffset + yStep;
 
     if (x < 0 || x >= w || y < 0 || matrix[y][x]) {
       canMove = false;
@@ -159,36 +190,52 @@ function moveTetrimino(xStep, yStep) {
 }
 
 // TODO: have to rewrite
-function rotateRight() {
-  const rotationOffset = {
-    O: [
-      [0, 0],
-      [0, -1],
-      [-1, -1],
-      [-1, 0],
-    ],
-  };
-  const name = currentShape.tetrimino.name;
-  const tempRotation = currentShape.rotation;
-
-  currentShape.rotation += 1;
-  if (currentShape.rotation > 3) {
-    currentShape.rotation = 0;
+function rotateTetrimino(rotationStep) {
+  if (checkRotation(rotationStep, 0)) {
+    currentShape.rotation = (currentShape.rotation + rotationStep) % 4;
   }
-
-  if (rotationOffset[name]) {
-    const x =
-      rotationOffset[name][tempRotation][0] -
-      rotationOffset[name][currentShape.rotation][0];
-    const y =
-      rotationOffset[name][tempRotation][1] -
-      rotationOffset[name][currentShape.rotation][1];
-
-    rotationXOffset = x;
-    rotationYOffset = y;
-  }
-
   drawPlayfield();
+}
+
+function checkRotation(rotationStep, wallKickIndex) {
+  const tetrimino = getCurrentTetrimino();
+  const name = remapName(currentShape.tetrimino.name);
+
+  let xStep = 0;
+  let yStep = 0;
+  let currentRotation = currentShape.rotation;
+
+  currentRotation = (currentRotation + rotationStep) % 4;
+
+  if (name === "O") {
+    xStep = rotationOffset[name][currentRotation][0];
+    yStep = rotationOffset[name][currentRotation][1];
+  } else {
+    xStep = rotationOffset[name][currentRotation][wallKickIndex][0];
+    yStep = rotationOffset[name][currentRotation][wallKickIndex][1];
+  }
+
+  for (let j = 0; j < tetrimino.length; j++) {
+    const x = tetrimino[j][0] + currentShape.x - xStep;
+    const y = tetrimino[j][1] + currentShape.y - yStep;
+
+    if (matrix[y][x]) {
+      return false;
+    }
+  }
+
+  currentShape.rotationXOffset = xStep;
+  currentShape.rotationYOffset = yStep;
+
+  return checkRotation(rotationStep, wallKickIndex + 1) || true;
+}
+
+function remapName(name) {
+  const arr = ["T", "Z", "S", "J", "L"];
+  if (arr.includes(name)) {
+    return "A";
+  }
+  return name;
 }
 
 function mergeMatrix() {
@@ -196,8 +243,8 @@ function mergeMatrix() {
   const tetrimino = getCurrentTetrimino();
 
   for (let i = 0; i < tetrimino.length; i++) {
-    const x = tetrimino[i][0] + currentShape.x;
-    const y = tetrimino[i][1] + currentShape.y;
+    const x = tetrimino[i][0] + currentShape.x - currentShape.rotationXOffset;
+    const y = tetrimino[i][1] + currentShape.y - currentShape.rotationYOffset;
 
     matrix[y][x] = type;
   }
@@ -231,6 +278,7 @@ function clearFilledLines() {
 function drawPlayfield() {
   clearCanvas();
   drawMatrix();
+  drawGhostPiece();
   drawCurrentTetrimino();
 }
 
@@ -242,19 +290,51 @@ function drawMatrix() {
   const w = matrix[0].length;
   const h = matrix.length;
 
-  for (let i = 0; i < h; i++) {
-    for (let j = 0; j < w; j++) {
-      if (!matrix[i][j]) continue;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      if (!matrix[y][x]) continue;
 
-      ctx.value.fillStyle = palette.tetriminoColor[matrix[i][j] - 1];
+      ctx.value.fillStyle = palette.tetriminoColor[matrix[y][x] - 1];
       ctx.value.fillRect(
-        j * game.block,
-        i * game.block,
+        x * game.block,
+        y * game.block,
         game.block,
         game.block,
       );
     }
   }
+}
+
+function drawGhostPiece() {
+  const color = palette.previewColor;
+  const ghostPieceYOffset = getGhostPieceYOffset(currentShape.y);
+  const tetrimino = getCurrentTetrimino();
+
+  ctx.value.fillStyle = color;
+  for (let i = 0; i < tetrimino.length; i++) {
+    const x = tetrimino[i][0] + currentShape.x - currentShape.rotationXOffset;
+    const y =
+      tetrimino[i][1] + ghostPieceYOffset - currentShape.rotationYOffset;
+
+    ctx.value.fillRect(x * game.block, y * game.block, game.block, game.block);
+  }
+}
+
+function getGhostPieceYOffset(offset) {
+  const tetrimino = getCurrentTetrimino();
+
+  for (let i = 0; i < tetrimino.length; i++) {
+    const x = tetrimino[i][0] + currentShape.x - currentShape.rotationXOffset;
+    const y = tetrimino[i][1] + offset - currentShape.rotationYOffset;
+
+    if (
+      offset <= currentShape.y &&
+      (y <= 0 || (matrix[y] && matrix[y - 1][x]))
+    ) {
+      return offset;
+    }
+  }
+  return getGhostPieceYOffset(offset - 1);
 }
 
 function drawCurrentTetrimino() {
@@ -263,8 +343,8 @@ function drawCurrentTetrimino() {
 
   ctx.value.fillStyle = color;
   for (let i = 0; i < tetrimino.length; i++) {
-    const x = tetrimino[i][0] + currentShape.x + rotationXOffset;
-    const y = tetrimino[i][1] + currentShape.y + rotationYOffset;
+    const x = tetrimino[i][0] + currentShape.x - currentShape.rotationXOffset;
+    const y = tetrimino[i][1] + currentShape.y - currentShape.rotationYOffset;
     ctx.value.fillRect(x * game.block, y * game.block, game.block, game.block);
   }
 }

@@ -15,6 +15,7 @@ import NexTetriminoInfo from "@/components/info/NextTetriminoInfo.vue";
 import GameOverInfo from "@/components/info/GameOverInfo.vue";
 import GamePrepareInfo from "@/components/info/GamePrepareInfo.vue";
 import ButtonOperation from "@/components/operation/ButtonOperation.vue";
+import KeyOperation from "@/components/operation/KeyOperation.vue";
 
 const game = useGameStore();
 const route = useRoute();
@@ -128,6 +129,7 @@ function checkGameMode(mode) {
   </main>
 
   <ButtonOperation />
+  <KeyOperation />
 
   <GamePrepareInfo />
   <GameOverInfo />
