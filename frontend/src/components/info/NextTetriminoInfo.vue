@@ -4,9 +4,7 @@ import NextTetriminoCanvas from "@/components/canvas/NextTetriminoCanvas.vue";
 </script>
 
 <template>
-  <div class="h-full">
-    <InfoBox title="NEXT">
-      <NextTetriminoCanvas />
-    </InfoBox>
-  </div>
+  <InfoBox title="NEXT">
+    <NextTetriminoCanvas />
+  </InfoBox>
 </template>
