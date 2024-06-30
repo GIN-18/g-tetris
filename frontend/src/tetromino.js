@@ -1,10 +1,10 @@
 import { palette } from "@/assets/js/palette.js";
 
-const tetriminoes = {
+const tetrominoes = {
   O: {
     name: "O",
     type: 1,
-    color: palette.tetriminoColor[0],
+    color: palette.tetrominoColor[0],
     pieces: [
       [
         [0, 0],
@@ -35,7 +35,7 @@ const tetriminoes = {
   I: {
     name: "I",
     type: 2,
-    color: palette.tetriminoColor[1],
+    color: palette.tetrominoColor[1],
     pieces: [
       [
         [0, 0],
@@ -66,7 +66,7 @@ const tetriminoes = {
   T: {
     name: "T",
     type: 3,
-    color: palette.tetriminoColor[2],
+    color: palette.tetrominoColor[2],
     pieces: [
       [
         [0, 0],
@@ -97,7 +97,7 @@ const tetriminoes = {
   S: {
     name: "S",
     type: 4,
-    color: palette.tetriminoColor[3],
+    color: palette.tetrominoColor[3],
     pieces: [
       [
         [0, 0],
@@ -128,7 +128,7 @@ const tetriminoes = {
   Z: {
     name: "Z",
     type: 5,
-    color: palette.tetriminoColor[4],
+    color: palette.tetrominoColor[4],
     pieces: [
       [
         [0, 0],
@@ -159,7 +159,7 @@ const tetriminoes = {
   J: {
     name: "J",
     type: 6,
-    color: palette.tetriminoColor[5],
+    color: palette.tetrominoColor[5],
     pieces: [
       [
         [0, 0],
@@ -190,7 +190,7 @@ const tetriminoes = {
   L: {
     name: "L",
     type: 7,
-    color: palette.tetriminoColor[6],
+    color: palette.tetrominoColor[6],
     pieces: [
       [
         [0, 0],
@@ -329,7 +329,7 @@ export function getBags() {
   const bag = shuffleBag();
 
   for (let i = 0; i < bag.length; i++) {
-    result.push(tetriminoes[bag[i]]);
+    result.push(tetrominoes[bag[i]]);
   }
 
   return result;

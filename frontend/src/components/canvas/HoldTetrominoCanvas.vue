@@ -15,7 +15,7 @@ watch(
   () => game.holdShape,
   () => {
     clearCanvas();
-    drawHoldTetrimino();
+    drawHoldTetromino();
   },
   {
     deep: true,
@@ -31,11 +31,11 @@ function clearCanvas() {
   ctx.value.clearRect(0, 0, width.value, height.value);
 }
 
-function drawHoldTetrimino() {
+function drawHoldTetromino() {
   const shape = game.holdShape;
-  const color = shape.tetrimino.color;
-  const tetrimino = shape.tetrimino.pieces[shape.rotation];
-  const name = shape.tetrimino.name;
+  const color = shape.tetromino.color;
+  const tetromino = shape.tetromino.pieces[shape.rotation];
+  const name = shape.tetromino.name;
 
   if (game.holdShape.holdLock) {
     ctx.value.fillStyle = palette.previewColor;
@@ -43,9 +43,9 @@ function drawHoldTetrimino() {
     ctx.value.fillStyle = color;
   }
 
-  for (let i = 0; i < tetrimino.length; i++) {
-    const x = tetrimino[i][0] + setXOffset(name);
-    const y = tetrimino[i][1] + setYOffset(name);
+  for (let i = 0; i < tetromino.length; i++) {
+    const x = tetromino[i][0] + setXOffset(name);
+    const y = tetromino[i][1] + setYOffset(name);
 
     ctx.value.fillRect(x * game.block, y * game.block, game.block, game.block);
   }

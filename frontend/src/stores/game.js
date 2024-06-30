@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { getBags } from "@/assets/js/tetrimino.js";
+import { getBags } from "@/assets/js/tetromino.js";
 
 export const useGameStore = defineStore("game", {
   state: () => ({
@@ -8,14 +8,15 @@ export const useGameStore = defineStore("game", {
     gameOver: false,
     level: 1,
     lines: 0,
-    volumeUp: true,
     score: 0,
-    scoreDiff: 0,
     highScore: localStorage.getItem("highScore") || 0,
     isPreview: localStorage.getItem("isPreview") || true,
     holdShape: null,
     currentBags: getBags(),
     nextBags: getBags(),
+
+    // NOTE: need or not
     players: 0,
+    volumeUp: true,
   }),
 });

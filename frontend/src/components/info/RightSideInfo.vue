@@ -2,14 +2,16 @@
 import { useGameStore } from "@/stores/game.js";
 
 import InfoBox from "./InfoBox.vue";
-import NextTetriminoInfo from "./NextTetriminoInfo.vue";
+import NextTetrominoCanvas from "@/components/canvas/NextTetrominoCanvas.vue";
 
 const game = useGameStore();
 </script>
 
 <template>
   <div class="flex flex-col justify-between h-full">
-    <NextTetriminoInfo />
+    <InfoBox title="NEXT">
+      <NextTetrominoCanvas />
+    </InfoBox>
 
     <!-- game score -->
     <InfoBox title="SCORE">

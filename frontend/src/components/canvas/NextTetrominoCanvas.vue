@@ -38,14 +38,14 @@ function drawBags() {
 
   for (let i = 0; i < arr.length; i++) {
     const color = arr[i].color;
-    const tetrimino = arr[i].pieces[0];
+    const tetromino = arr[i].pieces[0];
     const xOffset = setXOffset(arr[i].name);
     const yOffset = setYOffset(arr[i].name, i);
 
     ctx.value.fillStyle = color;
-    for (let j = 0; j < tetrimino.length; j++) {
-      const x = tetrimino[j][0] + 1 + xOffset;
-      const y = tetrimino[j][1] + 1 + i * 3 + yOffset;
+    for (let j = 0; j < tetromino.length; j++) {
+      const x = tetromino[j][0] + 1 + xOffset;
+      const y = tetromino[j][1] + 1 + i * 3 + yOffset;
 
       ctx.value.fillRect(
         x * game.block,

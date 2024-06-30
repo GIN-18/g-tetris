@@ -1,6 +1,6 @@
 export const palette = {
   previewColor: "#7c7c7c",
-  tetriminoColor: [
+  tetrominoColor: [
     "#f8b800",
     "#3cbcfc",
     "#9878f8",
