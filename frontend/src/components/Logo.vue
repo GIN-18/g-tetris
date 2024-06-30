@@ -17,6 +17,6 @@ function jumpToHome() {
     @click.prevent="jumpToHome"
     @touchstart.prevent="jumpToHome"
   >
-    TETRIS
+    VUETRIS
   </h1>
 </template>

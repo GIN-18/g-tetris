@@ -16,6 +16,7 @@ const gameMode = inject("gameMode");
 
 let matrix = new Array(20).fill(0).map(() => new Array(10).fill(0));
 let currentShape = null;
+let startTime = 0;
 
 onMounted(() => {
   // set canvas size
@@ -45,8 +46,10 @@ onUnmounted(() => {
   emitter.off("hold", holdTetrimino);
 });
 
+// TODO: way to start game
 function playGame() {
-  addShape();
+  // addShape();
+  gameLoop();
 }
 
 function moveTetriminoRight() {
@@ -62,7 +65,6 @@ function moveTetriminoDown(enable) {
   console.log("move tetrimino down");
 }
 
-// TODO: rotate tetrimino
 function rotateRight() {
   rotateTetrimino(1);
 }
@@ -95,6 +97,20 @@ function holdTetrimino() {
   game.holdShape.holdLock = true;
 
   drawPlayfield();
+}
+
+function gameLoop() {
+  requestAnimationFrame((timestamp) => {
+    if (!startTime) {
+      startTime = timestamp;
+    }
+
+    const elapsed = timestamp - startTime;
+
+    console.log(elapsed);
+
+    gameLoop();
+  });
 }
 
 function addShape() {
@@ -173,7 +189,6 @@ function moveTetrimino(xStep, yStep) {
   return canMove;
 }
 
-// TODO: have to rewrite
 function rotateTetrimino(rotationStep) {
   const rotationInfo = checkRotation(rotationStep, 0);
 
@@ -185,7 +200,6 @@ function rotateTetrimino(rotationStep) {
   }
 }
 
-// TODO: rotate left
 function checkRotation(rotationStep, wallKickIndex) {
   if (wallKickIndex > 4) {
     return {
@@ -279,7 +293,7 @@ function clearFilledLines() {
 function drawPlayfield() {
   clearCanvas();
   drawMatrix();
-  // drawGhostPiece();
+  drawGhostPiece();
   drawCurrentTetrimino();
 }
 
@@ -306,7 +320,6 @@ function drawMatrix() {
   }
 }
 
-// NOTE: y offset not right
 function drawGhostPiece() {
   const color = palette.previewColor;
   const ghostPieceYOffset = getGhostPieceYOffset(currentShape.y);
@@ -314,9 +327,8 @@ function drawGhostPiece() {
 
   ctx.value.fillStyle = color;
   for (let i = 0; i < tetrimino.length; i++) {
-    const x = tetrimino[i][0] + currentShape.x + currentShape.rotationXOffset;
-    const y =
-      tetrimino[i][1] + ghostPieceYOffset + currentShape.rotationYOffset;
+    const x = tetrimino[i][0] + currentShape.x;
+    const y = tetrimino[i][1] + ghostPieceYOffset;
 
     ctx.value.fillRect(x * game.block, y * game.block, game.block, game.block);
   }
@@ -327,8 +339,8 @@ function getGhostPieceYOffset(offset) {
   const h = matrix.length - 2;
 
   for (let i = 0; i < tetrimino.length; i++) {
-    const x = tetrimino[i][0] + currentShape.x - currentShape.rotationXOffset;
-    const y = tetrimino[i][1] + offset - currentShape.rotationYOffset;
+    const x = tetrimino[i][0] + currentShape.x;
+    const y = tetrimino[i][1] + offset;
 
     if (
       offset >= currentShape.y &&
