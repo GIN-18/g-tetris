@@ -99,6 +99,7 @@ function holdTetromino() {
   drawPlayfield();
 }
 
+// TODO: set game loop
 function gameLoop() {
   requestAnimationFrame((timestamp) => {
     if (!startTime) {
@@ -296,7 +297,14 @@ function clearFilledLines() {
 }
 
 function updateLevel() {
-  console.log(game.lines);
+  if (game.level === 25) return;
+
+  const oldLevel = game.level - 1;
+  const increasedLevel = Math.floor(game.lines / 10);
+
+  if (oldLevel !== increasedLevel) {
+    game.level += increasedLevel;
+  }
 }
 
 function drawPlayfield() {
