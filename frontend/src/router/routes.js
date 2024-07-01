@@ -7,8 +7,4 @@ export const routes = [
     path: "/game/:mode",
     component: () => import("@/views/Game.vue"),
   },
-  {
-    path: "/room",
-    component: () => import("@/views/Room.vue"),
-  },
 ];

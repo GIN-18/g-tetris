@@ -10,13 +10,9 @@ export const useGameStore = defineStore("game", {
     lines: 0,
     score: 0,
     highScore: localStorage.getItem("highScore") || 0,
-    isPreview: localStorage.getItem("isPreview") || true,
+    isDrawGhostPiece: localStorage.getItem("isDrawGhostPiece") || true,
     holdShape: null,
     currentBags: getBags(),
     nextBags: getBags(),
-
-    // NOTE: need or not
-    players: 0,
-    volumeUp: true,
   }),
 });

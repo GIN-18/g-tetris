@@ -1,20 +1,17 @@
 <script setup>
-import { ref, inject } from "vue";
+import { ref } from "vue";
 import { useGameStore } from "@/stores/game.js";
 import { emitter } from "@/assets/js/emitter.js";
 
 import MenuItem from "./MenuItem.vue";
-import ToggleOption from "./ToggleOption.vue";
+import ToggleButton from "@/components/button/ToggleButton.vue";
 import Footer from "@/components/Footer.vue";
 
 const game = useGameStore();
-const gameMode = inject("gameMode");
 const showMenu = ref(false);
 
 function toggleMenu() {
   showMenu.value = !showMenu.value;
-
-  if (gameMode.checkGameMode("2p")) return;
 
   if (game.gamePlay) emitter.emit("play");
 }
@@ -64,7 +61,7 @@ function toggleMenu() {
           <main class="grow">
             <ul class="flex flex-col gap-2 mb-6">
               <MenuItem text="Preview">
-                <ToggleOption option="isPreview" />
+                <ToggleButton option="isDrawGhostPiece" />
               </MenuItem>
             </ul>
           </main>

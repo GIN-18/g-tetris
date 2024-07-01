@@ -1,33 +1,40 @@
 <script setup>
-import { computed } from "vue";
-import { emitter } from "@/assets/js/emitter.js";
-import Button from "./Button.vue";
+import { computed, watch } from "vue";
+import { useGameStore } from "@/stores/game.js";
+
+const game = useGameStore();
 
 const props = defineProps({
-  type: {
-    type: String,
-    default: "primary",
-  },
-  status: Boolean,
-  event: String,
-  trueIcon: String,
-  falseIcon: String,
-  trueText: String,
-  falseText: String,
+  option: String,
 });
 
-const icon = computed(() => (props.status ? props.trueIcon : props.falseIcon));
-const text = computed(() => (props.status ? props.trueText : props.falseText));
+const classList = computed(() => ({
+  "text-2xl": true,
+  "icon-[pixelarticons--toggle-right] text-nes-deep-green": JSON.parse(
+    game[props.option],
+  ),
+  "icon-[pixelarticons--toggle-left] text-nes-deep-gray": !JSON.parse(
+    game[props.option],
+  ),
+}));
+
+watch(
+  () => game[props.option],
+  (newValue, oldValue) => {
+    classList.value;
+    localStorage.setItem(props.option, JSON.stringify(newValue));
+  },
+);
+
+function toggleOption() {
+  game[props.option] = !JSON.parse(game[props.option]);
+}
 </script>
 
 <template>
-  <div>
-    <Button
-      :type="type"
-      :icon="icon"
-      :text="text"
-      @click.prevent="emitter.emit(event)"
-      @touchstart.prevent="emitter.emit(event)"
-    />
-  </div>
+  <button
+    :class="classList"
+    @click.prevent="toggleOption"
+    @touchstart.prevent="toggleOption"
+  ></button>
 </template>

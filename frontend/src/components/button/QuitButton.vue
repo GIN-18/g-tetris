@@ -4,7 +4,10 @@ import Button from "./Button.vue";
 
 const router = useRouter();
 
+// TODO: not home page or not?
 function quitGame() {
+  return;
+
   router.push({
     path: "/",
   });

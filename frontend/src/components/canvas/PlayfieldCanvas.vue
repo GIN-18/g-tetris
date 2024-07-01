@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, inject, onMounted, onUnmounted } from "vue";
+import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import { useGameStore } from "@/stores/game.js";
 import { palette } from "@/assets/js/palette.js";
 import { rotationOffset, getBags } from "@/assets/js/tetromino.js";
@@ -12,11 +12,20 @@ const height = computed(() => canvas.value.height);
 const ctx = computed(() => canvas.value.getContext("2d"));
 
 const game = useGameStore();
-const gameMode = inject("gameMode");
 
 let matrix = new Array(20).fill(0).map(() => new Array(10).fill(0));
 let currentShape = null;
+
+// TODO: set timing for the game
 let startTime = 0;
+let intetval = 1000;
+
+watch(
+  () => game.isDrawGhostPiece,
+  () => {
+    drawPlayfield();
+  },
+);
 
 onMounted(() => {
   // set canvas size
@@ -48,8 +57,7 @@ onUnmounted(() => {
 
 // TODO: way to start game
 function playGame() {
-  addShape();
-  // gameLoop();
+  requestAnimationFrame(gameLoop);
 }
 
 function moveTetrominoRight() {
@@ -100,18 +108,17 @@ function holdTetromino() {
 }
 
 // TODO: set game loop
-function gameLoop() {
-  requestAnimationFrame((timestamp) => {
-    if (!startTime) {
-      startTime = timestamp;
+function gameLoop(timestamp) {
+  if (timestamp - startTime >= intetval) {
+    if (!currentShape) {
+      addShape();
     }
 
-    const elapsed = timestamp - startTime;
+    fallTetrominoToLand();
+    startTime = timestamp;
+  }
 
-    console.log(elapsed);
-
-    gameLoop();
-  });
+  requestAnimationFrame(gameLoop);
 }
 
 function addShape() {
@@ -129,6 +136,7 @@ function updateCurrentBags() {
   }
 }
 
+// TODO: set current y for tetromino
 function getCurrentShape() {
   return {
     x: 4,
@@ -156,9 +164,12 @@ function fallTetrominoToLand() {
     if (game.holdShape) {
       game.holdShape.holdLock = false;
     }
+
     mergeMatrix();
-    clearFilledLines();
+    updateLines();
+    updateScore();
     updateLevel();
+    clearFilledLines();
     addShape();
     drawPlayfield();
   }
@@ -267,6 +278,47 @@ function mergeMatrix() {
   }
 }
 
+function updateLines() {
+  const filledLines = getFilledLines();
+
+  game.lines += filledLines.length;
+}
+
+// TODO: scoring system not yet
+// doc: https://tetris.wiki/Scoring#Recent_guideline_compatible_games
+// just single-tetris
+function updateScore() {
+  const scoreArray = [100, 300, 500, 800];
+  const filledLines = getFilledLines();
+
+  if (!filledLines.length) return;
+
+  game.score += scoreArray[filledLines.length - 1] * game.level;
+}
+
+// HACK: setup for highest level
+function updateLevel() {
+  if (game.level === 25) return;
+
+  const oldLevel = game.level - 1;
+  const increased = Math.floor(game.lines / 10);
+
+  if (oldLevel !== increased) {
+    game.level += 1;
+  }
+}
+
+function clearFilledLines() {
+  const filledLines = getFilledLines();
+
+  if (!filledLines.length) return;
+
+  for (let i = 0; i < filledLines.length; i++) {
+    matrix.splice(filledLines[i], 1);
+    matrix.unshift(new Array(10).fill(0));
+  }
+}
+
 function getFilledLines() {
   const filledLines = [];
 
@@ -279,32 +331,6 @@ function getFilledLines() {
   }
 
   return filledLines;
-}
-
-function clearFilledLines() {
-  const filledLines = getFilledLines();
-
-  if (!filledLines.length) return;
-
-  // update lines
-  game.lines += filledLines.length;
-
-  // clear lines
-  for (let i = 0; i < filledLines.length; i++) {
-    matrix.splice(filledLines[i], 1);
-    matrix.unshift(new Array(10).fill(0));
-  }
-}
-
-function updateLevel() {
-  if (game.level === 25) return;
-
-  const oldLevel = game.level - 1;
-  const increasedLevel = Math.floor(game.lines / 10);
-
-  if (oldLevel !== increasedLevel) {
-    game.level += increasedLevel;
-  }
 }
 
 function drawPlayfield() {
@@ -338,6 +364,8 @@ function drawMatrix() {
 }
 
 function drawGhostPiece() {
+  if (!JSON.parse(game.isDrawGhostPiece)) return;
+
   const color = palette.previewColor;
   const ghostPieceYOffset = getGhostPieceYOffset(currentShape.y);
   const tetromino = getCurrentTetromino();
