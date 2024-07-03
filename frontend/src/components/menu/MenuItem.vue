@@ -5,8 +5,8 @@ const props = defineProps({
 </script>
 
 <template>
-  <li class="flex justify-between">
-    <p class="!mb-0">{{ text }}</p>
+  <li class="flex justify-between items-center text-xs">
+    <p>{{ text }}</p>
     <slot></slot>
   </li>
 </template>

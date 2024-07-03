@@ -8,13 +8,17 @@ const width = computed(() => canvas.value.width);
 const height = computed(() => canvas.value.height);
 const ctx = computed(() => canvas.value.getContext("2d"));
 
+const props = defineProps({
+  block: Number,
+});
+
 const game = useGameStore();
 
 watch(
-  () => game.currentBags,
+  () => game.currentBag,
   () => {
     clearCanvas();
-    drawBags();
+    drawBag();
   },
   {
     deep: true,
@@ -22,25 +26,25 @@ watch(
 );
 
 onMounted(() => {
-  canvas.value.width = game.block * 4;
-  canvas.value.height = game.block * (2 * 4 + 3);
+  canvas.value.width = props.block * 4;
+  canvas.value.height = props.block * (2 * 4 + 3);
 
   clearCanvas();
-  drawBags();
+  drawBag();
 });
 
 function clearCanvas() {
   ctx.value.clearRect(0, 0, width.value, height.value);
 }
 
-function drawBags() {
-  const arr = game.currentBags;
+function drawBag() {
+  const bag = game.currentBag;
 
-  for (let i = 0; i < arr.length; i++) {
-    const color = arr[i].color;
-    const tetromino = arr[i].pieces[0];
-    const xOffset = setXOffset(arr[i].name);
-    const yOffset = setYOffset(arr[i].name, i);
+  for (let i = 0; i < bag.length; i++) {
+    const color = bag[i].color;
+    const tetromino = bag[i].pieces[0];
+    const xOffset = setXOffset(bag[i].name);
+    const yOffset = setYOffset(bag[i].name, i);
 
     ctx.value.fillStyle = color;
     for (let j = 0; j < tetromino.length; j++) {
@@ -48,10 +52,10 @@ function drawBags() {
       const y = tetromino[j][1] + 1 + i * 3 + yOffset;
 
       ctx.value.fillRect(
-        x * game.block,
-        y * game.block,
-        game.block,
-        game.block,
+        x * props.block,
+        y * props.block,
+        props.block,
+        props.block,
       );
     }
   }

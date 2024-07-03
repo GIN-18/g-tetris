@@ -43,7 +43,7 @@ import ArrowButton from "@/components/button/ArrowButton.vue";
         <!-- rotate 180 degrees button -->
         <Button
           type="primary"
-          icon="icon-[pixelarticons--sync]"
+          icon="icon-[pixelarticons--repeat]"
           @click.prevent="emitter.emit('rotateReverse')"
           @touchstart.prevent="emitter.emit('rotateReverse')"
         />
@@ -51,7 +51,7 @@ import ArrowButton from "@/components/button/ArrowButton.vue";
         <!-- hold tetrimino button -->
         <Button
           type="primary"
-          icon="icon-[pixelarticons--login]"
+          icon="icon-[pixelarticons--sync]"
           @click.prevent="emitter.emit('hold')"
           @touchstart.prevent="emitter.emit('hold')"
         />

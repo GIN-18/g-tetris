@@ -1,4 +1,9 @@
 <script setup>
+import { onMounted, onUnmounted } from "vue";
+import { useGameStore } from "@/stores/game.js";
+import { emitter } from "@/assets/js/emitter.js";
+import { Tetris } from "@/assets/js/mode/Tetris.js";
+
 import Header from "@/components/Header.vue";
 import Menu from "@/components/menu/Menu.vue";
 import PlayfieldCanvas from "@/components/canvas/PlayfieldCanvas.vue";
@@ -7,6 +12,31 @@ import RightSideInfo from "@/components/info/RightSideInfo.vue";
 import GameOverInfo from "@/components/info/GameOverInfo.vue";
 import ButtonOperation from "@/components/operation/ButtonOperation.vue";
 import KeyOperation from "@/components/operation/KeyOperation.vue";
+
+// TODO: new instance acording to game mode
+const tetris = new Tetris();
+
+const game = useGameStore();
+
+game.currentBag = tetris.getBag();
+// game.currentTetromino = tetris.getCurrentTetromino(game.currentBag);
+
+onMounted(() => {
+  emitter.on("play", playGame);
+});
+
+onUnmounted(() => {
+  emitter.off("play", playGame);
+});
+
+function playGame() {
+  addTetromino();
+}
+
+function addTetromino() {
+  tetris.updateBag(game.currentBag);
+  game.currentTetromino = tetris.getCurrentTetromino(game.currentBag);
+}
 </script>
 
 <template>

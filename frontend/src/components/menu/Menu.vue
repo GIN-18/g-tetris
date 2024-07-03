@@ -60,7 +60,7 @@ function toggleMenu() {
 
           <main class="grow">
             <ul class="flex flex-col gap-2 mb-6">
-              <MenuItem text="Preview">
+              <MenuItem text="SHOW GHOSTPIECE">
                 <ToggleButton option="isDrawGhostPiece" />
               </MenuItem>
             </ul>

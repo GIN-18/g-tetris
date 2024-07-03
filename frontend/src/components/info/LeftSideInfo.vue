@@ -14,12 +14,12 @@ const game = useGameStore();
     </InfoBox>
 
     <div class="flex flex-col gap-6">
-      <InfoBox title="LINES">
-        <p>{{ game.lines }}</p>
-      </InfoBox>
-
       <InfoBox title="LEVEL">
         <p>{{ game.level }}</p>
+      </InfoBox>
+
+      <InfoBox title="LINES">
+        <p>{{ game.lines }}</p>
       </InfoBox>
     </div>
   </div>
