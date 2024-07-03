@@ -58,12 +58,6 @@ onUnmounted(() => {
   emitter.off("hold", holdTetromino);
 });
 
-// TODO: way to start game
-// function playGame() {
-//   addShape();
-//   gameLoop();
-// }
-
 function moveTetrominoRight() {
   moveTetromino(1, 0);
 }
