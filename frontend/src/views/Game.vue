@@ -19,14 +19,15 @@ const tetris = new Tetris();
 const game = useGameStore();
 
 game.currentBag = tetris.getBag();
-// game.currentTetromino = tetris.getCurrentTetromino(game.currentBag);
 
 onMounted(() => {
   emitter.on("play", playGame);
+  emitter.on("hold", holdTetromino);
 });
 
 onUnmounted(() => {
   emitter.off("play", playGame);
+  emitter.off("hold", holdTetromino);
 });
 
 function playGame() {
@@ -34,8 +35,18 @@ function playGame() {
 }
 
 function addTetromino() {
-  tetris.updateBag(game.currentBag);
-  game.currentTetromino = tetris.getCurrentTetromino(game.currentBag);
+  game.currentTetromino = tetris.addTetromino(game.currentBag);
+}
+
+function holdTetromino() {
+  const { currentTetromino, holdTetromino } = tetris.updateHoldTetromino(
+    game.currentBag,
+    game.currentTetromino,
+    game.holdTetromino,
+  );
+
+  game.currentTetromino = currentTetromino;
+  game.holdTetromino = holdTetromino;
 }
 </script>
 

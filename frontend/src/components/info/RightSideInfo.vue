@@ -10,7 +10,7 @@ const game = useGameStore();
 <template>
   <div class="flex flex-col justify-between h-full">
     <InfoBox title="NEXT">
-      <NextTetrominoCanvas :block="18" />
+      <NextTetrominoCanvas :block="game.block" />
     </InfoBox>
 
     <!-- game score -->

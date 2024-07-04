@@ -8,7 +8,7 @@ export class Tetris {
         type: 1,
         color: palette.tetrominoColor[0],
         x: 4,
-        y: 0,
+        y: 1,
         rotation: 0,
         hold: false,
         pieces: [
@@ -78,7 +78,7 @@ export class Tetris {
         type: 3,
         color: palette.tetrominoColor[2],
         x: 4,
-        y: 0,
+        y: 1,
         rotation: 0,
         hold: false,
         pieces: [
@@ -113,7 +113,7 @@ export class Tetris {
         type: 4,
         color: palette.tetrominoColor[3],
         x: 4,
-        y: 0,
+        y: 1,
         rotation: 0,
         hold: false,
         pieces: [
@@ -148,7 +148,7 @@ export class Tetris {
         type: 5,
         color: palette.tetrominoColor[4],
         x: 4,
-        y: 0,
+        y: 1,
         rotation: 0,
         hold: false,
         pieces: [
@@ -183,7 +183,7 @@ export class Tetris {
         type: 6,
         color: palette.tetrominoColor[5],
         x: 4,
-        y: 0,
+        y: 1,
         rotation: 0,
         hold: false,
         pieces: [
@@ -218,7 +218,7 @@ export class Tetris {
         type: 7,
         color: palette.tetrominoColor[6],
         x: 4,
-        y: 0,
+        y: 1,
         rotation: 0,
         hold: false,
         pieces: [
@@ -344,6 +344,34 @@ export class Tetris {
 
     this.matrix = new Array(20).fill(0).map(() => new Array(10).fill(0));
     this.nextBag = this.getBag();
+  }
+
+  updateHoldTetromino(currentBag, currentTetromino, holdTetromino) {
+    let tempTetromino = null;
+
+    if (!holdTetromino) {
+      // TODO: have to reset tetromino position
+      holdTetromino = currentTetromino;
+      holdTetromino.hold = true;
+      currentTetromino = this.addTetromino(currentBag);
+    } else if (!holdTetromino.hold) {
+      // have to reset tetromino position
+      tempTetromino = currentTetromino;
+      currentTetromino = holdTetromino;
+      holdTetromino = tempTetromino;
+      holdTetromino.hold = true;
+    }
+
+    return {
+      holdTetromino,
+      currentTetromino,
+    };
+  }
+
+  addTetromino(currentBag) {
+    const currentTetromino = this.getCurrentTetromino(currentBag);
+    this.updateBag(currentBag);
+    return currentTetromino;
   }
 
   getCurrentTetromino(currentBag) {

@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import { getBags } from "@/assets/js/tetromino.js";
 
 export const useGameStore = defineStore("game", {
   state: () => ({
@@ -12,7 +11,7 @@ export const useGameStore = defineStore("game", {
     currentBag: null,
     nextBag: null,
     currentTetromino: null,
-    holdShape: null,
+    holdTetromino: null,
     highScore: localStorage.getItem("highScore") || 0,
     isDrawGhostPiece: localStorage.getItem("isDrawGhostPiece") || true,
   }),

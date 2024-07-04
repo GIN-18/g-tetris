@@ -43,7 +43,7 @@ onMounted(() => {
   emitter.on("rotateRight", rotateRight);
   emitter.on("rotateLeft", rotateLeft);
   emitter.on("rotateReverse", rotateReverse);
-  emitter.on("hold", holdTetromino);
+  // emitter.on("hold", holdTetromino);
 });
 
 onUnmounted(() => {
@@ -55,7 +55,7 @@ onUnmounted(() => {
   emitter.off("rotateRight", rotateRight);
   emitter.off("rotateLeft", rotateLeft);
   emitter.off("rotateReverse", rotateReverse);
-  emitter.off("hold", holdTetromino);
+  // emitter.off("hold", holdTetromino);
 });
 
 function moveTetrominoRight() {

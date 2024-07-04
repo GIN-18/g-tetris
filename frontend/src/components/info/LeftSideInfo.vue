@@ -10,7 +10,7 @@ const game = useGameStore();
 <template>
   <div class="flex flex-col justify-between h-full">
     <InfoBox title="HOLD">
-      <HoldTetrominoCanvas />
+      <HoldTetrominoCanvas :block="game.block" />
     </InfoBox>
 
     <div class="flex flex-col gap-6">
