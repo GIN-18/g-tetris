@@ -1,404 +1,369 @@
 import { palette } from "@/assets/js/palette.js";
 
 export class Tetris {
-  constructor() {
-    this.tetrominoes = {
-      O: {
-        name: "O",
-        type: 1,
-        color: palette.tetrominoColor[0],
-        x: 4,
-        y: 1,
-        rotation: 0,
-        hold: false,
-        pieces: [
-          [
-            [0, 0],
-            [1, 0],
-            [0, -1],
-            [1, -1],
-          ],
-          [
-            [0, 0],
-            [1, 0],
-            [0, 1],
-            [1, 1],
-          ],
-          [
-            [0, 0],
-            [-1, 0],
-            [0, 1],
-            [-1, 1],
-          ],
-          [
-            [0, 0],
-            [-1, 0],
-            [0, -1],
-            [-1, -1],
-          ],
-        ],
-      },
-      I: {
-        name: "I",
-        type: 2,
-        color: palette.tetrominoColor[1],
-        x: 4,
-        y: 0,
-        rotation: 0,
-        hold: false,
-        pieces: [
-          [
-            [0, 0],
-            [-1, 0],
-            [1, 0],
-            [2, 0],
-          ],
-          [
-            [0, 0],
-            [0, -1],
-            [0, 1],
-            [0, 2],
-          ],
-          [
-            [0, 0],
-            [1, 0],
-            [-1, 0],
-            [-2, 0],
-          ],
-          [
-            [0, 0],
-            [0, 1],
-            [0, -1],
-            [0, -2],
-          ],
-        ],
-      },
-      T: {
-        name: "T",
-        type: 3,
-        color: palette.tetrominoColor[2],
-        x: 4,
-        y: 1,
-        rotation: 0,
-        hold: false,
-        pieces: [
-          [
-            [0, 0],
-            [-1, 0],
-            [1, 0],
-            [0, -1],
-          ],
-          [
-            [0, 0],
-            [0, -1],
-            [0, 1],
-            [1, 0],
-          ],
-          [
-            [0, 0],
-            [-1, 0],
-            [1, 0],
-            [0, 1],
-          ],
-          [
-            [0, 0],
-            [-1, 0],
-            [0, 1],
-            [0, -1],
-          ],
-        ],
-      },
-      S: {
-        name: "S",
-        type: 4,
-        color: palette.tetrominoColor[3],
-        x: 4,
-        y: 1,
-        rotation: 0,
-        hold: false,
-        pieces: [
-          [
-            [0, 0],
-            [-1, 0],
-            [0, -1],
-            [1, -1],
-          ],
-          [
-            [0, 0],
-            [1, 0],
-            [0, -1],
-            [1, 1],
-          ],
-          [
-            [0, 0],
-            [-1, 1],
-            [1, 0],
-            [0, 1],
-          ],
-          [
-            [0, 0],
-            [-1, 0],
-            [-1, -1],
-            [0, 1],
-          ],
-        ],
-      },
-      Z: {
-        name: "Z",
-        type: 5,
-        color: palette.tetrominoColor[4],
-        x: 4,
-        y: 1,
-        rotation: 0,
-        hold: false,
-        pieces: [
-          [
-            [0, 0],
-            [-1, -1],
-            [1, 0],
-            [0, -1],
-          ],
-          [
-            [0, 0],
-            [1, 0],
-            [0, 1],
-            [1, -1],
-          ],
-          [
-            [0, 0],
-            [-1, 0],
-            [1, 1],
-            [0, 1],
-          ],
-          [
-            [0, 0],
-            [-1, 0],
-            [0, -1],
-            [-1, 1],
-          ],
-        ],
-      },
-      J: {
-        name: "J",
-        type: 6,
-        color: palette.tetrominoColor[5],
-        x: 4,
-        y: 1,
-        rotation: 0,
-        hold: false,
-        pieces: [
-          [
-            [0, 0],
-            [-1, 0],
-            [1, 0],
-            [-1, -1],
-          ],
-          [
-            [0, 0],
-            [0, -1],
-            [0, 1],
-            [1, -1],
-          ],
-          [
-            [0, 0],
-            [-1, 0],
-            [1, 0],
-            [1, 1],
-          ],
-          [
-            [0, 0],
-            [-1, 1],
-            [0, -1],
-            [0, 1],
-          ],
-        ],
-      },
-      L: {
-        name: "L",
-        type: 7,
-        color: palette.tetrominoColor[6],
-        x: 4,
-        y: 1,
-        rotation: 0,
-        hold: false,
-        pieces: [
-          [
-            [0, 0],
-            [-1, 0],
-            [1, 0],
-            [1, -1],
-          ],
-          [
-            [0, 0],
-            [1, 1],
-            [0, -1],
-            [0, 1],
-          ],
-          [
-            [0, 0],
-            [-1, 0],
-            [1, 0],
-            [-1, 1],
-          ],
-          [
-            [0, 0],
-            [-1, -1],
-            [0, -1],
-            [0, 1],
-          ],
-        ],
-      },
-    };
-    this.rotationOffset = {
-      A: [
+  static tetrominoes = {
+    O: {
+      name: "O",
+      type: 1,
+      color: palette.tetrominoColor[0],
+      x: 4,
+      y: 1,
+      rotation: 0,
+      hold: false,
+      pieces: [
         [
           [0, 0],
-          [0, 0],
-          [0, 0],
-          [0, 0],
-          [0, 0],
+          [1, 0],
+          [0, -1],
+          [1, -1],
         ],
         [
           [0, 0],
           [1, 0],
+          [0, 1],
           [1, 1],
-          [0, -2],
-          [1, -2],
-        ],
-        [
-          [0, 0],
-          [0, 0],
-          [0, 0],
-          [0, 0],
-          [0, 0],
         ],
         [
           [0, 0],
           [-1, 0],
+          [0, 1],
           [-1, 1],
-          [0, -2],
-          [-1, -2],
+        ],
+        [
+          [0, 0],
+          [-1, 0],
+          [0, -1],
+          [-1, -1],
         ],
       ],
-      I: [
+    },
+    I: {
+      name: "I",
+      type: 2,
+      color: palette.tetrominoColor[1],
+      x: 4,
+      y: 0,
+      rotation: 0,
+      hold: false,
+      pieces: [
         [
           [0, 0],
           [-1, 0],
-          [2, 0],
-          [-1, 0],
+          [1, 0],
           [2, 0],
         ],
         [
-          [-1, 0],
-          [0, 0],
           [0, 0],
           [0, -1],
+          [0, 1],
           [0, 2],
         ],
         [
-          [-1, -1],
-          [1, -1],
-          [-2, -1],
+          [0, 0],
           [1, 0],
+          [-1, 0],
           [-2, 0],
         ],
         [
-          [0, -1],
-          [0, -1],
-          [0, -1],
+          [0, 0],
           [0, 1],
+          [0, -1],
           [0, -2],
         ],
       ],
-      O: [
+    },
+    T: {
+      name: "T",
+      type: 3,
+      color: palette.tetrominoColor[2],
+      x: 4,
+      y: 1,
+      rotation: 0,
+      hold: false,
+      pieces: [
         [
           [0, 0],
-          [0, 0],
-          [0, 0],
-          [0, 0],
-          [0, 0],
-        ],
-        [
-          [0, 1],
-          [0, 0],
-          [0, 0],
-          [0, 0],
-          [0, 0],
-        ],
-        [
-          [-1, 1],
-          [0, 0],
-          [0, 0],
-          [0, 0],
-          [0, 0],
-        ],
-        [
           [-1, 0],
+          [1, 0],
+          [0, -1],
+        ],
+        [
           [0, 0],
+          [0, -1],
+          [0, 1],
+          [1, 0],
+        ],
+        [
           [0, 0],
+          [-1, 0],
+          [1, 0],
+          [0, 1],
+        ],
+        [
           [0, 0],
-          [0, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
         ],
       ],
-    };
+    },
+    S: {
+      name: "S",
+      type: 4,
+      color: palette.tetrominoColor[3],
+      x: 4,
+      y: 1,
+      rotation: 0,
+      hold: false,
+      pieces: [
+        [
+          [0, 0],
+          [-1, 0],
+          [0, -1],
+          [1, -1],
+        ],
+        [
+          [0, 0],
+          [1, 0],
+          [0, -1],
+          [1, 1],
+        ],
+        [
+          [0, 0],
+          [-1, 1],
+          [1, 0],
+          [0, 1],
+        ],
+        [
+          [0, 0],
+          [-1, 0],
+          [-1, -1],
+          [0, 1],
+        ],
+      ],
+    },
+    Z: {
+      name: "Z",
+      type: 5,
+      color: palette.tetrominoColor[4],
+      x: 4,
+      y: 1,
+      rotation: 0,
+      hold: false,
+      pieces: [
+        [
+          [0, 0],
+          [-1, -1],
+          [1, 0],
+          [0, -1],
+        ],
+        [
+          [0, 0],
+          [1, 0],
+          [0, 1],
+          [1, -1],
+        ],
+        [
+          [0, 0],
+          [-1, 0],
+          [1, 1],
+          [0, 1],
+        ],
+        [
+          [0, 0],
+          [-1, 0],
+          [0, -1],
+          [-1, 1],
+        ],
+      ],
+    },
+    J: {
+      name: "J",
+      type: 6,
+      color: palette.tetrominoColor[5],
+      x: 4,
+      y: 1,
+      rotation: 0,
+      hold: false,
+      pieces: [
+        [
+          [0, 0],
+          [-1, 0],
+          [1, 0],
+          [-1, -1],
+        ],
+        [
+          [0, 0],
+          [0, -1],
+          [0, 1],
+          [1, -1],
+        ],
+        [
+          [0, 0],
+          [-1, 0],
+          [1, 0],
+          [1, 1],
+        ],
+        [
+          [0, 0],
+          [-1, 1],
+          [0, -1],
+          [0, 1],
+        ],
+      ],
+    },
+    L: {
+      name: "L",
+      type: 7,
+      color: palette.tetrominoColor[6],
+      x: 4,
+      y: 1,
+      rotation: 0,
+      hold: false,
+      pieces: [
+        [
+          [0, 0],
+          [-1, 0],
+          [1, 0],
+          [1, -1],
+        ],
+        [
+          [0, 0],
+          [1, 1],
+          [0, -1],
+          [0, 1],
+        ],
+        [
+          [0, 0],
+          [-1, 0],
+          [1, 0],
+          [-1, 1],
+        ],
+        [
+          [0, 0],
+          [-1, -1],
+          [0, -1],
+          [0, 1],
+        ],
+      ],
+    },
+  };
 
-    this.matrix = new Array(20).fill(0).map(() => new Array(10).fill(0));
-    this.nextBag = this.getBag();
+  static rotationOffset = {
+    A: [
+      [
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+      ],
+      [
+        [0, 0],
+        [1, 0],
+        [1, 1],
+        [0, -2],
+        [1, -2],
+      ],
+      [
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+      ],
+      [
+        [0, 0],
+        [-1, 0],
+        [-1, 1],
+        [0, -2],
+        [-1, -2],
+      ],
+    ],
+    I: [
+      [
+        [0, 0],
+        [-1, 0],
+        [2, 0],
+        [-1, 0],
+        [2, 0],
+      ],
+      [
+        [-1, 0],
+        [0, 0],
+        [0, 0],
+        [0, -1],
+        [0, 2],
+      ],
+      [
+        [-1, -1],
+        [1, -1],
+        [-2, -1],
+        [1, 0],
+        [-2, 0],
+      ],
+      [
+        [0, -1],
+        [0, -1],
+        [0, -1],
+        [0, 1],
+        [0, -2],
+      ],
+    ],
+    O: [
+      [
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+      ],
+      [
+        [0, 1],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+      ],
+      [
+        [-1, 1],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+      ],
+      [
+        [-1, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+      ],
+    ],
+  };
+
+  constructor(matrix, currentBag) {
+    this.matrix = matrix;
+    this.currentBag = currentBag;
+    this.nextBag = Tetris.getBag();
   }
 
-  updateHoldTetromino(currentBag, currentTetromino, holdTetromino) {
-    let tempTetromino = null;
-
-    if (!holdTetromino) {
-      // TODO: have to reset tetromino position
-      holdTetromino = currentTetromino;
-      holdTetromino.hold = true;
-      currentTetromino = this.addTetromino(currentBag);
-    } else if (!holdTetromino.hold) {
-      // have to reset tetromino position
-      tempTetromino = currentTetromino;
-      currentTetromino = holdTetromino;
-      holdTetromino = tempTetromino;
-      holdTetromino.hold = true;
-    }
-
-    return {
-      holdTetromino,
-      currentTetromino,
-    };
+  static generateMatrix(width, height) {
+    return new Array(height).fill(0).map(() => new Array(width).fill(0));
   }
 
-  addTetromino(currentBag) {
-    const currentTetromino = this.getCurrentTetromino(currentBag);
-    this.updateBag(currentBag);
-    return currentTetromino;
-  }
-
-  getCurrentTetromino(currentBag) {
-    return currentBag[0];
-  }
-
-  updateBag(currentBag) {
-    currentBag.shift();
-    currentBag.push(this.nextBag.shift());
-
-    if (!this.nextBag.length) {
-      this.nextBag = this.getBag();
-    }
-  }
-
-  getBag() {
+  static getBag() {
     const tetrominoBag = [];
-    const bag = this.shuffleBag();
+    const bag = Tetris.shuffleBag();
 
     for (let i = 0; i < bag.length; i++) {
-      tetrominoBag.push(this.tetrominoes[bag[i]]);
+      tetrominoBag.push(Tetris.tetrominoes[bag[i]]);
     }
 
     return tetrominoBag;
   }
 
-  shuffleBag() {
+  static shuffleBag() {
     const arr = ["I", "J", "L", "O", "S", "T", "Z"];
 
     for (let i = arr.length - 1; i > 0; i--) {
@@ -407,5 +372,151 @@ export class Tetris {
     }
 
     return arr;
+  }
+
+  moveTetromino(activeTetromino, xStep, yStep) {
+    const piece = activeTetromino.pieces[activeTetromino.rotation];
+    const w = this.matrix[0].length;
+    const h = this.matrix.length;
+
+    let canMove = true;
+
+    for (let i = 0; i < piece.length; i++) {
+      const x = piece[i][0] + activeTetromino.x + xStep;
+      const y = piece[i][1] + activeTetromino.y + yStep;
+
+      if (x < 0 || x >= w || y >= h || this.matrix[y][x]) {
+        canMove = false;
+        return canMove;
+      }
+    }
+
+    if (canMove) {
+      activeTetromino.x += xStep;
+      activeTetromino.y += yStep;
+      return canMove;
+    }
+  }
+
+  rotateTetromino(activeTetromino, rotationStep) {
+    const rotationInfo = this.checkRotation(activeTetromino, rotationStep, 0);
+
+    if (rotationInfo.canRotate) {
+      activeTetromino.x += rotationInfo.wallKickXOffset;
+      activeTetromino.y += rotationInfo.wallKickYOffset;
+      activeTetromino.rotation = rotationInfo.nextRotation;
+    }
+  }
+
+  holdTetromino(activeTetromino, holdTetromino) {
+    let tempTetromino = null;
+
+    if (!holdTetromino) {
+      // TODO: have to reset tetromino position
+      holdTetromino = activeTetromino;
+      holdTetromino.hold = true;
+      activeTetromino = this.getActiveTetromino();
+      this.updateBag();
+    } else if (!holdTetromino.hold) {
+      // have to reset tetromino position
+      tempTetromino = activeTetromino;
+      activeTetromino = holdTetromino;
+      holdTetromino = tempTetromino;
+      holdTetromino.hold = true;
+    }
+
+    return {
+      holdTetromino,
+      activeTetromino,
+    };
+  }
+
+  checkRotation(activeTetromino, rotationStep, wallKickIndex) {
+    if (wallKickIndex > 4) {
+      return {
+        canRotate: false,
+      };
+    }
+
+    let wallKickXOffset = 0;
+    let wallKickYOffset = 0;
+    let nextRotation = 0;
+    let currentRotation = activeTetromino.rotation;
+
+    nextRotation = (currentRotation + rotationStep) % 4;
+
+    if (nextRotation < 0) {
+      nextRotation = 3;
+    }
+
+    const nextRotationTetromino = activeTetromino.pieces[nextRotation];
+    const name = this.remapTetrominoName(activeTetromino.name);
+
+    wallKickXOffset =
+      Tetris.rotationOffset[name][currentRotation][wallKickIndex][0] -
+      Tetris.rotationOffset[name][nextRotation][wallKickIndex][0];
+
+    wallKickYOffset =
+      Tetris.rotationOffset[name][currentRotation][wallKickIndex][1] -
+      Tetris.rotationOffset[name][nextRotation][wallKickIndex][1];
+
+    for (let i = 0; i < nextRotationTetromino.length; i++) {
+      const x =
+        nextRotationTetromino[i][0] + activeTetromino.x + wallKickXOffset;
+      const y =
+        nextRotationTetromino[i][1] + activeTetromino.y + wallKickYOffset;
+
+      if (
+        !this.matrix[y] ||
+        this.matrix[y][x] ||
+        this.matrix[y][x] === undefined
+      ) {
+        return this.checkRotation(
+          activeTetromino,
+          rotationStep,
+          wallKickIndex + 1,
+        );
+      }
+    }
+
+    return {
+      canRotate: true,
+      wallKickXOffset,
+      wallKickYOffset,
+      nextRotation,
+    };
+  }
+
+  remapTetrominoName(name) {
+    const arr = ["T", "Z", "S", "J", "L"];
+    if (arr.includes(name)) {
+      return "A";
+    }
+    return name;
+  }
+
+  mergeMatrix(activeTetromino) {
+    const type = activeTetromino.type;
+    const piece = activeTetromino.pieces[activeTetromino.rotation];
+
+    for (let i = 0; i < piece.length; i++) {
+      const x = piece[i][0] + activeTetromino.x;
+      const y = piece[i][1] + activeTetromino.y;
+
+      this.matrix[y][x] = type;
+    }
+  }
+
+  getActiveTetromino() {
+    return this.currentBag[0];
+  }
+
+  updateBag() {
+    this.currentBag.shift();
+    this.currentBag.push(this.nextBag.shift());
+
+    if (!this.nextBag.length) {
+      this.nextBag = Tetris.getBag();
+    }
   }
 }

@@ -13,20 +13,35 @@ import GameOverInfo from "@/components/info/GameOverInfo.vue";
 import ButtonOperation from "@/components/operation/ButtonOperation.vue";
 import KeyOperation from "@/components/operation/KeyOperation.vue";
 
-// TODO: new instance acording to game mode
-const tetris = new Tetris();
-
 const game = useGameStore();
 
-game.currentBag = tetris.getBag();
+game.matrix = Tetris.generateMatrix(10, 20);
+game.currentBag = Tetris.getBag();
+
+// TODO: new instance acording to game mode
+const tetris = new Tetris(game.matrix, game.currentBag);
 
 onMounted(() => {
   emitter.on("play", playGame);
+  emitter.on("left", moveTetrominoLeft);
+  emitter.on("right", moveTetrominoRight);
+  emitter.on("hardDrop", fallTetrominoToLand);
+  // emitter.on("softDrop", moveTetrominoDown);
+  emitter.on("rotateRight", rotateRight);
+  emitter.on("rotateLeft", rotateLeft);
+  emitter.on("rotateReverse", rotateFlip);
   emitter.on("hold", holdTetromino);
 });
 
 onUnmounted(() => {
   emitter.off("play", playGame);
+  emitter.off("left", moveTetrominoLeft);
+  emitter.onf("right", moveTetrominoRight);
+  emitter.off("hardDrop", fallTetrominoToLand);
+  // emitter.off("softDrop", moveTetrominoDown);
+  emitter.off("rotateRight", rotateRight);
+  emitter.off("rotateLeft", rotateLeft);
+  emitter.off("rotateReverse", rotateFlip);
   emitter.off("hold", holdTetromino);
 });
 
@@ -34,18 +49,46 @@ function playGame() {
   addTetromino();
 }
 
+function moveTetrominoLeft() {
+  tetris.moveTetromino(game.activeTetromino, -1, 0);
+}
+
+function moveTetrominoRight() {
+  tetris.moveTetromino(game.activeTetromino, 1, 0);
+}
+
+function fallTetrominoToLand() {
+  if (!tetris.moveTetromino(game.activeTetromino, 0, 1)) {
+    // handle tetromino land
+    tetris.mergeMatrix(game.activeTetromino);
+    addTetromino();
+  }
+}
+
+function rotateRight() {
+  tetris.rotateTetromino(game.activeTetromino, 1);
+}
+
+function rotateLeft() {
+  tetris.rotateTetromino(game.activeTetromino, -1);
+}
+
+function rotateFlip() {
+  tetris.rotateTetromino(game.activeTetromino, 2);
+}
+
 function addTetromino() {
-  game.currentTetromino = tetris.addTetromino(game.currentBag);
+  game.activeTetromino = tetris.getActiveTetromino();
+  tetris.updateBag();
 }
 
 function holdTetromino() {
-  const { currentTetromino, holdTetromino } = tetris.updateHoldTetromino(
-    game.currentBag,
-    game.currentTetromino,
+  const { activeTetromino, holdTetromino } = tetris.holdTetromino(
+    game.activeTetromino,
     game.holdTetromino,
   );
 
-  game.currentTetromino = currentTetromino;
+  game.activeTetromino = activeTetromino;
   game.holdTetromino = holdTetromino;
 }
 </script>
