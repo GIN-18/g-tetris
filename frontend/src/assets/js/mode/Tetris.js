@@ -9,7 +9,7 @@ export class Tetris {
       x: 4,
       y: 1,
       rotation: 0,
-      hold: false,
+      holdLock: false,
       pieces: [
         [
           [0, 0],
@@ -44,7 +44,7 @@ export class Tetris {
       x: 4,
       y: 0,
       rotation: 0,
-      hold: false,
+      holdLock: false,
       pieces: [
         [
           [0, 0],
@@ -79,7 +79,7 @@ export class Tetris {
       x: 4,
       y: 1,
       rotation: 0,
-      hold: false,
+      holdLock: false,
       pieces: [
         [
           [0, 0],
@@ -114,7 +114,7 @@ export class Tetris {
       x: 4,
       y: 1,
       rotation: 0,
-      hold: false,
+      holdLock: false,
       pieces: [
         [
           [0, 0],
@@ -149,7 +149,7 @@ export class Tetris {
       x: 4,
       y: 1,
       rotation: 0,
-      hold: false,
+      holdLock: false,
       pieces: [
         [
           [0, 0],
@@ -184,7 +184,7 @@ export class Tetris {
       x: 4,
       y: 1,
       rotation: 0,
-      hold: false,
+      holdLock: false,
       pieces: [
         [
           [0, 0],
@@ -219,7 +219,7 @@ export class Tetris {
       x: 4,
       y: 1,
       rotation: 0,
-      hold: false,
+      holdLock: false,
       pieces: [
         [
           [0, 0],
@@ -412,17 +412,17 @@ export class Tetris {
     let tempTetromino = null;
 
     if (!holdTetromino) {
-      // TODO: have to reset tetromino position
+      this.resetTetrominoOption(activeTetromino);
       holdTetromino = activeTetromino;
-      holdTetromino.hold = true;
+      holdTetromino.holdLock = true;
       activeTetromino = this.getActiveTetromino();
       this.updateBag();
     } else if (!holdTetromino.hold) {
-      // have to reset tetromino position
+      this.resetTetrominoOption(activeTetromino);
       tempTetromino = activeTetromino;
       activeTetromino = holdTetromino;
       holdTetromino = tempTetromino;
-      holdTetromino.hold = true;
+      holdTetromino.holdLock = true;
     }
 
     return {
@@ -495,6 +495,17 @@ export class Tetris {
     return name;
   }
 
+  landTetromino(activeTetromino, holdTetromino) {
+    // reset hold tetromino lock
+    if (holdTetromino) {
+      holdTetromino.holdLock = false;
+    }
+
+    this.mergeMatrix(activeTetromino);
+    this.clearFilledLines();
+    this.resetTetrominoOption(activeTetromino);
+  }
+
   mergeMatrix(activeTetromino) {
     const type = activeTetromino.type;
     const piece = activeTetromino.pieces[activeTetromino.rotation];
@@ -505,6 +516,32 @@ export class Tetris {
 
       this.matrix[y][x] = type;
     }
+  }
+
+  clearFilledLines() {
+    const filledLines = this.getFilledLines();
+    const width = this.matrix[0].length;
+
+    if (!filledLines.length) return;
+
+    for (let i = 0; i < filledLines.length; i++) {
+      this.matrix.splice(filledLines[i], 1);
+      this.matrix.unshift(new Array(width).fill(0));
+    }
+  }
+
+  getFilledLines() {
+    const filledLines = [];
+
+    for (let i = 0; i < this.matrix.length; i++) {
+      const isFilled = this.matrix[i].includes(0);
+
+      if (!isFilled) {
+        filledLines.push(i);
+      }
+    }
+
+    return filledLines;
   }
 
   getActiveTetromino() {
@@ -518,5 +555,11 @@ export class Tetris {
     if (!this.nextBag.length) {
       this.nextBag = Tetris.getBag();
     }
+  }
+
+  resetTetrominoOption(activeTetromino) {
+    activeTetromino.x = 4;
+    activeTetromino.y = 1;
+    activeTetromino.rotation = 0;
   }
 }

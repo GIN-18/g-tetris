@@ -59,8 +59,7 @@ function moveTetrominoRight() {
 
 function fallTetrominoToLand() {
   if (!tetris.moveTetromino(game.activeTetromino, 0, 1)) {
-    // handle tetromino land
-    tetris.mergeMatrix(game.activeTetromino);
+    tetris.landTetromino(game.activeTetromino, game.holdTetromino);
     addTetromino();
   }
 }

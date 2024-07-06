@@ -28,164 +28,46 @@ onMounted(() => {
   canvas.value.height = game.block * 20;
 });
 
-function checkGameOver() {
-  const tetromino = getCurrentTetromino();
+// function checkGameOver() {
+//   const tetromino = getCurrentTetromino();
+//
+//   for (let i = 0; i < tetromino.length; i++) {
+//     const x = tetromino[i][0] + currentShape.x;
+//     const y = tetromino[i][1] + currentShape.y;
+//
+//     if (matrix[y][x]) {
+//       return true;
+//     }
+//   }
+//
+//   return false;
+// }
 
-  for (let i = 0; i < tetromino.length; i++) {
-    const x = tetromino[i][0] + currentShape.x;
-    const y = tetromino[i][1] + currentShape.y;
+// function updateLines() {
+//   const filledLines = getFilledLines();
+//
+//   game.lines += filledLines.length;
+// }
 
-    if (matrix[y][x]) {
-      return true;
-    }
-  }
+// function updateScore() {
+//   const scoreArray = [100, 300, 500, 800];
+//   const filledLines = getFilledLines();
+//
+//   if (!filledLines.length) return;
+//
+//   game.score += scoreArray[filledLines.length - 1] * game.level;
+// }
 
-  return false;
-}
-
-function updateCurrentBags() {
-  game.currentBag.shift();
-  game.currentBag.push(game.nextBag.shift());
-
-  if (!game.nextBag.length) {
-    game.nextBag = getBags();
-  }
-}
-
-// TODO: set current y for tetromino
-function getCurrentShape() {
-  return {
-    x: 4,
-    y: 1,
-    rotation: 0,
-    holdLock: false,
-    tetromino: game.currentBag[0],
-  };
-}
-
-function getCurrentTetromino() {
-  return currentShape.tetromino.pieces[currentShape.rotation];
-}
-
-function checkRotation(rotationStep, wallKickIndex) {
-  if (wallKickIndex > 4) {
-    return {
-      canRotate: false,
-    };
-  }
-
-  let wallKickXOffset = 0;
-  let wallKickYOffset = 0;
-  let nextRotation = 0;
-  let currentRotation = currentShape.rotation;
-
-  nextRotation = (currentRotation + rotationStep) % 4;
-
-  if (nextRotation < 0) {
-    nextRotation = 3;
-  }
-
-  const nextRotationTetromino = currentShape.tetromino.pieces[nextRotation];
-  const name = remapName(currentShape.tetromino.name);
-
-  wallKickXOffset =
-    rotationOffset[name][currentRotation][wallKickIndex][0] -
-    rotationOffset[name][nextRotation][wallKickIndex][0];
-  wallKickYOffset =
-    rotationOffset[name][currentRotation][wallKickIndex][1] -
-    rotationOffset[name][nextRotation][wallKickIndex][1];
-
-  for (let i = 0; i < nextRotationTetromino.length; i++) {
-    const x = nextRotationTetromino[i][0] + currentShape.x + wallKickXOffset;
-    const y = nextRotationTetromino[i][1] + currentShape.y + wallKickYOffset;
-
-    if (!matrix[y] || matrix[y][x] || matrix[y][x] === undefined) {
-      return checkRotation(rotationStep, wallKickIndex + 1);
-    }
-  }
-
-  return {
-    wallKickXOffset,
-    wallKickYOffset,
-    nextRotation,
-    canRotate: true,
-  };
-}
-
-function remapName(name) {
-  const arr = ["T", "Z", "S", "J", "L"];
-  if (arr.includes(name)) {
-    return "A";
-  }
-  return name;
-}
-
-function mergeMatrix() {
-  const type = currentShape.tetromino.type;
-  const tetromino = getCurrentTetromino();
-
-  for (let i = 0; i < tetromino.length; i++) {
-    const x = tetromino[i][0] + currentShape.x;
-    const y = tetromino[i][1] + currentShape.y;
-
-    matrix[y][x] = type;
-  }
-}
-
-function updateLines() {
-  const filledLines = getFilledLines();
-
-  game.lines += filledLines.length;
-}
-
-// TODO: scoring system not yet
-// doc: https://tetris.wiki/Scoring#Recent_guideline_compatible_games
-// just single-tetris
-function updateScore() {
-  const scoreArray = [100, 300, 500, 800];
-  const filledLines = getFilledLines();
-
-  if (!filledLines.length) return;
-
-  game.score += scoreArray[filledLines.length - 1] * game.level;
-}
-
-// HACK: setup for highest level
-function updateLevel() {
-  if (game.level === 25) return;
-
-  const oldLevel = game.level - 1;
-  const increased = Math.floor(game.lines / 10);
-
-  if (oldLevel !== increased) {
-    game.level += 1;
-  }
-}
-
-function clearFilledLines() {
-  const filledLines = getFilledLines();
-
-  if (!filledLines.length) return;
-
-  for (let i = 0; i < filledLines.length; i++) {
-    matrix.splice(filledLines[i], 1);
-    matrix.unshift(new Array(10).fill(0));
-  }
-}
-
-function getFilledLines() {
-  const filledLines = [];
-
-  for (let i = 0; i < matrix.length; i++) {
-    const isFilled = matrix[i].every((item) => !!item);
-
-    if (isFilled) {
-      filledLines.push(i);
-    }
-  }
-
-  return filledLines;
-}
+// function updateLevel() {
+//   if (game.level === 25) return;
+//
+//   const oldLevel = game.level - 1;
+//   const increased = Math.floor(game.lines / 10);
+//
+//   if (oldLevel !== increased) {
+//     game.level += 1;
+//   }
+// }
 
 function drawPlayfield() {
   clearCanvas();

@@ -37,9 +37,9 @@ function drawHoldTetromino() {
   const tetromino = game.holdTetromino;
   const name = tetromino.name;
   const color = tetromino.color;
-  const piece = tetromino.pieces[tetromino.rotation];
+  const piece = tetromino.pieces[0];
 
-  if (tetromino.hold) {
+  if (tetromino.holdLock) {
     ctx.value.fillStyle = palette.previewColor;
   } else {
     ctx.value.fillStyle = color;
