@@ -2,7 +2,6 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useGameStore } from "@/stores/game.js";
 import { palette } from "@/assets/js/palette.js";
-import { rotationOffset, getBags } from "@/assets/js/tetromino.js";
 
 // get canvas info
 const canvas = ref(null);
@@ -11,8 +10,6 @@ const height = computed(() => canvas.value.height);
 const ctx = computed(() => canvas.value.getContext("2d"));
 
 const game = useGameStore();
-
-let currentShape = null;
 
 watch(
   [() => game.matrix, () => game.activeTetromino, () => game.isDrawGhostPiece],
@@ -27,47 +24,6 @@ onMounted(() => {
   canvas.value.width = game.block * 10;
   canvas.value.height = game.block * 20;
 });
-
-// function checkGameOver() {
-//   const tetromino = getCurrentTetromino();
-//
-//   for (let i = 0; i < tetromino.length; i++) {
-//     const x = tetromino[i][0] + currentShape.x;
-//     const y = tetromino[i][1] + currentShape.y;
-//
-//     if (matrix[y][x]) {
-//       return true;
-//     }
-//   }
-//
-//   return false;
-// }
-
-// function updateLines() {
-//   const filledLines = getFilledLines();
-//
-//   game.lines += filledLines.length;
-// }
-
-// function updateScore() {
-//   const scoreArray = [100, 300, 500, 800];
-//   const filledLines = getFilledLines();
-//
-//   if (!filledLines.length) return;
-//
-//   game.score += scoreArray[filledLines.length - 1] * game.level;
-// }
-
-// function updateLevel() {
-//   if (game.level === 25) return;
-//
-//   const oldLevel = game.level - 1;
-//   const increased = Math.floor(game.lines / 10);
-//
-//   if (oldLevel !== increased) {
-//     game.level += 1;
-//   }
-// }
 
 function drawPlayfield() {
   clearCanvas();

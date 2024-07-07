@@ -431,6 +431,36 @@ export class Tetris {
     };
   }
 
+  landTetromino(activeTetromino, holdTetromino) {
+    // reset hold tetromino lock
+    if (holdTetromino) {
+      holdTetromino.holdLock = false;
+    }
+
+    this.mergeMatrix(activeTetromino);
+    this.clearFilledLines();
+    this.resetTetrominoOption(activeTetromino);
+  }
+
+  checkGameover(activeTetromino) {
+    const piece = activeTetromino.pieces[activeTetromino.rotation];
+
+    for (let i = 0; i < piece.length; i++) {
+      const x = piece[i][0] + activeTetromino.x;
+      const y = piece[i][1] + activeTetromino.y;
+
+      if (this.matrix[y][x]) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  updateLines() {
+    return this.getFilledLines().length;
+  }
+
   checkRotation(activeTetromino, rotationStep, wallKickIndex) {
     if (wallKickIndex > 4) {
       return {
@@ -493,17 +523,6 @@ export class Tetris {
       return "A";
     }
     return name;
-  }
-
-  landTetromino(activeTetromino, holdTetromino) {
-    // reset hold tetromino lock
-    if (holdTetromino) {
-      holdTetromino.holdLock = false;
-    }
-
-    this.mergeMatrix(activeTetromino);
-    this.clearFilledLines();
-    this.resetTetrominoOption(activeTetromino);
   }
 
   mergeMatrix(activeTetromino) {

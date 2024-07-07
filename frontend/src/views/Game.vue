@@ -57,13 +57,6 @@ function moveTetrominoRight() {
   tetris.moveTetromino(game.activeTetromino, 1, 0);
 }
 
-function fallTetrominoToLand() {
-  if (!tetris.moveTetromino(game.activeTetromino, 0, 1)) {
-    tetris.landTetromino(game.activeTetromino, game.holdTetromino);
-    addTetromino();
-  }
-}
-
 function rotateRight() {
   tetris.rotateTetromino(game.activeTetromino, 1);
 }
@@ -76,11 +69,6 @@ function rotateFlip() {
   tetris.rotateTetromino(game.activeTetromino, 2);
 }
 
-function addTetromino() {
-  game.activeTetromino = tetris.getActiveTetromino();
-  tetris.updateBag();
-}
-
 function holdTetromino() {
   const { activeTetromino, holdTetromino } = tetris.holdTetromino(
     game.activeTetromino,
@@ -89,6 +77,19 @@ function holdTetromino() {
 
   game.activeTetromino = activeTetromino;
   game.holdTetromino = holdTetromino;
+}
+
+function fallTetrominoToLand() {
+  if (!tetris.moveTetromino(game.activeTetromino, 0, 1)) {
+    // handle tetromino land
+    tetris.landTetromino(game.activeTetromino, game.holdTetromino);
+    addTetromino();
+  }
+}
+
+function addTetromino() {
+  game.activeTetromino = tetris.getActiveTetromino();
+  tetris.updateBag();
 }
 </script>
 
