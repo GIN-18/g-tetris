@@ -42,7 +42,7 @@ export class Tetris {
       type: 2,
       color: palette.tetrominoColor[1],
       x: 4,
-      y: 0,
+      y: 1,
       rotation: 0,
       holdLock: false,
       pieces: [
@@ -408,7 +408,7 @@ export class Tetris {
     }
   }
 
-  holdTetromino(activeTetromino, holdTetromino) {
+  updateHoldTetromino(activeTetromino, holdTetromino) {
     let tempTetromino = null;
 
     if (!holdTetromino) {
@@ -429,17 +429,6 @@ export class Tetris {
       holdTetromino,
       activeTetromino,
     };
-  }
-
-  landTetromino(activeTetromino, holdTetromino) {
-    // reset hold tetromino lock
-    if (holdTetromino) {
-      holdTetromino.holdLock = false;
-    }
-
-    this.mergeMatrix(activeTetromino);
-    this.clearFilledLines();
-    this.resetTetrominoOption(activeTetromino);
   }
 
   checkGameover(activeTetromino) {

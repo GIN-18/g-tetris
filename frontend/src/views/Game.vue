@@ -70,7 +70,7 @@ function rotateFlip() {
 }
 
 function holdTetromino() {
-  const { activeTetromino, holdTetromino } = tetris.holdTetromino(
+  const { activeTetromino, holdTetromino } = tetris.updateHoldTetromino(
     game.activeTetromino,
     game.holdTetromino,
   );
@@ -81,10 +81,21 @@ function holdTetromino() {
 
 function fallTetrominoToLand() {
   if (!tetris.moveTetromino(game.activeTetromino, 0, 1)) {
-    // handle tetromino land
-    tetris.landTetromino(game.activeTetromino, game.holdTetromino);
-    addTetromino();
+    landTetromino();
   }
+}
+
+function landTetromino() {
+  if (game.holdTetromino) {
+    game.holdTetromino.holdLock = false;
+  }
+
+  tetris.mergeMatrix(game.activeTetromino);
+  game.lines += tetris.updateLines();
+  tetris.clearFilledLines();
+  tetris.resetTetrominoOption(game.activeTetromino);
+
+  addTetromino();
 }
 
 function addTetromino() {
@@ -100,7 +111,7 @@ function addTetromino() {
 
   <main class="flex justify-between items-center w-full">
     <LeftSideInfo />
-    <PlayfieldCanvas />
+    <PlayfieldCanvas :block="game.block" />
     <RightSideInfo />
   </main>
 
