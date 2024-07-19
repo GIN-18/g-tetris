@@ -346,8 +346,6 @@ export class Tetris {
     this.matrix = matrix;
     this.currentBag = currentBag;
     this.nextBag = Tetris.getBag();
-    this.level = 1;
-    this.lines = 0;
     this.oldLines = 0;
   }
 
@@ -438,7 +436,7 @@ export class Tetris {
     return this.getFilledLines().length;
   }
 
-  getLevel(lines) {
+  getLevelIncrement(lines) {
     const increment = Math.floor(lines / 10);
 
     if (increment > 0 && Math.abs(this.oldLines - lines) >= 10) {

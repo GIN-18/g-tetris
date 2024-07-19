@@ -20,15 +20,15 @@ game.currentBag = Tetris.getBag();
 
 // TODO: new instance acording to game mode
 const tetris = new Tetris(game.matrix, game.currentBag);
-
+//
 onMounted(() => {
   // requestAnimationFrame(gameLoop);
 
   emitter.on("play", playGame);
   emitter.on("left", moveTetrominoLeft);
   emitter.on("right", moveTetrominoRight);
-  emitter.on("hardDrop", fallTetrominoToLand);
-  // emitter.on("softDrop", moveTetrominoDown);
+  emitter.on("hardDrop", hardDropTetromino);
+  emitter.on("softDrop", softDropTetromino);
   emitter.on("rotateRight", rotateRight);
   emitter.on("rotateLeft", rotateLeft);
   emitter.on("rotateReverse", rotateFlip);
@@ -39,8 +39,8 @@ onUnmounted(() => {
   emitter.off("play", playGame);
   emitter.off("left", moveTetrominoLeft);
   emitter.onf("right", moveTetrominoRight);
-  emitter.off("hardDrop", fallTetrominoToLand);
-  // emitter.off("softDrop", moveTetrominoDown);
+  emitter.off("hardDrop", hardDropTetromino);
+  emitter.off("softDrop", softDropTetromino);
   emitter.off("rotateRight", rotateRight);
   emitter.off("rotateLeft", rotateLeft);
   emitter.off("rotateReverse", rotateFlip);
@@ -67,6 +67,17 @@ function moveTetrominoLeft() {
 
 function moveTetrominoRight() {
   tetris.moveTetromino(game.activeTetromino, 1, 0);
+}
+
+function hardDropTetromino() {
+  while (tetris.moveTetromino(game.activeTetromino, 0, 1)) {}
+  landTetromino();
+}
+
+function softDropTetromino(enable) {
+  if (enable && !tetris.moveTetromino(game.activeTetromino, 0, 1)) {
+    landTetromino();
+  }
 }
 
 function rotateRight() {
@@ -120,7 +131,7 @@ function updateScore() {
 }
 
 function updateLevel() {
-  game.level += tetris.getLevel(game.lines);
+  game.level += tetris.getLevelIncrement(game.lines);
 }
 
 function addTetromino() {
@@ -129,6 +140,7 @@ function addTetromino() {
     tetris.updateBag();
   } else {
     // TODO: handle game over
+    console.log("game over");
   }
 }
 </script>
