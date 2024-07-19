@@ -346,6 +346,9 @@ export class Tetris {
     this.matrix = matrix;
     this.currentBag = currentBag;
     this.nextBag = Tetris.getBag();
+    this.level = 1;
+    this.lines = 0;
+    this.oldLines = 0;
   }
 
   static generateMatrix(width, height) {
@@ -417,7 +420,7 @@ export class Tetris {
       holdTetromino.holdLock = true;
       activeTetromino = this.getActiveTetromino();
       this.updateBag();
-    } else if (!holdTetromino.hold) {
+    } else if (!holdTetromino.holdLock) {
       this.resetTetrominoOption(activeTetromino);
       tempTetromino = activeTetromino;
       activeTetromino = holdTetromino;
@@ -429,6 +432,36 @@ export class Tetris {
       holdTetromino,
       activeTetromino,
     };
+  }
+
+  getLines() {
+    return this.getFilledLines().length;
+  }
+
+  getLevel(lines) {
+    const increment = Math.floor(lines / 10);
+
+    if (increment > 0 && Math.abs(this.oldLines - lines) >= 10) {
+      this.oldLines += 10;
+      return 1;
+    }
+
+    return 0;
+  }
+
+  // TODO: update score acording to T-Spin, T-Spin Mini, BackToBack and Combo
+  getScore(level) {
+    const lineScore = [100, 300, 500, 800];
+    let index, score;
+
+    if (!this.getLines()) {
+      score = 0;
+    } else {
+      index = this.getLines() - 1;
+      score = lineScore[index] * level;
+    }
+
+    return score;
   }
 
   checkGameover(activeTetromino) {
@@ -444,10 +477,6 @@ export class Tetris {
     }
 
     return false;
-  }
-
-  updateLines() {
-    return this.getFilledLines().length;
   }
 
   checkRotation(activeTetromino, rotationStep, wallKickIndex) {

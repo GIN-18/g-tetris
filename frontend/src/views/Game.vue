@@ -22,6 +22,8 @@ game.currentBag = Tetris.getBag();
 const tetris = new Tetris(game.matrix, game.currentBag);
 
 onMounted(() => {
+  // requestAnimationFrame(gameLoop);
+
   emitter.on("play", playGame);
   emitter.on("left", moveTetrominoLeft);
   emitter.on("right", moveTetrominoRight);
@@ -47,6 +49,16 @@ onUnmounted(() => {
 
 function playGame() {
   addTetromino();
+}
+
+function gameLoop() {
+  if (!game.activeTetromino) {
+    addTetromino();
+  }
+
+  fallTetrominoToLand();
+
+  requestAnimationFrame(gameLoop);
 }
 
 function moveTetrominoLeft() {
@@ -91,16 +103,33 @@ function landTetromino() {
   }
 
   tetris.mergeMatrix(game.activeTetromino);
-  game.lines += tetris.updateLines();
+  updateLines();
+  updateScore();
+  updateLevel();
   tetris.clearFilledLines();
   tetris.resetTetrominoOption(game.activeTetromino);
-
   addTetromino();
 }
 
+function updateLines() {
+  game.lines += tetris.getLines();
+}
+
+function updateScore() {
+  game.score += tetris.getScore(game.level);
+}
+
+function updateLevel() {
+  game.level += tetris.getLevel(game.lines);
+}
+
 function addTetromino() {
-  game.activeTetromino = tetris.getActiveTetromino();
-  tetris.updateBag();
+  if (!game.activeTetromino || !tetris.checkGameover(game.activeTetromino)) {
+    game.activeTetromino = tetris.getActiveTetromino();
+    tetris.updateBag();
+  } else {
+    // TODO: handle game over
+  }
 }
 </script>
 
