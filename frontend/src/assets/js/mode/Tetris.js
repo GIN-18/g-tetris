@@ -347,6 +347,7 @@ export class Tetris {
     this.currentBag = currentBag;
     this.nextBag = Tetris.getBag();
     this.oldLines = 0;
+    this.lastRenderTime = 0;
   }
 
   static generateMatrix(width, height) {
@@ -430,6 +431,10 @@ export class Tetris {
       holdTetromino,
       activeTetromino,
     };
+  }
+
+  getDropInterval(level) {
+    return Math.pow(0.8 - (level - 1) * 0.007, level - 1);
   }
 
   getLines() {

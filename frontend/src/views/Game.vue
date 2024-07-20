@@ -20,9 +20,9 @@ game.currentBag = Tetris.getBag();
 
 // TODO: new instance acording to game mode
 const tetris = new Tetris(game.matrix, game.currentBag);
-//
+
 onMounted(() => {
-  // requestAnimationFrame(gameLoop);
+  requestAnimationFrame(gameLoop);
 
   emitter.on("play", playGame);
   emitter.on("left", moveTetrominoLeft);
@@ -51,12 +51,18 @@ function playGame() {
   addTetromino();
 }
 
-function gameLoop() {
-  if (!game.activeTetromino) {
-    addTetromino();
-  }
+function gameLoop(currentTime) {
+  const dropInterval = tetris.getDropInterval(game.level) * 1000;
+  const deltaTime = currentTime - tetris.lastRenderTime;
 
-  fallTetrominoToLand();
+  if (deltaTime > dropInterval) {
+    if (!game.activeTetromino) {
+      addTetromino();
+    }
+    fallTetrominoToLand();
+
+    tetris.lastRenderTime = currentTime;
+  }
 
   requestAnimationFrame(gameLoop);
 }
