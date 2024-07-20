@@ -348,6 +348,7 @@ export class Tetris {
     this.nextBag = Tetris.getBag();
     this.oldLines = 0;
     this.lastRenderTime = 0;
+    this.combo = 0;
   }
 
   static generateMatrix(width, height) {
@@ -536,6 +537,20 @@ export class Tetris {
       wallKickYOffset,
       nextRotation,
     };
+  }
+
+  checkCombo() {
+    if (this.getLines()) {
+      this.combo += 1;
+    } else {
+      this.combo = 0;
+    }
+
+    if (this.combo > 1) {
+      return true;
+    }
+
+    return false;
   }
 
   remapTetrominoName(name) {

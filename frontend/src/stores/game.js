@@ -13,7 +13,6 @@ export const useGameStore = defineStore("game", {
     nextBag: null,
     activeTetromino: null,
     holdTetromino: null,
-    highScore: localStorage.getItem("highScore") || 0,
     isDrawGhostPiece: localStorage.getItem("isDrawGhostPiece") || true,
   }),
 });

@@ -22,7 +22,7 @@ game.currentBag = Tetris.getBag();
 const tetris = new Tetris(game.matrix, game.currentBag);
 
 onMounted(() => {
-  requestAnimationFrame(gameLoop);
+  // requestAnimationFrame(gameLoop);
 
   emitter.on("play", playGame);
   emitter.on("left", moveTetrominoLeft);
@@ -145,8 +145,8 @@ function addTetromino() {
     game.activeTetromino = tetris.getActiveTetromino();
     tetris.updateBag();
   } else {
-    // TODO: handle game over
-    console.log("game over");
+    // handle game over
+    game.gameOver = true;
   }
 }
 </script>
