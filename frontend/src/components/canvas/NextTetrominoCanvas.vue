@@ -2,15 +2,10 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useGameStore } from "@/stores/game.js";
 
-// get canvas info
 const canvas = ref(null);
 const width = computed(() => canvas.value.width);
 const height = computed(() => canvas.value.height);
 const ctx = computed(() => canvas.value.getContext("2d"));
-
-const props = defineProps({
-  block: Number,
-});
 
 const game = useGameStore();
 
@@ -26,8 +21,8 @@ watch(
 );
 
 onMounted(() => {
-  canvas.value.width = props.block * 4;
-  canvas.value.height = props.block * (2 * 4 + 3);
+  canvas.value.width = game.block * 4;
+  canvas.value.height = game.block * (2 * 4 + 3);
 
   clearCanvas();
   drawBag();
@@ -52,10 +47,10 @@ function drawBag() {
       const y = tetromino[j][1] + 1 + i * 3 + yOffset;
 
       ctx.value.fillRect(
-        x * props.block,
-        y * props.block,
-        props.block,
-        props.block,
+        x * game.block,
+        y * game.block,
+        game.block,
+        game.block,
       );
     }
   }

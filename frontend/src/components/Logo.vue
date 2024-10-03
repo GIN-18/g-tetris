@@ -12,11 +12,7 @@ function jumpToHome() {
 </script>
 
 <template>
-  <h1
-    class="text-3xl"
-    @click.prevent="jumpToHome"
-    @touchstart.prevent="jumpToHome"
-  >
+  <h1 class="text-2xl" @click.prevent="jumpToHome" @touchstart.prevent="jumpToHome">
     VUETRIS
   </h1>
 </template>

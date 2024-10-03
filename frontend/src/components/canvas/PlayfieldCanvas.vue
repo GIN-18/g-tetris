@@ -11,10 +11,6 @@ const ctx = computed(() => canvas.value.getContext("2d"));
 
 const game = useGameStore();
 
-const props = defineProps({
-  block: Number,
-});
-
 watch(
   [() => game.matrix, () => game.activeTetromino, () => game.isDrawGhostPiece],
   () => {
@@ -25,8 +21,8 @@ watch(
 
 onMounted(() => {
   // set canvas size
-  canvas.value.width = props.block * 10;
-  canvas.value.height = props.block * 20;
+  canvas.value.width = game.block * 10;
+  canvas.value.height = game.block * 20;
 });
 
 function drawPlayfield() {
@@ -50,10 +46,10 @@ function drawMatrix() {
 
       ctx.value.fillStyle = palette.tetrominoColor[game.matrix[y][x] - 1];
       ctx.value.fillRect(
-        x * props.block,
-        y * props.block,
-        props.block,
-        props.block,
+        x * game.block,
+        y * game.block,
+        game.block,
+        game.block,
       );
     }
   }
@@ -73,10 +69,10 @@ function drawGhostPiece() {
     const y = piece[i][1] + ghostPieceYOffset;
 
     ctx.value.fillRect(
-      x * props.block,
-      y * props.block,
-      props.block,
-      props.block,
+      x * game.block,
+      y * game.block,
+      game.block,
+      game.block,
     );
   }
 }
@@ -91,10 +87,10 @@ function drawActiveTetromino() {
     const x = piece[i][0] + tetromino.x;
     const y = piece[i][1] + tetromino.y;
     ctx.value.fillRect(
-      x * props.block,
-      y * props.block,
-      props.block,
-      props.block,
+      x * game.block,
+      y * game.block,
+      game.block,
+      game.block,
     );
   }
 }

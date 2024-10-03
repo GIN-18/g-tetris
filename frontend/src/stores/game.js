@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 export const useGameStore = defineStore("game", {
   state: () => ({
-    block: 18,
+    block: 16,
     gamePlay: false,
     gameOver: false,
     level: 1,

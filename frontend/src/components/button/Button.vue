@@ -2,7 +2,7 @@
 import { computed } from "vue";
 
 const props = defineProps({
-  type: String,
+  color: String,
   text: String,
   icon: {
     type: [String, Object],
@@ -11,10 +11,10 @@ const props = defineProps({
 
 const classList = computed(() => ({
   "nes-btn !flex justify-center items-center": true,
-  "is-primary": props.type === "primary",
-  "is-success": props.type === "success",
-  "is-warning": props.type === "warning",
-  "is-error": props.type === "error",
+  "is-primary": props.color === "blue",
+  "is-success": props.color === "green",
+  "is-warning": props.color === "yellow",
+  "is-error": props.color === "red",
 }));
 </script>
 

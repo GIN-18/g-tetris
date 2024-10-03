@@ -11,10 +11,6 @@ const ctx = computed(() => canvas.value.getContext("2d"));
 
 const game = useGameStore();
 
-const props = defineProps({
-  block: Number,
-});
-
 watch(
   () => game.holdTetromino,
   () => {
@@ -25,8 +21,8 @@ watch(
 );
 
 onMounted(() => {
-  canvas.value.width = props.block * 4;
-  canvas.value.height = props.block * 4;
+  canvas.value.width = game.block * 4;
+  canvas.value.height = game.block * 4;
 });
 
 function clearCanvas() {
@@ -50,10 +46,10 @@ function drawHoldTetromino() {
     const y = piece[i][1] + setYOffset(name);
 
     ctx.value.fillRect(
-      x * props.block,
-      y * props.block,
-      props.block,
-      props.block,
+      x * game.block,
+      y * game.block,
+      game.block,
+      game.block,
     );
   }
 }
@@ -78,5 +74,5 @@ function setYOffset(name) {
 </script>
 
 <template>
-  <canvas class="border-4 border-black bg-black" ref="canvas"></canvas>
+  <canvas class="border-2 border-black bg-black" ref="canvas"></canvas>
 </template>
