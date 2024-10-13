@@ -5,7 +5,6 @@ import { useGameStore } from "@/stores/game";
 import DialogsBox from "@/components/DialogsBox.vue";
 import LabelBox from "@/components/info/LabelBox.vue";
 import Button from "@/components/button/Button.vue";
-import QuitButton from "@/components/button/QuitButton.vue";
 
 const game = useGameStore();
 const title = ref("GAME OVER");
@@ -31,15 +30,12 @@ const title = ref("GAME OVER");
     <!-- button -->
     <div class="flex gap-12">
       <!-- again button -->
-      <Button
-        type="success"
-        text="AGAIN"
-        @click.prevent="emitter.emit('reset')"
-        @touchstart.prevent="emitter.emit('reset')"
-      />
+      <Button color="green" text="AGAIN" @click.prevent="emitter.emit('reset')"
+        @touchstart.prevent="emitter.emit('reset')" />
 
       <!-- quit button -->
-      <QuitButton />
+      <Button color="yellow" text="Quit" @click.prevent="emitter.emit('reset')"
+        @touchstart.prevent="emitter.emit('reset')" />
     </div>
   </DialogsBox>
 </template>

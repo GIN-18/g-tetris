@@ -13,9 +13,11 @@ import GameOverInfo from "@/components/info/GameOverInfo.vue";
 import ButtonOperation from "@/components/operation/ButtonOperation.vue";
 import KeyOperation from "@/components/operation/KeyOperation.vue";
 
+const MATRIX_WIDTH = 10
+const MATRIX_HEIGHT = 20
 const game = useGameStore();
 
-game.matrix = Tetris.generateMatrix(10, 20);
+game.matrix = Tetris.generateMatrix(MATRIX_WIDTH, MATRIX_HEIGHT);
 game.currentBag = Tetris.getBag();
 
 // TODO: new instance acording to game mode
@@ -38,7 +40,7 @@ onMounted(() => {
 onUnmounted(() => {
   emitter.off("play", playGame);
   emitter.off("left", moveTetrominoLeft);
-  emitter.onf("right", moveTetrominoRight);
+  emitter.off("right", moveTetrominoRight);
   emitter.off("hardDrop", hardDropTetromino);
   emitter.off("softDrop", softDropTetromino);
   emitter.off("rotateRight", rotateRight);
@@ -76,7 +78,7 @@ function moveTetrominoRight() {
 }
 
 function hardDropTetromino() {
-  while (tetris.moveTetromino(game.activeTetromino, 0, 1)) {}
+  while (tetris.moveTetromino(game.activeTetromino, 0, 1)) { }
   landTetromino();
 }
 

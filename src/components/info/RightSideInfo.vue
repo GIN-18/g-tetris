@@ -14,7 +14,7 @@ const game = useGameStore();
     </InfoBox>
 
     <!-- game score -->
-    <InfoBox title="SCORE">
+    <InfoBox border title="SCORE">
       <p>{{ game.score }}</p>
     </InfoBox>
   </div>

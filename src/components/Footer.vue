@@ -7,7 +7,7 @@ const author = {
 </script>
 
 <template>
-  <footer class="flex justify-center items-center gap-8 py-2">
+  <footer class="flex justify-center items-center gap-8 pt-2">
     <a class="flex items-center gap-2" :href="author.blog">
       <span class="icon-[pixelarticons--home] text-lg"></span>
       <p class="mb-0 text-xs">{{ author.name }}</p>

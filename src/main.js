@@ -1,4 +1,4 @@
-import "./assets/main.css";
+import "./assets/css/main.css";
 import "nes.css/css/nes.min.css";
 
 import App from "./App.vue";
