@@ -1,29 +1,29 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { emitter } from "@/assets/js/emitter.js";
+import { ref, computed, onMounted } from 'vue'
+import { emitter } from '@/assets/js/emitter.js'
 
-const messages = ref([]);
-const messageType = ref(null);
+const messages = ref([])
+const messageType = ref(null)
 
 const messageClassList = computed(() => ({
-  "p-3 border-4 border-black": true,
-  "text-nes-white bg-nes-red": messageType.value === "error",
-  "bg-nes-yellow": messageType.value === "warning",
-  "text-nes-white bg-nes-green": messageType.value === "success",
-}));
+  'p-3 border-4 border-black': true,
+  'text-nes-white bg-nes-red': messageType.value === 'error',
+  'bg-nes-yellow': messageType.value === 'warning',
+  'text-nes-white bg-nes-green': messageType.value === 'success',
+}))
 
 onMounted(() => {
-  emitter.on("add", addMessage);
-});
+  emitter.on('add', addMessage)
+})
 
 // FIXME: have to clear setTimerout or clear messages
 function addMessage({ type, message }) {
-  messageType.value = type;
-  messages.value.push(message);
+  messageType.value = type
+  messages.value.push(message)
 
   setTimeout(() => {
-    messages.value.shift();
-  }, 3000);
+    messages.value.shift()
+  }, 3000)
 }
 </script>
 

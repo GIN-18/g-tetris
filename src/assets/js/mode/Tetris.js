@@ -1,9 +1,9 @@
-import { palette } from "@/assets/js/palette.js";
+import { palette } from '@/assets/js/palette.js'
 
 export class Tetris {
   static tetrominoes = {
     O: {
-      name: "O",
+      name: 'O',
       type: 1,
       color: palette.tetrominoColor[0],
       x: 4,
@@ -38,7 +38,7 @@ export class Tetris {
       ],
     },
     I: {
-      name: "I",
+      name: 'I',
       type: 2,
       color: palette.tetrominoColor[1],
       x: 4,
@@ -73,7 +73,7 @@ export class Tetris {
       ],
     },
     T: {
-      name: "T",
+      name: 'T',
       type: 3,
       color: palette.tetrominoColor[2],
       x: 4,
@@ -108,7 +108,7 @@ export class Tetris {
       ],
     },
     S: {
-      name: "S",
+      name: 'S',
       type: 4,
       color: palette.tetrominoColor[3],
       x: 4,
@@ -143,7 +143,7 @@ export class Tetris {
       ],
     },
     Z: {
-      name: "Z",
+      name: 'Z',
       type: 5,
       color: palette.tetrominoColor[4],
       x: 4,
@@ -178,7 +178,7 @@ export class Tetris {
       ],
     },
     J: {
-      name: "J",
+      name: 'J',
       type: 6,
       color: palette.tetrominoColor[5],
       x: 4,
@@ -213,7 +213,7 @@ export class Tetris {
       ],
     },
     L: {
-      name: "L",
+      name: 'L',
       type: 7,
       color: palette.tetrominoColor[6],
       x: 4,
@@ -247,7 +247,7 @@ export class Tetris {
         ],
       ],
     },
-  };
+  }
 
   static rotationOffset = {
     A: [
@@ -340,183 +340,183 @@ export class Tetris {
         [0, 0],
       ],
     ],
-  };
+  }
 
   constructor(matrix, currentBag) {
-    this.matrix = matrix;
-    this.currentBag = currentBag;
-    this.nextBag = Tetris.getBag();
-    this.oldLines = 0;
-    this.lastRenderTime = 0;
-    this.combo = 0;
+    this.matrix = matrix
+    this.currentBag = currentBag
+    this.nextBag = Tetris.getBag()
+    this.oldLines = 0
+    this.lastRenderTime = 0
+    this.combo = 0
   }
 
   static generateMatrix(width, height) {
-    return new Array(height).fill(0).map(() => new Array(width).fill(0));
+    return new Array(height).fill(0).map(() => new Array(width).fill(0))
   }
 
   static getBag() {
-    const tetrominoBag = [];
-    const bag = Tetris.shuffleBag();
+    const tetrominoBag = []
+    const bag = Tetris.shuffleBag()
 
     for (let i = 0; i < bag.length; i++) {
-      tetrominoBag.push(Tetris.tetrominoes[bag[i]]);
+      tetrominoBag.push(Tetris.tetrominoes[bag[i]])
     }
 
-    return tetrominoBag;
+    return tetrominoBag
   }
 
   static shuffleBag() {
-    const arr = ["I", "J", "L", "O", "S", "T", "Z"];
+    const arr = ['I', 'J', 'L', 'O', 'S', 'T', 'Z']
 
     for (let i = arr.length - 1; i > 0; i--) {
-      let j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
+      let j = Math.floor(Math.random() * (i + 1))
+      ;[arr[i], arr[j]] = [arr[j], arr[i]]
     }
 
-    return arr;
+    return arr
   }
 
   moveTetromino(activeTetromino, xStep, yStep) {
-    const piece = activeTetromino.pieces[activeTetromino.rotation];
-    const w = this.matrix[0].length;
-    const h = this.matrix.length;
+    const piece = activeTetromino.pieces[activeTetromino.rotation]
+    const w = this.matrix[0].length
+    const h = this.matrix.length
 
-    let canMove = true;
+    let canMove = true
 
     for (let i = 0; i < piece.length; i++) {
-      const x = piece[i][0] + activeTetromino.x + xStep;
-      const y = piece[i][1] + activeTetromino.y + yStep;
+      const x = piece[i][0] + activeTetromino.x + xStep
+      const y = piece[i][1] + activeTetromino.y + yStep
 
       if (x < 0 || x >= w || y >= h || this.matrix[y][x]) {
-        canMove = false;
-        return canMove;
+        canMove = false
+        return canMove
       }
     }
 
     if (canMove) {
-      activeTetromino.x += xStep;
-      activeTetromino.y += yStep;
-      return canMove;
+      activeTetromino.x += xStep
+      activeTetromino.y += yStep
+      return canMove
     }
   }
 
   rotateTetromino(activeTetromino, rotationStep) {
-    const rotationInfo = this.checkRotation(activeTetromino, rotationStep, 0);
+    const rotationInfo = this.checkRotation(activeTetromino, rotationStep, 0)
 
     if (rotationInfo.canRotate) {
-      activeTetromino.x += rotationInfo.wallKickXOffset;
-      activeTetromino.y += rotationInfo.wallKickYOffset;
-      activeTetromino.rotation = rotationInfo.nextRotation;
+      activeTetromino.x += rotationInfo.wallKickXOffset
+      activeTetromino.y += rotationInfo.wallKickYOffset
+      activeTetromino.rotation = rotationInfo.nextRotation
     }
   }
 
   updateHoldTetromino(activeTetromino, holdTetromino) {
-    let tempTetromino = null;
+    let tempTetromino = null
 
     if (!holdTetromino) {
-      this.resetTetrominoOption(activeTetromino);
-      holdTetromino = activeTetromino;
-      holdTetromino.holdLock = true;
-      activeTetromino = this.getActiveTetromino();
-      this.updateBag();
+      this.resetTetrominoOption(activeTetromino)
+      holdTetromino = activeTetromino
+      holdTetromino.holdLock = true
+      activeTetromino = this.getActiveTetromino()
+      this.updateBag()
     } else if (!holdTetromino.holdLock) {
-      this.resetTetrominoOption(activeTetromino);
-      tempTetromino = activeTetromino;
-      activeTetromino = holdTetromino;
-      holdTetromino = tempTetromino;
-      holdTetromino.holdLock = true;
+      this.resetTetrominoOption(activeTetromino)
+      tempTetromino = activeTetromino
+      activeTetromino = holdTetromino
+      holdTetromino = tempTetromino
+      holdTetromino.holdLock = true
     }
 
     return {
       holdTetromino,
       activeTetromino,
-    };
+    }
   }
 
   getDropInterval(level) {
-    return Math.pow(0.8 - (level - 1) * 0.007, level - 1);
+    return Math.pow(0.8 - (level - 1) * 0.007, level - 1)
   }
 
   getLines() {
-    return this.getFilledLines().length;
+    return this.getFilledLines().length
   }
 
   getLevelIncrement(lines) {
-    const increment = Math.floor(lines / 10);
+    const increment = Math.floor(lines / 10)
 
     if (increment > 0 && Math.abs(this.oldLines - lines) >= 10) {
-      this.oldLines += 10;
-      return 1;
+      this.oldLines += 10
+      return 1
     }
 
-    return 0;
+    return 0
   }
 
   // TODO: update score acording to T-Spin, T-Spin Mini, BackToBack and Combo
   getScore(level) {
-    const lineScore = [100, 300, 500, 800];
-    let index, score;
+    const lineScore = [100, 300, 500, 800]
+    let index, score
 
     if (!this.getLines()) {
-      score = 0;
+      score = 0
     } else {
-      index = this.getLines() - 1;
-      score = lineScore[index] * level;
+      index = this.getLines() - 1
+      score = lineScore[index] * level
     }
 
-    return score;
+    return score
   }
 
   checkGameover(activeTetromino) {
-    const piece = activeTetromino.pieces[activeTetromino.rotation];
+    const piece = activeTetromino.pieces[activeTetromino.rotation]
 
     for (let i = 0; i < piece.length; i++) {
-      const x = piece[i][0] + activeTetromino.x;
-      const y = piece[i][1] + activeTetromino.y;
+      const x = piece[i][0] + activeTetromino.x
+      const y = piece[i][1] + activeTetromino.y
 
       if (this.matrix[y][x]) {
-        return true;
+        return true
       }
     }
 
-    return false;
+    return false
   }
 
   checkRotation(activeTetromino, rotationStep, wallKickIndex) {
     if (wallKickIndex > 4) {
       return {
         canRotate: false,
-      };
+      }
     }
 
-    let wallKickXOffset = 0;
-    let wallKickYOffset = 0;
-    let nextRotation = 0;
-    let currentRotation = activeTetromino.rotation;
+    let wallKickXOffset = 0
+    let wallKickYOffset = 0
+    let nextRotation = 0
+    let currentRotation = activeTetromino.rotation
 
-    nextRotation = (currentRotation + rotationStep) % 4;
+    nextRotation = (currentRotation + rotationStep) % 4
 
     if (nextRotation < 0) {
-      nextRotation = 3;
+      nextRotation = 3
     }
 
-    const nextRotationTetromino = activeTetromino.pieces[nextRotation];
-    const name = this.remapTetrominoName(activeTetromino.name);
+    const nextRotationTetromino = activeTetromino.pieces[nextRotation]
+    const name = this.remapTetrominoName(activeTetromino.name)
 
     wallKickXOffset =
       Tetris.rotationOffset[name][currentRotation][wallKickIndex][0] -
-      Tetris.rotationOffset[name][nextRotation][wallKickIndex][0];
+      Tetris.rotationOffset[name][nextRotation][wallKickIndex][0]
 
     wallKickYOffset =
       Tetris.rotationOffset[name][currentRotation][wallKickIndex][1] -
-      Tetris.rotationOffset[name][nextRotation][wallKickIndex][1];
+      Tetris.rotationOffset[name][nextRotation][wallKickIndex][1]
 
     for (let i = 0; i < nextRotationTetromino.length; i++) {
       const x =
-        nextRotationTetromino[i][0] + activeTetromino.x + wallKickXOffset;
+        nextRotationTetromino[i][0] + activeTetromino.x + wallKickXOffset
       const y =
-        nextRotationTetromino[i][1] + activeTetromino.y + wallKickYOffset;
+        nextRotationTetromino[i][1] + activeTetromino.y + wallKickYOffset
 
       if (
         !this.matrix[y] ||
@@ -527,7 +527,7 @@ export class Tetris {
           activeTetromino,
           rotationStep,
           wallKickIndex + 1,
-        );
+        )
       }
     }
 
@@ -536,85 +536,85 @@ export class Tetris {
       wallKickXOffset,
       wallKickYOffset,
       nextRotation,
-    };
+    }
   }
 
   checkCombo() {
     if (this.getLines()) {
-      this.combo += 1;
+      this.combo += 1
     } else {
-      this.combo = 0;
+      this.combo = 0
     }
 
     if (this.combo > 1) {
-      return true;
+      return true
     }
 
-    return false;
+    return false
   }
 
   remapTetrominoName(name) {
-    const arr = ["T", "Z", "S", "J", "L"];
+    const arr = ['T', 'Z', 'S', 'J', 'L']
     if (arr.includes(name)) {
-      return "A";
+      return 'A'
     }
-    return name;
+    return name
   }
 
   mergeMatrix(activeTetromino) {
-    const type = activeTetromino.type;
-    const piece = activeTetromino.pieces[activeTetromino.rotation];
+    const type = activeTetromino.type
+    const piece = activeTetromino.pieces[activeTetromino.rotation]
 
     for (let i = 0; i < piece.length; i++) {
-      const x = piece[i][0] + activeTetromino.x;
-      const y = piece[i][1] + activeTetromino.y;
+      const x = piece[i][0] + activeTetromino.x
+      const y = piece[i][1] + activeTetromino.y
 
-      this.matrix[y][x] = type;
+      this.matrix[y][x] = type
     }
   }
 
   clearFilledLines() {
-    const filledLines = this.getFilledLines();
-    const width = this.matrix[0].length;
+    const filledLines = this.getFilledLines()
+    const width = this.matrix[0].length
 
-    if (!filledLines.length) return;
+    if (!filledLines.length) return
 
     for (let i = 0; i < filledLines.length; i++) {
-      this.matrix.splice(filledLines[i], 1);
-      this.matrix.unshift(new Array(width).fill(0));
+      this.matrix.splice(filledLines[i], 1)
+      this.matrix.unshift(new Array(width).fill(0))
     }
   }
 
   getFilledLines() {
-    const filledLines = [];
+    const filledLines = []
 
     for (let i = 0; i < this.matrix.length; i++) {
-      const isFilled = this.matrix[i].includes(0);
+      const isFilled = this.matrix[i].includes(0)
 
       if (!isFilled) {
-        filledLines.push(i);
+        filledLines.push(i)
       }
     }
 
-    return filledLines;
+    return filledLines
   }
 
   getActiveTetromino() {
-    return this.currentBag[0];
+    return this.currentBag[0]
   }
 
   updateBag() {
-    this.currentBag.shift();
-    this.currentBag.push(this.nextBag.shift());
+    this.currentBag.shift()
+    this.currentBag.push(this.nextBag.shift())
 
     if (!this.nextBag.length) {
-      this.nextBag = Tetris.getBag();
+      this.nextBag = Tetris.getBag()
     }
   }
 
   resetTetrominoOption(activeTetromino) {
-    activeTetromino.x = 4;
-    activeTetromino.y = 1;
-    activeTetromino.rotation = 0;
+    activeTetromino.x = 4
+    activeTetromino.y = 1
+    activeTetromino.rotation = 0
   }
 }

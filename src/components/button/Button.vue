@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { computed } from 'vue'
 
 const props = defineProps({
   color: String,
@@ -7,15 +7,15 @@ const props = defineProps({
   icon: {
     type: [String, Object],
   },
-});
+})
 
 const classList = computed(() => ({
-  "nes-btn !flex justify-center items-center": true,
-  "is-primary": props.color === "blue",
-  "is-success": props.color === "green",
-  "is-warning": props.color === "yellow",
-  "is-error": props.color === "red",
-}));
+  'nes-btn !flex justify-center items-center': true,
+  'is-primary': props.color === 'blue',
+  'is-success': props.color === 'green',
+  'is-warning': props.color === 'yellow',
+  'is-error': props.color === 'red',
+}))
 </script>
 
 <template>

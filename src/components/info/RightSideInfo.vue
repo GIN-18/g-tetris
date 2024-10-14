@@ -1,10 +1,10 @@
 <script setup>
-import { useGameStore } from "@/stores/game.js";
+import { useGameStore } from '@/stores/game.js'
 
-import InfoBox from "./InfoBox.vue";
-import NextTetrominoCanvas from "@/components/canvas/NextTetrominoCanvas.vue";
+import InfoBox from './InfoBox.vue'
+import NextTetrominoCanvas from '@/components/canvas/NextTetrominoCanvas.vue'
 
-const game = useGameStore();
+const game = useGameStore()
 </script>
 
 <template>

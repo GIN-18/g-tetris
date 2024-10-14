@@ -1,9 +1,9 @@
 <script setup>
 const author = {
-  name: "GIN",
-  blog: "https://gin-18.github.io/",
-  github: "https://github.com/gin-18/catppuccin-tetris",
-};
+  name: 'GIN',
+  blog: 'https://gin-18.github.io/',
+  github: 'https://github.com/gin-18/catppuccin-tetris',
+}
 </script>
 
 <template>

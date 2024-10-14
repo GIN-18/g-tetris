@@ -1,13 +1,13 @@
 <script setup>
-import { ref } from "vue";
-import { useGameStore } from "@/stores/game";
+import { ref } from 'vue'
+import { useGameStore } from '@/stores/game'
 
-import DialogsBox from "@/components/DialogsBox.vue";
-import LabelBox from "@/components/info/LabelBox.vue";
-import Button from "@/components/button/Button.vue";
+import DialogsBox from '@/components/DialogsBox.vue'
+import LabelBox from '@/components/info/LabelBox.vue'
+import Button from '@/components/button/Button.vue'
 
-const game = useGameStore();
-const title = ref("GAME OVER");
+const game = useGameStore()
+const title = ref('GAME OVER')
 </script>
 
 <template>
@@ -30,12 +30,20 @@ const title = ref("GAME OVER");
     <!-- button -->
     <div class="flex gap-12">
       <!-- again button -->
-      <Button color="green" text="AGAIN" @click.prevent="emitter.emit('reset')"
-        @touchstart.prevent="emitter.emit('reset')" />
+      <Button
+        color="green"
+        text="AGAIN"
+        @click.prevent="emitter.emit('reset')"
+        @touchstart.prevent="emitter.emit('reset')"
+      />
 
       <!-- quit button -->
-      <Button color="yellow" text="Quit" @click.prevent="emitter.emit('reset')"
-        @touchstart.prevent="emitter.emit('reset')" />
+      <Button
+        color="yellow"
+        text="Quit"
+        @click.prevent="emitter.emit('reset')"
+        @touchstart.prevent="emitter.emit('reset')"
+      />
     </div>
   </DialogsBox>
 </template>

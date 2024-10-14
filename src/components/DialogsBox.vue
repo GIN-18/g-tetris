@@ -2,7 +2,7 @@
 const props = defineProps({
   title: String,
   isShow: Boolean,
-});
+})
 </script>
 
 <template>

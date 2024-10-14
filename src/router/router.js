@@ -3,5 +3,5 @@ import { routes } from './routes.js'
 
 export const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 })

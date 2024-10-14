@@ -1,18 +1,22 @@
 <script setup>
 // TODO: need home page or not?
-import { useRouter } from "vue-router";
+import { useRouter } from 'vue-router'
 
-const router = useRouter();
+const router = useRouter()
 
 function jumpToHome() {
   router.push({
-    path: "/",
-  });
+    path: '/',
+  })
 }
 </script>
 
 <template>
-  <h1 class="text-2xl" @click.prevent="jumpToHome" @touchstart.prevent="jumpToHome">
+  <h1
+    class="text-2xl"
+    @click.prevent="jumpToHome"
+    @touchstart.prevent="jumpToHome"
+  >
     VUETRIS
   </h1>
 </template>

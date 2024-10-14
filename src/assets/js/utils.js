@@ -1,24 +1,19 @@
 export function preventZoom() {
-  document.addEventListener("gesturestart", function (e) {
-    e.preventDefault();
-    document.body.style.zoom = 1;
-  });
-  document.addEventListener("gesturechange", function (e) {
-    e.preventDefault();
+  document.addEventListener('gesturestart', function (e) {
+    e.preventDefault()
+    document.body.style.zoom = 1
+  })
+  document.addEventListener('gesturechange', function (e) {
+    e.preventDefault()
 
-    document.body.style.zoom = 1;
-  });
-  document.addEventListener("gestureend", function (e) {
-    e.preventDefault();
-    document.body.style.zoom = 1;
-  });
-  document.addEventListener("dblclick", function (e) {
-    e.preventDefault();
-    document.body.style.zoom = 1;
-  });
-}
-
-export function checkGameMode(mode) {
-  const route = useRoute();
-  return route.params.mode === mode;
+    document.body.style.zoom = 1
+  })
+  document.addEventListener('gestureend', function (e) {
+    e.preventDefault()
+    document.body.style.zoom = 1
+  })
+  document.addEventListener('dblclick', function (e) {
+    e.preventDefault()
+    document.body.style.zoom = 1
+  })
 }

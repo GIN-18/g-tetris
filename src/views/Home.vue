@@ -1,12 +1,12 @@
 <script setup>
-import Selection from "@/components/Selection.vue";
-import Footer from "@/components/Footer.vue";
+import Selection from '@/components/Selection.vue'
+import Footer from '@/components/Footer.vue'
 
 const selection = [
   {
     text: 'Marathon',
-    link: '/game/marathon'
-  }
+    link: '/game/marathon',
+  },
 ]
 </script>
 
@@ -19,7 +19,11 @@ const selection = [
     </h1>
 
     <div class="flex flex-col gap-10">
-      <Selection v-for="item in selection" :text="item.text" :link="item.link" />
+      <Selection
+        v-for="item in selection"
+        :text="item.text"
+        :link="item.link"
+      />
     </div>
   </main>
 

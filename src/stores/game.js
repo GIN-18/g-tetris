@@ -1,6 +1,6 @@
-import { defineStore } from "pinia";
+import { defineStore } from 'pinia'
 
-export const useGameStore = defineStore("game", {
+export const useGameStore = defineStore('game', {
   state: () => ({
     block: 16,
     gamePlay: false,
@@ -13,6 +13,6 @@ export const useGameStore = defineStore("game", {
     nextBag: null,
     activeTetromino: null,
     holdTetromino: null,
-    isDrawGhostPiece: localStorage.getItem("isDrawGhostPiece") || true,
+    isDrawGhostPiece: localStorage.getItem('isDrawGhostPiece') || true,
   }),
-});
+})
