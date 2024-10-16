@@ -381,13 +381,11 @@ export class Tetris {
     return arr
   }
 
-  // 添加新方块
   addTetromino() {
     this.activeTetromino = this.currentBag[0] // 在当前背包中获取第一个方块作为当前方块
-    this.updateBag()
+    this.updateBag() // 更新背包
   }
 
-  // 更新背包
   updateBag() {
     this.currentBag.shift() // 在当前背包中删除第一个方块
     this.currentBag.push(this.nextBag.shift()) // 在下一个背包中添加第一个方块
@@ -398,17 +396,16 @@ export class Tetris {
     }
   }
 
-  // 更新暂存块
   updateHoldTetromino() {
     let tempTetromino = null
 
     if (!this.holdTetromino) {
-      this.resetTetrominoOption()
+      this.resetTetrominoLocation()
       this.holdTetromino = this.activeTetromino
       this.holdTetromino.holdLock = true
       this.addTetromino()
     } else if (!this.holdTetromino.holdLock) {
-      this.resetTetrominoOption()
+      this.resetTetrominoLocation()
       tempTetromino = this.activeTetromino
       this.activeTetromino = this.holdTetromino
       this.holdTetromino = tempTetromino
@@ -416,7 +413,6 @@ export class Tetris {
     }
   }
 
-  // 更新暂存锁
   updateHoldLock() {
     if (this.holdTetromino) {
       this.holdTetromino.holdLock = false
@@ -457,10 +453,10 @@ export class Tetris {
     }
   }
 
-  // 方块落地
   landTetromino() {
     this.updateHoldLock()
     this.mergeMatrix()
+    this.resetTetrominoLocation()
     this.addTetromino()
   }
 
@@ -477,8 +473,8 @@ export class Tetris {
     }
   }
 
-  getDropInterval(level) {
-    return Math.pow(0.8 - (level - 1) * 0.007, level - 1)
+  getDropInterval() {
+    return Math.pow(0.8 - (this.level - 1) * 0.007, this.level - 1)
   }
 
   // 获取消除的行数
@@ -498,15 +494,15 @@ export class Tetris {
   }
 
   // TODO: update score acording to T-Spin, T-Spin Mini, BackToBack and Combo
-  getScore(level) {
-    const lineScore = [100, 300, 500, 800]
+  getScore() {
     let index, score
+    const lineScore = [100, 300, 500, 800]
 
     if (!this.getLines()) {
       score = 0
     } else {
       index = this.getLines() - 1
-      score = lineScore[index] * level
+      score = lineScore[index] * this.level
     }
 
     return score
@@ -548,7 +544,7 @@ export class Tetris {
     return filledLines
   }
 
-  resetTetrominoOption() {
+  resetTetrominoLocation() {
     this.activeTetromino.x = 4
     this.activeTetromino.y = 1
     this.activeTetromino.rotation = 0

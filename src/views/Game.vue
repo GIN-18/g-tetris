@@ -47,12 +47,13 @@ function playGame() {
 }
 
 function gameLoop(currentTime) {
-  const dropInterval = tetris.value.getDropInterval(tetris.value.level) * 1000
+  const dropInterval = tetris.value.getDropInterval() * 1000
   const deltaTime = currentTime - tetris.value.lastRenderTime
 
   if (deltaTime > dropInterval) {
     if (!tetris.value.activeTetromino) {
       tetris.value.addTetromino()
+      tetris.value.updateBag()
     }
     fallTetrominoToLand()
 
@@ -62,23 +63,19 @@ function gameLoop(currentTime) {
   requestAnimationFrame(gameLoop)
 }
 
-// 方块左移
 function moveTetrominoLeft() {
   tetris.value.moveTetromino(-1, 0)
 }
 
-// 方块右移
 function moveTetrominoRight() {
   tetris.value.moveTetromino(1, 0)
 }
 
-// 方块硬降
 function hardDropTetromino() {
   while (tetris.value.moveTetromino(0, 1)) {}
   landTetromino()
 }
 
-// 方块软降
 function softDropTetromino(enable) {
   if (enable && !tetris.value.moveTetromino(0, 1)) {
     landTetromino()

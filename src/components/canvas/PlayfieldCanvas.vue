@@ -83,7 +83,6 @@ function drawGhostPiece() {
 
 function drawActiveTetromino() {
   const tetromino = tetris.value.activeTetromino
-  // console.log(tetromino)
   const color = tetromino.color
   const piece = tetromino.pieces[tetromino.rotation]
 
