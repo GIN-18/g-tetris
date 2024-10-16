@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useGameStore } from '@/stores/game.js'
 
 const canvas = ref(null)
@@ -7,10 +8,10 @@ const width = computed(() => canvas.value.width)
 const height = computed(() => canvas.value.height)
 const ctx = computed(() => canvas.value.getContext('2d'))
 
-const game = useGameStore()
+const { block, tetris } = storeToRefs(useGameStore())
 
 watch(
-  () => game.currentBag,
+  () => tetris.value.currentBag,
   () => {
     clearCanvas()
     drawBag()
@@ -21,8 +22,8 @@ watch(
 )
 
 onMounted(() => {
-  canvas.value.width = game.block * 4
-  canvas.value.height = game.block * (2 * 4 + 3)
+  canvas.value.width = block.value * 4
+  canvas.value.height = block.value * (2 * 4 + 3)
 
   clearCanvas()
   drawBag()
@@ -33,7 +34,7 @@ function clearCanvas() {
 }
 
 function drawBag() {
-  const bag = game.currentBag
+  const bag = tetris.value.currentBag
 
   for (let i = 0; i < bag.length; i++) {
     const color = bag[i].color
@@ -46,7 +47,12 @@ function drawBag() {
       const x = tetromino[j][0] + 1 + xOffset
       const y = tetromino[j][1] + 1 + i * 3 + yOffset
 
-      ctx.value.fillRect(x * game.block, y * game.block, game.block, game.block)
+      ctx.value.fillRect(
+        x * block.value,
+        y * block.value,
+        block.value,
+        block.value,
+      )
     }
   }
 }

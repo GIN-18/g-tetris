@@ -1,18 +1,17 @@
 import { defineStore } from 'pinia'
+import { Tetris } from '@/assets/js/mode/Tetris.js'
+
+const MATRIX_WIDTH = 10
+const MATRIX_HEIGHT = 20
+
+const tetris = new Tetris(MATRIX_WIDTH, MATRIX_HEIGHT)
 
 export const useGameStore = defineStore('game', {
   state: () => ({
     block: 16,
+    tetris: tetris,
     gamePlay: false,
     gameOver: false,
-    level: 1,
-    lines: 0,
-    score: 0,
-    matrix: null,
-    currentBag: null,
-    nextBag: null,
-    activeTetromino: null,
-    holdTetromino: null,
     isDrawGhostPiece: localStorage.getItem('isDrawGhostPiece') || true,
   }),
 })

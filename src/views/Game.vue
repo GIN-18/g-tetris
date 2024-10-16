@@ -1,9 +1,9 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useGameStore } from '@/stores/game.js'
 import { emitter } from '@/assets/js/emitter.js'
 import { notify } from '@/assets/js/notify.js'
-import { Tetris } from '@/assets/js/mode/Tetris.js'
 
 import Header from '@/components/Header.vue'
 import Menu from '@/components/menu/Menu.vue'
@@ -14,15 +14,7 @@ import GameOverInfo from '@/components/info/GameOverInfo.vue'
 import ButtonOperation from '@/components/operation/ButtonOperation.vue'
 import KeyOperation from '@/components/operation/KeyOperation.vue'
 
-const MATRIX_WIDTH = 10
-const MATRIX_HEIGHT = 20
-const game = useGameStore()
-
-game.matrix = Tetris.generateMatrix(MATRIX_WIDTH, MATRIX_HEIGHT)
-game.currentBag = Tetris.getBag()
-
-// TODO: new instance acording to game mode
-const tetris = new Tetris(game.matrix, game.currentBag)
+const { tetris } = storeToRefs(useGameStore())
 
 onMounted(() => {
   // requestAnimationFrame(gameLoop)
@@ -51,114 +43,77 @@ onUnmounted(() => {
 })
 
 function playGame() {
-  addTetromino()
+  tetris.value.addTetromino()
 }
 
 function gameLoop(currentTime) {
-  const dropInterval = tetris.getDropInterval(game.level) * 1000
-  const deltaTime = currentTime - tetris.lastRenderTime
+  const dropInterval = tetris.value.getDropInterval(tetris.value.level) * 1000
+  const deltaTime = currentTime - tetris.value.lastRenderTime
 
   if (deltaTime > dropInterval) {
-    if (!game.activeTetromino) {
-      addTetromino()
+    if (!tetris.value.activeTetromino) {
+      tetris.value.addTetromino()
     }
     fallTetrominoToLand()
 
-    tetris.lastRenderTime = currentTime
+    tetris.value.lastRenderTime = currentTime
   }
 
   requestAnimationFrame(gameLoop)
 }
 
+// 方块左移
 function moveTetrominoLeft() {
-  tetris.moveTetromino(game.activeTetromino, -1, 0)
+  tetris.value.moveTetromino(-1, 0)
 }
 
+// 方块右移
 function moveTetrominoRight() {
-  tetris.moveTetromino(game.activeTetromino, 1, 0)
+  tetris.value.moveTetromino(1, 0)
 }
 
+// 方块硬降
 function hardDropTetromino() {
-  while (tetris.moveTetromino(game.activeTetromino, 0, 1)) {}
+  while (tetris.value.moveTetromino(0, 1)) {}
   landTetromino()
 }
 
+// 方块软降
 function softDropTetromino(enable) {
-  if (enable && !tetris.moveTetromino(game.activeTetromino, 0, 1)) {
+  if (enable && !tetris.value.moveTetromino(0, 1)) {
     landTetromino()
   }
 }
 
 function rotateRight() {
-  tetris.rotateTetromino(game.activeTetromino, 1)
+  tetris.value.rotateTetromino(1)
 }
 
 function rotateLeft() {
-  tetris.rotateTetromino(game.activeTetromino, -1)
+  tetris.value.rotateTetromino(-1)
 }
 
 function rotateFlip() {
-  tetris.rotateTetromino(game.activeTetromino, 2)
+  tetris.value.rotateTetromino(2)
 }
 
 function holdTetromino() {
-  const { activeTetromino, holdTetromino } = tetris.updateHoldTetromino(
-    game.activeTetromino,
-    game.holdTetromino,
-  )
-
-  game.activeTetromino = activeTetromino
-  game.holdTetromino = holdTetromino
+  tetris.value.updateHoldTetromino()
 }
 
 function fallTetrominoToLand() {
-  if (!tetris.moveTetromino(game.activeTetromino, 0, 1)) {
+  if (!tetris.value.moveTetromino(0, 1)) {
     landTetromino()
   }
 }
 
 function landTetromino() {
-  updateHoldLock()
-  tetris.mergeMatrix(game.activeTetromino)
-  updateLines()
-  updateScore()
-  updateLevel()
-  tetris.clearFilledLines()
-  tetris.resetTetrominoOption(game.activeTetromino)
-  checkCombo()
-  addTetromino()
-}
-
-function updateHoldLock() {
-  if (game.holdTetromino) {
-    game.holdTetromino.holdLock = false
-  }
-}
-
-function updateLines() {
-  game.lines += tetris.getLines()
-}
-
-function updateScore() {
-  game.score += tetris.getScore(game.level)
-}
-
-function updateLevel() {
-  game.level += tetris.getLevelIncrement(game.lines)
-}
-
-function addTetromino() {
-  if (!game.activeTetromino || !tetris.checkGameover(game.activeTetromino)) {
-    game.activeTetromino = tetris.getActiveTetromino()
-    tetris.updateBag()
-  } else {
-    game.gameOver = true
-  }
+  tetris.value.landTetromino()
 }
 
 function checkCombo() {
-  if (tetris.isCombo) {
-    notify('warning', `Combo: ${tetris.comboNum - 1}`)
+  if (tetris.value.isCombo) {
+    notify('warning', `Combo: ${tetris.value.comboNum - 1}`)
   }
 }
 </script>
@@ -170,7 +125,7 @@ function checkCombo() {
 
   <main class="flex justify-between items-center w-full">
     <LeftSideInfo />
-    <PlayfieldCanvas :block="game.block" />
+    <PlayfieldCanvas />
     <RightSideInfo />
   </main>
 

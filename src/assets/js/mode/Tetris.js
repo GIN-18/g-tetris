@@ -342,18 +342,20 @@ export class Tetris {
     ],
   }
 
-  constructor(matrix, currentBag) {
-    this.matrix = matrix
-    this.currentBag = currentBag
+  constructor(width, height) {
+    this.matrix = new Array(height).fill(0).map(() => new Array(width).fill(0))
+
+    this.currentBag = Tetris.getBag()
     this.nextBag = Tetris.getBag()
+
+    this.activeTetromino = null
+    this.holdTetromino = null
+
     this.oldLines = 0
     this.lastRenderTime = 0
+
     this.comboNum = 0
     this.isCombo = false
-  }
-
-  static generateMatrix(width, height) {
-    return new Array(height).fill(0).map(() => new Array(width).fill(0))
   }
 
   static getBag() {
@@ -372,22 +374,65 @@ export class Tetris {
 
     for (let i = arr.length - 1; i > 0; i--) {
       let j = Math.floor(Math.random() * (i + 1))
+
       ;[arr[i], arr[j]] = [arr[j], arr[i]]
     }
 
     return arr
   }
 
-  moveTetromino(activeTetromino, xStep, yStep) {
-    const piece = activeTetromino.pieces[activeTetromino.rotation]
+  // 添加新方块
+  addTetromino() {
+    this.activeTetromino = this.currentBag[0] // 在当前背包中获取第一个方块作为当前方块
+    this.updateBag()
+  }
+
+  // 更新背包
+  updateBag() {
+    this.currentBag.shift() // 在当前背包中删除第一个方块
+    this.currentBag.push(this.nextBag.shift()) // 在下一个背包中添加第一个方块
+
+    // 如果下一个背包为空，就重新洗牌
+    if (!this.nextBag.length) {
+      this.nextBag = Tetris.getBag()
+    }
+  }
+
+  // 更新暂存块
+  updateHoldTetromino() {
+    let tempTetromino = null
+
+    if (!this.holdTetromino) {
+      this.resetTetrominoOption()
+      this.holdTetromino = this.activeTetromino
+      this.holdTetromino.holdLock = true
+      this.addTetromino()
+    } else if (!this.holdTetromino.holdLock) {
+      this.resetTetrominoOption()
+      tempTetromino = this.activeTetromino
+      this.activeTetromino = this.holdTetromino
+      this.holdTetromino = tempTetromino
+      this.holdTetromino.holdLock = true
+    }
+  }
+
+  // 更新暂存锁
+  updateHoldLock() {
+    if (this.holdTetromino) {
+      this.holdTetromino.holdLock = false
+    }
+  }
+
+  moveTetromino(xStep, yStep) {
+    const piece = this.activeTetromino.pieces[this.activeTetromino.rotation]
     const w = this.matrix[0].length
     const h = this.matrix.length
 
     let canMove = true
 
     for (let i = 0; i < piece.length; i++) {
-      const x = piece[i][0] + activeTetromino.x + xStep
-      const y = piece[i][1] + activeTetromino.y + yStep
+      const x = piece[i][0] + this.activeTetromino.x + xStep
+      const y = piece[i][1] + this.activeTetromino.y + yStep
 
       if (x < 0 || x >= w || y >= h || this.matrix[y][x]) {
         canMove = false
@@ -396,42 +441,39 @@ export class Tetris {
     }
 
     if (canMove) {
-      activeTetromino.x += xStep
-      activeTetromino.y += yStep
+      this.activeTetromino.x += xStep
+      this.activeTetromino.y += yStep
       return canMove
     }
   }
 
-  rotateTetromino(activeTetromino, rotationStep) {
-    const rotationInfo = this.checkRotation(activeTetromino, rotationStep, 0)
+  rotateTetromino(rotationStep) {
+    const rotationInfo = this.checkRotation(rotationStep, 0)
 
     if (rotationInfo.canRotate) {
-      activeTetromino.x += rotationInfo.wallKickXOffset
-      activeTetromino.y += rotationInfo.wallKickYOffset
-      activeTetromino.rotation = rotationInfo.nextRotation
+      this.activeTetromino.x += rotationInfo.wallKickXOffset
+      this.activeTetromino.y += rotationInfo.wallKickYOffset
+      this.activeTetromino.rotation = rotationInfo.nextRotation
     }
   }
 
-  updateHoldTetromino(activeTetromino, holdTetromino) {
-    let tempTetromino = null
+  // 方块落地
+  landTetromino() {
+    this.updateHoldLock()
+    this.mergeMatrix()
+    this.addTetromino()
+  }
 
-    if (!holdTetromino) {
-      this.resetTetrominoOption(activeTetromino)
-      holdTetromino = activeTetromino
-      holdTetromino.holdLock = true
-      activeTetromino = this.getActiveTetromino()
-      this.updateBag()
-    } else if (!holdTetromino.holdLock) {
-      this.resetTetrominoOption(activeTetromino)
-      tempTetromino = activeTetromino
-      activeTetromino = holdTetromino
-      holdTetromino = tempTetromino
-      holdTetromino.holdLock = true
-    }
+  // 合并当前方块到地图矩阵
+  mergeMatrix() {
+    const type = this.activeTetromino.type
+    const piece = this.activeTetromino.pieces[this.activeTetromino.rotation]
 
-    return {
-      holdTetromino,
-      activeTetromino,
+    for (let i = 0; i < piece.length; i++) {
+      const x = piece[i][0] + this.activeTetromino.x
+      const y = piece[i][1] + this.activeTetromino.y
+
+      this.matrix[y][x] = type
     }
   }
 
@@ -439,6 +481,7 @@ export class Tetris {
     return Math.pow(0.8 - (level - 1) * 0.007, level - 1)
   }
 
+  // 获取消除的行数
   getLines() {
     return this.getFilledLines().length
   }
@@ -469,109 +512,12 @@ export class Tetris {
     return score
   }
 
-  checkGameover(activeTetromino) {
-    const piece = activeTetromino.pieces[activeTetromino.rotation]
-
-    for (let i = 0; i < piece.length; i++) {
-      const x = piece[i][0] + activeTetromino.x
-      const y = piece[i][1] + activeTetromino.y
-
-      if (this.matrix[y][x]) {
-        return true
-      }
-    }
-
-    return false
-  }
-
-  checkRotation(activeTetromino, rotationStep, wallKickIndex) {
-    if (wallKickIndex > 4) {
-      return {
-        canRotate: false,
-      }
-    }
-
-    let wallKickXOffset = 0
-    let wallKickYOffset = 0
-    let nextRotation = 0
-    let currentRotation = activeTetromino.rotation
-
-    nextRotation = (currentRotation + rotationStep) % 4
-
-    if (nextRotation < 0) {
-      nextRotation = 3
-    }
-
-    const nextRotationTetromino = activeTetromino.pieces[nextRotation]
-    const name = this.remapTetrominoName(activeTetromino.name)
-
-    wallKickXOffset =
-      Tetris.rotationOffset[name][currentRotation][wallKickIndex][0] -
-      Tetris.rotationOffset[name][nextRotation][wallKickIndex][0]
-
-    wallKickYOffset =
-      Tetris.rotationOffset[name][currentRotation][wallKickIndex][1] -
-      Tetris.rotationOffset[name][nextRotation][wallKickIndex][1]
-
-    for (let i = 0; i < nextRotationTetromino.length; i++) {
-      const x =
-        nextRotationTetromino[i][0] + activeTetromino.x + wallKickXOffset
-      const y =
-        nextRotationTetromino[i][1] + activeTetromino.y + wallKickYOffset
-
-      if (
-        !this.matrix[y] ||
-        this.matrix[y][x] ||
-        this.matrix[y][x] === undefined
-      ) {
-        return this.checkRotation(
-          activeTetromino,
-          rotationStep,
-          wallKickIndex + 1,
-        )
-      }
-    }
-
-    return {
-      canRotate: true,
-      wallKickXOffset,
-      wallKickYOffset,
-      nextRotation,
-    }
-  }
-
-  checkCombo() {
-    if (this.getLines()) {
-      this.comboNum += 1
-    } else {
-      this.comboNum = 0
-    }
-
-    if (this.comboNum > 1) {
-      this.isCombo = true
-    } else {
-      this.isCombo = false
-    }
-  }
-
   remapTetrominoName(name) {
     const arr = ['T', 'Z', 'S', 'J', 'L']
     if (arr.includes(name)) {
       return 'A'
     }
     return name
-  }
-
-  mergeMatrix(activeTetromino) {
-    const type = activeTetromino.type
-    const piece = activeTetromino.pieces[activeTetromino.rotation]
-
-    for (let i = 0; i < piece.length; i++) {
-      const x = piece[i][0] + activeTetromino.x
-      const y = piece[i][1] + activeTetromino.y
-
-      this.matrix[y][x] = type
-    }
   }
 
   clearFilledLines() {
@@ -602,22 +548,90 @@ export class Tetris {
     return filledLines
   }
 
-  getActiveTetromino() {
-    return this.currentBag[0]
+  resetTetrominoOption() {
+    this.activeTetromino.x = 4
+    this.activeTetromino.y = 1
+    this.activeTetromino.rotation = 0
   }
 
-  updateBag() {
-    this.currentBag.shift()
-    this.currentBag.push(this.nextBag.shift())
+  checkRotation(rotationStep, wallKickIndex) {
+    if (wallKickIndex > 4) {
+      return {
+        canRotate: false,
+      }
+    }
 
-    if (!this.nextBag.length) {
-      this.nextBag = Tetris.getBag()
+    let wallKickXOffset = 0
+    let wallKickYOffset = 0
+    let nextRotation = 0
+    let currentRotation = this.activeTetromino.rotation
+
+    nextRotation = (currentRotation + rotationStep) % 4
+
+    if (nextRotation < 0) {
+      nextRotation = 3
+    }
+
+    const nextRotationTetromino = this.activeTetromino.pieces[nextRotation]
+    const name = this.remapTetrominoName(this.activeTetromino.name)
+
+    wallKickXOffset =
+      Tetris.rotationOffset[name][currentRotation][wallKickIndex][0] -
+      Tetris.rotationOffset[name][nextRotation][wallKickIndex][0]
+
+    wallKickYOffset =
+      Tetris.rotationOffset[name][currentRotation][wallKickIndex][1] -
+      Tetris.rotationOffset[name][nextRotation][wallKickIndex][1]
+
+    for (let i = 0; i < nextRotationTetromino.length; i++) {
+      const x =
+        nextRotationTetromino[i][0] + this.activeTetromino.x + wallKickXOffset
+      const y =
+        nextRotationTetromino[i][1] + this.activeTetromino.y + wallKickYOffset
+
+      if (
+        !this.matrix[y] ||
+        this.matrix[y][x] ||
+        this.matrix[y][x] === undefined
+      ) {
+        return this.checkRotation(rotationStep, wallKickIndex + 1)
+      }
+    }
+
+    return {
+      canRotate: true,
+      wallKickXOffset,
+      wallKickYOffset,
+      nextRotation,
     }
   }
 
-  resetTetrominoOption(activeTetromino) {
-    activeTetromino.x = 4
-    activeTetromino.y = 1
-    activeTetromino.rotation = 0
+  checkCombo() {
+    if (this.getLines()) {
+      this.comboNum += 1
+    } else {
+      this.comboNum = 0
+    }
+
+    if (this.comboNum > 1) {
+      this.isCombo = true
+    } else {
+      this.isCombo = false
+    }
+  }
+
+  checkGameover() {
+    const piece = this.activeTetromino.pieces[this.activeTetromino.rotation]
+
+    for (let i = 0; i < piece.length; i++) {
+      const x = piece[i][0] + this.activeTetromino.x
+      const y = piece[i][1] + this.activeTetromino.y
+
+      if (this.matrix[y][x]) {
+        return true
+      }
+    }
+
+    return false
   }
 }

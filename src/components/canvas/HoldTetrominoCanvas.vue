@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useGameStore } from '@/stores/game.js'
 import { palette } from '@/assets/js/palette.js'
 
@@ -9,10 +10,10 @@ const width = computed(() => canvas.value.width)
 const height = computed(() => canvas.value.height)
 const ctx = computed(() => canvas.value.getContext('2d'))
 
-const game = useGameStore()
+const { block, tetris } = storeToRefs(useGameStore())
 
 watch(
-  () => game.holdTetromino,
+  () => tetris.value.holdTetromino,
   () => {
     clearCanvas()
     drawHoldTetromino()
@@ -21,8 +22,8 @@ watch(
 )
 
 onMounted(() => {
-  canvas.value.width = game.block * 4
-  canvas.value.height = game.block * 4
+  canvas.value.width = block.value * 4
+  canvas.value.height = block.value * 4
 })
 
 function clearCanvas() {
@@ -30,7 +31,7 @@ function clearCanvas() {
 }
 
 function drawHoldTetromino() {
-  const tetromino = game.holdTetromino
+  const tetromino = tetris.value.holdTetromino
   const name = tetromino.name
   const color = tetromino.color
   const piece = tetromino.pieces[0]
@@ -45,7 +46,12 @@ function drawHoldTetromino() {
     const x = piece[i][0] + setXOffset(name)
     const y = piece[i][1] + setYOffset(name)
 
-    ctx.value.fillRect(x * game.block, y * game.block, game.block, game.block)
+    ctx.value.fillRect(
+      x * block.value,
+      y * block.value,
+      block.value,
+      block.value,
+    )
   }
 }
 
