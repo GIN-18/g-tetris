@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted } from 'vue'
 import { useGameStore } from '@/stores/game.js'
 import { emitter } from '@/assets/js/emitter.js'
+import { notify } from '@/assets/js/notify.js'
 import { Tetris } from '@/assets/js/mode/Tetris.js'
 
 import Header from '@/components/Header.vue'
@@ -24,7 +25,7 @@ game.currentBag = Tetris.getBag()
 const tetris = new Tetris(game.matrix, game.currentBag)
 
 onMounted(() => {
-  // requestAnimationFrame(gameLoop);
+  // requestAnimationFrame(gameLoop)
 
   emitter.on('play', playGame)
   emitter.on('left', moveTetrominoLeft)
@@ -117,17 +118,21 @@ function fallTetrominoToLand() {
 }
 
 function landTetromino() {
-  if (game.holdTetromino) {
-    game.holdTetromino.holdLock = false
-  }
-
+  updateHoldLock()
   tetris.mergeMatrix(game.activeTetromino)
   updateLines()
   updateScore()
   updateLevel()
   tetris.clearFilledLines()
   tetris.resetTetrominoOption(game.activeTetromino)
+  checkCombo()
   addTetromino()
+}
+
+function updateHoldLock() {
+  if (game.holdTetromino) {
+    game.holdTetromino.holdLock = false
+  }
 }
 
 function updateLines() {
@@ -148,6 +153,12 @@ function addTetromino() {
     tetris.updateBag()
   } else {
     game.gameOver = true
+  }
+}
+
+function checkCombo() {
+  if (tetris.isCombo) {
+    notify('warning', `Combo: ${tetris.comboNum - 1}`)
   }
 }
 </script>

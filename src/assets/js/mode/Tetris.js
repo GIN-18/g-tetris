@@ -348,7 +348,8 @@ export class Tetris {
     this.nextBag = Tetris.getBag()
     this.oldLines = 0
     this.lastRenderTime = 0
-    this.combo = 0
+    this.comboNum = 0
+    this.isCombo = false
   }
 
   static generateMatrix(width, height) {
@@ -541,16 +542,16 @@ export class Tetris {
 
   checkCombo() {
     if (this.getLines()) {
-      this.combo += 1
+      this.comboNum += 1
     } else {
-      this.combo = 0
+      this.comboNum = 0
     }
 
-    if (this.combo > 1) {
-      return true
+    if (this.comboNum > 1) {
+      this.isCombo = true
+    } else {
+      this.isCombo = false
     }
-
-    return false
   }
 
   remapTetrominoName(name) {
@@ -574,14 +575,16 @@ export class Tetris {
   }
 
   clearFilledLines() {
-    const filledLines = this.getFilledLines()
+    const filledLines = this.getFilledLines() // 获取满行
     const width = this.matrix[0].length
 
-    if (!filledLines.length) return
+    this.checkCombo()
+
+    if (!filledLines.length) return // 没有满行直接返回
 
     for (let i = 0; i < filledLines.length; i++) {
-      this.matrix.splice(filledLines[i], 1)
-      this.matrix.unshift(new Array(width).fill(0))
+      this.matrix.splice(filledLines[i], 1) // 删除满行
+      this.matrix.unshift(new Array(width).fill(0)) // 在数组顶部插入空行
     }
   }
 
