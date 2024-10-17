@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
+import { watch, onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGameStore } from '@/stores/game.js'
 import { emitter } from '@/assets/js/emitter.js'
@@ -15,6 +15,24 @@ import ButtonOperation from '@/components/operation/ButtonOperation.vue'
 import KeyOperation from '@/components/operation/KeyOperation.vue'
 
 const { tetris } = storeToRefs(useGameStore())
+
+watch(
+  () => tetris.value.tetrisNum,
+  (newValue) => {
+    if (newValue >= 1) {
+      notify('success', `Tetris: ${tetris.value.tetrisNum}`)
+    }
+  },
+)
+
+watch(
+  () => tetris.value.comboNum,
+  (newValue) => {
+    if (newValue > 1) {
+      notify('warning', `Combo: ${tetris.value.comboNum - 1}`)
+    }
+  },
+)
 
 onMounted(() => {
   // requestAnimationFrame(gameLoop)
@@ -106,12 +124,6 @@ function fallTetrominoToLand() {
 
 function landTetromino() {
   tetris.value.landTetromino()
-}
-
-function checkCombo() {
-  if (tetris.value.isCombo) {
-    notify('warning', `Combo: ${tetris.value.comboNum - 1}`)
-  }
 }
 </script>
 

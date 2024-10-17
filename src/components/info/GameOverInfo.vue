@@ -1,29 +1,30 @@
 <script setup>
 import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useGameStore } from '@/stores/game'
 
 import DialogsBox from '@/components/DialogsBox.vue'
 import LabelBox from '@/components/info/LabelBox.vue'
 import Button from '@/components/button/Button.vue'
 
-const game = useGameStore()
+const { tetris } = storeToRefs(useGameStore())
 const title = ref('GAME OVER')
 </script>
 
 <template>
-  <DialogsBox :title="title" :is-show="game.gameOver">
+  <DialogsBox :title="title" :is-show="tetris.gameOver">
     <!-- info -->
     <div class="flex flex-col gap-4 w-72">
       <LabelBox label="Level:">
-        <p>{{ game.level }}</p>
+        <p>{{ tetris.level }}</p>
       </LabelBox>
 
       <LabelBox label="Lines:">
-        <p>{{ game.lines }}</p>
+        <p>{{ tetris.lines }}</p>
       </LabelBox>
 
       <LabelBox label="Score:">
-        <p>{{ game.score }}</p>
+        <p>{{ tetris.score }}</p>
       </LabelBox>
     </div>
 

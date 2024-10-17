@@ -355,11 +355,13 @@ export class Tetris {
     this.lines = 0
     this.score = 0
 
+    this.gameOver = false
+
     this.oldLines = 0
     this.lastRenderTime = 0
 
+    this.tetrisNum = 0
     this.comboNum = 0
-    this.isCombo = false
   }
 
   static getBag() {
@@ -386,8 +388,13 @@ export class Tetris {
   }
 
   addTetromino() {
-    this.activeTetromino = this.currentBag[0] // 在当前背包中获取第一个方块作为当前方块
-    this.updateBag() // 更新背包
+    if (!this.activeTetromino || !this.checkGameover()) {
+      this.activeTetromino = this.currentBag[0] // 在当前背包中获取第一个方块作为当前方块
+      this.updateBag() // 更新背包
+      return
+    }
+
+    this.gameOver = true
   }
 
   moveTetromino(xStep, yStep) {
@@ -430,6 +437,8 @@ export class Tetris {
     this.updateLines()
     this.updateLevel()
     this.updateScore()
+    this.checkTetris()
+    this.checkCombo()
     this.clearFilledLines()
     this.resetTetrominoLocation()
     this.addTetromino()
@@ -438,8 +447,6 @@ export class Tetris {
   clearFilledLines() {
     const filledLines = this.getFilledLines() // 获取满行
     const width = this.matrix[0].length
-
-    this.checkCombo()
 
     if (!filledLines.length) return // 没有满行直接返回
 
@@ -611,15 +618,17 @@ export class Tetris {
   checkCombo() {
     if (this.getLines()) {
       this.comboNum += 1
-    } else {
-      this.comboNum = 0
+      return
     }
+    this.comboNum = 0
+  }
 
-    if (this.comboNum > 1) {
-      this.isCombo = true
-    } else {
-      this.isCombo = false
+  checkTetris() {
+    if (this.getLines() === 4) {
+      this.tetrisNum += 1
+      return
     }
+    this.tetrisNum = 0
   }
 
   checkGameover() {

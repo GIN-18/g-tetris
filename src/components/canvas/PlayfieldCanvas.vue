@@ -29,6 +29,7 @@ onMounted(() => {
 })
 
 function drawPlayfield() {
+  if (!tetris.value.activeTetromino) return
   clearCanvas()
   drawMatrix()
   drawGhostPiece()
