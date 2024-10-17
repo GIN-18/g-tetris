@@ -429,9 +429,24 @@ export class Tetris {
     this.mergeMatrix()
     this.updateLines()
     this.updateLevel()
+    this.updateScore()
     this.clearFilledLines()
     this.resetTetrominoLocation()
     this.addTetromino()
+  }
+
+  clearFilledLines() {
+    const filledLines = this.getFilledLines() // 获取满行
+    const width = this.matrix[0].length
+
+    this.checkCombo()
+
+    if (!filledLines.length) return // 没有满行直接返回
+
+    for (let i = 0; i < filledLines.length; i++) {
+      this.matrix.splice(filledLines[i], 1) // 删除满行
+      this.matrix.unshift(new Array(width).fill(0)) // 在数组顶部插入空行
+    }
   }
 
   // 合并当前方块到地图矩阵
@@ -488,6 +503,10 @@ export class Tetris {
     this.level += this.getLevelIncrement()
   }
 
+  updateScore() {
+    this.score += this.getScore()
+  }
+
   // 获取消除的行数
   getLines() {
     return this.getFilledLines().length
@@ -521,20 +540,6 @@ export class Tetris {
 
   getDropInterval() {
     return Math.pow(0.8 - (this.level - 1) * 0.007, this.level - 1)
-  }
-
-  clearFilledLines() {
-    const filledLines = this.getFilledLines() // 获取满行
-    const width = this.matrix[0].length
-
-    this.checkCombo()
-
-    if (!filledLines.length) return // 没有满行直接返回
-
-    for (let i = 0; i < filledLines.length; i++) {
-      this.matrix.splice(filledLines[i], 1) // 删除满行
-      this.matrix.unshift(new Array(width).fill(0)) // 在数组顶部插入空行
-    }
   }
 
   getFilledLines() {
