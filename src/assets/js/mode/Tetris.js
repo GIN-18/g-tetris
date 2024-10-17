@@ -351,6 +351,10 @@ export class Tetris {
     this.activeTetromino = null
     this.holdTetromino = null
 
+    this.level = 1
+    this.lines = 0
+    this.score = 0
+
     this.oldLines = 0
     this.lastRenderTime = 0
 
@@ -384,39 +388,6 @@ export class Tetris {
   addTetromino() {
     this.activeTetromino = this.currentBag[0] // 在当前背包中获取第一个方块作为当前方块
     this.updateBag() // 更新背包
-  }
-
-  updateBag() {
-    this.currentBag.shift() // 在当前背包中删除第一个方块
-    this.currentBag.push(this.nextBag.shift()) // 在下一个背包中添加第一个方块
-
-    // 如果下一个背包为空，就重新洗牌
-    if (!this.nextBag.length) {
-      this.nextBag = Tetris.getBag()
-    }
-  }
-
-  updateHoldTetromino() {
-    let tempTetromino = null
-
-    if (!this.holdTetromino) {
-      this.resetTetrominoLocation()
-      this.holdTetromino = this.activeTetromino
-      this.holdTetromino.holdLock = true
-      this.addTetromino()
-    } else if (!this.holdTetromino.holdLock) {
-      this.resetTetrominoLocation()
-      tempTetromino = this.activeTetromino
-      this.activeTetromino = this.holdTetromino
-      this.holdTetromino = tempTetromino
-      this.holdTetromino.holdLock = true
-    }
-  }
-
-  updateHoldLock() {
-    if (this.holdTetromino) {
-      this.holdTetromino.holdLock = false
-    }
   }
 
   moveTetromino(xStep, yStep) {
@@ -456,6 +427,9 @@ export class Tetris {
   landTetromino() {
     this.updateHoldLock()
     this.mergeMatrix()
+    this.updateLines()
+    this.updateLevel()
+    this.clearFilledLines()
     this.resetTetrominoLocation()
     this.addTetromino()
   }
@@ -473,8 +447,45 @@ export class Tetris {
     }
   }
 
-  getDropInterval() {
-    return Math.pow(0.8 - (this.level - 1) * 0.007, this.level - 1)
+  updateHoldTetromino() {
+    let tempTetromino = null
+
+    if (!this.holdTetromino) {
+      this.resetTetrominoLocation()
+      this.holdTetromino = this.activeTetromino
+      this.holdTetromino.holdLock = true
+      this.addTetromino()
+    } else if (!this.holdTetromino.holdLock) {
+      this.resetTetrominoLocation()
+      tempTetromino = this.activeTetromino
+      this.activeTetromino = this.holdTetromino
+      this.holdTetromino = tempTetromino
+      this.holdTetromino.holdLock = true
+    }
+  }
+
+  updateHoldLock() {
+    if (this.holdTetromino) {
+      this.holdTetromino.holdLock = false
+    }
+  }
+
+  updateBag() {
+    this.currentBag.shift() // 在当前背包中删除第一个方块
+    this.currentBag.push(this.nextBag.shift()) // 在当前背包中添加下一个背包中添加第一个方块
+
+    // 如果下一个背包为空，就重新洗牌
+    if (!this.nextBag.length) {
+      this.nextBag = Tetris.getBag()
+    }
+  }
+
+  updateLines() {
+    this.lines += this.getLines()
+  }
+
+  updateLevel() {
+    this.level += this.getLevelIncrement()
   }
 
   // 获取消除的行数
@@ -482,10 +493,10 @@ export class Tetris {
     return this.getFilledLines().length
   }
 
-  getLevelIncrement(lines) {
-    const increment = Math.floor(lines / 10)
+  getLevelIncrement() {
+    const increment = Math.floor(this.lines / 10)
 
-    if (increment > 0 && Math.abs(this.oldLines - lines) >= 10) {
+    if (increment > 0 && Math.abs(this.oldLines - this.lines) >= 10) {
       this.oldLines += 10
       return 1
     }
@@ -508,12 +519,8 @@ export class Tetris {
     return score
   }
 
-  remapTetrominoName(name) {
-    const arr = ['T', 'Z', 'S', 'J', 'L']
-    if (arr.includes(name)) {
-      return 'A'
-    }
-    return name
+  getDropInterval() {
+    return Math.pow(0.8 - (this.level - 1) * 0.007, this.level - 1)
   }
 
   clearFilledLines() {
@@ -542,12 +549,6 @@ export class Tetris {
     }
 
     return filledLines
-  }
-
-  resetTetrominoLocation() {
-    this.activeTetromino.x = 4
-    this.activeTetromino.y = 1
-    this.activeTetromino.rotation = 0
   }
 
   checkRotation(rotationStep, wallKickIndex) {
@@ -629,5 +630,19 @@ export class Tetris {
     }
 
     return false
+  }
+
+  resetTetrominoLocation() {
+    this.activeTetromino.x = 4
+    this.activeTetromino.y = 1
+    this.activeTetromino.rotation = 0
+  }
+
+  remapTetrominoName(name) {
+    const arr = ['T', 'Z', 'S', 'J', 'L']
+    if (arr.includes(name)) {
+      return 'A'
+    }
+    return name
   }
 }
