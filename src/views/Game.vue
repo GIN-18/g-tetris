@@ -59,8 +59,8 @@ onUnmounted(() => {
 })
 
 function playGame() {
-  // tetris.value.playGame()
-  tetris.value.addTetromino()
+  tetris.value.playGame()
+  // tetris.value.addTetromino()
 }
 
 function moveTetrominoLeft() {

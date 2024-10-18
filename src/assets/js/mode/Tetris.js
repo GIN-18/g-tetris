@@ -357,11 +357,11 @@ export class Tetris {
 
     this.gameOver = false
 
-    this.oldLines = 0
-    this.lastRenderTime = 0
-
     this.tetrisNum = 0
     this.comboNum = 0
+
+    this.oldLines = 0
+    this.timer = 0
   }
 
   static getBag() {
@@ -394,7 +394,7 @@ export class Tetris {
   gameLoop() {
     const deltaTime = this.getDropInterval() * 1000
 
-    setInterval(() => {
+    this.timer = setInterval(() => {
       if (!this.activeTetromino) {
         this.addTetromino()
       } else {
@@ -410,6 +410,7 @@ export class Tetris {
       return
     }
 
+    clearInterval(this.timer)
     this.gameOver = true
   }
 
@@ -561,6 +562,8 @@ export class Tetris {
 
   updateLevel() {
     this.level += this.getLevelIncrement()
+    clearInterval(this.timer)
+    this.gameLoop()
   }
 
   updateScore() {
