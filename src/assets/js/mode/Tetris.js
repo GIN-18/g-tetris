@@ -387,6 +387,22 @@ export class Tetris {
     return arr
   }
 
+  playGame() {
+    this.gameLoop()
+  }
+
+  gameLoop() {
+    const deltaTime = this.getDropInterval() * 1000
+
+    setInterval(() => {
+      if (!this.activeTetromino) {
+        this.addTetromino()
+      } else {
+        this.fallTetrominoToLand()
+      }
+    }, deltaTime)
+  }
+
   addTetromino() {
     if (!this.activeTetromino || !this.checkGameover()) {
       this.activeTetromino = this.currentBag[0] // 在当前背包中获取第一个方块作为当前方块
@@ -395,6 +411,25 @@ export class Tetris {
     }
 
     this.gameOver = true
+  }
+
+  moveTetrominoLeft() {
+    this.moveTetromino(-1, 0)
+  }
+
+  moveTetrominoRight() {
+    this.moveTetromino(1, 0)
+  }
+
+  hardDropTetromino() {
+    while (this.moveTetromino(0, 1)) {}
+    this.landTetromino()
+  }
+
+  softDropTetromino(enable) {
+    if (enable && !this.moveTetromino(0, 1)) {
+      this.landTetromino()
+    }
   }
 
   moveTetromino(xStep, yStep) {
@@ -419,6 +454,18 @@ export class Tetris {
       this.activeTetromino.y += yStep
       return canMove
     }
+  }
+
+  rotateRight() {
+    this.rotateTetromino(1)
+  }
+
+  rotateLeft() {
+    this.rotateTetromino(-1)
+  }
+
+  rotateFlip() {
+    this.rotateTetromino(2)
   }
 
   rotateTetromino(rotationStep) {
@@ -466,6 +513,12 @@ export class Tetris {
       const y = piece[i][1] + this.activeTetromino.y
 
       this.matrix[y][x] = type
+    }
+  }
+
+  fallTetrominoToLand() {
+    if (!this.moveTetromino(0, 1)) {
+      this.landTetromino()
     }
   }
 

@@ -35,8 +35,6 @@ watch(
 )
 
 onMounted(() => {
-  // requestAnimationFrame(gameLoop)
-
   emitter.on('play', playGame)
   emitter.on('left', moveTetrominoLeft)
   emitter.on('right', moveTetrominoRight)
@@ -61,69 +59,40 @@ onUnmounted(() => {
 })
 
 function playGame() {
+  // tetris.value.playGame()
   tetris.value.addTetromino()
 }
 
-function gameLoop(currentTime) {
-  const dropInterval = tetris.value.getDropInterval() * 1000
-  const deltaTime = currentTime - tetris.value.lastRenderTime
-
-  if (deltaTime > dropInterval) {
-    if (!tetris.value.activeTetromino) {
-      tetris.value.addTetromino()
-      tetris.value.updateBag()
-    }
-    fallTetrominoToLand()
-
-    tetris.value.lastRenderTime = currentTime
-  }
-
-  requestAnimationFrame(gameLoop)
-}
-
 function moveTetrominoLeft() {
-  tetris.value.moveTetromino(-1, 0)
+  tetris.value.moveTetrominoLeft()
 }
 
 function moveTetrominoRight() {
-  tetris.value.moveTetromino(1, 0)
+  tetris.value.moveTetrominoRight()
 }
 
 function hardDropTetromino() {
-  while (tetris.value.moveTetromino(0, 1)) {}
-  landTetromino()
+  tetris.value.hardDropTetromino()
 }
 
 function softDropTetromino(enable) {
-  if (enable && !tetris.value.moveTetromino(0, 1)) {
-    landTetromino()
-  }
+  tetris.value.softDropTetromino(enable)
 }
 
 function rotateRight() {
-  tetris.value.rotateTetromino(1)
+  tetris.value.rotateRight()
 }
 
 function rotateLeft() {
-  tetris.value.rotateTetromino(-1)
+  tetris.value.rotateLeft()
 }
 
 function rotateFlip() {
-  tetris.value.rotateTetromino(2)
+  tetris.value.rotateFlip()
 }
 
 function holdTetromino() {
   tetris.value.updateHoldTetromino()
-}
-
-function fallTetrominoToLand() {
-  if (!tetris.value.moveTetromino(0, 1)) {
-    landTetromino()
-  }
-}
-
-function landTetromino() {
-  tetris.value.landTetromino()
 }
 </script>
 
