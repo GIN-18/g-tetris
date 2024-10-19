@@ -1,19 +1,29 @@
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useGameStore } from '@/stores/game'
+import { emitter } from '@/assets/js/emitter.js'
 
 import DialogsBox from '@/components/DialogsBox.vue'
 import LabelBox from '@/components/info/LabelBox.vue'
 import Button from '@/components/button/Button.vue'
 
 const { tetris } = storeToRefs(useGameStore())
+const router = useRouter()
 const title = ref('GAME OVER')
+
+function replayGame() {
+  emitter.emit('replay')
+}
+
+function navigateToHome() {
+  router.push({ name: 'Home' })
+}
 </script>
 
 <template>
   <DialogsBox :title="title" :is-show="tetris.gameOver">
-    <!-- info -->
     <div class="flex flex-col gap-4 w-72">
       <LabelBox label="Level:">
         <p>{{ tetris.level }}</p>
@@ -28,22 +38,19 @@ const title = ref('GAME OVER')
       </LabelBox>
     </div>
 
-    <!-- button -->
     <div class="flex gap-12">
-      <!-- again button -->
       <Button
         color="green"
         text="AGAIN"
-        @click.prevent="emitter.emit('reset')"
-        @touchstart.prevent="emitter.emit('reset')"
+        @click.prevent="replayGame"
+        @touchstart.prevent="replayGame"
       />
 
-      <!-- quit button -->
       <Button
         color="yellow"
         text="Quit"
-        @click.prevent="emitter.emit('reset')"
-        @touchstart.prevent="emitter.emit('reset')"
+        @click.prevent="navigateToHome"
+        @touchstart.prevent="navigateToHome"
       />
     </div>
   </DialogsBox>

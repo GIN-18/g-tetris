@@ -31,6 +31,8 @@ function clearCanvas() {
 }
 
 function drawHoldTetromino() {
+  if (!tetris.value.holdTetromino) return
+
   const tetromino = tetris.value.holdTetromino
   const name = tetromino.name
   const color = tetromino.color

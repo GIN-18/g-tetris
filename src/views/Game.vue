@@ -1,5 +1,6 @@
 <script setup>
 import { watch, onMounted, onUnmounted } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useGameStore } from '@/stores/game.js'
 import { emitter } from '@/assets/js/emitter.js'
@@ -35,7 +36,11 @@ watch(
 )
 
 onMounted(() => {
+  // playGame()
+
   emitter.on('play', playGame)
+  emitter.on('reset', resetGame)
+  emitter.on('replay', replayGame)
   emitter.on('left', moveTetrominoLeft)
   emitter.on('right', moveTetrominoRight)
   emitter.on('hardDrop', hardDropTetromino)
@@ -48,6 +53,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   emitter.off('play', playGame)
+  emitter.off('reset', resetGame)
+  emitter.off('replay', replayGame)
   emitter.off('left', moveTetrominoLeft)
   emitter.off('right', moveTetrominoRight)
   emitter.off('hardDrop', hardDropTetromino)
@@ -58,9 +65,23 @@ onUnmounted(() => {
   emitter.off('hold', holdTetromino)
 })
 
+onBeforeRouteLeave((to, from, next) => {
+  resetGame()
+  next()
+})
+
+function replayGame() {
+  resetGame()
+  playGame()
+}
+
 function playGame() {
   tetris.value.playGame()
   // tetris.value.addTetromino()
+}
+
+function resetGame() {
+  tetris.value.resetGame()
 }
 
 function moveTetrominoLeft() {

@@ -18,6 +18,7 @@ watch(
     () => isDrawGhostPiece.value,
   ],
   () => {
+    clearCanvas()
     drawPlayfield()
   },
   { deep: true },
@@ -30,7 +31,6 @@ onMounted(() => {
 
 function drawPlayfield() {
   if (!tetris.value.activeTetromino) return
-  clearCanvas()
   drawMatrix()
   drawGhostPiece()
   drawActiveTetromino()

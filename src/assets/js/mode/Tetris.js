@@ -342,28 +342,6 @@ export class Tetris {
     ],
   }
 
-  constructor(width, height) {
-    this.matrix = new Array(height).fill(0).map(() => new Array(width).fill(0))
-
-    this.currentBag = Tetris.getBag()
-    this.nextBag = Tetris.getBag()
-
-    this.activeTetromino = null
-    this.holdTetromino = null
-
-    this.level = 1
-    this.lines = 0
-    this.score = 0
-
-    this.gameOver = false
-
-    this.tetrisNum = 0
-    this.comboNum = 0
-
-    this.oldLines = 0
-    this.timer = 0
-  }
-
   static getBag() {
     const tetrominoBag = []
     const bag = Tetris.shuffleBag()
@@ -387,12 +365,62 @@ export class Tetris {
     return arr
   }
 
+  static initMatrix() {
+    return new Array(20).fill(0).map(() => new Array(10).fill(0))
+  }
+
+  constructor() {
+    this.matrix = Tetris.initMatrix()
+
+    this.currentBag = Tetris.getBag()
+    this.nextBag = Tetris.getBag()
+
+    this.activeTetromino = null
+    this.holdTetromino = null
+
+    this.level = 1
+    this.lines = 0
+    this.score = 0
+
+    this.gameOver = false
+
+    this.tetrisNum = 0
+    this.comboNum = 0
+
+    this.oldLines = 0
+    this.timer = null
+  }
+
   playGame() {
     this.gameLoop()
   }
 
+  resetGame() {
+    clearInterval(this.timer)
+
+    this.matrix = Tetris.initMatrix()
+
+    this.currentBag = Tetris.getBag()
+    this.nextBag = Tetris.getBag()
+
+    this.activeTetromino = null
+    this.holdTetromino = null
+
+    this.level = 1
+    this.lines = 0
+    this.score = 0
+
+    this.gameOver = false
+
+    this.tetrisNum = 0
+    this.comboNum = 0
+
+    this.oldLines = 0
+    this.timer = null
+  }
+
   gameLoop() {
-    const deltaTime = this.getDropInterval() * 1000
+    const deltaTime = this.getDropInterval()
 
     this.timer = setInterval(() => {
       if (!this.activeTetromino) {
@@ -602,7 +630,7 @@ export class Tetris {
   }
 
   getDropInterval() {
-    return Math.pow(0.8 - (this.level - 1) * 0.007, this.level - 1)
+    return Math.pow(0.8 - (this.level - 1) * 0.007, this.level - 1) * 1000
   }
 
   getFilledLines() {
