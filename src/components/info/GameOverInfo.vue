@@ -55,9 +55,3 @@ function navigateToHome() {
     </div>
   </DialogsBox>
 </template>
-
-<style scoped>
-p {
-  @apply mb-0;
-}
-</style>

@@ -1,12 +1,12 @@
 export const routes = [
   {
     path: '/',
-    name: 'Home',
+    name: 'home',
     component: () => import('@/views/Home.vue'),
   },
   {
     path: '/game/:mode',
-    name: 'Game',
+    name: 'game',
     component: () => import('@/views/Game.vue'),
   },
 ]

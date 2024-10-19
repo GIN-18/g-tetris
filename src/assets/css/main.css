@@ -6,7 +6,7 @@
 
 html,
 body {
-  @apply w-full h-full;
+  @apply w-full h-full bg-nes-gray;
 }
 
 h1,

@@ -1,13 +1,10 @@
 <script setup>
-// TODO: need home page or not?
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
 function jumpToHome() {
-  router.push({
-    path: '/',
-  })
+  router.push({ name: 'home' })
 }
 </script>
 
