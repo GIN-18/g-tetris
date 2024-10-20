@@ -447,17 +447,23 @@ export class Tetris {
   }
 
   hardDropTetromino() {
+    if (!this.activeTetromino) return
+
     while (this.moveTetromino(0, 1)) {}
     this.landTetromino()
   }
 
   softDropTetromino(enable) {
+    if (!this.activeTetromino) return
+
     if (enable && !this.moveTetromino(0, 1)) {
       this.landTetromino()
     }
   }
 
   moveTetromino(xStep, yStep) {
+    if (!this.activeTetromino) return
+
     const piece = this.activeTetromino.pieces[this.activeTetromino.rotation]
     const w = this.matrix[0].length
     const h = this.matrix.length
@@ -494,6 +500,8 @@ export class Tetris {
   }
 
   rotateTetromino(rotationStep) {
+    if (!this.activeTetromino) return
+
     const rotationInfo = this.checkRotation(rotationStep, 0)
 
     if (rotationInfo.canRotate) {
@@ -506,11 +514,11 @@ export class Tetris {
   landTetromino() {
     this.updateHoldLock()
     this.mergeMatrix()
+    this.checkTetris()
+    this.checkCombo()
     this.updateLines()
     this.updateLevel()
     this.updateScore()
-    this.checkTetris()
-    this.checkCombo()
     this.clearFilledLines()
     this.resetTetrominoLocation()
     this.addTetromino()
@@ -548,6 +556,8 @@ export class Tetris {
   }
 
   updateHoldTetromino() {
+    if (!this.activeTetromino) return
+
     let tempTetromino = null
 
     if (!this.holdTetromino) {
@@ -610,16 +620,21 @@ export class Tetris {
     return 0
   }
 
-  // TODO: update score acording to T-Spin, T-Spin Mini, BackToBack and Combo
+  // TODO: update score acording to T-Spin, T-Spin Mini, BackToBack
   getScore() {
     let index, score
     const lineScore = [100, 300, 500, 800]
 
     if (!this.getLines()) {
       score = 0
-    } else {
-      index = this.getLines() - 1
-      score = lineScore[index] * this.level
+      return score
+    }
+
+    index = this.getLines() - 1
+    score = lineScore[index] * this.level
+
+    if (this.comboNum > 0) {
+      score += 50 * this.level * (this.comboNum - 1)
     }
 
     return score
