@@ -391,10 +391,6 @@ export class Tetris {
     this.timer = null
   }
 
-  playGame() {
-    this.gameLoop()
-  }
-
   resetGame() {
     clearInterval(this.timer)
 

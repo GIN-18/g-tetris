@@ -76,7 +76,7 @@ function replayGame() {
 }
 
 function playGame() {
-  tetris.value.playGame()
+  tetris.value.gameLoop()
   // tetris.value.addTetromino()
 }
 

@@ -18,7 +18,7 @@ function replayGame() {
 }
 
 function navigateToHome() {
-  router.push({ name: 'Home' })
+  router.push({ name: 'home' })
 }
 </script>
 

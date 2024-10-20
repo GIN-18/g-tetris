@@ -11,8 +11,8 @@ const props = defineProps({
 
 const classList = computed(() => ({
   'text-2xl': true,
-  'w-13 h-13': arrowName.includes(props.type),
-  'w-32 h-13': rotateName.includes(props.type),
+  'w-14 h-14': arrowName.includes(props.type),
+  'w-32 h-14': rotateName.includes(props.type),
 }))
 
 const icon = computed(() => ({
