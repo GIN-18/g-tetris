@@ -384,8 +384,9 @@ export class Tetris {
 
     this.gameOver = false
 
-    this.tetrisNum = 0
-    this.comboNum = 0
+    this.tetrisCount = 0
+    this.comboCount = 0
+    this.backToBackCount = 0
 
     this.oldLines = 0
     this.timer = null
@@ -408,8 +409,9 @@ export class Tetris {
 
     this.gameOver = false
 
-    this.tetrisNum = 0
-    this.comboNum = 0
+    this.tetrisCount = 0
+    this.comboCount = 0
+    this.isBackToBack = false
 
     this.oldLines = 0
     this.timer = null
@@ -530,6 +532,8 @@ export class Tetris {
 
     if (!filledLines.length) return // 没有满行直接返回
 
+    this.resetBackToBackCount() // 重置背靠背次数
+
     for (let i = 0; i < filledLines.length; i++) {
       this.matrix.splice(filledLines[i], 1) // 删除满行
       this.matrix.unshift(new Array(width).fill(0)) // 在数组顶部插入空行
@@ -633,8 +637,12 @@ export class Tetris {
     index = this.getLines() - 1
     score = lineScore[index] * this.level
 
-    if (this.comboNum > 0) {
-      score += 50 * this.level * (this.comboNum - 1)
+    if (this.comboCount > 0) {
+      score += 50 * this.level * (this.comboCount - 1)
+    }
+
+    if (this.backToBackCount > 1) {
+      score += score * 1.5
     }
 
     return score
@@ -710,20 +718,26 @@ export class Tetris {
     }
   }
 
-  checkCombo() {
-    if (this.getLines()) {
-      this.comboNum += 1
-      return
-    }
-    this.comboNum = 0
-  }
-
   checkTetris() {
     if (this.getLines() === 4) {
-      this.tetrisNum += 1
+      this.backToBackCount += 1
+      this.tetrisCount += 1
       return
     }
-    this.tetrisNum = 0
+    this.tetrisCount = 0
+  }
+
+  checkCombo() {
+    if (this.getLines()) {
+      this.comboCount += 1
+      return
+    }
+    this.comboCount = 0
+  }
+
+  // TODO: check T-Spin
+  checkTSpin() {
+    console.log('tspin')
   }
 
   checkGameover() {
@@ -745,6 +759,14 @@ export class Tetris {
     this.activeTetromino.x = 4
     this.activeTetromino.y = 1
     this.activeTetromino.rotation = 0
+  }
+
+  resetBackToBackCount() {
+    const lines = [1, 2, 3]
+
+    if (lines.includes(this.getLines())) {
+      this.backToBackCount = 0
+    }
   }
 
   remapTetrominoName(name) {

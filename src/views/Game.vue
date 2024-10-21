@@ -18,19 +18,28 @@ import KeyOperation from '@/components/operation/KeyOperation.vue'
 const { tetris } = storeToRefs(useGameStore())
 
 watch(
-  () => tetris.value.tetrisNum,
+  () => tetris.value.tetrisCount,
   (newValue) => {
-    if (newValue >= 1) {
-      notify('success', `Tetris: ${tetris.value.tetrisNum}`)
+    if (newValue > 0) {
+      notify('warning', `TETRIS`)
     }
   },
 )
 
 watch(
-  () => tetris.value.comboNum,
+  () => tetris.value.comboCount,
   (newValue) => {
     if (newValue > 1) {
-      notify('warning', `Combo: ${tetris.value.comboNum - 1}`)
+      notify('warning', `${tetris.value.comboCount - 1} Combo`)
+    }
+  },
+)
+
+watch(
+  () => tetris.value.backToBackCount,
+  (newValue) => {
+    if (newValue > 1) {
+      notify('warning', `${tetris.value.backToBackCount - 1} BackToBack`)
     }
   },
 )
