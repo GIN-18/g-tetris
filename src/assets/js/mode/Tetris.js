@@ -433,6 +433,7 @@ export class Tetris {
     if (!this.activeTetromino || !this.checkGameover()) {
       this.activeTetromino = this.currentBag[0] // 在当前背包中获取第一个方块作为当前方块
       this.updateBag() // 更新背包
+      this.getHardDropIncrement()
       return
     }
 
@@ -451,12 +452,18 @@ export class Tetris {
   hardDropTetromino() {
     if (!this.activeTetromino) return
 
+    this.score += this.getHardDropIncrement() // 硬降更新分数
     while (this.moveTetromino(0, 1)) {}
     this.landTetromino()
   }
 
   softDropTetromino(enable) {
     if (!this.activeTetromino) return
+
+    if (this.softDropCount >= 3) {
+      this.softDropCount = 0
+      this.moveTetromino(0, 1)
+    }
 
     if (enable && !this.moveTetromino(0, 1)) {
       this.landTetromino()
@@ -485,8 +492,9 @@ export class Tetris {
     if (canMove) {
       this.activeTetromino.x += xStep
       this.activeTetromino.y += yStep
-      return canMove
+      this.getHardDropIncrement()
     }
+    return canMove
   }
 
   rotateRight() {
@@ -664,6 +672,30 @@ export class Tetris {
     }
 
     return filledLines
+  }
+
+  getHardDropIncrement() {
+    const y = this.activeTetromino.y
+    return (this.getLandTetrominoYOffset(y) - y) * 2
+  }
+
+  getLandTetrominoYOffset(offset) {
+    const tetromino = this.activeTetromino
+    const piece = tetromino.pieces[tetromino.rotation]
+    const h = this.matrix.length - 2
+
+    for (let i = 0; i < piece.length; i++) {
+      const x = piece[i][0] + tetromino.x
+      const y = piece[i][1] + offset
+
+      if (
+        offset >= tetromino.y &&
+        (y > h || (this.matrix[y] && this.matrix[y + 1][x]))
+      ) {
+        return offset
+      }
+    }
+    return this.getLandTetrominoYOffset(offset + 1)
   }
 
   checkRotation(rotationStep, wallKickIndex) {

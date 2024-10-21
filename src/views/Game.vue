@@ -47,7 +47,7 @@ watch(
 onMounted(() => {
   // playGame()
 
-  emitter.on('play', playGame)
+  emitter.on('play', playGame) // for test
   emitter.on('reset', resetGame)
   emitter.on('replay', replayGame)
   emitter.on('left', moveTetrominoLeft)
@@ -61,7 +61,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  emitter.off('play', playGame)
+  emitter.off('play', playGame) // for test
   emitter.off('reset', resetGame)
   emitter.off('replay', replayGame)
   emitter.off('left', moveTetrominoLeft)

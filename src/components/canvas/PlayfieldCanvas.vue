@@ -65,7 +65,7 @@ function drawGhostPiece() {
 
   const tetromino = tetris.value.activeTetromino
   const color = palette.previewColor
-  const ghostPieceYOffset = getGhostPieceYOffset(tetromino.y)
+  const ghostPieceYOffset = tetris.value.getLandTetrominoYOffset(tetromino.y)
   const piece = tetromino.pieces[tetromino.rotation]
 
   ctx.value.fillStyle = color
@@ -98,25 +98,6 @@ function drawActiveTetromino() {
       block.value,
     )
   }
-}
-
-function getGhostPieceYOffset(offset) {
-  const tetromino = tetris.value.activeTetromino
-  const piece = tetromino.pieces[tetromino.rotation]
-  const h = tetris.value.matrix.length - 2
-
-  for (let i = 0; i < piece.length; i++) {
-    const x = piece[i][0] + tetromino.x
-    const y = piece[i][1] + offset
-
-    if (
-      offset >= tetromino.y &&
-      (y > h || (tetris.value.matrix[y] && tetris.value.matrix[y + 1][x]))
-    ) {
-      return offset
-    }
-  }
-  return getGhostPieceYOffset(offset + 1)
 }
 </script>
 
