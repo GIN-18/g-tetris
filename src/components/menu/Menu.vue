@@ -41,7 +41,7 @@ function toggleMenu() {
         leave-active-class="animate-[slide-out-right_0.4s_ease_both]"
       >
         <aside
-          class="z-20 fixed top-0 right-0 flex flex-col w-2/3 h-full p-3 text-white bg-nes-dark"
+          class="z-20 fixed top-0 right-0 flex flex-col w-2/3 h-full p-3 text-white bg-nes-black"
           v-show="showMenu"
         >
           <header class="flex justify-between items-center mb-4">

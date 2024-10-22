@@ -102,5 +102,5 @@ function drawActiveTetromino() {
 </script>
 
 <template>
-  <canvas class="border-4 border-black bg-black" ref="canvas"></canvas>
+  <canvas class="border-4 border-black bg-nes-black" ref="canvas"></canvas>
 </template>

@@ -7,9 +7,9 @@ export default {
     extend: {
       colors: {
         'nes-white': '#f8f8f8',
+        'nes-black': '#212529',
         'nes-gray': '#d8d8d8',
         'nes-deep-gray': '#787878',
-        'nes-dark': '#212529',
         'nes-blue': '#209cee',
         'nes-deep-blue': '#108de0',
         'nes-red': '#e76e55',

@@ -1,4 +1,5 @@
 import { palette } from '@/assets/js/palette.js'
+import PlayfieldCanvas from '@/components/canvas/PlayfieldCanvas.vue'
 
 export class Tetris {
   static tetrominoes = {
@@ -387,13 +388,17 @@ export class Tetris {
     this.tetrisCount = 0
     this.comboCount = 0
     this.backToBackCount = 0
+    this.TSpinCount = 0
 
     this.oldLines = 0
-    this.timer = null
+    this.gameLoopTimer = null
+
+    this.tetrominoLockTimer = null
+    this.lockDelay = 1000
   }
 
   resetGame() {
-    clearInterval(this.timer)
+    clearInterval(this.gameLoopTimer)
 
     this.matrix = Tetris.initMatrix()
 
@@ -414,13 +419,18 @@ export class Tetris {
     this.isBackToBack = false
 
     this.oldLines = 0
-    this.timer = null
+    this.gameLoopTimer = null
   }
 
   gameLoop() {
     const deltaTime = this.getDropInterval()
 
-    this.timer = setInterval(() => {
+    if (this.gameLoopTimer) {
+      clearInterval(this.gameLoopTimer)
+      this.gameLoopTimer = null
+    }
+
+    this.gameLoopTimer = setInterval(() => {
       if (!this.activeTetromino) {
         this.addTetromino()
       } else {
@@ -433,11 +443,10 @@ export class Tetris {
     if (!this.activeTetromino || !this.checkGameover()) {
       this.activeTetromino = this.currentBag[0] // 在当前背包中获取第一个方块作为当前方块
       this.updateBag() // 更新背包
-      this.getHardDropIncrement()
       return
     }
 
-    clearInterval(this.timer)
+    clearInterval(this.gameLoopTimer)
     this.gameOver = true
   }
 
@@ -452,21 +461,18 @@ export class Tetris {
   hardDropTetromino() {
     if (!this.activeTetromino) return
 
-    this.score += this.getHardDropIncrement() // 硬降更新分数
-    while (this.moveTetromino(0, 1)) {}
-    this.landTetromino()
+    this.updateScoreByHardDrop() // 硬降更新分数
+
+    while (!this.checkTetrominoLock()) {
+      this.moveTetromino(0, 1)
+    }
   }
 
   softDropTetromino(enable) {
     if (!this.activeTetromino) return
 
-    if (this.softDropCount >= 3) {
-      this.softDropCount = 0
+    if (enable) {
       this.moveTetromino(0, 1)
-    }
-
-    if (enable && !this.moveTetromino(0, 1)) {
-      this.landTetromino()
     }
   }
 
@@ -477,24 +483,20 @@ export class Tetris {
     const w = this.matrix[0].length
     const h = this.matrix.length
 
-    let canMove = true
-
     for (let i = 0; i < piece.length; i++) {
       const x = piece[i][0] + this.activeTetromino.x + xStep
       const y = piece[i][1] + this.activeTetromino.y + yStep
 
-      if (x < 0 || x >= w || y >= h || this.matrix[y][x]) {
-        canMove = false
-        return canMove
-      }
+      if (x < 0 || x >= w || y >= h || this.matrix[y][x]) return
     }
 
-    if (canMove) {
-      this.activeTetromino.x += xStep
-      this.activeTetromino.y += yStep
-      this.getHardDropIncrement()
+    this.activeTetromino.x += xStep
+    this.activeTetromino.y += yStep
+
+    // 锁定方块
+    if (this.checkTetrominoLock()) {
+      this.lockTetromino()
     }
-    return canMove
   }
 
   rotateRight() {
@@ -521,6 +523,18 @@ export class Tetris {
     }
   }
 
+  fallTetrominoToLand() {
+    this.moveTetromino(0, 1)
+  }
+
+  lockTetromino() {
+    this.resetTetrominoLock()
+
+    this.tetrominoLockTimer = setTimeout(() => {
+      this.landTetromino()
+    }, this.lockDelay)
+  }
+
   landTetromino() {
     this.updateHoldLock()
     this.mergeMatrix()
@@ -541,6 +555,7 @@ export class Tetris {
     if (!filledLines.length) return // 没有满行直接返回
 
     this.resetBackToBackCount() // 重置背靠背次数
+    // this.checkTSpin() // NOTE: 是否在这里检查T-Spin
 
     for (let i = 0; i < filledLines.length; i++) {
       this.matrix.splice(filledLines[i], 1) // 删除满行
@@ -558,12 +573,6 @@ export class Tetris {
       const y = piece[i][1] + this.activeTetromino.y
 
       this.matrix[y][x] = type
-    }
-  }
-
-  fallTetrominoToLand() {
-    if (!this.moveTetromino(0, 1)) {
-      this.landTetromino()
     }
   }
 
@@ -608,12 +617,17 @@ export class Tetris {
 
   updateLevel() {
     this.level += this.getLevelIncrement()
-    clearInterval(this.timer)
+    clearInterval(this.gameLoopTimer)
     this.gameLoop()
   }
 
   updateScore() {
     this.score += this.getScore()
+  }
+
+  updateScoreByHardDrop() {
+    const increment = this.getHardDropIncrement() * 2
+    this.score += increment
   }
 
   // 获取消除的行数
@@ -632,7 +646,7 @@ export class Tetris {
     return 0
   }
 
-  // TODO: update score acording to T-Spin, T-Spin Mini, BackToBack
+  // TODO: update score acording to T-Spin
   getScore() {
     let index, score
     const lineScore = [100, 300, 500, 800]
@@ -674,9 +688,10 @@ export class Tetris {
     return filledLines
   }
 
+  // 获取当前方块距离底部的距离
   getHardDropIncrement() {
     const y = this.activeTetromino.y
-    return (this.getLandTetrominoYOffset(y) - y) * 2
+    return this.getLandTetrominoYOffset(y) - y
   }
 
   getLandTetrominoYOffset(offset) {
@@ -769,7 +784,14 @@ export class Tetris {
 
   // TODO: check T-Spin
   checkTSpin() {
-    console.log('tspin')
+    console.log('check T-Spin')
+  }
+
+  checkTetrominoLock() {
+    if (this.getHardDropIncrement() === 0) {
+      return true
+    }
+    return false
   }
 
   checkGameover() {
@@ -798,6 +820,13 @@ export class Tetris {
 
     if (lines.includes(this.getLines())) {
       this.backToBackCount = 0
+    }
+  }
+
+  resetTetrominoLock() {
+    if (this.tetrominoLockTimer) {
+      clearTimeout(this.tetrominoLockTimer)
+      this.tetrominoLockTimer = null
     }
   }
 

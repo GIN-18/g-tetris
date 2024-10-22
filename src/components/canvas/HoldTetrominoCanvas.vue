@@ -77,5 +77,5 @@ function setYOffset(name) {
 </script>
 
 <template>
-  <canvas class="border-2 border-black bg-black" ref="canvas"></canvas>
+  <canvas class="border-4 border-black bg-nes-black" ref="canvas"></canvas>
 </template>
