@@ -466,6 +466,8 @@ export class Tetris {
     while (!this.checkTetrominoLock()) {
       this.moveTetromino(0, 1)
     }
+    this.resetTetrominoLock()
+    this.landTetromino()
   }
 
   softDropTetromino(enable) {
