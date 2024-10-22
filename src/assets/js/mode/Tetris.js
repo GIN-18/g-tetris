@@ -415,21 +415,25 @@ export class Tetris {
 
     this.tetrisCount = 0
     this.comboCount = 0
-    this.isBackToBack = false
+    this.backToBackCount = 0
+    this.TSpinCount = 0
 
     this.oldLines = 0
     this.gameLoopTimer = null
+
+    this.tetrominoLockTimer = null
+    this.lockDelay = 500
   }
 
   gameLoop() {
-    const deltaTime = this.getDropInterval()
+    const deltaTime = this.getDropInterval() // 获取下落间隔时间
 
     this.gameLoopTimer = setInterval(() => {
       if (!this.activeTetromino) {
         this.addTetromino()
-      } else {
-        this.fallTetrominoToLand()
+        return
       }
+      this.moveTetromino(0, 1)
     }, deltaTime)
   }
 
@@ -440,32 +444,36 @@ export class Tetris {
       return
     }
 
+    // 游戏结束
     clearInterval(this.gameLoopTimer)
     this.gameOver = true
   }
 
-  moveTetrominoLeft() {
+  moveLeft() {
     this.moveTetromino(-1, 0)
   }
 
-  moveTetrominoRight() {
+  moveRight() {
     this.moveTetromino(1, 0)
   }
 
-  hardDropTetromino() {
+  hardDrop() {
     if (!this.activeTetromino) return
 
     this.updateScoreByHardDrop() // 硬降更新分数
 
+    // 下落直到碰撞
     while (!this.checkTetrominoLock()) {
       this.moveTetromino(0, 1)
     }
 
+    // 硬降直接锁定
     this.resetTetrominoLock()
     this.landTetromino()
   }
 
-  softDropTetromino(enable) {
+  // TODO: 按钮操作时，不能连续软降
+  softDrop(enable) {
     if (!this.activeTetromino) return
 
     if (enable) {
@@ -488,16 +496,17 @@ export class Tetris {
       const x = piece[i][0] + this.activeTetromino.x + xStep
       const y = piece[i][1] + this.activeTetromino.y + yStep
 
+      // 碰撞检测
       if (x < 0 || x >= w || y >= h || this.matrix[y][x]) return
     }
 
+    // 未碰撞，更新位置
     this.activeTetromino.x += xStep
     this.activeTetromino.y += yStep
 
     // 锁定方块
-    if (this.checkTetrominoLock()) {
-      this.lockTetromino()
-    }
+    this.resetTetrominoLock()
+    this.lockTetromino()
   }
 
   rotateRight() {
@@ -525,18 +534,11 @@ export class Tetris {
       this.activeTetromino.rotation = rotationInfo.nextRotation
     }
 
-    if (this.checkTetrominoLock()) {
-      this.resetTetrominoLock()
-      this.lockTetromino()
-    }
-  }
-
-  fallTetrominoToLand() {
-    this.moveTetromino(0, 1)
+    this.lockTetromino()
   }
 
   lockTetromino() {
-    this.resetTetrominoLock()
+    if (!this.checkTetrominoLock()) return
 
     this.tetrominoLockTimer = setTimeout(() => {
       this.landTetromino()
@@ -560,7 +562,7 @@ export class Tetris {
     const filledLines = this.getFilledLines() // 获取满行
     const width = this.matrix[0].length
 
-    if (!filledLines.length) return // 没有满行直接返回
+    if (!filledLines.length) return
 
     this.resetBackToBackCount() // 重置背靠背次数
     // this.checkTSpin() // NOTE: 是否在这里检查T-Spin
@@ -634,7 +636,7 @@ export class Tetris {
   }
 
   updateScoreByHardDrop() {
-    const increment = this.getHardDropIncrement() * 2
+    const increment = this.getBottomDistance() * 2
     this.score += increment
   }
 
@@ -697,7 +699,7 @@ export class Tetris {
   }
 
   // 获取当前方块距离底部的距离
-  getHardDropIncrement() {
+  getBottomDistance() {
     const y = this.activeTetromino.y
     return this.getLandTetrominoYOffset(y) - y
   }
@@ -795,8 +797,10 @@ export class Tetris {
     console.log('check T-Spin')
   }
 
+  // 检查当前方块是否可以锁定
   checkTetrominoLock() {
-    if (this.getHardDropIncrement() === 0) {
+    // 如果当前方块距离底部的距离等于0，可以触发锁定
+    if (this.getBottomDistance() === 0) {
       return true
     }
     return false

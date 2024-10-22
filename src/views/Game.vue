@@ -50,10 +50,10 @@ onMounted(() => {
   emitter.on('play', playGame) // for test
   emitter.on('reset', resetGame)
   emitter.on('replay', replayGame)
-  emitter.on('left', moveTetrominoLeft)
-  emitter.on('right', moveTetrominoRight)
-  emitter.on('hardDrop', hardDropTetromino)
-  emitter.on('softDrop', softDropTetromino)
+  emitter.on('left', moveLeft)
+  emitter.on('right', moveRight)
+  emitter.on('hardDrop', hardDrop)
+  emitter.on('softDrop', softDrop)
   emitter.on('rotateRight', rotateRight)
   emitter.on('rotateLeft', rotateLeft)
   emitter.on('rotateReverse', rotateFlip)
@@ -64,10 +64,10 @@ onUnmounted(() => {
   emitter.off('play', playGame) // for test
   emitter.off('reset', resetGame)
   emitter.off('replay', replayGame)
-  emitter.off('left', moveTetrominoLeft)
-  emitter.off('right', moveTetrominoRight)
-  emitter.off('hardDrop', hardDropTetromino)
-  emitter.off('softDrop', softDropTetromino)
+  emitter.off('left', moveLeft)
+  emitter.off('right', moveRight)
+  emitter.off('hardDrop', hardDrop)
+  emitter.off('softDrop', softDrop)
   emitter.off('rotateRight', rotateRight)
   emitter.off('rotateLeft', rotateLeft)
   emitter.off('rotateReverse', rotateFlip)
@@ -93,20 +93,20 @@ function resetGame() {
   tetris.value.resetGame()
 }
 
-function moveTetrominoLeft() {
-  tetris.value.moveTetrominoLeft()
+function moveLeft() {
+  tetris.value.moveLeft()
 }
 
-function moveTetrominoRight() {
-  tetris.value.moveTetrominoRight()
+function moveRight() {
+  tetris.value.moveRight()
 }
 
-function hardDropTetromino() {
-  tetris.value.hardDropTetromino()
+function hardDrop() {
+  tetris.value.hardDrop()
 }
 
-function softDropTetromino(enable) {
-  tetris.value.softDropTetromino(enable)
+function softDrop(enable) {
+  tetris.value.softDrop(enable)
 }
 
 function rotateRight() {
