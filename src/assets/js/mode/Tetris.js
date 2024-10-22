@@ -472,8 +472,12 @@ export class Tetris {
     if (!this.activeTetromino) return
 
     if (enable) {
+      clearInterval(this.gameLoopTimer)
       this.moveTetromino(0, 1)
+      return
     }
+
+    this.gameLoop()
   }
 
   moveTetromino(xStep, yStep) {
