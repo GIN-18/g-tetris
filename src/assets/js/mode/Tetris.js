@@ -1,5 +1,4 @@
 import { palette } from '@/assets/js/palette.js'
-import PlayfieldCanvas from '@/components/canvas/PlayfieldCanvas.vue'
 
 export class Tetris {
   static tetrominoes = {
@@ -394,7 +393,7 @@ export class Tetris {
     this.gameLoopTimer = null
 
     this.tetrominoLockTimer = null
-    this.lockDelay = 1000
+    this.lockDelay = 500
   }
 
   resetGame() {
@@ -424,11 +423,6 @@ export class Tetris {
 
   gameLoop() {
     const deltaTime = this.getDropInterval()
-
-    if (this.gameLoopTimer) {
-      clearInterval(this.gameLoopTimer)
-      this.gameLoopTimer = null
-    }
 
     this.gameLoopTimer = setInterval(() => {
       if (!this.activeTetromino) {
@@ -466,6 +460,7 @@ export class Tetris {
     while (!this.checkTetrominoLock()) {
       this.moveTetromino(0, 1)
     }
+
     this.resetTetrominoLock()
     this.landTetromino()
   }
@@ -520,12 +515,19 @@ export class Tetris {
   rotateTetromino(rotationStep) {
     if (!this.activeTetromino) return
 
+    this.resetTetrominoLock()
+
     const rotationInfo = this.checkRotation(rotationStep, 0)
 
     if (rotationInfo.canRotate) {
       this.activeTetromino.x += rotationInfo.wallKickXOffset
       this.activeTetromino.y += rotationInfo.wallKickYOffset
       this.activeTetromino.rotation = rotationInfo.nextRotation
+    }
+
+    if (this.checkTetrominoLock()) {
+      this.resetTetrominoLock()
+      this.lockTetromino()
     }
   }
 
