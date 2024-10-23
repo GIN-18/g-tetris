@@ -366,7 +366,7 @@ export class Tetris {
   }
 
   static initMatrix() {
-    return new Array(20).fill(0).map(() => new Array(10).fill(0))
+    return new Array(22).fill(0).map(() => new Array(10).fill(0))
   }
 
   constructor() {
@@ -437,10 +437,12 @@ export class Tetris {
     }, deltaTime)
   }
 
+  // BUG: 方块出现的时候刚好可以触发锁定，这时方块无法锁定
   addTetromino() {
     if (!this.activeTetromino || !this.checkGameover()) {
       this.activeTetromino = this.currentBag[0] // 在当前背包中获取第一个方块作为当前方块
       this.updateBag() // 更新背包
+      this.lockTetromino() // HACK: 检查方块出现的时候是否可以直接锁定
       return
     }
 
@@ -497,6 +499,7 @@ export class Tetris {
       const y = piece[i][1] + this.activeTetromino.y + yStep
 
       // 碰撞检测
+      // BUG: 方块出现就在底部的情况是因为这里直接return，所以无法下移锁定
       if (x < 0 || x >= w || y >= h || this.matrix[y][x]) return
     }
 

@@ -52,7 +52,7 @@ function drawMatrix() {
         palette.tetrominoColor[tetris.value.matrix[y][x] - 1]
       ctx.value.fillRect(
         x * block.value,
-        y * block.value,
+        (y - 2) * block.value,
         block.value,
         block.value,
       )
@@ -75,7 +75,7 @@ function drawGhostPiece() {
 
     ctx.value.fillRect(
       x * block.value,
-      y * block.value,
+      (y - 2) * block.value,
       block.value,
       block.value,
     )
@@ -93,7 +93,7 @@ function drawActiveTetromino() {
     const y = piece[i][1] + tetromino.y
     ctx.value.fillRect(
       x * block.value,
-      y * block.value,
+      (y - 2) * block.value,
       block.value,
       block.value,
     )
