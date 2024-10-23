@@ -394,6 +394,8 @@ export class Tetris {
 
     this.tetrominoLockTimer = null
     this.lockDelay = 500
+
+    this.isSoftDrop = false
   }
 
   resetGame() {
@@ -479,11 +481,13 @@ export class Tetris {
     if (!this.activeTetromino) return
 
     if (enable) {
+      this.isSoftDrop = true
       clearInterval(this.gameLoopTimer)
       this.moveTetromino(0, 1)
       return
     }
 
+    this.isSoftDrop = false
     this.gameLoop()
   }
 
@@ -506,6 +510,9 @@ export class Tetris {
     // 未碰撞，更新位置
     this.activeTetromino.x += xStep
     this.activeTetromino.y += yStep
+
+    // 软降时更新分数
+    this.updateScoreBySoftDrop()
 
     // 锁定方块
     this.resetTetrominoLock()
@@ -641,6 +648,12 @@ export class Tetris {
   updateScoreByHardDrop() {
     const increment = this.getBottomDistance() * 2
     this.score += increment
+  }
+
+  updateScoreBySoftDrop() {
+    if (this.isSoftDrop) {
+      this.score += 1
+    }
   }
 
   // 获取消除的行数
