@@ -6,7 +6,7 @@
 
 html,
 body {
-  @apply w-full h-full bg-nes-gray;
+  @apply w-full h-full bg-nes-white;
 }
 
 h1,
@@ -20,5 +20,5 @@ p {
 }
 
 #app {
-  @apply flex flex-col justify-between items-center w-full h-full p-2 bg-nes-gray;
+  @apply flex flex-col justify-between items-center w-full h-full p-2 bg-nes-white;
 }

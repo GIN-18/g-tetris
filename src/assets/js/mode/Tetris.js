@@ -366,7 +366,8 @@ export class Tetris {
   }
 
   static initMatrix() {
-    return new Array(22).fill(0).map(() => new Array(10).fill(0))
+    return new Array(20).fill(0).map(() => new Array(10).fill(0))
+    // return new Array(22).fill(0).map(() => new Array(10).fill(0))
   }
 
   constructor() {
@@ -430,12 +431,17 @@ export class Tetris {
   gameLoop() {
     const deltaTime = this.getDropInterval() // 获取下落间隔时间
 
+    if (this.gameLoopTimer) {
+      clearInterval(this.gameLoopTimer)
+      this.gameLoopTimer = null
+    }
+
     this.gameLoopTimer = setInterval(() => {
       if (!this.activeTetromino) {
         this.addTetromino()
         return
       }
-      this.moveTetromino(0, 1)
+      this.moveTetromino(0, 1) // 方块下落
     }, deltaTime)
   }
 
@@ -637,7 +643,6 @@ export class Tetris {
 
   updateLevel() {
     this.level += this.getLevelIncrement()
-    clearInterval(this.gameLoopTimer)
     this.gameLoop()
   }
 
@@ -822,19 +827,9 @@ export class Tetris {
     return false
   }
 
+  // 如果地图的第一行已经存在方块的话，游戏结束
   checkGameover() {
-    const piece = this.activeTetromino.pieces[this.activeTetromino.rotation]
-
-    for (let i = 0; i < piece.length; i++) {
-      const x = piece[i][0] + this.activeTetromino.x
-      const y = piece[i][1] + this.activeTetromino.y
-
-      if (this.matrix[y][x]) {
-        return true
-      }
-    }
-
-    return false
+    return this.matrix[1].some((item) => item > 0)
   }
 
   resetTetrominoLocation() {
