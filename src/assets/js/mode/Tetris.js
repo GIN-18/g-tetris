@@ -379,7 +379,7 @@ export class Tetris {
     this.activeTetromino = null
     this.holdTetromino = null
 
-    this.level = 1
+    this.level = 5
     this.lines = 0
     this.score = 0
 
@@ -442,11 +442,15 @@ export class Tetris {
       this.gameLoopTimer = null
     }
 
-    const deltaTime = this.getDropInterval() // 获取下落间隔时间
+    const dropDelay = this.getDropDelay() // 获取下落间隔时间
 
     this.gameLoopTimer = setInterval(() => {
-      this.moveTetromino(0, 1) // 方块下落
-    }, deltaTime)
+      if (this.checkCanMove(0, 1) && !this.checkTetrominoLock()) {
+        this.activeTetromino.y += 1
+      } else {
+        this.lockTetromino()
+      }
+    }, dropDelay)
   }
 
   addTetromino() {
@@ -462,13 +466,23 @@ export class Tetris {
   }
 
   moveLeft() {
-    this.resetTetrominoLock()
-    this.moveTetromino(-1, 0)
+    if (this.checkCanMove(-1, 0)) {
+      this.activeTetromino.x += -1
+
+      if (this.checkTetrominoLock()) {
+        this.resetTetrominoLock()
+      }
+    }
   }
 
   moveRight() {
-    this.resetTetrominoLock()
-    this.moveTetromino(1, 0)
+    if (this.checkCanMove(1, 0)) {
+      this.activeTetromino.x += 1
+
+      if (this.checkTetrominoLock()) {
+        this.resetTetrominoLock()
+      }
+    }
   }
 
   hardDrop() {
@@ -477,8 +491,8 @@ export class Tetris {
     this.updateScoreByHardDrop() // 硬降更新分数
 
     // 下落直到触底
-    while (!this.checkTetrominoLock()) {
-      this.moveTetromino(0, 1)
+    while (!this.checkTetrominoLock() && this.checkCanMove(0, 1)) {
+      this.activeTetromino.y += 1
     }
 
     // 硬降时直接锁定
@@ -486,32 +500,14 @@ export class Tetris {
     this.landTetromino()
   }
 
-  // BUG: 连续按下按钮的时候，在出现新方块的情况下会直接结束游戏
+  // TODO: 按钮连续降落
   softDrop(enable) {
     if (!this.activeTetromino) return
 
-    if (enable) {
-      this.isSoftDrop = true
-      clearInterval(this.gameLoopTimer)
-      this.moveTetromino(0, 1)
-      return
+    if (enable && this.checkCanMove(0, 1)) {
+      this.activeTetromino.y += 1
+      this.score += 1
     }
-
-    this.isSoftDrop = false
-    this.gameLoop()
-  }
-
-  moveTetromino(xStep, yStep) {
-    if (!this.activeTetromino) return
-
-    if (this.checkMove(xStep, yStep)) {
-      this.updateScoreBySoftDrop()
-      this.activeTetromino.x += xStep
-      this.activeTetromino.y += yStep
-      return
-    }
-
-    this.lockTetromino()
   }
 
   rotateRight() {
@@ -703,7 +699,7 @@ export class Tetris {
     return score
   }
 
-  getDropInterval() {
+  getDropDelay() {
     return Math.pow(0.8 - (this.level - 1) * 0.007, this.level - 1) * 1000
   }
 
@@ -746,7 +742,7 @@ export class Tetris {
     return this.getLandTetrominoYOffset(offset + 1)
   }
 
-  checkMove(xStep, yStep) {
+  checkCanMove(xStep, yStep) {
     const piece = this.activeTetromino.pieces[this.activeTetromino.rotation]
     const w = this.matrix[0].length
     const h = this.matrix.length
