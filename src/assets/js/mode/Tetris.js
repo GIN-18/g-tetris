@@ -366,8 +366,8 @@ export class Tetris {
   }
 
   static initMatrix() {
-    return new Array(20).fill(0).map(() => new Array(10).fill(0))
-    // return new Array(22).fill(0).map(() => new Array(10).fill(0))
+    // return new Array(20).fill(0).map(() => new Array(10).fill(0))
+    return new Array(22).fill(0).map(() => new Array(10).fill(0))
   }
 
   constructor() {
@@ -445,12 +445,10 @@ export class Tetris {
     }, deltaTime)
   }
 
-  // BUG: 方块出现的时候刚好可以触发锁定，这时方块无法锁定
   addTetromino() {
     if (!this.activeTetromino || !this.checkGameover()) {
       this.activeTetromino = this.currentBag[0] // 在当前背包中获取第一个方块作为当前方块
       this.updateBag() // 更新背包
-      this.lockTetromino() // HACK: 检查方块出现的时候是否可以直接锁定
       return
     }
 
@@ -460,10 +458,12 @@ export class Tetris {
   }
 
   moveLeft() {
+    this.resetTetrominoLock()
     this.moveTetromino(-1, 0)
   }
 
   moveRight() {
+    this.resetTetrominoLock()
     this.moveTetromino(1, 0)
   }
 
@@ -482,7 +482,7 @@ export class Tetris {
     this.landTetromino()
   }
 
-  // TODO: 按钮操作时，不能连续软降
+  // BUG: 连续按下按钮的时候，在出现新方块的情况下会直接结束游戏
   softDrop(enable) {
     if (!this.activeTetromino) return
 
@@ -509,20 +509,18 @@ export class Tetris {
       const y = piece[i][1] + this.activeTetromino.y + yStep
 
       // 碰撞检测
-      // BUG: 方块出现就在底部的情况是因为这里直接return，所以无法下移锁定
-      if (x < 0 || x >= w || y >= h || this.matrix[y][x]) return
+      if (x < 0 || x >= w || y >= h || this.matrix[y][x]) {
+        this.lockTetromino()
+        return
+      }
     }
-
-    // 未碰撞，更新位置
-    this.activeTetromino.x += xStep
-    this.activeTetromino.y += yStep
 
     // 软降时更新分数
     this.updateScoreBySoftDrop()
 
-    // 锁定方块
-    this.resetTetrominoLock()
-    this.lockTetromino()
+    // 未碰撞，更新位置
+    this.activeTetromino.x += xStep
+    this.activeTetromino.y += yStep
   }
 
   rotateRight() {
@@ -554,7 +552,9 @@ export class Tetris {
   }
 
   lockTetromino() {
-    if (!this.checkTetrominoLock()) return
+    if (!this.checkTetrominoLock()) return // 不能锁定，直接返回
+
+    clearInterval(this.gameLoopTimer)
 
     this.tetrominoLockTimer = setTimeout(() => {
       this.landTetromino()
@@ -572,6 +572,7 @@ export class Tetris {
     this.clearFilledLines()
     this.resetTetrominoLocation()
     this.addTetromino()
+    this.gameLoop()
   }
 
   clearFilledLines() {
@@ -608,16 +609,22 @@ export class Tetris {
     let tempTetromino = null
 
     if (!this.holdTetromino) {
+      clearInterval(this.gameLoopTimer)
+      this.resetTetrominoLock()
       this.resetTetrominoLocation()
       this.holdTetromino = this.activeTetromino
       this.holdTetromino.holdLock = true
       this.addTetromino()
+      this.gameLoop()
     } else if (!this.holdTetromino.holdLock) {
+      clearInterval(this.gameLoopTimer)
+      this.resetTetrominoLock()
       this.resetTetrominoLocation()
       tempTetromino = this.activeTetromino
       this.activeTetromino = this.holdTetromino
       this.holdTetromino = tempTetromino
       this.holdTetromino.holdLock = true
+      this.gameLoop()
     }
   }
 
@@ -643,7 +650,6 @@ export class Tetris {
 
   updateLevel() {
     this.level += this.getLevelIncrement()
-    this.gameLoop()
   }
 
   updateScore() {
@@ -850,6 +856,7 @@ export class Tetris {
     if (this.tetrominoLockTimer) {
       clearTimeout(this.tetrominoLockTimer)
       this.tetrominoLockTimer = null
+      this.gameLoop()
     }
   }
 

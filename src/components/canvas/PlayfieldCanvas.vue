@@ -53,6 +53,7 @@ function drawMatrix() {
       ctx.value.fillRect(
         x * block.value,
         (y - 2) * block.value,
+        // y * block.value,
         block.value,
         block.value,
       )
@@ -76,6 +77,7 @@ function drawGhostPiece() {
     ctx.value.fillRect(
       x * block.value,
       (y - 2) * block.value,
+      // y * block.value,
       block.value,
       block.value,
     )
@@ -94,6 +96,7 @@ function drawActiveTetromino() {
     ctx.value.fillRect(
       x * block.value,
       (y - 2) * block.value,
+      // y * block.value,
       block.value,
       block.value,
     )
