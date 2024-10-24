@@ -426,35 +426,39 @@ export class Tetris {
 
     this.tetrominoLockTimer = null
     this.lockDelay = 500
+
+    this.isSoftDrop = false
   }
 
   gameLoop() {
-    const deltaTime = this.getDropInterval() // 获取下落间隔时间
+    if (this.checkGameover()) return
+
+    if (!this.activeTetromino) {
+      this.addTetromino()
+    }
 
     if (this.gameLoopTimer) {
       clearInterval(this.gameLoopTimer)
       this.gameLoopTimer = null
     }
 
+    const deltaTime = this.getDropInterval() // 获取下落间隔时间
+
     this.gameLoopTimer = setInterval(() => {
-      if (!this.activeTetromino) {
-        this.addTetromino()
-        return
-      }
       this.moveTetromino(0, 1) // 方块下落
     }, deltaTime)
   }
 
   addTetromino() {
-    if (!this.activeTetromino || !this.checkGameover()) {
-      this.activeTetromino = this.currentBag[0] // 在当前背包中获取第一个方块作为当前方块
-      this.updateBag() // 更新背包
+    // 产生新方块的时候处理游戏结束
+    if (this.checkGameover()) {
+      clearInterval(this.gameLoopTimer)
+      this.gameOver = true
       return
     }
 
-    // 游戏结束
-    clearInterval(this.gameLoopTimer)
-    this.gameOver = true
+    this.activeTetromino = this.currentBag[0] // 在当前背包中获取第一个方块作为当前方块
+    this.updateBag() // 更新背包
   }
 
   moveLeft() {
@@ -472,12 +476,12 @@ export class Tetris {
 
     this.updateScoreByHardDrop() // 硬降更新分数
 
-    // 下落直到碰撞
+    // 下落直到触底
     while (!this.checkTetrominoLock()) {
       this.moveTetromino(0, 1)
     }
 
-    // 硬降直接锁定
+    // 硬降时直接锁定
     this.resetTetrominoLock()
     this.landTetromino()
   }
@@ -500,27 +504,14 @@ export class Tetris {
   moveTetromino(xStep, yStep) {
     if (!this.activeTetromino) return
 
-    const piece = this.activeTetromino.pieces[this.activeTetromino.rotation]
-    const w = this.matrix[0].length
-    const h = this.matrix.length
-
-    for (let i = 0; i < piece.length; i++) {
-      const x = piece[i][0] + this.activeTetromino.x + xStep
-      const y = piece[i][1] + this.activeTetromino.y + yStep
-
-      // 碰撞检测
-      if (x < 0 || x >= w || y >= h || this.matrix[y][x]) {
-        this.lockTetromino()
-        return
-      }
+    if (this.checkMove(xStep, yStep)) {
+      this.updateScoreBySoftDrop()
+      this.activeTetromino.x += xStep
+      this.activeTetromino.y += yStep
+      return
     }
 
-    // 软降时更新分数
-    this.updateScoreBySoftDrop()
-
-    // 未碰撞，更新位置
-    this.activeTetromino.x += xStep
-    this.activeTetromino.y += yStep
+    this.lockTetromino()
   }
 
   rotateRight() {
@@ -552,12 +543,17 @@ export class Tetris {
   }
 
   lockTetromino() {
-    if (!this.checkTetrominoLock()) return // 不能锁定，直接返回
+    if (!this.checkTetrominoLock()) return // 不能锁定时直接返回
 
-    clearInterval(this.gameLoopTimer)
+    // 锁定时停止游戏
+    if (this.gameLoopTimer) {
+      clearInterval(this.gameLoopTimer)
+      this.gameLoopTimer = null
+    }
 
+    // 延迟锁定
     this.tetrominoLockTimer = setTimeout(() => {
-      this.landTetromino()
+      this.landTetromino() // 方块落地
     }, this.lockDelay)
   }
 
@@ -748,6 +744,22 @@ export class Tetris {
       }
     }
     return this.getLandTetrominoYOffset(offset + 1)
+  }
+
+  checkMove(xStep, yStep) {
+    const piece = this.activeTetromino.pieces[this.activeTetromino.rotation]
+    const w = this.matrix[0].length
+    const h = this.matrix.length
+
+    for (let i = 0; i < piece.length; i++) {
+      const x = piece[i][0] + this.activeTetromino.x + xStep
+      const y = piece[i][1] + this.activeTetromino.y + yStep
+
+      // 碰撞检测
+      if (x < 0 || x >= w || y >= h || this.matrix[y][x]) return false
+    }
+
+    return true
   }
 
   checkRotation(rotationStep, wallKickIndex) {
