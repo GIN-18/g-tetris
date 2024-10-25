@@ -395,6 +395,8 @@ export class Tetris {
 
     this.tetrominoLockTimer = null
     this.lockDelay = 500
+
+    this.maneuver = '' // 当前的动作
   }
 
   resetGame() {
@@ -424,6 +426,8 @@ export class Tetris {
 
     this.tetrominoLockTimer = null
     this.lockDelay = 500
+
+    this.maneuver = ''
   }
 
   gameLoop() {
@@ -442,6 +446,7 @@ export class Tetris {
 
     this.gameLoopTimer = setInterval(() => {
       if (this.checkCanMove(0, 1)) {
+        this.setManeuver('drop')
         this.activeTetromino.y += 1
       } else {
         this.lockTetromino()
@@ -462,16 +467,19 @@ export class Tetris {
   }
 
   moveLeft() {
+    this.setManeuver('left')
     this.moveHorizontal(-1)
   }
 
   moveRight() {
+    this.setManeuver('right')
     this.moveHorizontal(1)
   }
 
   hardDrop() {
     if (!this.activeTetromino) return
 
+    this.setManeuver('hardDrop')
     this.updateScoreByHardDrop() // 硬降更新分数
 
     // 下落直到触底
@@ -489,6 +497,7 @@ export class Tetris {
     if (!this.activeTetromino) return
 
     if (enable && this.checkCanMove(0, 1)) {
+      this.setManeuver('softDrop')
       this.activeTetromino.y += 1
       this.score += 1 // 软降更新分数
     }
@@ -522,6 +531,8 @@ export class Tetris {
     const rotationInfo = this.checkRotation(rotationStep, 0)
 
     if (rotationInfo.canRotate) {
+      this.maneuver = 'rotate'
+
       this.activeTetromino.x += rotationInfo.wallKickXOffset
       this.activeTetromino.y += rotationInfo.wallKickYOffset
       this.activeTetromino.rotation = rotationInfo.nextRotation
@@ -568,7 +579,7 @@ export class Tetris {
     if (!filledLines.length) return
 
     this.resetBackToBackCount() // 重置背靠背次数
-    // this.checkTSpin() // NOTE: 是否在这里检查T-Spin
+    this.checkTSpin() // NOTE: 是否在这里检查T-Spin
 
     for (let i = 0; i < filledLines.length; i++) {
       this.matrix.splice(filledLines[i], 1) // 删除满行
@@ -818,9 +829,9 @@ export class Tetris {
     this.comboCount = 0
   }
 
-  // TODO: check T-Spin
+  // TODO: 判断T-Spin
   checkTSpin() {
-    console.log('check T-Spin')
+    console.log(this.maneuver)
   }
 
   // 检查当前方块是否可以锁定
@@ -832,9 +843,12 @@ export class Tetris {
     return false
   }
 
-  // 如果地图的第一行已经存在方块的话，游戏结束
   checkGameover() {
-    return this.matrix[1].some((item) => item > 0)
+    return this.matrix[1].some((item) => item > 0) // 如果地图的第一行已经存在方块的话，游戏结束
+  }
+
+  setManeuver(maneuver) {
+    this.maneuver = maneuver
   }
 
   resetTetrominoLocation() {
