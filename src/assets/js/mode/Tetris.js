@@ -379,7 +379,7 @@ export class Tetris {
     this.activeTetromino = null
     this.holdTetromino = null
 
-    this.level = 5
+    this.level = 1
     this.lines = 0
     this.score = 0
 
@@ -395,8 +395,6 @@ export class Tetris {
 
     this.tetrominoLockTimer = null
     this.lockDelay = 500
-
-    this.isSoftDrop = false
   }
 
   resetGame() {
@@ -426,8 +424,6 @@ export class Tetris {
 
     this.tetrominoLockTimer = null
     this.lockDelay = 500
-
-    this.isSoftDrop = false
   }
 
   gameLoop() {
@@ -445,7 +441,7 @@ export class Tetris {
     const dropDelay = this.getDropDelay() // 获取下落间隔时间
 
     this.gameLoopTimer = setInterval(() => {
-      if (this.checkCanMove(0, 1) && !this.checkTetrominoLock()) {
+      if (this.checkCanMove(0, 1)) {
         this.activeTetromino.y += 1
       } else {
         this.lockTetromino()
@@ -466,23 +462,11 @@ export class Tetris {
   }
 
   moveLeft() {
-    if (this.checkCanMove(-1, 0)) {
-      this.activeTetromino.x += -1
-
-      if (this.checkTetrominoLock()) {
-        this.resetTetrominoLock()
-      }
-    }
+    this.moveHorizontal(-1)
   }
 
   moveRight() {
-    if (this.checkCanMove(1, 0)) {
-      this.activeTetromino.x += 1
-
-      if (this.checkTetrominoLock()) {
-        this.resetTetrominoLock()
-      }
-    }
+    this.moveHorizontal(1)
   }
 
   hardDrop() {
@@ -491,7 +475,7 @@ export class Tetris {
     this.updateScoreByHardDrop() // 硬降更新分数
 
     // 下落直到触底
-    while (!this.checkTetrominoLock() && this.checkCanMove(0, 1)) {
+    while (this.checkCanMove(0, 1)) {
       this.activeTetromino.y += 1
     }
 
@@ -506,7 +490,7 @@ export class Tetris {
 
     if (enable && this.checkCanMove(0, 1)) {
       this.activeTetromino.y += 1
-      this.score += 1
+      this.score += 1 // 软降更新分数
     }
   }
 
@@ -522,10 +506,18 @@ export class Tetris {
     this.rotateTetromino(2)
   }
 
+  moveHorizontal(direction) {
+    if (this.activeTetromino && this.checkCanMove(direction, 0)) {
+      this.activeTetromino.x += direction
+
+      clearInterval(this.gameLoopTimer)
+      this.resetTetrominoLock()
+      this.gameLoop()
+    }
+  }
+
   rotateTetromino(rotationStep) {
     if (!this.activeTetromino) return
-
-    this.resetTetrominoLock()
 
     const rotationInfo = this.checkRotation(rotationStep, 0)
 
@@ -533,9 +525,11 @@ export class Tetris {
       this.activeTetromino.x += rotationInfo.wallKickXOffset
       this.activeTetromino.y += rotationInfo.wallKickYOffset
       this.activeTetromino.rotation = rotationInfo.nextRotation
-    }
 
-    this.lockTetromino()
+      clearInterval(this.gameLoopTimer)
+      this.resetTetrominoLock()
+      this.gameLoop()
+    }
   }
 
   lockTetromino() {
@@ -608,7 +602,10 @@ export class Tetris {
       this.holdTetromino.holdLock = true
       this.addTetromino()
       this.gameLoop()
-    } else if (!this.holdTetromino.holdLock) {
+      return
+    }
+
+    if (!this.holdTetromino.holdLock) {
       clearInterval(this.gameLoopTimer)
       this.resetTetrominoLock()
       this.resetTetrominoLocation()
@@ -651,12 +648,6 @@ export class Tetris {
   updateScoreByHardDrop() {
     const increment = this.getBottomDistance() * 2
     this.score += increment
-  }
-
-  updateScoreBySoftDrop() {
-    if (this.isSoftDrop) {
-      this.score += 1
-    }
   }
 
   // 获取消除的行数
