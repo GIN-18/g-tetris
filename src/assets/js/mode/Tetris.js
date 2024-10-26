@@ -388,7 +388,6 @@ export class Tetris {
     this.tetrisCount = 0
     this.comboCount = 0
     this.backToBackCount = 0
-    this.TSpinCount = 0
 
     this.oldLines = 0
     this.gameLoopTimer = null
@@ -419,7 +418,6 @@ export class Tetris {
     this.tetrisCount = 0
     this.comboCount = 0
     this.backToBackCount = 0
-    this.TSpinCount = 0
 
     this.oldLines = 0
     this.gameLoopTimer = null
@@ -565,11 +563,8 @@ export class Tetris {
   landTetromino() {
     this.updateHoldLock()
     this.mergeMatrix()
-    this.checkTetris()
     this.checkCombo()
-    this.updateLines()
-    this.updateLevel()
-    this.updateScore()
+    this.updateScoreByTSpin()
     this.clearFilledLines()
     this.resetTetrominoLocation()
     this.addTetromino()
@@ -582,8 +577,11 @@ export class Tetris {
 
     if (!filledLines.length) return
 
+    this.checkTetris()
+    this.updateLines()
+    this.updateScore()
+    this.updateLevel()
     this.resetBackToBackCount() // 重置背靠背次数
-    this.checkTSpin() // NOTE: 是否在这里检查T-Spin
 
     for (let i = 0; i < filledLines.length; i++) {
       this.matrix.splice(filledLines[i], 1) // 删除满行
@@ -665,6 +663,20 @@ export class Tetris {
     this.score += increment
   }
 
+  updateScoreByTSpin() {
+    const TSpinScores = {
+      'T-Spin': 400,
+      'T-Spin Single': 800,
+      'T-Spin Double': 1200,
+      'T-Spin Triple': 1600,
+    }
+
+    const TSpinType = this.getTSpinType()
+    if (TSpinScores[TSpinType]) {
+      this.score += TSpinScores[TSpinType] * this.level
+    }
+  }
+
   // 获取消除的行数
   getLines() {
     return this.getFilledLines().length
@@ -721,6 +733,18 @@ export class Tetris {
     }
 
     return filledLines
+  }
+
+  getTSpinType() {
+    if (!this.checkTSpin()) return
+
+    const TSpinTypes = {
+      1: 'T-Spin Single',
+      2: 'T-Spin Double',
+      3: 'T-Spin Triple',
+    }
+
+    return TSpinTypes[this.getLines()] || 'T-Spin'
   }
 
   // 获取当前方块距离底部的距离
@@ -833,10 +857,7 @@ export class Tetris {
     this.comboCount = 0
   }
 
-  /*
-   * TODO: 判断T-Spin
-   * 踢墙后，头部一个顶角存在方块，背部两个底角存在方块，也表现为T-Spin
-   * */
+  // TODO:  踢墙后，头部一个顶角存在方块，背部两个底角存在方块，也表现为T-Spin
   checkTSpin() {
     if (this.activeTetromino.name !== 'T') return // 只有T块可以检查T-Spin
 
@@ -879,15 +900,15 @@ export class Tetris {
     ])
 
     const matrix = this.matrix
-    const top_1 = movedCorners[0] // 第一个顶角坐标
-    const top_2 = movedCorners[1] // 第二个顶角坐标
-    const bottom_1 = movedCorners[2] // 第一个底角坐标
-    const bottom_2 = movedCorners[3] // 第二个底角坐标
+    const top1 = movedCorners[0] // 第一个顶角坐标
+    const top2 = movedCorners[1] // 第二个顶角坐标
+    const bottom1 = movedCorners[2] // 第一个底角坐标
+    const bottom2 = movedCorners[3] // 第二个底角坐标
 
-    const isTop1 = matrix[top_1[1]] && matrix[top_1[1]][top_1[0]] // 第一个顶角是否存在方块
-    const isTop2 = matrix[top_2[1]] && matrix[top_2[1]][top_2[0]] // 第二个顶角是否存在方块
-    const isBottom1 = matrix[bottom_1[1]] && matrix[bottom_1[1]][bottom_1[0]] // 第一个底角是否存在方块
-    const isBottom2 = matrix[bottom_2[1]] && matrix[bottom_2[1]][bottom_2[0]] // 第二个底角是否存在方块
+    const isTop1 = matrix[top1[1]] && matrix[top1[1]][top1[0]] // 第一个顶角是否存在方块
+    const isTop2 = matrix[top2[1]] && matrix[top2[1]][top2[0]] // 第二个顶角是否存在方块
+    const isBottom1 = matrix[bottom1[1]] && matrix[bottom1[1]][bottom1[0]] // 第一个底角是否存在方块
+    const isBottom2 = matrix[bottom2[1]] && matrix[bottom2[1]][bottom2[0]] // 第二个底角是否存在方块
 
     // 最后的操作是旋转；两个顶角都存在方块；任意一个底角存在方块，表现为T-Spin
     if (
