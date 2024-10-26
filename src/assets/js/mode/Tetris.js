@@ -833,9 +833,73 @@ export class Tetris {
     this.comboCount = 0
   }
 
-  // TODO: 判断T-Spin
+  /*
+   * TODO: 判断T-Spin
+   * 踢墙后，头部一个顶角存在方块，背部两个底角存在方块，也表现为T-Spin
+   * */
   checkTSpin() {
-    console.log(this.maneuver)
+    if (this.activeTetromino.name !== 'T') return // 只有T块可以检查T-Spin
+
+    // T型方块所在3x3网格中4个角的坐，下标0,1为顶角坐标，2,3为底角坐标
+    const corners = [
+      // 0旋的顶角坐标
+      [
+        [1, -1],
+        [-1, -1],
+        [-1, 1],
+        [1, 1],
+      ],
+      // R旋的顶角坐标
+      [
+        [1, -1],
+        [1, 1],
+        [-1, -1],
+        [-1, 1],
+      ],
+      // 2旋的顶角坐标
+      [
+        [-1, 1],
+        [1, 1],
+        [1, -1],
+        [-1, -1],
+      ],
+      // L旋的顶角坐标
+      [
+        [-1, -1],
+        [-1, 1],
+        [1, -1],
+        [1, 1],
+      ],
+    ]
+
+    // 获取4个角落地的坐标
+    const movedCorners = corners[this.activeTetromino.rotation].map((item) => [
+      item[0] + this.activeTetromino.x,
+      item[1] + this.activeTetromino.y,
+    ])
+
+    const matrix = this.matrix
+    const top_1 = movedCorners[0] // 第一个顶角坐标
+    const top_2 = movedCorners[1] // 第二个顶角坐标
+    const bottom_1 = movedCorners[2] // 第一个底角坐标
+    const bottom_2 = movedCorners[3] // 第二个底角坐标
+
+    const isTop1 = matrix[top_1[1]] && matrix[top_1[1]][top_1[0]] // 第一个顶角是否存在方块
+    const isTop2 = matrix[top_2[1]] && matrix[top_2[1]][top_2[0]] // 第二个顶角是否存在方块
+    const isBottom1 = matrix[bottom_1[1]] && matrix[bottom_1[1]][bottom_1[0]] // 第一个底角是否存在方块
+    const isBottom2 = matrix[bottom_2[1]] && matrix[bottom_2[1]][bottom_2[0]] // 第二个底角是否存在方块
+
+    // 最后的操作是旋转；两个顶角都存在方块；任意一个底角存在方块，表现为T-Spin
+    if (
+      this.maneuver === 'rotate' &&
+      isTop1 &&
+      isTop2 &&
+      (isBottom1 || isBottom2)
+    ) {
+      return true
+    }
+
+    return false
   }
 
   // 检查当前方块是否可以锁定
