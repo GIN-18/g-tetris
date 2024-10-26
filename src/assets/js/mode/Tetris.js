@@ -519,9 +519,11 @@ export class Tetris {
     if (this.activeTetromino && this.checkCanMove(direction, 0)) {
       this.activeTetromino.x += direction
 
-      clearInterval(this.gameLoopTimer)
-      this.resetTetrominoLock()
-      this.gameLoop()
+      if (this.tetrominoLockTimer) {
+        clearInterval(this.gameLoopTimer)
+        this.resetTetrominoLock()
+        this.gameLoop()
+      }
     }
   }
 
@@ -537,9 +539,11 @@ export class Tetris {
       this.activeTetromino.y += rotationInfo.wallKickYOffset
       this.activeTetromino.rotation = rotationInfo.nextRotation
 
-      clearInterval(this.gameLoopTimer)
-      this.resetTetrominoLock()
-      this.gameLoop()
+      if (this.tetrominoLockTimer) {
+        clearInterval(this.gameLoopTimer)
+        this.resetTetrominoLock()
+        this.gameLoop()
+      }
     }
   }
 
@@ -866,11 +870,8 @@ export class Tetris {
   }
 
   resetTetrominoLock() {
-    if (this.tetrominoLockTimer) {
-      clearTimeout(this.tetrominoLockTimer)
-      this.tetrominoLockTimer = null
-      this.gameLoop()
-    }
+    clearTimeout(this.tetrominoLockTimer)
+    this.tetrominoLockTimer = null
   }
 
   remapTetrominoName(name) {
