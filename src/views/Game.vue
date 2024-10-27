@@ -45,9 +45,7 @@ watch(
 )
 
 onMounted(() => {
-  // playGame()
-
-  emitter.on('play', playGame) // for test
+  emitter.on('play', playGame)
   emitter.on('reset', resetGame)
   emitter.on('replay', replayGame)
   emitter.on('left', moveLeft)
@@ -61,7 +59,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  emitter.off('play', playGame) // for test
+  emitter.off('play', playGame)
   emitter.off('reset', resetGame)
   emitter.off('replay', replayGame)
   emitter.off('left', moveLeft)
@@ -86,7 +84,6 @@ function replayGame() {
 
 function playGame() {
   tetris.value.gameLoop()
-  // tetris.value.addTetromino()
 }
 
 function resetGame() {

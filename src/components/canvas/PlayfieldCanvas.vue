@@ -3,6 +3,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGameStore } from '@/stores/game.js'
 import { palette } from '@/assets/js/palette.js'
+import { emitter } from '@/assets/js/emitter.js'
 
 const canvas = ref(null)
 const width = computed(() => canvas.value.width)
@@ -27,6 +28,11 @@ watch(
 onMounted(() => {
   canvas.value.width = block.value * 10
   canvas.value.height = block.value * 20
+
+  // 在页面加载时,启动计时器以游戏开始
+  // countdownToPlay(3000, () => {
+  //   emitter.emit('play')
+  // })
 })
 
 function drawPlayfield() {
@@ -53,7 +59,6 @@ function drawMatrix() {
       ctx.value.fillRect(
         x * block.value,
         (y - 2) * block.value,
-        // y * block.value,
         block.value,
         block.value,
       )
@@ -77,7 +82,6 @@ function drawGhostPiece() {
     ctx.value.fillRect(
       x * block.value,
       (y - 2) * block.value,
-      // y * block.value,
       block.value,
       block.value,
     )
@@ -96,11 +100,40 @@ function drawActiveTetromino() {
     ctx.value.fillRect(
       x * block.value,
       (y - 2) * block.value,
-      // y * block.value,
       block.value,
       block.value,
     )
   }
+}
+
+function countdownToPlay(duration, callback) {
+  const startTime = Date.now()
+  const interval = 1000 // 1秒钟更新一次
+
+  function update() {
+    const currentTime = Date.now()
+    const remainingTime = duration - (currentTime - startTime)
+
+    if (remainingTime <= -interval) {
+      callback()
+      return
+    }
+
+    ctx.value.clearRect(0, 0, width.value, height.value)
+    ctx.value.font = '32px "Press Start 2p"'
+    ctx.value.textAlign = 'center'
+    ctx.value.textBaseline = 'middle'
+    ctx.value.fillStyle = '#f8f8f8'
+    ctx.value.fillText(
+      `${Math.ceil(remainingTime / 1000)}`,
+      width.value / 2,
+      height.value / 2,
+    )
+
+    setTimeout(update, interval)
+  }
+
+  update()
 }
 </script>
 

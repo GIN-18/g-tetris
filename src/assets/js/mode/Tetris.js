@@ -366,7 +366,6 @@ export class Tetris {
   }
 
   static initMatrix() {
-    // return new Array(20).fill(0).map(() => new Array(10).fill(0))
     return new Array(22).fill(0).map(() => new Array(10).fill(0))
   }
 
