@@ -565,6 +565,7 @@ export class Tetris {
     this.mergeMatrix()
     this.checkCombo()
     this.updateScoreByTSpin()
+    this.updateScoreByMiniTSpin()
     this.clearFilledLines()
     this.resetTetrominoLocation()
     this.addTetromino()
@@ -664,16 +665,31 @@ export class Tetris {
   }
 
   updateScoreByTSpin() {
-    const TSpinScores = {
+    const scoreTable = {
       'T-Spin': 400,
       'T-Spin Single': 800,
       'T-Spin Double': 1200,
       'T-Spin Triple': 1600,
     }
 
-    const TSpinType = this.getTSpinType()
-    if (TSpinScores[TSpinType]) {
-      this.score += TSpinScores[TSpinType] * this.level
+    const type = this.getTSpinType()
+
+    if (scoreTable[type]) {
+      this.score += scoreTable[type] * this.level
+    }
+  }
+
+  updateScoreByMiniTSpin() {
+    const scoreTable = {
+      'Mini T-Spin': 100,
+      'Mini T-Spin Single': 200,
+      'Mini T-Spin Double': 400,
+    }
+
+    const type = this.getMiniTSpinType()
+
+    if (scoreTable[type]) {
+      this.score += scoreTable[type] * this.level
     }
   }
 
@@ -693,7 +709,6 @@ export class Tetris {
     return 0
   }
 
-  // TODO: update score acording to T-Spin
   getScore() {
     let index, score
     const lineScore = [100, 300, 500, 800]
@@ -745,6 +760,17 @@ export class Tetris {
     }
 
     return TSpinTypes[this.getLines()] || 'T-Spin'
+  }
+
+  getMiniTSpinType() {
+    if (!this.checkMiniTSpin()) return
+
+    const TSpinTypes = {
+      1: 'Mini T-Spin Single',
+      2: 'Mini T-Spin Double',
+    }
+
+    return TSpinTypes[this.getLines()] || 'Mini T-Spin'
   }
 
   // 获取当前方块距离底部的距离
@@ -859,8 +885,53 @@ export class Tetris {
 
   // TODO:  踢墙后，头部一个顶角存在方块，背部两个底角存在方块，也表现为T-Spin
   checkTSpin() {
-    if (this.activeTetromino.name !== 'T') return // 只有T块可以检查T-Spin
+    if (this.activeTetromino.name !== 'T') return
 
+    const { isTop1, isTop2, isBottom1, isBottom2 } =
+      this.checkTCornerExistence()
+
+    // 最后的操作是旋转；两个顶角都存在方块；任意一个底角存在方块，表现为T-Spin
+    if (
+      this.maneuver === 'rotate' &&
+      isTop1 &&
+      isTop2 &&
+      (isBottom1 || isBottom2)
+    ) {
+      return true
+    }
+
+    return false
+  }
+
+  checkMiniTSpin() {
+    if (this.activeTetromino.name !== 'T') return
+
+    const { isTop1, isTop2, isBottom1, isBottom2 } =
+      this.checkTCornerExistence()
+
+    if (
+      this.maneuver === 'rotate' &&
+      (isTop1 || isTop2) &&
+      isBottom1 === undefined &&
+      isBottom2 === undefined
+    ) {
+      return true
+    }
+
+    if (
+      this.maneuver === 'rotate' &&
+      (isTop1 || isTop2) &&
+      isBottom1 &&
+      isBottom2
+    ) {
+      return true
+    }
+
+    return false
+  }
+
+  // 检查T块的顶角和底角是否存在方块
+  checkTCornerExistence() {
     // T型方块所在3x3网格中4个角的坐，下标0,1为顶角坐标，2,3为底角坐标
     const corners = [
       // 0旋的顶角坐标
@@ -910,17 +981,12 @@ export class Tetris {
     const isBottom1 = matrix[bottom1[1]] && matrix[bottom1[1]][bottom1[0]] // 第一个底角是否存在方块
     const isBottom2 = matrix[bottom2[1]] && matrix[bottom2[1]][bottom2[0]] // 第二个底角是否存在方块
 
-    // 最后的操作是旋转；两个顶角都存在方块；任意一个底角存在方块，表现为T-Spin
-    if (
-      this.maneuver === 'rotate' &&
-      isTop1 &&
-      isTop2 &&
-      (isBottom1 || isBottom2)
-    ) {
-      return true
+    return {
+      isTop1,
+      isTop2,
+      isBottom1,
+      isBottom2,
     }
-
-    return false
   }
 
   // 检查当前方块是否可以锁定
@@ -936,6 +1002,7 @@ export class Tetris {
     return this.matrix[1].some((item) => item > 0) // 如果地图的第一行已经存在方块的话，游戏结束
   }
 
+  // 设置当前操作
   setManeuver(maneuver) {
     this.maneuver = maneuver
   }
