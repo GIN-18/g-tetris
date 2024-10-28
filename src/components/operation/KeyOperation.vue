@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { emitter } from '@/assets/js/emitter.js'
 
+// TODO: 删除开始操作
 const keys = ref({
   play: 'i',
   hard_drop: ' ',
@@ -63,5 +64,5 @@ function handleKeyUp(e) {
 }
 </script>
 
-<!-- TODO: option -->
+<!-- TODO: 键盘设置 -->
 <template></template>

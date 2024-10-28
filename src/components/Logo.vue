@@ -3,7 +3,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-function jumpToHome() {
+function navigateToHome() {
   router.push({ name: 'home' })
 }
 </script>
@@ -11,8 +11,8 @@ function jumpToHome() {
 <template>
   <h1
     class="text-2xl"
-    @click.prevent="jumpToHome"
-    @touchstart.prevent="jumpToHome"
+    @click.prevent="navigateToHome"
+    @touchstart.prevent="navigateToHome"
   >
     VUETRIS
   </h1>

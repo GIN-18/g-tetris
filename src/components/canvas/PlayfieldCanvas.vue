@@ -127,10 +127,10 @@ function countdownToPlay(duration, callback) {
       return
     }
 
-    const text = Math.ceil(remainingTime / 1000)
+    const mins = Math.ceil(remainingTime / 1000)
 
     clearCanvas()
-    drawText(text)
+    drawText(mins)
 
     setTimeout(update, interval)
   }
