@@ -7,6 +7,7 @@ export class Marathon extends Tetris {
     this.level = 1
     this.score = 0
     this.oldLines = 0
+    this.dropDelay = null
   }
 
   /**
@@ -135,6 +136,41 @@ export class Marathon extends Tetris {
 
     // 如果增量不大于 0 或绝对差值小于 10，则返回 0。
     return 0
+  }
+  /**
+   * @override 在游戏循环中更新下落速度
+   */
+  gameLoop() {
+    if (this.checkGameover()) return
+
+    if (!this.activeTetromino) {
+      this.addTetromino()
+    }
+
+    if (this.gameLoopTimer) {
+      clearInterval(this.gameLoopTimer)
+      this.gameLoopTimer = null
+    }
+
+    this.dropDelay = this.updateDropDelay()
+
+    this.gameLoopTimer = setInterval(() => {
+      if (this.checkCanMove(0, 1)) {
+        this.setManeuver('drop')
+        this.activeTetromino.y += 1
+      } else {
+        this.lockTetromino()
+      }
+    }, this.dropDelay)
+  }
+
+  /**
+   * @override 重置等级和分数
+   */
+  resetGame() {
+    super.resetGame()
+    this.level = 1
+    this.score = 0
   }
 
   /**
