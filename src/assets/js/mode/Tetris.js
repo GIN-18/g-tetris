@@ -345,7 +345,7 @@ export class Tetris {
   /**
    * 静态方法：返回一个洗好的俄罗斯方块袋。
    *
-   * @returns {Array} 一个包含俄罗斯方块对象的数组。
+   * @return {Array} 一个包含俄罗斯方块对象的数组。
    */
   static getBag() {
     // 初始化一个空数组来存储俄罗斯方块。
@@ -366,7 +366,7 @@ export class Tetris {
   /**
    * 静态方法：洗牌算法，随机打乱七种方块的顺序
    *
-   * @returns {Array} 包含七种方块的随机顺序数组
+   * @return {Array} 包含七种方块的随机顺序数组
    */
   static shuffleBag() {
     // 方块类型数组
@@ -388,7 +388,7 @@ export class Tetris {
   /**
    * 静态方法： 初始化一个22x10的矩阵，用于存储俄罗斯方块游戏的状态。
    *
-   * @returns {Array<Array<number>>} 一个22x10的二维数组，所有元素初始化为0。
+   * @return {Array<Array<number>>} 一个22x10的二维数组，所有元素初始化为0。
    */
   static initMatrix() {
     // 使用fill()方法创建一个长度为22的数组，并将所有元素初始化为0。
