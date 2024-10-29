@@ -342,31 +342,62 @@ export class Tetris {
     ],
   }
 
+  /**
+   * 静态方法：返回一个洗好的俄罗斯方块袋。
+   *
+   * @returns {Array} 一个包含俄罗斯方块对象的数组。
+   */
   static getBag() {
+    // 初始化一个空数组来存储俄罗斯方块。
     const tetrominoBag = []
+
+    // 获取一个洗好的俄罗斯方块索引袋。
     const bag = Tetris.shuffleBag()
 
+    // 遍历洗好的袋子，并将对应的俄罗斯方块添加到结果数组中。
     for (let i = 0; i < bag.length; i++) {
       tetrominoBag.push(Tetris.tetrominoes[bag[i]])
     }
 
+    // 返回洗好的俄罗斯方块袋。
     return tetrominoBag
   }
 
+  /**
+   * 静态方法：洗牌算法，随机打乱七种方块的顺序
+   *
+   * @returns {Array} 包含七种方块的随机顺序数组
+   */
   static shuffleBag() {
+    // 方块类型数组
     const arr = ['I', 'J', 'L', 'O', 'S', 'T', 'Z']
 
+    // 洗牌算法
     for (let i = arr.length - 1; i > 0; i--) {
+      // 生成一个随机索引 j，范围为 [0, i]
       let j = Math.floor(Math.random() * (i + 1))
 
+      // 交换 arr[i] 和 arr[j] 的值
       ;[arr[i], arr[j]] = [arr[j], arr[i]]
     }
 
+    // 返回洗牌后的数组
     return arr
   }
 
+  /**
+   * 静态方法： 初始化一个22x10的矩阵，用于存储俄罗斯方块游戏的状态。
+   *
+   * @returns {Array<Array<number>>} 一个22x10的二维数组，所有元素初始化为0。
+   */
   static initMatrix() {
-    return new Array(22).fill(0).map(() => new Array(10).fill(0))
+    // 使用fill()方法创建一个长度为22的数组，并将所有元素初始化为0。
+    return (
+      new Array(22)
+        .fill(0)
+        // 使用map()方法将每个元素转换为一个长度为10的数组，并将所有元素初始化为0。
+        .map(() => new Array(10).fill(0))
+    )
   }
 
   constructor() {
