@@ -1,17 +1,11 @@
-import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { Tetris } from '@/assets/js/mode/Tetris.js'
-import { Marathon } from '@/assets/js/mode/Marathon.js'
+import { useRoute } from 'vue-router'
+import { factory } from '@/assets/js/factory.js'
 
-export const useGameStore = defineStore('game', () => {
-  const block = ref(16)
-  // const tetris = ref(new Tetris()) // TODO: 切换游戏模式
-  const tetris = ref(new Marathon())
-  const isDrawGhostPiece = ref(localStorage.getItem('isDrawGhostPiece') || true)
-
-  return {
-    block,
-    tetris,
-    isDrawGhostPiece,
-  }
+export const useGameStore = defineStore('game', {
+  state: () => ({
+    block: 16,
+    tetris: factory(useRoute().params.mode),
+    isDrawGhostPiece: localStorage.getItem('isDrawGhostPiece') || true,
+  }),
 })
