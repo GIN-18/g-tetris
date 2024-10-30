@@ -9,7 +9,7 @@ import HoldTetrominoCanvas from '@/components/canvas/HoldTetrominoCanvas.vue'
 const { tetris } = storeToRefs(useGameStore())
 const route = useRoute()
 
-function isShowByMode(mode) {
+function checkMode(mode) {
   return route.params.mode === mode
 }
 </script>
@@ -21,7 +21,7 @@ function isShowByMode(mode) {
     </InfoBox>
 
     <!-- 马拉松模式显示 -->
-    <div class="flex flex-col gap-6" v-if="isShowByMode('marathon')">
+    <div class="flex flex-col gap-6" v-if="checkMode('marathon')">
       <InfoBox border title="LEVEL">
         <p>{{ tetris.level }}</p>
       </InfoBox>

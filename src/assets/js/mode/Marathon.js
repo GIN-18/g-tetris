@@ -154,6 +154,20 @@ export class Marathon extends Tetris {
     // 如果增量不大于 0 或绝对差值小于 10，则返回 0。
     return 0
   }
+
+  /**
+   * 返回当前分数的总和。
+   *
+   * @return {number} 总分数。
+   */
+  sumScore() {
+    return (
+      this.starCount * this.coinIncrement * this.scoreIncrement +
+      this.coinCount * this.scoreIncrement +
+      this.score
+    )
+  }
+
   /**
    * @override 在游戏循环中更新下落速度
    */
@@ -190,6 +204,8 @@ export class Marathon extends Tetris {
     this.score = 0
     this.coinCount = 0
     this.starCount = 0
+    this.coinIncrement = 99
+    this.scoreIncrement = 100000
   }
 
   /**

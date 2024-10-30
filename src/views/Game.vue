@@ -1,7 +1,7 @@
 <script setup>
 import { watch, onMounted, onUnmounted } from 'vue'
-import { onBeforeRouteLeave } from 'vue-router'
 import { storeToRefs } from 'pinia'
+import { onBeforeRouteLeave } from 'vue-router'
 import { useGameStore } from '@/stores/game.js'
 import { emitter } from '@/assets/js/emitter.js'
 import { notify } from '@/assets/js/notify.js'

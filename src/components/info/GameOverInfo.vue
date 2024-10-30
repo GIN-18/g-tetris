@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useGameStore } from '@/stores/game'
 import { emitter } from '@/assets/js/emitter.js'
@@ -10,6 +10,7 @@ import LabelBox from '@/components/info/LabelBox.vue'
 import Button from '@/components/button/Button.vue'
 
 const { tetris } = storeToRefs(useGameStore())
+const route = useRoute()
 const router = useRouter()
 const title = ref('GAME OVER')
 
@@ -20,22 +21,30 @@ function replayGame() {
 function navigateToHome() {
   router.push({ name: 'home' })
 }
+
+function checkGameMode(mode) {
+  return route.params.mode === mode
+}
 </script>
 
 <template>
   <DialogsBox :title="title" :is-show="tetris.gameOver">
     <div class="flex flex-col gap-4 w-72">
-      <LabelBox label="Level:">
-        <p>{{ tetris.level }}</p>
-      </LabelBox>
-
       <LabelBox label="Lines:">
         <p>{{ tetris.lines }}</p>
       </LabelBox>
 
-      <LabelBox label="Score:">
-        <p>{{ tetris.score }}</p>
-      </LabelBox>
+      <!-- 马拉松模式显示 -->
+      <div class="flex flex-col gap-4" v-if="checkGameMode('marathon')">
+        <LabelBox label="Level:">
+          <p>{{ tetris.level }}</p>
+        </LabelBox>
+
+        <!-- HACK: 是否星星和金币 -->
+        <LabelBox label="Score:">
+          <p>{{ tetris.sumScore() }}</p>
+        </LabelBox>
+      </div>
     </div>
 
     <div class="flex gap-12">

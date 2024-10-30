@@ -13,7 +13,7 @@ const props = defineProps({
     leave-active-class="animate-[fade-out_0.4s_ease_both]"
   >
     <div
-      class="z-10 fixed top-0 right-0 flex flex-col justify-center items-center gap-16 w-full h-full p-8 bg-black/50"
+      class="z-10 fixed top-0 right-0 flex flex-col justify-center items-center w-full h-full p-8 bg-black/50"
       v-show="props.isShow"
     >
       <Transition
@@ -23,7 +23,7 @@ const props = defineProps({
         leave-active-class="animate-[scale-out-center_0.4s_ease_both]"
       >
         <div
-          class="nes-container flex flex-col justify-between items-center gap-16 bg-nes-gray"
+          class="nes-container flex flex-col justify-between items-center gap-12 bg-nes-gray"
           v-show="props.isShow"
         >
           <h2 class="text-3xl">{{ props.title }}</h2>
