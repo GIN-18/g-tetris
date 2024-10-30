@@ -20,5 +20,5 @@ p {
 }
 
 #app {
-  @apply flex flex-col justify-between items-center w-full h-full p-2 bg-nes-white;
+  @apply flex flex-col justify-between items-center w-full h-full p-4 bg-nes-white;
 }

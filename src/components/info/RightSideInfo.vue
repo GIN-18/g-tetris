@@ -14,8 +14,8 @@ const { tetris } = storeToRefs(useGameStore())
       <NextTetrominoCanvas />
     </InfoBox>
 
-    <InfoBox border title="SCORE">
-      <p>{{ tetris.score }}</p>
+    <InfoBox border title="LINES">
+      <p>{{ tetris.lines }}</p>
     </InfoBox>
   </div>
 </template>

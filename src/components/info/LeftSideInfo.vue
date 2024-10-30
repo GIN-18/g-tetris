@@ -1,11 +1,17 @@
 <script setup>
 import { storeToRefs } from 'pinia'
+import { useRoute } from 'vue-router'
 import { useGameStore } from '@/stores/game.js'
 
 import InfoBox from './InfoBox.vue'
 import HoldTetrominoCanvas from '@/components/canvas/HoldTetrominoCanvas.vue'
 
 const { tetris } = storeToRefs(useGameStore())
+const route = useRoute()
+
+function isShowByMode(mode) {
+  return route.params.mode === mode
+}
 </script>
 
 <template>
@@ -14,13 +20,26 @@ const { tetris } = storeToRefs(useGameStore())
       <HoldTetrominoCanvas />
     </InfoBox>
 
-    <div class="flex flex-col gap-6">
+    <!-- 马拉松模式显示 -->
+    <div class="flex flex-col gap-6" v-if="isShowByMode('marathon')">
       <InfoBox border title="LEVEL">
         <p>{{ tetris.level }}</p>
       </InfoBox>
 
-      <InfoBox border title="LINES">
-        <p>{{ tetris.lines }}</p>
+      <InfoBox border title="SCORE">
+        <div class="flex gap-2" v-if="tetris.starCount">
+          <i class="nes-icon is-small star"></i>
+          <p>x</p>
+          <p>{{ tetris.starCount }}</p>
+        </div>
+
+        <div class="flex gap-2" v-if="tetris.coinCount">
+          <i class="nes-icon is-small coin"></i>
+          <p>x</p>
+          <p>{{ tetris.coinCount }}</p>
+        </div>
+
+        <p>{{ tetris.score }}</p>
       </InfoBox>
     </div>
   </div>

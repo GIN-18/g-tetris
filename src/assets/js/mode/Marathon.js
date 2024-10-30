@@ -8,6 +8,12 @@ export class Marathon extends Tetris {
     this.score = 0
     this.oldLines = 0
     this.dropDelay = null
+
+    this.coinCount = 0
+    this.starCount = 0
+
+    this.coinIncrement = 99
+    this.scoreIncrement = 100000
   }
 
   /**
@@ -25,11 +31,22 @@ export class Marathon extends Tetris {
   updateLevel() {
     this.level += this.getLevelIncrement()
   }
+
   /**
-   * 将当前分数（score）增加指定的分数（getScore()）
+   * 更新当前分数，将获取的分数（getScore()）添加到当前分数中，触发可能的coinCount和starCount增加
    */
   updateScore() {
     this.score += this.getScore()
+
+    if (this.score >= this.scoreIncrement) {
+      this.score = this.score - this.scoreIncrement
+      this.coinCount += 1
+    }
+
+    if (this.coinCount >= this.coinIncrement) {
+      this.starCount += 1
+      this.coinCount = this.coinCount - this.coinIncrement
+    }
   }
 
   /**
@@ -171,6 +188,8 @@ export class Marathon extends Tetris {
     super.resetGame()
     this.level = 1
     this.score = 0
+    this.coinCount = 0
+    this.starCount = 0
   }
 
   /**
