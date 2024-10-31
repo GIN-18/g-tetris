@@ -417,6 +417,12 @@ export class Tetris {
     this.comboCount = 0
     this.backToBackCount = 0
 
+    this.TSpingCount = 0
+    this.TSpinType = ''
+
+    this.miniTSpinCount = 0
+    this.miniTSpinType = ''
+
     this.gameLoopTimer = null
 
     this.tetrominoLockTimer = null
@@ -585,11 +591,12 @@ export class Tetris {
     }, this.lockDelay)
   }
 
-  // TODO: 在Marathon模式下需要重写
   landTetromino() {
     this.updateHoldLock()
     this.mergeMatrix()
     this.checkCombo()
+    this.setTSpinType()
+    this.setMiniTSpinType()
     this.clearFilledLines()
     this.resetTetrominoLocation()
     this.addTetromino()
@@ -692,7 +699,7 @@ export class Tetris {
     return filledLines
   }
 
-  getTSpinType() {
+  setTSpinType() {
     if (!this.checkTSpin()) return
 
     const TSpinTypes = {
@@ -701,10 +708,10 @@ export class Tetris {
       3: 'T-Spin Triple',
     }
 
-    return TSpinTypes[this.getLines()] || 'T-Spin'
+    this.TSpinType = TSpinTypes[this.getLines()] || 'T-Spin'
   }
 
-  getMiniTSpinType() {
+  setMiniTSpinType() {
     if (!this.checkMiniTSpin()) return
 
     const TSpinTypes = {
@@ -712,7 +719,7 @@ export class Tetris {
       2: 'Mini T-Spin Double',
     }
 
-    return TSpinTypes[this.getLines()] || 'Mini T-Spin'
+    this.miniTSpinType = TSpinTypes[this.getLines()] || 'Mini T-Spin'
   }
 
   // 获取当前方块距离底部的距离
@@ -839,9 +846,11 @@ export class Tetris {
       isTop2 &&
       (isBottom1 || isBottom2)
     ) {
+      this.TSpingCount += 1
       return true
     }
 
+    this.TSpingCount = 0
     return false
   }
 
@@ -854,21 +863,14 @@ export class Tetris {
     if (
       this.maneuver === 'rotate' &&
       (isTop1 || isTop2) &&
-      isBottom1 === undefined &&
-      isBottom2 === undefined
+      !(isTop1 && isTop2) &&
+      ((!isBottom1 && !isBottom2) || (isBottom1 && isBottom2))
     ) {
+      this.miniTSpinCount += 1
       return true
     }
 
-    if (
-      this.maneuver === 'rotate' &&
-      (isTop1 || isTop2) &&
-      isBottom1 &&
-      isBottom2
-    ) {
-      return true
-    }
-
+    this.miniTSpinCount = 0
     return false
   }
 

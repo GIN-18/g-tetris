@@ -17,6 +17,7 @@ import KeyOperation from '@/components/operation/KeyOperation.vue'
 
 const { tetris } = storeToRefs(useGameStore())
 
+// HACK: 监听各种操作，发出通知
 watch(
   () => tetris.value.tetrisCount,
   (newValue) => {
@@ -30,7 +31,7 @@ watch(
   () => tetris.value.comboCount,
   (newValue) => {
     if (newValue > 1) {
-      notify('warning', `${tetris.value.comboCount - 1} Combo`)
+      notify('warning', `${tetris.value.comboCount - 1} COMBO`)
     }
   },
 )
@@ -39,7 +40,25 @@ watch(
   () => tetris.value.backToBackCount,
   (newValue) => {
     if (newValue > 1) {
-      notify('warning', `${tetris.value.backToBackCount - 1} BackToBack`)
+      notify('warning', `${tetris.value.backToBackCount - 1} B2B`)
+    }
+  },
+)
+
+watch(
+  () => tetris.value.TSpingCount,
+  (newValue) => {
+    if (newValue > 0) {
+      notify('warning', `${tetris.value.TSpinType}`)
+    }
+  },
+)
+
+watch(
+  () => tetris.value.miniTSpinCount,
+  (newValue) => {
+    if (newValue > 0) {
+      notify('warning', `${tetris.value.miniTSpinType}`)
     }
   },
 )
