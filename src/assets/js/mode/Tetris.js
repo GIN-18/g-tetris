@@ -607,8 +607,14 @@ export class Tetris {
     const width = this.matrix[0].length
 
     if (!filledLines.length) {
+      this.tetrisCount = 0 // 没有满行的时候重置tetris
       this.comboCount = 0 // 没有满行的时候重置combo
       return
+    }
+
+    // 满行是4行时，tetris加1
+    if (filledLines.length === 4) {
+      this.tetrisCount += 1
     }
 
     this.comboCount += 1 // 满行时，combo加1
@@ -726,14 +732,6 @@ export class Tetris {
     return this.getLandTetrominoYOffset(offset + 1)
   }
 
-  setTetrisCount() {
-    if (this.checkTetris()) {
-      this.tetrisCount += 1
-      return
-    }
-    this.tetrisCount = 0
-  }
-
   setTSpinType() {
     if (!this.checkTSpin()) return
 
@@ -823,13 +821,6 @@ export class Tetris {
       wallKickYOffset,
       nextRotation,
     }
-  }
-
-  checkTetris() {
-    if (this.getLines() === 4) {
-      return true
-    }
-    return false
   }
 
   // TODO:  踢墙后，头部一个顶角存在方块，背部两个底角存在方块，也表现为T-Spin

@@ -295,8 +295,14 @@ export class Marathon extends Tetris {
 
     // 处理没有满行的情况
     if (!filledLines.length) {
+      this.tetrisCount = 0 // 没有满行的时候重置tetris
       this.comboCount = 0 // 没有满行的时候重置combo
       return
+    }
+
+    // 满行是4行时，tetris加1
+    if (filledLines.length === 4) {
+      this.tetrisCount += 1
     }
 
     this.comboCount += 1 // 满行时，combo加1
