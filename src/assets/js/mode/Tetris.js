@@ -741,24 +741,40 @@ export class Tetris {
   setTSpinType() {
     if (!this.checkTSpin()) return
 
+    this.TSpingCount += 1
+
+    if (!this.getLines()) {
+      this.TSpinType = 'T-Spin'
+      return
+    }
+
     const TSpinTypes = {
       1: 'T-Spin Single',
       2: 'T-Spin Double',
       3: 'T-Spin Triple',
     }
 
-    this.TSpinType = TSpinTypes[this.getLines()] || 'T-Spin'
+    this.backToBackCount += 1
+    this.TSpinType = TSpinTypes[this.getLines()]
   }
 
   setMiniTSpinType() {
     if (!this.checkMiniTSpin()) return
+
+    this.miniTSpinCount += 1
+
+    if (!this.getLines()) {
+      this.miniTSpinType = 'Mini T-Spin'
+      return
+    }
 
     const TSpinTypes = {
       1: 'Mini T-Spin Single',
       2: 'Mini T-Spin Double',
     }
 
-    this.miniTSpinType = TSpinTypes[this.getLines()] || 'Mini T-Spin'
+    this.backToBackCount += 1
+    this.miniTSpinType = TSpinTypes[this.getLines()]
   }
 
   checkCanMove(xStep, yStep) {
@@ -843,11 +859,9 @@ export class Tetris {
       isTop2 &&
       (isBottom1 || isBottom2)
     ) {
-      this.TSpingCount += 1
       return true
     }
 
-    this.TSpingCount = 0
     return false
   }
 
@@ -863,11 +877,9 @@ export class Tetris {
       !(isTop1 && isTop2) &&
       ((!isBottom1 && !isBottom2) || (isBottom1 && isBottom2))
     ) {
-      this.miniTSpinCount += 1
       return true
     }
 
-    this.miniTSpinCount = 0
     return false
   }
 
