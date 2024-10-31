@@ -591,12 +591,26 @@ export class Tetris {
     }, this.lockDelay)
   }
 
+  // 方块落地
   landTetromino() {
-    this.updateHoldLock()
-    this.mergeMatrix()
+    this.updateHoldLock() // 更新hold锁定状态
+    this.mergeMatrix() // 合并当前方块到地图矩阵
+
     this.setTSpinType()
     this.setMiniTSpinType()
-    this.clearFilledLines()
+
+    // 处理有满行的情况
+    if (this.getLines()) {
+      this.comboCount += 1 // 满行时，combo加1
+      this.updateTetrisCount() // 如果4满行， tetris加1
+      this.updateLines() // 更新行数
+      this.resetBackToBackCount() // 重置背靠背次数
+      this.clearFilledLines()
+    } else {
+      // 处理没有满行的情况
+      this.comboCount = 0 // 没有满行的时候重置combo
+    }
+
     this.resetTetrominoLocation()
     this.addTetromino()
     this.gameLoop()
@@ -605,21 +619,6 @@ export class Tetris {
   clearFilledLines() {
     const filledLines = this.getFilledLines() // 获取满行
     const width = this.matrix[0].length
-
-    if (!filledLines.length) {
-      this.tetrisCount = 0 // 没有满行的时候重置tetris
-      this.comboCount = 0 // 没有满行的时候重置combo
-      return
-    }
-
-    // 满行是4行时，tetris加1
-    if (filledLines.length === 4) {
-      this.tetrisCount += 1
-    }
-
-    this.comboCount += 1 // 满行时，combo加1
-    this.updateLines()
-    this.resetBackToBackCount() // 重置背靠背次数
 
     for (let i = 0; i < filledLines.length; i++) {
       this.matrix.splice(filledLines[i], 1) // 删除满行
@@ -686,6 +685,13 @@ export class Tetris {
 
   updateLines() {
     this.lines += this.getLines()
+  }
+
+  updateTetrisCount() {
+    if (this.getLines() === 4) {
+      this.tetrisCount += 1
+      this.backToBackCount += 1 // tetris时，B2B次数加1
+    }
   }
 
   // 获取消除的行数
@@ -951,7 +957,11 @@ export class Tetris {
   resetBackToBackCount() {
     const lines = [1, 2, 3]
 
-    if (lines.includes(this.getLines())) {
+    if (
+      lines.includes(this.getLines()) &&
+      !this.checkTSpin() &&
+      !this.checkMiniTSpin()
+    ) {
       this.backToBackCount = 0
     }
   }
