@@ -70,13 +70,13 @@ export class Marathon extends Tetris {
       'T-Spin Triple': 1600,
     }
 
-    // 获取T-Spin类型。
-    const type = this.getTSpinType()
+    // 设置T-Spin类型。
+    this.setTSpinType()
 
     // 检查得分表是否有T-Spin类型的得分。
-    if (scoreTable[type]) {
+    if (scoreTable[this.TSpinType]) {
       // 根据T-Spin类型和当前等级计算得分，并更新得分。
-      this.score += scoreTable[type] * this.level
+      this.score += scoreTable[this.TSpinType] * this.level
     }
   }
 
@@ -91,13 +91,13 @@ export class Marathon extends Tetris {
       'Mini T-Spin Double': 400,
     }
 
-    // 获取Mini T-Spin类型。
-    const type = this.getMiniTSpinType()
+    // 设置Mini T-Spin类型。
+    this.setMiniTSpinType()
 
     // 检查得分表是否有Mini T-Spin类型的得分。
-    if (scoreTable[type]) {
+    if (scoreTable[this.miniTSpinType]) {
       // 根据Mini T-Spin类型和当前等级计算得分, 并更新得分。
-      this.score += scoreTable[type] * this.level
+      this.score += scoreTable[this.miniTSpinType] * this.level
     }
   }
   /**
