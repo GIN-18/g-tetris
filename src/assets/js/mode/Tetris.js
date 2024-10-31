@@ -599,6 +599,8 @@ export class Tetris {
     this.setTSpinType()
     this.setMiniTSpinType()
 
+    console.log(this.miniTSpinType)
+
     // 处理有满行的情况
     if (this.getLines()) {
       this.comboCount += 1 // 满行时，combo加1
@@ -739,7 +741,10 @@ export class Tetris {
   }
 
   setTSpinType() {
-    if (!this.checkTSpin()) return
+    if (!this.checkTSpin()) {
+      this.TSpinType = ''
+      return
+    }
 
     this.TSpingCount += 1
 
@@ -759,7 +764,10 @@ export class Tetris {
   }
 
   setMiniTSpinType() {
-    if (!this.checkMiniTSpin()) return
+    if (!this.checkMiniTSpin()) {
+      this.miniTSpinType = ''
+      return
+    }
 
     this.miniTSpinCount += 1
 

@@ -70,9 +70,6 @@ export class Marathon extends Tetris {
       'T-Spin Triple': 1600,
     }
 
-    // 设置T-Spin类型。
-    this.setTSpinType()
-
     // 检查得分表是否有T-Spin类型的得分。
     if (scoreTable[this.TSpinType]) {
       // 根据T-Spin类型和当前等级计算得分，并更新得分。
@@ -90,9 +87,6 @@ export class Marathon extends Tetris {
       'Mini T-Spin Single': 200,
       'Mini T-Spin Double': 400,
     }
-
-    // 设置Mini T-Spin类型。
-    this.setMiniTSpinType()
 
     // 检查得分表是否有Mini T-Spin类型的得分。
     if (scoreTable[this.miniTSpinType]) {
@@ -261,62 +255,31 @@ export class Marathon extends Tetris {
    * @override 方块落地的时候，根据T-Spin和Mini T-Spin类型更新得分。
    */
   landTetromino() {
-    // 更新hold锁定状态
-    this.updateHoldLock()
+    this.updateHoldLock() // 更新hold锁定状态
+    this.mergeMatrix() // 合并当前方块到地图矩阵
 
-    // 合并方块矩阵
-    this.mergeMatrix()
+    this.setTSpinType() // 设置T-Spin类型。
+    this.setMiniTSpinType() // 设置Mini T-Spin类型。
 
-    // 根据T-Spin类型更新得分
-    this.updateScoreByTSpin()
+    this.updateScoreByTSpin() // 根据T-Spin类型更新得分
+    this.updateScoreByMiniTSpin() // 根据Mini T-Spin类型更新得分
 
-    // 根据Mini T-Spin类型更新得分
-    this.updateScoreByMiniTSpin()
-
-    // 清除填满的行
-    this.clearFilledLines()
-
-    // 重置方块位置
-    this.resetTetrominoLocation()
-
-    // 添加新的方块
-    this.addTetromino()
-
-    // 进入游戏循环
-    this.gameLoop()
-  }
-
-  /**
-   * @override 清除满行的时候，更新等级、得分。
-   */
-  clearFilledLines() {
-    const filledLines = this.getFilledLines() // 获取满行的索引
-    const width = this.matrix[0].length // 获取矩阵的宽度
-
-    // 处理没有满行的情况
-    if (!filledLines.length) {
-      this.tetrisCount = 0 // 没有满行的时候重置tetris
+    // 处理有满行的情况
+    if (this.getLines()) {
+      this.comboCount += 1 // 满行时，combo加1
+      this.updateTetrisCount() // 如果4满行， tetris加1
+      this.updateLines() // 更新行数
+      this.updateLevel() // 更新等级
+      this.updateScore() // 更新分数
+      this.resetBackToBackCount() // 重置背靠背次数
+      this.clearFilledLines()
+    } else {
+      // 处理没有满行的情况
       this.comboCount = 0 // 没有满行的时候重置combo
-      return
     }
 
-    // 满行是4行时，tetris加1
-    if (filledLines.length === 4) {
-      this.tetrisCount += 1
-    }
-
-    this.comboCount += 1 // 满行时，combo加1
-    this.updateLines() // 更新行数
-    this.updateLevel() // 更新等级
-    this.updateScore() // 更新分数
-    this.resetBackToBackCount() // 重置背靠背次数
-
-    // 删除满行并在顶部插入空行
-    for (let i = 0; i < filledLines.length; i++) {
-      // 删除满行
-      this.matrix.splice(filledLines[i], 1)
-      // 在数组顶部插入空行
-      this.matrix.unshift(new Array(width).fill(0))
-    }
+    this.resetTetrominoLocation()
+    this.addTetromino()
+    this.gameLoop()
   }
 }
