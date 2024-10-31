@@ -267,9 +267,6 @@ export class Marathon extends Tetris {
     // 合并方块矩阵
     this.mergeMatrix()
 
-    // 检查连击状态
-    this.checkCombo()
-
     // 根据T-Spin类型更新得分
     this.updateScoreByTSpin()
 
@@ -293,24 +290,20 @@ export class Marathon extends Tetris {
    * @override 清除满行的时候，更新等级、得分。
    */
   clearFilledLines() {
-    // 获取满行的索引
-    const filledLines = this.getFilledLines()
-    // 获取矩阵的宽度
-    const width = this.matrix[0].length
+    const filledLines = this.getFilledLines() // 获取满行的索引
+    const width = this.matrix[0].length // 获取矩阵的宽度
 
-    // 如果没有满行，直接返回
-    if (!filledLines.length) return
+    // 处理没有满行的情况
+    if (!filledLines.length) {
+      this.comboCount = 0 // 没有满行的时候重置combo
+      return
+    }
 
-    // 检查是否出现了Tetris（四连消除）
-    this.checkTetris()
-    // 更新行数
-    this.updateLines()
-    // 更新等级
-    this.updateLevel()
-    // 更新得分
-    this.updateScore()
-    // 重置背靠背次数
-    this.resetBackToBackCount()
+    this.comboCount += 1 // 满行时，combo加1
+    this.updateLines() // 更新行数
+    this.updateLevel() // 更新等级
+    this.updateScore() // 更新分数
+    this.resetBackToBackCount() // 重置背靠背次数
 
     // 删除满行并在顶部插入空行
     for (let i = 0; i < filledLines.length; i++) {

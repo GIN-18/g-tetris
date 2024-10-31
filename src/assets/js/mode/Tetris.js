@@ -594,7 +594,6 @@ export class Tetris {
   landTetromino() {
     this.updateHoldLock()
     this.mergeMatrix()
-    this.checkCombo()
     this.setTSpinType()
     this.setMiniTSpinType()
     this.clearFilledLines()
@@ -607,9 +606,12 @@ export class Tetris {
     const filledLines = this.getFilledLines() // 获取满行
     const width = this.matrix[0].length
 
-    if (!filledLines.length) return
+    if (!filledLines.length) {
+      this.comboCount = 0 // 没有满行的时候重置combo
+      return
+    }
 
-    this.checkTetris()
+    this.comboCount += 1 // 满行时，combo加1
     this.updateLines()
     this.resetBackToBackCount() // 重置背靠背次数
 
@@ -699,29 +701,6 @@ export class Tetris {
     return filledLines
   }
 
-  setTSpinType() {
-    if (!this.checkTSpin()) return
-
-    const TSpinTypes = {
-      1: 'T-Spin Single',
-      2: 'T-Spin Double',
-      3: 'T-Spin Triple',
-    }
-
-    this.TSpinType = TSpinTypes[this.getLines()] || 'T-Spin'
-  }
-
-  setMiniTSpinType() {
-    if (!this.checkMiniTSpin()) return
-
-    const TSpinTypes = {
-      1: 'Mini T-Spin Single',
-      2: 'Mini T-Spin Double',
-    }
-
-    this.miniTSpinType = TSpinTypes[this.getLines()] || 'Mini T-Spin'
-  }
-
   // 获取当前方块距离底部的距离
   getBottomDistance() {
     const y = this.activeTetromino.y
@@ -745,6 +724,37 @@ export class Tetris {
       }
     }
     return this.getLandTetrominoYOffset(offset + 1)
+  }
+
+  setTetrisCount() {
+    if (this.checkTetris()) {
+      this.tetrisCount += 1
+      return
+    }
+    this.tetrisCount = 0
+  }
+
+  setTSpinType() {
+    if (!this.checkTSpin()) return
+
+    const TSpinTypes = {
+      1: 'T-Spin Single',
+      2: 'T-Spin Double',
+      3: 'T-Spin Triple',
+    }
+
+    this.TSpinType = TSpinTypes[this.getLines()] || 'T-Spin'
+  }
+
+  setMiniTSpinType() {
+    if (!this.checkMiniTSpin()) return
+
+    const TSpinTypes = {
+      1: 'Mini T-Spin Single',
+      2: 'Mini T-Spin Double',
+    }
+
+    this.miniTSpinType = TSpinTypes[this.getLines()] || 'Mini T-Spin'
   }
 
   checkCanMove(xStep, yStep) {
@@ -817,19 +827,9 @@ export class Tetris {
 
   checkTetris() {
     if (this.getLines() === 4) {
-      this.backToBackCount += 1
-      this.tetrisCount += 1
-      return
+      return true
     }
-    this.tetrisCount = 0
-  }
-
-  checkCombo() {
-    if (this.getLines()) {
-      this.comboCount += 1
-      return
-    }
-    this.comboCount = 0
+    return false
   }
 
   // TODO:  踢墙后，头部一个顶角存在方块，背部两个底角存在方块，也表现为T-Spin
