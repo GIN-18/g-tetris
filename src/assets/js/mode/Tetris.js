@@ -1002,4 +1002,14 @@ export class Tetris {
   clearCanvas(ctx, width, height) {
     ctx.clearRect(0, 0, width, height)
   }
+
+  getDrawXOffset(name, xStep, otherXStep) {
+    const arr = ['T', 'L', 'J', 'S', 'Z']
+
+    if (arr.includes(name)) {
+      return xStep
+    }
+
+    return otherXStep
+  }
 }

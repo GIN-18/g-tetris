@@ -39,7 +39,7 @@ function drawBag() {
   for (let i = 0; i < bag.length; i++) {
     const color = bag[i].color
     const tetromino = bag[i].pieces[0]
-    const xOffset = setXOffset(bag[i].name)
+    const xOffset = tetris.value.getDrawXOffset(bag[i].name, 0.5, 0)
     const yOffset = setYOffset(bag[i].name, i)
 
     ctx.value.fillStyle = color
@@ -55,16 +55,6 @@ function drawBag() {
       )
     }
   }
-}
-
-function setXOffset(name) {
-  const arr = ['T', 'L', 'J', 'S', 'Z']
-
-  if (arr.includes(name)) {
-    return 1 / 2
-  }
-
-  return 0
 }
 
 function setYOffset(name) {
