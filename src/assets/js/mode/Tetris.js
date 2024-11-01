@@ -542,13 +542,18 @@ export class Tetris {
     this.landTetromino()
   }
 
-  // TODO: 按钮连续降落
   softDrop(enable) {
     if (!this.activeTetromino) return
 
     if (enable && this.checkCanMove(0, 1)) {
       this.setManeuver('softDrop')
-      this.activeTetromino.y += 1
+      this.dropDelay = 10
+
+      if (this.tetrominoLockTimer) {
+        this.resetTetrominoLock()
+      }
+    } else if (!enable) {
+      this.dropDelay = 1000
     }
   }
 
