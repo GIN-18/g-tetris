@@ -171,7 +171,13 @@ export class Marathon extends Tetris {
   gameLoop(timestamp) {
     if (this.checkGameOver()) return
 
-    if (timestamp - this.lastTimestamp >= this.dropDelay) {
+    if (timestamp === undefined) {
+      timestamp = performance.now()
+    }
+
+    const deltaTime = timestamp - this.lastTimestamp
+
+    if (deltaTime >= this.dropDelay) {
       if (this.checkCanMove(0, 1)) {
         this.setManeuver('drop')
         this.activeTetromino.y += 1

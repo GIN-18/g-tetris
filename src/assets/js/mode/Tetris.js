@@ -432,9 +432,9 @@ export class Tetris {
 
     this.maneuver = '' // 当前的动作
 
-    this.lastTimestamp = 0
-
     this.dropDelay = 1000 // 下落间隔
+
+    this.lastTimestamp = performance.now()
   }
 
   resetGame() {
@@ -466,9 +466,9 @@ export class Tetris {
 
     this.maneuver = ''
 
-    this.lastTimestamp = 0
-
     this.dropDelay = 1000
+
+    this.lastTimestamp = performance.now()
   }
 
   playGame() {
@@ -482,7 +482,13 @@ export class Tetris {
   gameLoop(timestamp) {
     if (this.checkGameOver()) return
 
-    if (timestamp - this.lastTimestamp >= this.dropDelay) {
+    if (timestamp === undefined) {
+      timestamp = performance.now()
+    }
+
+    const deltaTime = timestamp - this.lastTimestamp
+
+    if (deltaTime >= this.dropDelay) {
       if (this.checkCanMove(0, 1)) {
         this.setManeuver('drop')
         this.activeTetromino.y += 1
