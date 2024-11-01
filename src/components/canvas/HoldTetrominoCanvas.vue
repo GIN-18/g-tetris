@@ -27,7 +27,7 @@ onMounted(() => {
 })
 
 function clearCanvas() {
-  ctx.value.clearRect(0, 0, width.value, height.value)
+  tetris.value.clearCanvas(ctx.value, width.value, height.value)
 }
 
 function drawHoldTetromino() {
