@@ -2,7 +2,6 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGameStore } from '@/stores/game.js'
-import { palette } from '@/assets/js/palette.js'
 import { emitter } from '@/assets/js/emitter.js'
 
 const canvas = ref(null)
@@ -10,7 +9,7 @@ const width = computed(() => canvas.value.width)
 const height = computed(() => canvas.value.height)
 const ctx = computed(() => canvas.value.getContext('2d'))
 
-const { block, tetris, isDrawGhostPiece } = storeToRefs(useGameStore())
+const { tetris, isDrawGhostPiece } = storeToRefs(useGameStore())
 
 watch(
   [
@@ -26,8 +25,8 @@ watch(
 )
 
 onMounted(() => {
-  canvas.value.width = block.value * 10
-  canvas.value.height = block.value * 20
+  canvas.value.width = tetris.value.blockSize * 10
+  canvas.value.height = tetris.value.blockSize * 20
 
   // 在页面加载时,启动计时器以游戏开始
   // countdownToPlay(3000, () => {
@@ -52,24 +51,7 @@ function drawMatrix() {
 
 function drawGhostPiece() {
   if (!JSON.parse(isDrawGhostPiece.value)) return
-
-  const tetromino = tetris.value.activeTetromino
-  const color = palette.previewColor
-  const ghostPieceYOffset = tetris.value.getLandTetrominoYOffset(tetromino.y)
-  const piece = tetromino.pieces[tetromino.rotation]
-
-  ctx.value.fillStyle = color
-  for (let i = 0; i < piece.length; i++) {
-    const x = piece[i][0] + tetromino.x
-    const y = piece[i][1] + ghostPieceYOffset
-
-    ctx.value.fillRect(
-      x * block.value,
-      (y - 2) * block.value,
-      block.value,
-      block.value,
-    )
-  }
+  tetris.value.drawGhostPiece(ctx.value)
 }
 
 function drawActiveTetromino() {
