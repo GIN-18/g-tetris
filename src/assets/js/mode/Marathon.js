@@ -7,13 +7,15 @@ export class Marathon extends Tetris {
     this.level = 1
     this.score = 0
     this.oldLines = 0
-    this.dropDelay = null
+    this.dropDelay = this.updateDropDelay()
 
     this.coinCount = 0
     this.starCount = 0
 
     this.coinIncrement = 99
     this.scoreIncrement = 100000
+
+    this.isSoftDrop = false
   }
 
   /**
@@ -30,6 +32,7 @@ export class Marathon extends Tetris {
    */
   updateLevel() {
     this.level += this.getLevelIncrement()
+    this.dropDelay = this.updateDropDelay()
   }
 
   /**
@@ -163,30 +166,31 @@ export class Marathon extends Tetris {
   }
 
   /**
-   * @override 在游戏循环中更新下落速度
+   * @override 软降时更新分数
    */
-  gameLoop() {
-    if (this.checkGameover()) return
+  gameLoop(timestamp) {
+    if (this.checkGameOver()) return
 
-    if (!this.activeTetromino) {
-      this.addTetromino()
-    }
-
-    if (this.gameLoopTimer) {
-      clearInterval(this.gameLoopTimer)
-      this.gameLoopTimer = null
-    }
-
-    this.dropDelay = this.updateDropDelay()
-
-    this.gameLoopTimer = setInterval(() => {
+    if (timestamp - this.lastTimestamp >= this.dropDelay) {
       if (this.checkCanMove(0, 1)) {
         this.setManeuver('drop')
         this.activeTetromino.y += 1
-      } else {
-        this.lockTetromino()
+
+        if (this.isSoftDrop) {
+          this.score += 1
+        }
       }
-    }, this.dropDelay)
+
+      this.lastTimestamp = timestamp
+    }
+
+    this.gameLoopTimerId = requestAnimationFrame((timestamp) =>
+      this.gameLoop(timestamp),
+    )
+
+    if (!this.checkCanMove(0, 1)) {
+      this.lockTetromino()
+    }
   }
 
   /**
@@ -200,6 +204,7 @@ export class Marathon extends Tetris {
     this.starCount = 0
     this.coinIncrement = 99
     this.scoreIncrement = 100000
+    this.dropDelay = this.updateDropDelay()
   }
 
   /**
@@ -208,19 +213,19 @@ export class Marathon extends Tetris {
    * @param {boolean} enable 是否启用软降
    */
   softDrop(enable) {
-    // 如果没有激活的方块，直接返回
     if (!this.activeTetromino) return
 
-    // 如果启用软降并且可以移动到下一行
     if (enable && this.checkCanMove(0, 1)) {
-      // 设置操作类型为软降
       this.setManeuver('softDrop')
+      this.isSoftDrop = true
+      this.dropDelay = 10
 
-      // 移动方块到下一行
-      this.activeTetromino.y += 1
-
-      // 增加分数
-      this.score += 1
+      if (this.tetrominoLockTimer) {
+        this.resetTetrominoLock()
+      }
+    } else if (!enable) {
+      this.isSoftDrop = false
+      this.dropDelay = 1000
     }
   }
 
@@ -230,24 +235,22 @@ export class Marathon extends Tetris {
    * 硬降时更新分数
    */
   hardDrop() {
-    // 如果没有激活的方块，直接退出函数
     if (!this.activeTetromino) return
 
-    // 设置操作类型为硬降
+    // 设置当前的操作为硬降
     this.setManeuver('hardDrop')
 
-    // 根据硬降更新分数
+    // 更新分数
     this.updateScoreByHardDrop()
 
-    // 将方块下落直到触底
+    // 下落直到触底
     while (this.checkCanMove(0, 1)) {
       this.activeTetromino.y += 1
     }
 
-    // 硬降时直接锁定方块
+    // 硬降时直接锁定
+    this.stopGameLoop()
     this.resetTetrominoLock()
-
-    // 方块落地，更新游戏状态
     this.landTetromino()
   }
 
