@@ -1012,4 +1012,12 @@ export class Tetris {
 
     return otherXStep
   }
+
+  getDrawYOffset(name, yStep, otherYStep) {
+    if (name === 'I') {
+      return yStep
+    }
+
+    return otherYStep
+  }
 }

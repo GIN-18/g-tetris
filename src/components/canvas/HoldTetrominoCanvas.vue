@@ -46,7 +46,7 @@ function drawHoldTetromino() {
 
   for (let i = 0; i < piece.length; i++) {
     const x = piece[i][0] + tetris.value.getDrawXOffset(name, 1.5, 1)
-    const y = piece[i][1] + setYOffset(name)
+    const y = piece[i][1] + tetris.value.getDrawYOffset(name, 1.5, 2)
 
     ctx.value.fillRect(
       x * block.value,
@@ -55,14 +55,6 @@ function drawHoldTetromino() {
       block.value,
     )
   }
-}
-
-function setYOffset(name) {
-  if (name === 'I') {
-    return 1.5
-  }
-
-  return 2
 }
 </script>
 

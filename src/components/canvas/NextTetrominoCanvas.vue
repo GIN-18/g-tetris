@@ -40,7 +40,7 @@ function drawBag() {
     const color = bag[i].color
     const tetromino = bag[i].pieces[0]
     const xOffset = tetris.value.getDrawXOffset(bag[i].name, 0.5, 0)
-    const yOffset = setYOffset(bag[i].name, i)
+    const yOffset = tetris.value.getDrawYOffset(bag[i].name, -0.5, 0)
 
     ctx.value.fillStyle = color
     for (let j = 0; j < tetromino.length; j++) {
@@ -55,14 +55,6 @@ function drawBag() {
       )
     }
   }
-}
-
-function setYOffset(name) {
-  if (name === 'I') {
-    return -1 / 2
-  }
-
-  return 0
 }
 </script>
 
