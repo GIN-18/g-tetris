@@ -1057,6 +1057,26 @@ export class Tetris {
     }
   }
 
+  drawMatrix(ctx) {
+    const w = this.matrix[0].length
+    const h = this.matrix.length
+
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        if (!this.matrix[y][x]) continue
+
+        ctx.fillStyle = palette.tetrominoColor[this.matrix[y][x] - 1]
+
+        ctx.fillRect(
+          x * this.blockSize,
+          (y - 2) * this.blockSize,
+          this.blockSize,
+          this.blockSize,
+        )
+      }
+    }
+  }
+
   getDrawXOffset(name, xStep, otherXStep) {
     const arr = ['T', 'L', 'J', 'S', 'Z']
 

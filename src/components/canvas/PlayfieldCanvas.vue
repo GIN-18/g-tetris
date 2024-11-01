@@ -47,23 +47,7 @@ function clearCanvas() {
 }
 
 function drawMatrix() {
-  const w = tetris.value.matrix[0].length
-  const h = tetris.value.matrix.length
-
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      if (!tetris.value.matrix[y][x]) continue
-
-      ctx.value.fillStyle =
-        palette.tetrominoColor[tetris.value.matrix[y][x] - 1]
-      ctx.value.fillRect(
-        x * block.value,
-        (y - 2) * block.value,
-        block.value,
-        block.value,
-      )
-    }
-  }
+  tetris.value.drawMatrix(ctx.value)
 }
 
 function drawGhostPiece() {

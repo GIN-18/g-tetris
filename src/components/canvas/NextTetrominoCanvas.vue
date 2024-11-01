@@ -8,6 +8,7 @@ const width = computed(() => canvas.value.width)
 const height = computed(() => canvas.value.height)
 const ctx = computed(() => canvas.value.getContext('2d'))
 
+// TODO: remove block
 const { block, tetris } = storeToRefs(useGameStore())
 
 watch(
