@@ -425,18 +425,20 @@ export class Tetris {
     this.miniTSpinCount = 0
     this.miniTSpinType = ''
 
-    this.gameLoopTimer = null
+    this.gameLoopTimerId = null
 
     this.tetrominoLockTimer = null
     this.lockDelay = 500
 
     this.maneuver = '' // 当前的动作
 
+    this.lastTimestamp = 0
+
     this.dropDelay = 1000 // 下落间隔
   }
 
   resetGame() {
-    clearInterval(this.gameLoopTimer)
+    this.stopGameLoop()
 
     this.matrix = Tetris.initMatrix()
 
@@ -457,42 +459,55 @@ export class Tetris {
     this.backToBackCount = 0
 
     this.oldLines = 0
-    this.gameLoopTimer = null
+    this.gameLoopTimerId = null
 
     this.tetrominoLockTimer = null
     this.lockDelay = 500
 
     this.maneuver = ''
 
+    this.lastTimestamp = 0
+
     this.dropDelay = 1000
   }
 
-  gameLoop() {
-    if (this.checkGameover()) return
-
+  playGame() {
     if (!this.activeTetromino) {
       this.addTetromino()
     }
 
-    if (this.gameLoopTimer) {
-      clearInterval(this.gameLoopTimer)
-      this.gameLoopTimer = null
-    }
+    this.gameLoop()
+  }
 
-    this.gameLoopTimer = setInterval(() => {
+  gameLoop(timestamp) {
+    if (this.checkGameOver()) return
+
+    if (timestamp - this.lastTimestamp >= this.dropDelay) {
       if (this.checkCanMove(0, 1)) {
         this.setManeuver('drop')
         this.activeTetromino.y += 1
-      } else {
-        this.lockTetromino()
       }
-    }, this.dropDelay)
+
+      this.lastTimestamp = timestamp
+    }
+
+    this.gameLoopTimerId = requestAnimationFrame((timestamp) =>
+      this.gameLoop(timestamp),
+    )
+
+    if (!this.checkCanMove(0, 1)) {
+      this.lockTetromino()
+    }
+  }
+
+  stopGameLoop() {
+    cancelAnimationFrame(this.gameLoopTimerId)
   }
 
   addTetromino() {
     // 产生新方块的时候处理游戏结束
-    if (this.checkGameover()) {
-      clearInterval(this.gameLoopTimer)
+    if (this.checkGameOver()) {
+      this.stopGameLoop()
       this.gameOver = true
       return
     }
@@ -522,6 +537,7 @@ export class Tetris {
     }
 
     // 硬降时直接锁定
+    this.stopGameLoop()
     this.resetTetrominoLock()
     this.landTetromino()
   }
@@ -553,7 +569,7 @@ export class Tetris {
       this.activeTetromino.x += direction
 
       if (this.tetrominoLockTimer) {
-        clearInterval(this.gameLoopTimer)
+        this.stopGameLoop()
         this.resetTetrominoLock()
         this.gameLoop()
       }
@@ -573,7 +589,7 @@ export class Tetris {
       this.activeTetromino.rotation = rotationInfo.nextRotation
 
       if (this.tetrominoLockTimer) {
-        clearInterval(this.gameLoopTimer)
+        this.stopGameLoop()
         this.resetTetrominoLock()
         this.gameLoop()
       }
@@ -583,11 +599,7 @@ export class Tetris {
   lockTetromino() {
     if (!this.checkTetrominoLock()) return // 不能锁定时直接返回
 
-    // 锁定时停止游戏
-    if (this.gameLoopTimer) {
-      clearInterval(this.gameLoopTimer)
-      this.gameLoopTimer = null
-    }
+    this.stopGameLoop()
 
     // 延迟锁定
     this.tetrominoLockTimer = setTimeout(() => {
@@ -602,8 +614,6 @@ export class Tetris {
 
     this.setTSpinType()
     this.setMiniTSpinType()
-
-    console.log(this.miniTSpinType)
 
     // 处理有满行的情况
     if (this.getLines()) {
@@ -651,7 +661,7 @@ export class Tetris {
     let tempTetromino = null
 
     if (!this.holdTetromino) {
-      clearInterval(this.gameLoopTimer)
+      this.stopGameLoop()
       this.resetTetrominoLock()
       this.resetTetrominoLocation()
       this.holdTetromino = this.activeTetromino
@@ -662,7 +672,7 @@ export class Tetris {
     }
 
     if (!this.holdTetromino.holdLock) {
-      clearInterval(this.gameLoopTimer)
+      this.stopGameLoop()
       this.resetTetrominoLock()
       this.resetTetrominoLocation()
       tempTetromino = this.activeTetromino
@@ -963,7 +973,7 @@ export class Tetris {
     return false
   }
 
-  checkGameover() {
+  checkGameOver() {
     return this.matrix[1].some((item) => item > 0) // 如果地图的第一行已经存在方块的话，游戏结束
   }
 

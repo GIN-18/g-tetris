@@ -102,7 +102,7 @@ function replayGame() {
 }
 
 function playGame() {
-  tetris.value.gameLoop()
+  tetris.value.playGame()
 }
 
 function resetGame() {
