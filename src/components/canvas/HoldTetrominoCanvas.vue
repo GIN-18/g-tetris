@@ -2,7 +2,6 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGameStore } from '@/stores/game.js'
-import { palette } from '@/assets/js/palette.js'
 
 // get canvas info
 const canvas = ref(null)

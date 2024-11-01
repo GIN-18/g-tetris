@@ -34,27 +34,7 @@ function clearCanvas() {
 }
 
 function drawBag() {
-  const bag = tetris.value.currentBag
-
-  for (let i = 0; i < bag.length; i++) {
-    const color = bag[i].color
-    const tetromino = bag[i].pieces[0]
-    const xOffset = tetris.value.getDrawXOffset(bag[i].name, 0.5, 0)
-    const yOffset = tetris.value.getDrawYOffset(bag[i].name, -0.5, 0)
-
-    ctx.value.fillStyle = color
-    for (let j = 0; j < tetromino.length; j++) {
-      const x = tetromino[j][0] + 1 + xOffset
-      const y = tetromino[j][1] + 1 + i * 3 + yOffset
-
-      ctx.value.fillRect(
-        x * block.value,
-        y * block.value,
-        block.value,
-        block.value,
-      )
-    }
-  }
+  tetris.value.drawBag(ctx.value)
 }
 </script>
 

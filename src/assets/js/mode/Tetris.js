@@ -1034,6 +1034,29 @@ export class Tetris {
     }
   }
 
+  drawBag(ctx) {
+    const bag = this.currentBag
+
+    for (let i = 0; i < bag.length; i++) {
+      const color = bag[i].color
+      const tetromino = bag[i].pieces[0]
+      const xOffset = this.getDrawXOffset(bag[i].name, 0.5, 0)
+      const yOffset = this.getDrawYOffset(bag[i].name, -0.5, 0)
+
+      ctx.fillStyle = color
+      for (let j = 0; j < tetromino.length; j++) {
+        const x = tetromino[j][0] + 1 + xOffset
+        const y = tetromino[j][1] + 1 + i * 3 + yOffset
+        ctx.fillRect(
+          x * this.blockSize,
+          y * this.blockSize,
+          this.blockSize,
+          this.blockSize,
+        )
+      }
+    }
+  }
+
   getDrawXOffset(name, xStep, otherXStep) {
     const arr = ['T', 'L', 'J', 'S', 'Z']
 
