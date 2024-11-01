@@ -403,6 +403,8 @@ export class Tetris {
   constructor() {
     this.matrix = Tetris.initMatrix()
 
+    this.blockSize = 16
+
     this.currentBag = Tetris.getBag()
     this.nextBag = Tetris.getBag()
 
@@ -437,6 +439,8 @@ export class Tetris {
     clearInterval(this.gameLoopTimer)
 
     this.matrix = Tetris.initMatrix()
+
+    this.blockSize = 16
 
     this.currentBag = Tetris.getBag()
     this.nextBag = Tetris.getBag()
@@ -1001,6 +1005,33 @@ export class Tetris {
 
   clearCanvas(ctx, width, height) {
     ctx.clearRect(0, 0, width, height)
+  }
+
+  drawHoldTetromino(ctx) {
+    if (!this.holdTetromino) return
+
+    const tetromino = this.holdTetromino
+    const name = tetromino.name
+    const color = tetromino.color
+    const piece = tetromino.pieces[0]
+
+    if (tetromino.holdLock) {
+      ctx.fillStyle = palette.previewColor
+    } else {
+      ctx.fillStyle = color
+    }
+
+    for (let i = 0; i < piece.length; i++) {
+      const x = piece[i][0] + this.getDrawXOffset(name, 1.5, 1)
+      const y = piece[i][1] + this.getDrawYOffset(name, 1.5, 2)
+
+      ctx.fillRect(
+        x * this.blockSize,
+        y * this.blockSize,
+        this.blockSize,
+        this.blockSize,
+      )
+    }
   }
 
   getDrawXOffset(name, xStep, otherXStep) {

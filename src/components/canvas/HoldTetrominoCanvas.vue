@@ -31,30 +31,7 @@ function clearCanvas() {
 }
 
 function drawHoldTetromino() {
-  if (!tetris.value.holdTetromino) return
-
-  const tetromino = tetris.value.holdTetromino
-  const name = tetromino.name
-  const color = tetromino.color
-  const piece = tetromino.pieces[0]
-
-  if (tetromino.holdLock) {
-    ctx.value.fillStyle = palette.previewColor
-  } else {
-    ctx.value.fillStyle = color
-  }
-
-  for (let i = 0; i < piece.length; i++) {
-    const x = piece[i][0] + tetris.value.getDrawXOffset(name, 1.5, 1)
-    const y = piece[i][1] + tetris.value.getDrawYOffset(name, 1.5, 2)
-
-    ctx.value.fillRect(
-      x * block.value,
-      y * block.value,
-      block.value,
-      block.value,
-    )
-  }
+  tetris.value.drawHoldTetromino(ctx.value)
 }
 </script>
 
