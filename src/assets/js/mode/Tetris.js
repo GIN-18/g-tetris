@@ -1077,6 +1077,26 @@ export class Tetris {
     }
   }
 
+  drawActiveTetromino(ctx) {
+    const tetromino = this.activeTetromino
+    const color = tetromino.color
+    const piece = tetromino.pieces[tetromino.rotation]
+
+    ctx.fillStyle = color
+
+    for (let i = 0; i < piece.length; i++) {
+      const x = piece[i][0] + tetromino.x
+      const y = piece[i][1] + tetromino.y
+
+      ctx.fillRect(
+        x * this.blockSize,
+        (y - 2) * this.blockSize,
+        this.blockSize,
+        this.blockSize,
+      )
+    }
+  }
+
   getDrawXOffset(name, xStep, otherXStep) {
     const arr = ['T', 'L', 'J', 'S', 'Z']
 
