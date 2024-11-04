@@ -503,7 +503,6 @@ export class Tetris {
     // 处理消息
     if (this.messageList.length > 0) {
       this.messageDuration -= 10
-      console.log(this.messageDuration)
     }
 
     if (this.messageDuration <= 0) {
@@ -643,6 +642,7 @@ export class Tetris {
     // 处理有满行的情况
     if (this.getLines()) {
       this.comboCount += 1 // 满行时，combo加1
+      this.showMessageForNormalClear() // 1,2,3消行的提示
       this.updateTetrisCount() // 如果4满行， tetris加1
       this.updateLines() // 更新行数
       this.resetBackToBackCount() // 重置背靠背次数
@@ -665,6 +665,30 @@ export class Tetris {
       this.matrix.splice(filledLines[i], 1) // 删除满行
       this.matrix.unshift(new Array(width).fill(0)) // 在数组顶部插入空行
     }
+  }
+
+  showMessageForNormalClear() {
+    const lines = this.getLines()
+
+    if (lines === 4 || this.checkTSpin() || this.checkMiniTSpin()) return
+
+    let messageTable = null
+
+    if (this.comboCount >= 2) {
+      messageTable = {
+        1: `SINGLE\n${this.comboCount - 1} COMBO`,
+        2: `DOUBLE\n${this.comboCount - 1} COMBO`,
+        3: `TRIPLE\n${this.comboCount - 1} COMBO`,
+      }
+    } else {
+      messageTable = {
+        1: 'SINGLE',
+        2: 'DOUBLE',
+        3: 'TRIPLE',
+      }
+    }
+
+    this.addMessage(`${messageTable[lines]}`)
   }
 
   // 合并当前方块到地图矩阵
@@ -732,6 +756,18 @@ export class Tetris {
     if (this.getLines() === 4) {
       this.tetrisCount += 1
       this.backToBackCount += 1 // tetris时，B2B次数加1
+
+      if (this.backToBackCount >= 2 && this.comboCount >= 2) {
+        this.addMessage(
+          `${this.backToBackCount - 1} B2B\nTETRIS\n${this.comboCount - 1} COMBO`,
+        )
+      } else if (this.backToBackCount >= 2) {
+        this.addMessage(`${this.backToBackCount - 1} B2B\nTETRIS`)
+      } else if (this.comboCount >= 2) {
+        this.addMessage(`TETRIS\n${this.comboCount - 1} COMBO`)
+      } else {
+        this.addMessage('TETRIS')
+      }
     }
   }
 

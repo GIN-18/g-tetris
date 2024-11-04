@@ -27,21 +27,6 @@ watch(
 )
 
 watch(
-  () => tetris.value.tetrisCount,
-  (newValue) => {
-    if (newValue > 0) {
-      if (tetris.value.backToBackCount >= 2) {
-        tetris.value.addMessage(
-          `${tetris.value.backToBackCount - 1} B2B\nTETRIS`,
-        )
-      } else {
-        tetris.value.addMessage(`TETRIS`)
-      }
-    }
-  },
-)
-
-watch(
   () => tetris.value.TSpingCount,
   (newValue) => {
     if (newValue > 0) {
