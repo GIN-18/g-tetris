@@ -435,6 +435,9 @@ export class Tetris {
     this.dropDelay = 1000 // 下落间隔
 
     this.lastTimestamp = performance.now()
+
+    this.messageList = []
+    this.messageDuration = 5000
   }
 
   resetGame() {
@@ -495,6 +498,17 @@ export class Tetris {
       }
 
       this.lastTimestamp = timestamp
+    }
+
+    // 处理消息
+    if (this.messageList.length > 0) {
+      this.messageDuration -= 10
+      console.log(this.messageDuration)
+    }
+
+    if (this.messageDuration <= 0) {
+      this.messageList.shift()
+      this.messageDuration = 5000
     }
 
     this.gameLoopTimerId = requestAnimationFrame((timestamp) =>
@@ -778,13 +792,24 @@ export class Tetris {
       return
     }
 
-    const TSpinTypes = {
-      1: 'T-Spin Single',
-      2: 'T-Spin Double',
-      3: 'T-Spin Triple',
+    this.backToBackCount += 1
+
+    let TSpinTypes = null
+
+    if (this.backToBackCount >= 2) {
+      TSpinTypes = {
+        1: `${this.backToBackCount - 1} B2B\nT-Spin Single`,
+        2: `${this.backToBackCount - 1} B2B\nT-Spin Double`,
+        3: `${this.backToBackCount - 1} B2B\nT-Spin Triple`,
+      }
+    } else {
+      TSpinTypes = {
+        1: 'T-Spin Single',
+        2: 'T-Spin Double',
+        3: 'T-Spin Triple',
+      }
     }
 
-    this.backToBackCount += 1
     this.TSpinType = TSpinTypes[this.getLines()]
   }
 
@@ -797,16 +822,26 @@ export class Tetris {
     this.miniTSpinCount += 1
 
     if (!this.getLines()) {
-      this.miniTSpinType = 'Mini T-Spin'
+      this.miniTSpinType = 'Mini\nT-Spin'
       return
     }
 
-    const TSpinTypes = {
-      1: 'Mini T-Spin Single',
-      2: 'Mini T-Spin Double',
+    this.backToBackCount += 1
+
+    let TSpinTypes = null
+
+    if (this.backToBackCount >= 2) {
+      TSpinTypes = {
+        1: `${this.backToBackCount - 1} B2B\nMini\nT-Spin Single`,
+        2: `${this.backToBackCount - 1} B2B\nMini\nT-Spin Double`,
+      }
+    } else {
+      TSpinTypes = {
+        1: 'Mini\nT-Spin Single',
+        2: 'Mini\nT-Spin Double',
+      }
     }
 
-    this.backToBackCount += 1
     this.miniTSpinType = TSpinTypes[this.getLines()]
   }
 
@@ -1137,6 +1172,10 @@ export class Tetris {
         this.blockSize,
       )
     }
+  }
+
+  addMessage(message) {
+    this.messageList.push(message)
   }
 
   getDrawXOffset(name, xStep, otherXStep) {

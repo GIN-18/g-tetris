@@ -1,10 +1,9 @@
 <script setup>
-import { watch, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { onBeforeRouteLeave } from 'vue-router'
 import { useGameStore } from '@/stores/game.js'
 import { emitter } from '@/assets/js/emitter.js'
-import { notify } from '@/assets/js/notify.js'
 
 import Header from '@/components/Header.vue'
 import Menu from '@/components/menu/Menu.vue'
@@ -16,52 +15,6 @@ import ButtonOperation from '@/components/operation/ButtonOperation.vue'
 import KeyOperation from '@/components/operation/KeyOperation.vue'
 
 const { tetris } = storeToRefs(useGameStore())
-
-// HACK: 监听各种操作，发出通知
-watch(
-  () => tetris.value.tetrisCount,
-  (newValue) => {
-    if (newValue > 0) {
-      notify('warning', `TETRIS`)
-    }
-  },
-)
-
-watch(
-  () => tetris.value.comboCount,
-  (newValue) => {
-    if (newValue > 1) {
-      notify('warning', `${tetris.value.comboCount - 1} COMBO`)
-    }
-  },
-)
-
-watch(
-  () => tetris.value.backToBackCount,
-  (newValue) => {
-    if (newValue > 1) {
-      notify('warning', `${tetris.value.backToBackCount - 1} B2B`)
-    }
-  },
-)
-
-watch(
-  () => tetris.value.TSpingCount,
-  (newValue) => {
-    if (newValue > 0) {
-      notify('warning', `${tetris.value.TSpinType}`)
-    }
-  },
-)
-
-watch(
-  () => tetris.value.miniTSpinCount,
-  (newValue) => {
-    if (newValue > 0) {
-      notify('warning', `${tetris.value.miniTSpinType}`)
-    }
-  },
-)
 
 onMounted(() => {
   emitter.on('play', playGame)

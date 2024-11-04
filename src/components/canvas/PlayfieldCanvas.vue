@@ -16,12 +16,47 @@ watch(
     () => tetris.value.matrix,
     () => tetris.value.activeTetromino,
     () => isDrawGhostPiece.value,
+    () => tetris.value.messageDuration,
   ],
   () => {
     clearCanvas()
     drawPlayfield()
+    drawMessage()
   },
   { deep: true },
+)
+
+watch(
+  () => tetris.value.tetrisCount,
+  (newValue) => {
+    if (newValue > 0) {
+      if (tetris.value.backToBackCount >= 2) {
+        tetris.value.addMessage(
+          `${tetris.value.backToBackCount - 1} B2B\nTETRIS`,
+        )
+      } else {
+        tetris.value.addMessage(`TETRIS`)
+      }
+    }
+  },
+)
+
+watch(
+  () => tetris.value.TSpingCount,
+  (newValue) => {
+    if (newValue > 0) {
+      tetris.value.addMessage(`${tetris.value.TSpinType}`)
+    }
+  },
+)
+
+watch(
+  () => tetris.value.miniTSpinCount,
+  (newValue) => {
+    if (newValue > 0) {
+      tetris.value.addMessage(`${tetris.value.miniTSpinType}`)
+    }
+  },
 )
 
 onMounted(() => {
@@ -58,12 +93,30 @@ function drawActiveTetromino() {
   tetris.value.drawActiveTetromino(ctx.value)
 }
 
-function drawText(text) {
-  ctx.value.font = '32px "Press Start 2p"'
+function drawMessage() {
+  if (!tetris.value.messageList.length) return
+
+  for (let i = 0; i < tetris.value.messageList.length; i++) {
+    drawText(tetris.value.messageList[i])
+  }
+}
+
+function drawText(text, fontSize = '12px') {
+  const lines = text.split('\n')
+  const lineHeight = parseInt(fontSize) * 2
+
+  ctx.value.font = `${fontSize} 'Press Start 2p'`
   ctx.value.textAlign = 'center'
   ctx.value.textBaseline = 'middle'
   ctx.value.fillStyle = '#f8f8f8'
-  ctx.value.fillText(text, width.value / 2, height.value / 2)
+
+  lines.forEach((line, index) => {
+    ctx.value.fillText(
+      line,
+      width.value / 2,
+      height.value / 2 + (index - (lines.length - 1) / 2) * lineHeight,
+    )
+  })
 }
 
 function countdownToPlay(duration, callback) {
@@ -82,7 +135,7 @@ function countdownToPlay(duration, callback) {
     const mins = Math.ceil(remainingTime / 1000)
 
     clearCanvas()
-    drawText(mins)
+    drawText(mins, '32px')
 
     setTimeout(update, interval)
   }
