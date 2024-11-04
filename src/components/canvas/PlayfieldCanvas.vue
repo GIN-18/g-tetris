@@ -5,8 +5,6 @@ import { useGameStore } from '@/stores/game.js'
 import { emitter } from '@/assets/js/emitter.js'
 
 const canvas = ref(null)
-const width = computed(() => canvas.value.width)
-const height = computed(() => canvas.value.height)
 const ctx = computed(() => canvas.value.getContext('2d'))
 
 const { tetris, isDrawGhostPiece } = storeToRefs(useGameStore())

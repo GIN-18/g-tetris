@@ -5,8 +5,6 @@ import { useGameStore } from '@/stores/game.js'
 
 // get canvas info
 const canvas = ref(null)
-const width = computed(() => canvas.value.width)
-const height = computed(() => canvas.value.height)
 const ctx = computed(() => canvas.value.getContext('2d'))
 
 const { tetris } = storeToRefs(useGameStore())
@@ -26,7 +24,7 @@ onMounted(() => {
 })
 
 function clearCanvas() {
-  tetris.value.clearCanvas(ctx.value, width.value, height.value)
+  tetris.value.clearCanvas(ctx.value)
 }
 
 function drawHoldTetromino() {
