@@ -437,7 +437,7 @@ export class Tetris {
     this.lastTimestamp = performance.now()
 
     this.messageList = []
-    this.messageDuration = 5000
+    this.messageDuration = 1000
   }
 
   resetGame() {
@@ -472,6 +472,9 @@ export class Tetris {
     this.dropDelay = 1000
 
     this.lastTimestamp = performance.now()
+
+    this.messageList = []
+    this.messageDuration = 1000
   }
 
   playGame() {
@@ -507,7 +510,7 @@ export class Tetris {
 
     if (this.messageDuration <= 0) {
       this.messageList.shift()
-      this.messageDuration = 5000
+      this.messageDuration = 1000
     }
 
     this.gameLoopTimerId = requestAnimationFrame((timestamp) =>
@@ -757,6 +760,7 @@ export class Tetris {
       this.tetrisCount += 1
       this.backToBackCount += 1 // tetris时，B2B次数加1
 
+      // tetris时的提示
       if (this.backToBackCount >= 2 && this.comboCount >= 2) {
         this.addMessage(
           `${this.backToBackCount - 1} B2B\nTETRIS\n${this.comboCount - 1} COMBO`,
@@ -832,11 +836,23 @@ export class Tetris {
 
     let TSpinTypes = null
 
-    if (this.backToBackCount >= 2) {
+    if (this.backToBackCount >= 2 && this.comboCount >= 2) {
+      TSpinTypes = {
+        1: `${this.backToBackCount - 1} B2B\nT-Spin Single\n${this.comboCount - 1} COMBO`,
+        2: `${this.backToBackCount - 1} B2B\nT-Spin Double\n${this.comboCount - 1} COMBO`,
+        3: `${this.backToBackCount - 1} B2B\nT-Spin Triple\n${this.comboCount - 1} COMBO`,
+      }
+    } else if (this.backToBackCount >= 2) {
       TSpinTypes = {
         1: `${this.backToBackCount - 1} B2B\nT-Spin Single`,
         2: `${this.backToBackCount - 1} B2B\nT-Spin Double`,
         3: `${this.backToBackCount - 1} B2B\nT-Spin Triple`,
+      }
+    } else if (this.comboCount >= 2) {
+      TSpinTypes = {
+        1: `T-Spin Single\n${this.comboCount - 1} COMBO`,
+        2: `T-Spin Double\n${this.comboCount - 1} COMBO`,
+        3: `T-Spin Triple\n${this.comboCount - 1} COMBO`,
       }
     } else {
       TSpinTypes = {
@@ -846,6 +862,7 @@ export class Tetris {
       }
     }
 
+    this.addMessage(TSpinTypes[this.getLines()])
     this.TSpinType = TSpinTypes[this.getLines()]
   }
 
@@ -866,10 +883,20 @@ export class Tetris {
 
     let TSpinTypes = null
 
-    if (this.backToBackCount >= 2) {
+    if (this.backToBackCount >= 2 && this.comboCount >= 2) {
+      TSpinTypes = {
+        1: `${this.backToBackCount - 1} B2B\nMini\nT-Spin Single\n${this.comboCount - 1} COMBO`,
+        2: `${this.backToBackCount - 1} B2B\nMini\nT-Spin Double\n${this.comboCount - 1} COMBO`,
+      }
+    } else if (this.backToBackCount >= 2) {
       TSpinTypes = {
         1: `${this.backToBackCount - 1} B2B\nMini\nT-Spin Single`,
         2: `${this.backToBackCount - 1} B2B\nMini\nT-Spin Double`,
+      }
+    } else if (this.comboCount >= 2) {
+      TSpinTypes = {
+        1: `Mini\nT-Spin Single\n${this.comboCount - 1} COMBO`,
+        2: `Mini\nT-Spin Double\n${this.comboCount - 1} COMBO`,
       }
     } else {
       TSpinTypes = {
@@ -878,6 +905,7 @@ export class Tetris {
       }
     }
 
+    this.addMessage(TSpinTypes[this.getLines()])
     this.miniTSpinType = TSpinTypes[this.getLines()]
   }
 
@@ -1211,6 +1239,11 @@ export class Tetris {
   }
 
   addMessage(message) {
+    if (this.messageList.length) {
+      this.messageList.length = 0
+      this.messageDuration = 1000
+    }
+
     this.messageList.push(message)
   }
 

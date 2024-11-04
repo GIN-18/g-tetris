@@ -26,24 +26,6 @@ watch(
   { deep: true },
 )
 
-watch(
-  () => tetris.value.TSpingCount,
-  (newValue) => {
-    if (newValue > 0) {
-      tetris.value.addMessage(`${tetris.value.TSpinType}`)
-    }
-  },
-)
-
-watch(
-  () => tetris.value.miniTSpinCount,
-  (newValue) => {
-    if (newValue > 0) {
-      tetris.value.addMessage(`${tetris.value.miniTSpinType}`)
-    }
-  },
-)
-
 onMounted(() => {
   canvas.value.width = tetris.value.blockSize * 10
   canvas.value.height = tetris.value.blockSize * 20
