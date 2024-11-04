@@ -190,6 +190,16 @@ export class Marathon extends Tetris {
       this.lastTimestamp = timestamp
     }
 
+    // 处理消息
+    if (this.messageList.length > 0) {
+      this.messageDuration -= 10
+    }
+
+    if (this.messageDuration <= 0) {
+      this.messageList.shift()
+      this.messageDuration = 1000
+    }
+
     this.gameLoopTimerId = requestAnimationFrame((timestamp) =>
       this.gameLoop(timestamp),
     )
@@ -276,6 +286,7 @@ export class Marathon extends Tetris {
     // 处理有满行的情况
     if (this.getLines()) {
       this.comboCount += 1 // 满行时，combo加1
+      this.showMessageForNormalClear() // 1,2,3消行信息
       this.updateTetrisCount() // 如果4满行， tetris加1
       this.updateLines() // 更新行数
       this.updateLevel() // 更新等级

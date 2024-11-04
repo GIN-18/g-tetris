@@ -526,6 +526,15 @@ export class Tetris {
     cancelAnimationFrame(this.gameLoopTimerId)
   }
 
+  addMessage(message) {
+    if (this.messageList.length) {
+      this.messageList.length = 0
+      this.messageDuration = 1000
+    }
+
+    this.messageList.push(message)
+  }
+
   addTetromino() {
     // 产生新方块的时候处理游戏结束
     if (this.checkGameOver()) {
@@ -1123,8 +1132,8 @@ export class Tetris {
     return name
   }
 
-  clearCanvas(ctx, width, height) {
-    ctx.clearRect(0, 0, width, height)
+  clearCanvas(ctx) {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
   }
 
   drawHoldTetromino(ctx) {
@@ -1238,13 +1247,22 @@ export class Tetris {
     }
   }
 
-  addMessage(message) {
-    if (this.messageList.length) {
-      this.messageList.length = 0
-      this.messageDuration = 1000
-    }
+  drawText(ctx, text, fontSize = '12px') {
+    const lines = text.toString().split('\n')
+    const lineHight = parseInt(fontSize) * 2
 
-    this.messageList.push(message)
+    ctx.font = `${fontSize} 'Press Start 2p'`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillStyle = '#f8f8f8'
+
+    lines.forEach((line, index) => {
+      ctx.fillText(
+        line,
+        ctx.canvas.width / 2,
+        ctx.canvas.height / 2 + (index - (lines.length - 1) / 2) * lineHight,
+      )
+    })
   }
 
   getDrawXOffset(name, xStep, otherXStep) {

@@ -44,7 +44,7 @@ function drawPlayfield() {
 }
 
 function clearCanvas() {
-  tetris.value.clearCanvas(ctx.value, width.value, height.value)
+  tetris.value.clearCanvas(ctx.value)
 }
 
 function drawMatrix() {
@@ -64,26 +64,8 @@ function drawMessage() {
   if (!tetris.value.messageList.length) return
 
   for (let i = 0; i < tetris.value.messageList.length; i++) {
-    drawText(tetris.value.messageList[i])
+    tetris.value.drawText(ctx.value, tetris.value.messageList[i])
   }
-}
-
-function drawText(text, fontSize = '12px') {
-  const lines = text.split('\n')
-  const lineHeight = parseInt(fontSize) * 2
-
-  ctx.value.font = `${fontSize} 'Press Start 2p'`
-  ctx.value.textAlign = 'center'
-  ctx.value.textBaseline = 'middle'
-  ctx.value.fillStyle = '#f8f8f8'
-
-  lines.forEach((line, index) => {
-    ctx.value.fillText(
-      line,
-      width.value / 2,
-      height.value / 2 + (index - (lines.length - 1) / 2) * lineHeight,
-    )
-  })
 }
 
 function countdownToPlay(duration, callback) {
@@ -102,7 +84,7 @@ function countdownToPlay(duration, callback) {
     const mins = Math.ceil(remainingTime / 1000)
 
     clearCanvas()
-    drawText(mins, '32px')
+    tetris.value.drawText(ctx.value, mins, '32px')
 
     setTimeout(update, interval)
   }
