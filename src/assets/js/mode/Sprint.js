@@ -5,4 +5,8 @@ export class Sprint extends Tetris {
     super()
     this.lines = 40
   }
+
+  updateLines() {
+    this.lines -= this.getLines()
+  }
 }
