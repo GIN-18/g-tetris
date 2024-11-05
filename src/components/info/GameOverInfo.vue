@@ -1,9 +1,10 @@
 <script setup>
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useGameStore } from '@/stores/game'
 import { emitter } from '@/assets/js/emitter'
+import { Timer } from '@/assets/js/Timer'
 
 import DialogsBox from '@/components/DialogsBox.vue'
 import LabelBox from '@/components/info/LabelBox.vue'
@@ -12,7 +13,15 @@ import Button from '@/components/button/Button.vue'
 const { tetris } = storeToRefs(useGameStore())
 const route = useRoute()
 const router = useRouter()
-const title = ref('GAME OVER')
+const finalScore = computed(() => tetris.value.sumScore())
+
+const props = defineProps({
+  title: {
+    type: String,
+    required: true,
+    default: 'GAME OVER',
+  },
+})
 
 function replayGame() {
   emitter.emit('replay')
@@ -30,9 +39,20 @@ function checkGameMode(mode) {
 <template>
   <DialogsBox :title="title" :is-show="tetris.gameOver">
     <div class="flex flex-col gap-4 w-72">
-      <LabelBox label="Lines:">
+      <LabelBox label="Lines:" v-if="!checkGameMode('sprint')">
         <p>{{ tetris.lines }}</p>
       </LabelBox>
+
+      <!-- 竞速模式显示 -->
+      <div>
+        <LabelBox label="Time:" v-if="checkGameMode('sprint')">
+          <p>
+            <span>{{ Timer.formatMinutesSeconds(tetris.timer.elapsed) }}</span>
+            <span>.</span>
+            <span>{{ Timer.formatMilliseconds(tetris.timer.elapsed) }}</span>
+          </p>
+        </LabelBox>
+      </div>
 
       <!-- 马拉松模式显示 -->
       <div class="flex flex-col gap-4" v-if="checkGameMode('marathon')">
@@ -42,7 +62,7 @@ function checkGameMode(mode) {
 
         <!-- HACK: 是否星星和金币 -->
         <LabelBox label="Score:">
-          <p>{{ tetris.sumScore() }}</p>
+          <p>{{ finalScore }}</p>
         </LabelBox>
       </div>
     </div>

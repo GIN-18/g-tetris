@@ -109,5 +109,5 @@ function holdTetromino() {
   <ButtonOperation />
   <KeyOperation />
 
-  <GameOverInfo />
+  <GameOverInfo :title="tetris.gameOverTitle" />
 </template>
