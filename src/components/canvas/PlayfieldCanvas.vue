@@ -60,10 +60,7 @@ function drawActiveTetromino() {
 
 function drawMessage() {
   if (!tetris.value.messageList.length) return
-
-  for (let i = 0; i < tetris.value.messageList.length; i++) {
-    tetris.value.drawText(ctx.value, tetris.value.messageList[i])
-  }
+  tetris.value.drawText(ctx.value, tetris.value.messageList[0])
 }
 
 function countdownToPlay(duration, callback) {

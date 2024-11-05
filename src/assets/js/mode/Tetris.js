@@ -1,11 +1,22 @@
-import { palette } from '@/assets/js/palette.js'
-
 export class Tetris {
+  static palette = {
+    ghostPieceColor: '#7c7c7c',
+    tetrominoColor: [
+      '#f8b800',
+      '#3cbcfc',
+      '#9878f8',
+      '#58d854',
+      '#f85898',
+      '#6888fc',
+      '#f87858',
+    ],
+  }
+
   static tetrominoes = {
     O: {
       name: 'O',
       type: 1,
-      color: palette.tetrominoColor[0],
+      color: Tetris.palette.tetrominoColor[0],
       x: 4,
       y: 1,
       rotation: 0,
@@ -40,7 +51,7 @@ export class Tetris {
     I: {
       name: 'I',
       type: 2,
-      color: palette.tetrominoColor[1],
+      color: Tetris.palette.tetrominoColor[1],
       x: 4,
       y: 1,
       rotation: 0,
@@ -75,7 +86,7 @@ export class Tetris {
     T: {
       name: 'T',
       type: 3,
-      color: palette.tetrominoColor[2],
+      color: Tetris.palette.tetrominoColor[2],
       x: 4,
       y: 1,
       rotation: 0,
@@ -110,7 +121,7 @@ export class Tetris {
     S: {
       name: 'S',
       type: 4,
-      color: palette.tetrominoColor[3],
+      color: Tetris.palette.tetrominoColor[3],
       x: 4,
       y: 1,
       rotation: 0,
@@ -145,7 +156,7 @@ export class Tetris {
     Z: {
       name: 'Z',
       type: 5,
-      color: palette.tetrominoColor[4],
+      color: Tetris.palette.tetrominoColor[4],
       x: 4,
       y: 1,
       rotation: 0,
@@ -180,7 +191,7 @@ export class Tetris {
     J: {
       name: 'J',
       type: 6,
-      color: palette.tetrominoColor[5],
+      color: Tetris.palette.tetrominoColor[5],
       x: 4,
       y: 1,
       rotation: 0,
@@ -215,7 +226,7 @@ export class Tetris {
     L: {
       name: 'L',
       type: 7,
-      color: palette.tetrominoColor[6],
+      color: Tetris.palette.tetrominoColor[6],
       x: 4,
       y: 1,
       rotation: 0,
@@ -1145,7 +1156,7 @@ export class Tetris {
     const piece = tetromino.pieces[0]
 
     if (tetromino.holdLock) {
-      ctx.fillStyle = palette.previewColor
+      ctx.fillStyle = Tetris.palette.ghostPieceColor
     } else {
       ctx.fillStyle = color
     }
@@ -1194,7 +1205,7 @@ export class Tetris {
       for (let x = 0; x < w; x++) {
         if (!this.matrix[y][x]) continue
 
-        ctx.fillStyle = palette.tetrominoColor[this.matrix[y][x] - 1]
+        ctx.fillStyle = Tetris.palette.tetrominoColor[this.matrix[y][x] - 1]
 
         ctx.fillRect(
           x * this.blockSize,
@@ -1208,7 +1219,7 @@ export class Tetris {
 
   drawGhostPiece(ctx) {
     const tetromino = this.activeTetromino
-    const color = palette.previewColor
+    const color = Tetris.palette.ghostPieceColor
     const ghostPieceYOffset = this.getLandTetrominoYOffset(tetromino.y)
     const piece = tetromino.pieces[tetromino.rotation]
 
