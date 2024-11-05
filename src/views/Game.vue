@@ -1,9 +1,8 @@
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
-import { storeToRefs } from 'pinia'
-import { onBeforeRouteLeave } from 'vue-router'
-import { useGameStore } from '@/stores/game'
+import { ref, provide, onMounted, onUnmounted } from 'vue'
+import { useRoute, onBeforeRouteLeave } from 'vue-router'
 import { emitter } from '@/assets/js/emitter'
+import { factory } from '@/assets/js/factory'
 
 import Header from '@/components/Header.vue'
 import Menu from '@/components/menu/Menu.vue'
@@ -14,7 +13,10 @@ import GameOverInfo from '@/components/info/GameOverInfo.vue'
 import ButtonOperation from '@/components/operation/ButtonOperation.vue'
 import KeyOperation from '@/components/operation/KeyOperation.vue'
 
-const { tetris } = storeToRefs(useGameStore())
+const route = useRoute()
+const mode = route.params.mode
+const tetris = ref(factory(mode))
+provide('tetris', tetris)
 
 onMounted(() => {
   emitter.on('play', playGame)

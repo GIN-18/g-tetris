@@ -1,11 +1,9 @@
 <script setup>
-import { storeToRefs } from 'pinia'
-import { useGameStore } from '@/stores/game'
-
+import { inject } from 'vue'
 import InfoBox from './InfoBox.vue'
 import NextTetrominoCanvas from '@/components/canvas/NextTetrominoCanvas.vue'
 
-const { tetris } = storeToRefs(useGameStore())
+const tetris = inject('tetris')
 </script>
 
 <template>

@@ -1,14 +1,13 @@
 <script setup>
-import { storeToRefs } from 'pinia'
+import { inject } from 'vue'
 import { useRoute } from 'vue-router'
-import { useGameStore } from '@/stores/game'
 import { Timer } from '@/assets/js/Timer'
 
 import InfoBox from './InfoBox.vue'
 import HoldTetrominoCanvas from '@/components/canvas/HoldTetrominoCanvas.vue'
 
-const { tetris } = storeToRefs(useGameStore())
 const route = useRoute()
+const tetris = inject('tetris')
 
 function checkMode(mode) {
   return route.params.mode === mode

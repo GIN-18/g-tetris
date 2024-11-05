@@ -38,7 +38,6 @@ export class Sprint extends Tetris {
     this.lines = 40
     this.timer = new Timer()
     this.gameOverTitle = ''
-    console.log('reset game')
   }
 
   /**

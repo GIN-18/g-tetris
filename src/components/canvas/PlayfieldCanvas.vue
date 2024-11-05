@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, inject, computed, watch, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGameStore } from '@/stores/game'
 import { emitter } from '@/assets/js/emitter'
@@ -7,7 +7,8 @@ import { emitter } from '@/assets/js/emitter'
 const canvas = ref(null)
 const ctx = computed(() => canvas.value.getContext('2d'))
 
-const { tetris, isDrawGhostPiece } = storeToRefs(useGameStore())
+const tetris = inject('tetris')
+const { isDrawGhostPiece } = storeToRefs(useGameStore())
 
 watch(
   [

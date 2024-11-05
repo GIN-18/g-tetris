@@ -1,13 +1,11 @@
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useGameStore } from '@/stores/game'
+import { ref, inject, computed, watch, onMounted } from 'vue'
 
 // get canvas info
 const canvas = ref(null)
 const ctx = computed(() => canvas.value.getContext('2d'))
 
-const { tetris } = storeToRefs(useGameStore())
+const tetris = inject('tetris')
 
 watch(
   () => tetris.value.holdTetromino,

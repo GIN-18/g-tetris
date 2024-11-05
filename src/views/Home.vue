@@ -7,6 +7,10 @@ const selection = [
     text: 'Marathon',
     link: '/game/marathon',
   },
+  {
+    text: 'Sprint',
+    link: '/game/sprint',
+  },
 ]
 </script>
 

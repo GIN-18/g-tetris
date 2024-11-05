@@ -1,8 +1,6 @@
 <script setup>
-import { computed } from 'vue'
+import { inject, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import { useGameStore } from '@/stores/game'
 import { emitter } from '@/assets/js/emitter'
 import { Timer } from '@/assets/js/Timer'
 
@@ -10,7 +8,7 @@ import DialogsBox from '@/components/DialogsBox.vue'
 import LabelBox from '@/components/info/LabelBox.vue'
 import Button from '@/components/button/Button.vue'
 
-const { tetris } = storeToRefs(useGameStore())
+const tetris = inject('tetris')
 const route = useRoute()
 const router = useRouter()
 const finalScore = computed(() => tetris.value.sumScore())
@@ -39,10 +37,6 @@ function checkGameMode(mode) {
 <template>
   <DialogsBox :title="title" :is-show="tetris.gameOver">
     <div class="flex flex-col gap-4 w-72">
-      <LabelBox label="Lines:" v-if="!checkGameMode('sprint')">
-        <p>{{ tetris.lines }}</p>
-      </LabelBox>
-
       <!-- 竞速模式显示 -->
       <div>
         <LabelBox label="Time:" v-if="checkGameMode('sprint')">
@@ -56,6 +50,10 @@ function checkGameMode(mode) {
 
       <!-- 马拉松模式显示 -->
       <div class="flex flex-col gap-4" v-if="checkGameMode('marathon')">
+        <LabelBox label="Lines:">
+          <p>{{ tetris.lines }}</p>
+        </LabelBox>
+
         <LabelBox label="Level:">
           <p>{{ tetris.level }}</p>
         </LabelBox>
