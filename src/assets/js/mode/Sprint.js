@@ -5,6 +5,19 @@ export class Sprint extends Tetris {
   constructor() {
     super()
     this.lines = 40
+    this.timer = new Timer()
+  }
+
+  /**
+   * @override 开始游戏时，启动计时器
+   */
+  playGame() {
+    if (!this.activeTetromino) {
+      this.addTetromino()
+    }
+
+    this.timer.startSequential()
+    this.gameLoop()
   }
 
   /**
@@ -13,6 +26,7 @@ export class Sprint extends Tetris {
   resetGame() {
     super.resetGame()
     this.lines = 40
+    this.timer = new Timer()
   }
 
   /**

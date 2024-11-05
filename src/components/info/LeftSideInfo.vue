@@ -2,6 +2,7 @@
 import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
 import { useGameStore } from '@/stores/game'
+import { Timer } from '@/assets/js/Timer'
 
 import InfoBox from './InfoBox.vue'
 import HoldTetrominoCanvas from '@/components/canvas/HoldTetrominoCanvas.vue'
@@ -23,7 +24,10 @@ function checkMode(mode) {
     <!-- 竞速模式显示 -->
     <div class="flex flex-col gap-6" v-if="checkMode('sprint')">
       <InfoBox title="TIMER">
-        <p>{{ tetris.level }}</p>
+        <div class="flex flex-col justify-center items-end">
+          <p>{{ Timer.formatMinutesSeconds(tetris.timer.elapsed) }}</p>
+          <p>{{ Timer.formatMilliseconds(tetris.timer.elapsed) }}</p>
+        </div>
       </InfoBox>
     </div>
 

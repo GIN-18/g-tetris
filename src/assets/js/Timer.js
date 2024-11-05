@@ -1,17 +1,31 @@
 export class Timer {
+  static formatMinutesSeconds(time) {
+    const minutes = Math.floor(time / (1000 * 60))
+    const seconds = Math.floor((time % (1000 * 60)) / 1000)
+    return `${Timer.padNumber(minutes)}:${Timer.padNumber(seconds)}`
+  }
+
+  static formatMilliseconds(time) {
+    const milliseconds = time % 1000
+    return `${Timer.padNumber(milliseconds, 3)}`
+  }
+
+  static padNumber(number, length = 2) {
+    return number.toString().padStart(length, '0')
+  }
+
   constructor() {
     this.startTime = null
-    this.elapsedTime = 0
+    this.elapsed = 0
     this.intervalId = null
   }
 
-  startSequential(callback) {
+  startSequential() {
     this.startTime = new Date().getTime()
     this.intervalId = setInterval(() => {
       const currentTime = new Date().getTime()
-      this.elapsedTime = currentTime - this.startTime
-      callback(this.formatTime(this.elapsedTime))
-    }, 1) // update every 1 millisecond
+      this.elapsed = currentTime - this.startTime
+    }, 1)
   }
 
   startCountdown(time, callback) {
@@ -19,36 +33,25 @@ export class Timer {
     this.startTime = new Date().getTime()
     this.intervalId = setInterval(() => {
       const currentTime = new Date().getTime()
-      this.elapsedTime = currentTime - this.startTime
-      const remainingTime = this.countdownTime - this.elapsedTime
+      this.elapsed = currentTime - this.startTime
+      const remainingTime = this.countdownTime - this.elapsed
       if (remainingTime <= 0) {
         callback('Countdown finished!')
-        this.stop()
+        this.stopTimer()
       } else {
-        callback(this.formatTime(remainingTime))
+        callback(Timer.formatTime(remainingTime))
       }
-    }, 1) // update every 1 millisecond
+    }, 1)
   }
 
-  stop() {
+  stopTimer() {
     clearInterval(this.intervalId)
     this.intervalId = null
   }
 
-  reset() {
-    this.elapsedTime = 0
+  resetTimer() {
+    this.elapsed = 0
     this.startTime = null
-    this.stop()
-  }
-
-  formatTime(time) {
-    const minutes = Math.floor(time / (1000 * 60))
-    const seconds = Math.floor((time % (1000 * 60)) / 1000)
-    const milliseconds = time % 1000
-    return `${minutes}:${this.pad(seconds)}\n${this.pad(milliseconds, 3)}`
-  }
-
-  pad(number, length = 2) {
-    return number.toString().padStart(length, '0')
+    this.stopTimer()
   }
 }
