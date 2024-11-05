@@ -45,7 +45,7 @@ export class Timer {
     const minutes = Math.floor(time / (1000 * 60))
     const seconds = Math.floor((time % (1000 * 60)) / 1000)
     const milliseconds = time % 1000
-    return `${minutes}:${this.pad(seconds)}:${this.pad(milliseconds, 3)}`
+    return `${minutes}:${this.pad(seconds)}\n${this.pad(milliseconds, 3)}`
   }
 
   pad(number, length = 2) {

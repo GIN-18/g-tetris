@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted } from 'vue'
-import { preventDoubleTap } from '@/assets/js/utils.js'
+import { preventDoubleTap } from '@/assets/js/utils'
 import Notification from '@/components/Notification.vue'
 
 onMounted(() => {

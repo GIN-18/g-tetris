@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
-import { useGameStore } from '@/stores/game.js'
-import { emitter } from '@/assets/js/emitter.js'
+import { useGameStore } from '@/stores/game'
+import { emitter } from '@/assets/js/emitter'
 
 import MenuItem from './MenuItem.vue'
 import ToggleButton from '@/components/button/ToggleButton.vue'

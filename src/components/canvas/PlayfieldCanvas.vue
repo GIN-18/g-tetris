@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useGameStore } from '@/stores/game.js'
-import { emitter } from '@/assets/js/emitter.js'
+import { useGameStore } from '@/stores/game'
+import { emitter } from '@/assets/js/emitter'
 
 const canvas = ref(null)
 const ctx = computed(() => canvas.value.getContext('2d'))

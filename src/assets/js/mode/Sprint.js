@@ -1,4 +1,5 @@
 import { Tetris } from './Tetris'
+import { Timer } from '@/assets/js/Timer'
 
 export class Sprint extends Tetris {
   constructor() {

@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useGameStore } from '@/stores/game'
-import { emitter } from '@/assets/js/emitter.js'
+import { emitter } from '@/assets/js/emitter'
 
 import DialogsBox from '@/components/DialogsBox.vue'
 import LabelBox from '@/components/info/LabelBox.vue'

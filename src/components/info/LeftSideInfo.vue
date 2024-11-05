@@ -1,7 +1,7 @@
 <script setup>
 import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
-import { useGameStore } from '@/stores/game.js'
+import { useGameStore } from '@/stores/game'
 
 import InfoBox from './InfoBox.vue'
 import HoldTetrominoCanvas from '@/components/canvas/HoldTetrominoCanvas.vue'
@@ -20,13 +20,20 @@ function checkMode(mode) {
       <HoldTetrominoCanvas />
     </InfoBox>
 
+    <!-- 竞速模式显示 -->
+    <div class="flex flex-col gap-6" v-if="checkMode('sprint')">
+      <InfoBox title="TIMER">
+        <p>{{ tetris.level }}</p>
+      </InfoBox>
+    </div>
+
     <!-- 马拉松模式显示 -->
     <div class="flex flex-col gap-6" v-if="checkMode('marathon')">
-      <InfoBox border title="LEVEL">
+      <InfoBox title="LEVEL">
         <p>{{ tetris.level }}</p>
       </InfoBox>
 
-      <InfoBox border title="SCORE">
+      <InfoBox title="SCORE">
         <div class="flex gap-2" v-if="tetris.starCount">
           <i class="nes-icon is-small star"></i>
           <p>x</p>

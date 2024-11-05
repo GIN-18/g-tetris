@@ -1,4 +1,4 @@
-import { Tetris } from './Tetris.js'
+import { Tetris } from './Tetris'
 
 export class Marathon extends Tetris {
   constructor() {

@@ -1,5 +1,5 @@
 <script setup>
-import { emitter } from '@/assets/js/emitter.js'
+import { emitter } from '@/assets/js/emitter'
 
 import Button from '@/components/button/Button.vue'
 import ArrowButton from '@/components/button/ArrowButton.vue'

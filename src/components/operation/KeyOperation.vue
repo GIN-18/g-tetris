@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { emitter } from '@/assets/js/emitter.js'
+import { emitter } from '@/assets/js/emitter'
 
 // TODO: 删除开始操作
 const keys = ref({

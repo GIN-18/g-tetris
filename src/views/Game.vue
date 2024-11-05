@@ -2,8 +2,8 @@
 import { onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { onBeforeRouteLeave } from 'vue-router'
-import { useGameStore } from '@/stores/game.js'
-import { emitter } from '@/assets/js/emitter.js'
+import { useGameStore } from '@/stores/game'
+import { emitter } from '@/assets/js/emitter'
 
 import Header from '@/components/Header.vue'
 import Menu from '@/components/menu/Menu.vue'

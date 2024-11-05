@@ -1,6 +1,6 @@
 <script setup>
 import { computed, watch } from 'vue'
-import { useGameStore } from '@/stores/game.js'
+import { useGameStore } from '@/stores/game'
 
 const game = useGameStore()
 

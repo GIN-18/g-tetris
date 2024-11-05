@@ -1,6 +1,6 @@
 <script setup>
 import { storeToRefs } from 'pinia'
-import { useGameStore } from '@/stores/game.js'
+import { useGameStore } from '@/stores/game'
 
 import InfoBox from './InfoBox.vue'
 import NextTetrominoCanvas from '@/components/canvas/NextTetrominoCanvas.vue'
