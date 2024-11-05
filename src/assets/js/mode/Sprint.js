@@ -7,10 +7,22 @@ export class Sprint extends Tetris {
   }
 
   /**
+   * @override 重置行数
+   */
+  resetGame() {
+    super.resetGame()
+    this.lines = 40
+  }
+
+  /**
    * @override 减少行数
    */
   updateLines() {
     this.lines -= this.getLines()
+
+    if (this.lines <= 0) {
+      this.lines = 0
+    }
   }
 
   /**
