@@ -21,6 +21,15 @@ export class Sprint extends Tetris {
   }
 
   /**
+   * @override 游戏结束时，停止计时器
+   */
+  handleGameOver() {
+    this.stopGameLoop()
+    this.gameOver = true
+    this.timer.stopTimer()
+  }
+
+  /**
    * @override 重置行数
    */
   resetGame() {

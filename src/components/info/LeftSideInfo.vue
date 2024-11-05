@@ -24,7 +24,7 @@ function checkMode(mode) {
     <!-- 竞速模式显示 -->
     <div class="flex flex-col gap-6" v-if="checkMode('sprint')">
       <InfoBox title="TIMER">
-        <div class="flex flex-col justify-center items-end">
+        <div class="flex flex-col justify-center items-end gap-1">
           <p>{{ Timer.formatMinutesSeconds(tetris.timer.elapsed) }}</p>
           <p>{{ Timer.formatMilliseconds(tetris.timer.elapsed) }}</p>
         </div>

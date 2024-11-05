@@ -549,13 +549,17 @@ export class Tetris {
   addTetromino() {
     // 产生新方块的时候处理游戏结束
     if (this.checkGameOver()) {
-      this.stopGameLoop()
-      this.gameOver = true
+      this.handleGameOver()
       return
     }
 
     this.activeTetromino = this.currentBag[0] // 在当前背包中获取第一个方块作为当前方块
     this.updateBag() // 更新背包
+  }
+
+  handleGameOver() {
+    this.stopGameLoop()
+    this.gameOver = true
   }
 
   moveLeft() {
