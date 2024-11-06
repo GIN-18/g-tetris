@@ -20,6 +20,36 @@ function checkMode(mode) {
       <HoldTetrominoCanvas />
     </InfoBox>
 
+    <!-- 限时打分模式显示 -->
+    <div class="flex flex-col gap-6" v-if="checkMode('ultra')">
+      <InfoBox title="LEVEL">
+        <p>{{ tetris.level }}</p>
+      </InfoBox>
+
+      <InfoBox title="SCORE">
+        <div class="flex gap-2" v-if="tetris.starCount">
+          <i class="nes-icon is-small star"></i>
+          <p>x</p>
+          <p>{{ tetris.starCount }}</p>
+        </div>
+
+        <div class="flex gap-2" v-if="tetris.coinCount">
+          <i class="nes-icon is-small coin"></i>
+          <p>x</p>
+          <p>{{ tetris.coinCount }}</p>
+        </div>
+
+        <p>{{ tetris.score }}</p>
+      </InfoBox>
+
+      <InfoBox title="TIMER">
+        <div class="flex flex-col justify-center items-end gap-1">
+          <p>{{ Timer.formatMinutesSeconds(tetris.timer.elapsed) }}</p>
+          <p>{{ Timer.formatMilliseconds(tetris.timer.elapsed) }}</p>
+        </div>
+      </InfoBox>
+    </div>
+
     <!-- 竞速模式显示 -->
     <div class="flex flex-col gap-6" v-if="checkMode('sprint')">
       <InfoBox title="TIMER">
