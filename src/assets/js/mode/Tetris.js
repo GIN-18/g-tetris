@@ -497,7 +497,10 @@ export class Tetris {
   }
 
   gameLoop(timestamp) {
-    if (this.checkGameOver()) return
+    if (this.checkGameOver()) {
+      this.handleGameOver()
+      return
+    }
 
     if (timestamp === undefined) {
       timestamp = performance.now()

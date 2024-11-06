@@ -6,7 +6,7 @@ export class Sprint extends Tetris {
     super()
     this.lines = 40
     this.timer = new Timer()
-    this.gameOverTitle = ''
+    this.gameOverTitle = 'GAME OVER'
   }
 
   /**
@@ -37,7 +37,7 @@ export class Sprint extends Tetris {
     super.resetGame()
     this.lines = 40
     this.timer = new Timer()
-    this.gameOverTitle = ''
+    this.gameOverTitle = 'GAME OVER'
   }
 
   /**
@@ -60,9 +60,6 @@ export class Sprint extends Tetris {
       return true
     }
 
-    if (this.matrix[1].some((item) => item > 0)) {
-      this.gameOverTitle = 'GAME OVER'
-      return true
-    }
+    return super.checkGameOver()
   }
 }

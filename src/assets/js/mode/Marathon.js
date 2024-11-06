@@ -169,7 +169,10 @@ export class Marathon extends Tetris {
    * @override 软降时更新分数
    */
   gameLoop(timestamp) {
-    if (this.checkGameOver()) return
+    if (this.checkGameOver()) {
+      this.handleGameOver()
+      return
+    }
 
     if (timestamp === undefined) {
       timestamp = performance.now()

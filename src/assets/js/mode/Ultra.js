@@ -5,6 +5,7 @@ export class Ultra extends Marathon {
   constructor() {
     super()
     this.timer = new Timer()
+    this.gameOverTitle = 'GAME OVER'
   }
 
   /**
@@ -14,8 +15,28 @@ export class Ultra extends Marathon {
     if (!this.activeTetromino) {
       this.addTetromino()
     }
-
     this.timer.startCountdown()
     this.gameLoop()
+  }
+
+  /**
+   * @override 重置计时器
+   */
+  resetGame() {
+    super.resetGame()
+    this.timer = new Timer()
+    this.gameOverTitle = 'GAME OVER'
+  }
+
+  /**
+   * @override 游戏结束时，停止倒计时
+   */
+  checkGameOver() {
+    if (this.timer.countdownTime <= 0) {
+      this.gameOverTitle = 'COMPLETION'
+      return true
+    }
+
+    return super.checkGameOver()
   }
 }
