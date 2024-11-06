@@ -5,11 +5,15 @@ import Footer from '@/components/Footer.vue'
 const selection = [
   {
     text: 'Marathon',
-    link: '/game/marathon',
+    link: '/detail/marathon',
   },
   {
     text: 'Sprint',
-    link: '/game/sprint',
+    link: '/detail/sprint',
+  },
+  {
+    text: 'Ultra',
+    link: '/detail/ultra',
   },
 ]
 </script>

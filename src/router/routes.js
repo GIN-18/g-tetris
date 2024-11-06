@@ -5,6 +5,11 @@ export const routes = [
     component: () => import('@/views/Home.vue'),
   },
   {
+    path: '/detail/:mode',
+    name: 'GameDetail',
+    component: () => import('@/views/GameDetail.vue'),
+  },
+  {
     path: '/game/:mode',
     name: 'game',
     component: () => import('@/views/Game.vue'),
