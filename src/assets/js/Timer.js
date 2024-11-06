@@ -16,30 +16,31 @@ export class Timer {
 
   constructor() {
     this.startTime = null
-    this.elapsed = 0
     this.intervalId = null
+    this.elapsedTime = 0
+    this.countdownTime = 180000 // TODO: 传参设置倒计时时间
   }
 
   startSequential() {
     this.startTime = new Date().getTime()
     this.intervalId = setInterval(() => {
       const currentTime = new Date().getTime()
-      this.elapsed = currentTime - this.startTime
+      this.elapsedTime = currentTime - this.startTime
     }, 1)
   }
 
-  startCountdown(time, callback) {
-    this.countdownTime = time
+  startCountdown() {
+    const countdownTime = this.countdownTime
     this.startTime = new Date().getTime()
+
     this.intervalId = setInterval(() => {
       const currentTime = new Date().getTime()
-      this.elapsed = currentTime - this.startTime
-      const remainingTime = this.countdownTime - this.elapsed
-      if (remainingTime <= 0) {
-        callback('Countdown finished!')
+      this.elapsedTime = currentTime - this.startTime
+      this.countdownTime = countdownTime - this.elapsedTime
+
+      if (this.countdownTime <= 0) {
+        this.countdownTime = 0
         this.stopTimer()
-      } else {
-        callback(Timer.formatTime(remainingTime))
       }
     }, 1)
   }
@@ -50,7 +51,7 @@ export class Timer {
   }
 
   resetTimer() {
-    this.elapsed = 0
+    this.elapsedTime = 0
     this.startTime = null
     this.stopTimer()
   }

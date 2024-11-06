@@ -44,8 +44,8 @@ function checkMode(mode) {
 
       <InfoBox title="TIMER">
         <div class="flex flex-col justify-center items-end gap-1">
-          <p>{{ Timer.formatMinutesSeconds(tetris.timer.elapsed) }}</p>
-          <p>{{ Timer.formatMilliseconds(tetris.timer.elapsed) }}</p>
+          <p>{{ Timer.formatMinutesSeconds(tetris.timer.countdownTime) }}</p>
+          <p>{{ Timer.formatMilliseconds(tetris.timer.countdownTime) }}</p>
         </div>
       </InfoBox>
     </div>
@@ -54,8 +54,8 @@ function checkMode(mode) {
     <div class="flex flex-col gap-6" v-if="checkMode('sprint')">
       <InfoBox title="TIMER">
         <div class="flex flex-col justify-center items-end gap-1">
-          <p>{{ Timer.formatMinutesSeconds(tetris.timer.elapsed) }}</p>
-          <p>{{ Timer.formatMilliseconds(tetris.timer.elapsed) }}</p>
+          <p>{{ Timer.formatMinutesSeconds(tetris.timer.elapsedTime) }}</p>
+          <p>{{ Timer.formatMilliseconds(tetris.timer.elapsedTime) }}</p>
         </div>
       </InfoBox>
     </div>
