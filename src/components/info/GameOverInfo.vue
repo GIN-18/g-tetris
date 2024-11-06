@@ -38,18 +38,25 @@ function checkGameMode(mode) {
   <DialogsBox :title="title" :is-show="tetris.gameOver">
     <div class="flex flex-col gap-4 w-72">
       <!-- 竞速模式显示 -->
-      <div>
-        <LabelBox label="Time:" v-if="checkGameMode('sprint')">
+      <div v-if="checkGameMode('sprint')">
+        <LabelBox label="Time:">
           <p>
-            <span>{{ Timer.formatMinutesSeconds(tetris.timer.elapsed) }}</span>
+            <span>
+              {{ Timer.formatMinutesSeconds(tetris.timer.elapsedTime) }}
+            </span>
             <span>.</span>
-            <span>{{ Timer.formatMilliseconds(tetris.timer.elapsed) }}</span>
+            <span>
+              {{ Timer.formatMilliseconds(tetris.timer.elapsedTime) }}
+            </span>
           </p>
         </LabelBox>
       </div>
 
-      <!-- 马拉松模式显示 -->
-      <div class="flex flex-col gap-4" v-if="checkGameMode('marathon')">
+      <!-- 马拉松模式和限时打分模式显示 -->
+      <div
+        class="flex flex-col gap-4"
+        v-if="checkGameMode('marathon') || checkGameMode('ultra')"
+      >
         <LabelBox label="Lines:">
           <p>{{ tetris.lines }}</p>
         </LabelBox>
