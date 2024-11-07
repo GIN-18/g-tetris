@@ -8,11 +8,11 @@ const tetris = inject('tetris')
 
 <template>
   <div class="flex flex-col justify-between h-full">
-    <InfoBox title="NEXT">
+    <InfoBox label="NEXT">
       <NextTetrominoCanvas />
     </InfoBox>
 
-    <InfoBox border title="LINES">
+    <InfoBox label="LINES">
       <p>{{ tetris.lines }}</p>
     </InfoBox>
   </div>

@@ -29,18 +29,18 @@ function formatTimeByMode(mode, formatFn) {
 
 <template>
   <div class="flex flex-col justify-between h-full">
-    <InfoBox title="HOLD">
+    <InfoBox label="HOLD">
       <HoldTetrominoCanvas />
     </InfoBox>
 
     <div class="flex flex-col gap-6">
       <!-- 竞速模式不显示 -->
       <div class="flex flex-col gap-6" v-if="mode !== 'sprint'">
-        <InfoBox title="LEVEL">
+        <InfoBox label="LEVEL">
           <p>{{ tetris.level }}</p>
         </InfoBox>
 
-        <InfoBox title="SCORE">
+        <InfoBox label="SCORE">
           <div class="flex gap-2" v-if="tetris.starCount">
             <i class="nes-icon is-small star"></i>
             <p>x</p>
@@ -58,7 +58,7 @@ function formatTimeByMode(mode, formatFn) {
       </div>
 
       <!-- 马拉松模式不显示 -->
-      <InfoBox title="TIMER" v-if="mode !== 'marathon'">
+      <InfoBox label="TIMER" v-if="mode !== 'marathon'">
         <div class="flex flex-col justify-center items-end gap-1">
           <p>{{ minutesSeconds }}</p>
           <p>{{ milliseconds }}</p>

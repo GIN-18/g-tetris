@@ -163,6 +163,8 @@ export class Marathon extends Tetris {
       this.coinCount * this.scoreIncrement +
       this.score
     )
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
   }
 
   /**

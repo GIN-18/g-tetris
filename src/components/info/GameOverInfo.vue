@@ -5,7 +5,7 @@ import { emitter } from '@/assets/js/emitter'
 import { Timer } from '@/assets/js/Timer'
 
 import DialogsBox from '@/components/DialogsBox.vue'
-import LabelBox from '@/components/info/LabelBox.vue'
+import InfoBox from '@/components/info/InfoBox.vue'
 import Button from '@/components/button/Button.vue'
 
 const tetris = inject('tetris')
@@ -39,7 +39,7 @@ function checkGameMode(mode) {
     <div class="flex flex-col gap-4 w-72">
       <!-- 竞速模式显示 -->
       <div v-if="checkGameMode('sprint')">
-        <LabelBox label="Time:">
+        <InfoBox label="Time:" type="horizontal">
           <p>
             <span>
               {{ Timer.formatMinutesSeconds(tetris.timer.elapsedTime) }}
@@ -49,7 +49,7 @@ function checkGameMode(mode) {
               {{ Timer.formatMilliseconds(tetris.timer.elapsedTime) }}
             </span>
           </p>
-        </LabelBox>
+        </InfoBox>
       </div>
 
       <!-- 马拉松模式和限时打分模式显示 -->
@@ -57,18 +57,18 @@ function checkGameMode(mode) {
         class="flex flex-col gap-4"
         v-if="checkGameMode('marathon') || checkGameMode('ultra')"
       >
-        <LabelBox label="Lines:">
+        <InfoBox label="Lines:" type="horizontal">
           <p>{{ tetris.lines }}</p>
-        </LabelBox>
+        </InfoBox>
 
-        <LabelBox label="Level:">
+        <InfoBox label="Level:" type="horizontal">
           <p>{{ tetris.level }}</p>
-        </LabelBox>
+        </InfoBox>
 
         <!-- HACK: 是否星星和金币 -->
-        <LabelBox label="Score:">
+        <InfoBox label="Score:" type="horizontal">
           <p>{{ finalScore }}</p>
-        </LabelBox>
+        </InfoBox>
       </div>
     </div>
 
