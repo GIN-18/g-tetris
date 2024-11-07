@@ -39,7 +39,7 @@ function goToHome() {
   <Header />
 
   <main class="flex flex-col justify-between items-center h-full">
-    <div class="grow flex flex-col justify-center items-center gap-6">
+    <div class="grow flex flex-col justify-center items-center gap-8">
       <h2 class="self-start text-xl text-nes-blue">{{ title }}</h2>
       <p class="text-sm leading-8">{{ description }}</p>
     </div>

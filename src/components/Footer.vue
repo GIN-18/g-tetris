@@ -1,20 +1,28 @@
 <script setup>
-const author = {
-  name: 'GIN',
-  blog: 'https://gin-18.github.io/',
-  github: 'https://github.com/gin-18/catppuccin-tetris',
-}
+const footerList = [
+  {
+    text: 'GIN',
+    icon: 'icon-[pixelarticons--home]',
+    url: 'https://gin-18.github.io/',
+  },
+  {
+    text: 'GitHub',
+    icon: 'icon-[pixelarticons--github]',
+    url: 'https://github.com/gin-18/vuetris',
+  },
+]
 </script>
 
 <template>
   <footer class="flex justify-center items-center gap-8 pt-2">
-    <a class="flex items-center gap-2" :href="author.blog">
-      <span class="icon-[pixelarticons--home] text-lg"></span>
-      <p class="!mb-0 text-xs">{{ author.name }}</p>
-    </a>
-    <a class="flex items-center gap-2" :href="author.github">
-      <span class="icon-[pixelarticons--github] text-lg"></span>
-      <p class="!mb-0 text-xs">GitHub</p>
+    <a
+      class="flex justify-center items-center gap-3 !no-underline"
+      v-for="item in footerList"
+      :key="item.text"
+      :href="item.url"
+    >
+      <span class="text-md" :class="item.icon"></span>
+      <p class="pt-1 text-xs">{{ item.text }}</p>
     </a>
   </footer>
 </template>
