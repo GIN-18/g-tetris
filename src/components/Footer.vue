@@ -10,11 +10,11 @@ const author = {
   <footer class="flex justify-center items-center gap-8 pt-2">
     <a class="flex items-center gap-2" :href="author.blog">
       <span class="icon-[pixelarticons--home] text-lg"></span>
-      <p class="mb-0 text-xs">{{ author.name }}</p>
+      <p class="!mb-0 text-xs">{{ author.name }}</p>
     </a>
     <a class="flex items-center gap-2" :href="author.github">
       <span class="icon-[pixelarticons--github] text-lg"></span>
-      <p class="mb-0 text-xs">GitHub</p>
+      <p class="!mb-0 text-xs">GitHub</p>
     </a>
   </footer>
 </template>

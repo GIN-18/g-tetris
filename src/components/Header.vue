@@ -4,7 +4,7 @@ import Logo from '@/components/Logo.vue'
 
 <template>
   <header class="flex justify-between items-center w-full">
-    <Logo />
+    <Logo link="/" />
     <slot></slot>
   </header>
 </template>

@@ -38,21 +38,22 @@ function goToHome() {
 <template>
   <Header />
 
-  <main class="flex flex-col justify-around items-center h-full">
-    <h2 class="text-xl">{{ title }}</h2>
-
-    <p class="text-sm leading-8">{{ description }}</p>
+  <main class="flex flex-col justify-between items-center h-full">
+    <div class="grow flex flex-col justify-center items-center gap-6">
+      <h2 class="self-start text-xl text-nes-blue">{{ title }}</h2>
+      <p class="text-sm leading-8">{{ description }}</p>
+    </div>
 
     <div class="flex justify-around w-full">
       <Button
         color="green"
-        text="START"
+        text="PLAY"
         @click="goToGame"
         @touchstart="goToGame"
       />
       <Button
         color="yellow"
-        text="QUIT"
+        text="BACK"
         @click="goToHome"
         @touchstart="goToHome"
       />

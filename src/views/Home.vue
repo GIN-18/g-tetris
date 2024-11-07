@@ -1,4 +1,5 @@
 <script setup>
+import Logo from '@/components/Logo.vue'
 import Selection from '@/components/Selection.vue'
 import Footer from '@/components/Footer.vue'
 
@@ -19,14 +20,10 @@ const selection = [
 </script>
 
 <template>
-  <main class="flex flex-col justify-center items-center gap-24 h-full">
-    <h1 class="flex text-4xl">
-      <p class="text-nes-deep-blue">VUE</p>
-      <p class="text-nes-deep-red">TR</p>
-      <p class="text-nes-deep-yellow">IS</p>
-    </h1>
+  <main class="flex flex-col justify-center items-center gap-36 h-full">
+    <Logo fontSize="text-4xl" />
 
-    <div class="flex flex-col gap-10">
+    <div class="flex flex-col gap-8">
       <Selection
         v-for="item in selection"
         :text="item.text"

@@ -1,19 +1,26 @@
 <script setup>
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
-
-function navigateToHome() {
-  router.push({ name: 'home' })
-}
+const props = defineProps({
+  link: {
+    type: String,
+    default: '#',
+  },
+  fontSize: {
+    type: String,
+    default: 'text-2xl',
+  },
+})
 </script>
 
 <template>
-  <h1
-    class="text-2xl"
-    @click.prevent="navigateToHome"
-    @touchstart.prevent="navigateToHome"
-  >
-    VUETRIS
+  <h1>
+    <RouterLink
+      class="flex !no-underline"
+      :class="props.fontSize"
+      :to="props.link"
+    >
+      <p class="text-nes-deep-blue">VUE</p>
+      <p class="text-nes-deep-red">TR</p>
+      <p class="text-nes-deep-yellow">IS</p>
+    </RouterLink>
   </h1>
 </template>
