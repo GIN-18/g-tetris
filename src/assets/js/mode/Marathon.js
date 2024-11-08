@@ -4,6 +4,7 @@ export class Marathon extends Tetris {
   constructor() {
     super()
 
+    this.mode = 'marathon'
     this.level = 1
     this.score = 0
     this.oldLines = 0
@@ -219,6 +220,7 @@ export class Marathon extends Tetris {
    */
   resetGame() {
     super.resetGame()
+    this.mode = 'marathon'
     this.level = 1
     this.score = 0
     this.coinCount = 0

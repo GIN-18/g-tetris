@@ -4,6 +4,7 @@ import { Timer } from '@/assets/js/Timer'
 export class Ultra extends Marathon {
   constructor() {
     super()
+    this.mode = 'ultra'
     this.timer = new Timer()
     this.gameOverTitle = 'GAME OVER'
   }
@@ -24,6 +25,7 @@ export class Ultra extends Marathon {
    */
   resetGame() {
     super.resetGame()
+    this.mode = 'ultra'
     this.timer = new Timer()
     this.gameOverTitle = 'GAME OVER'
   }

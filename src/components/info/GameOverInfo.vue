@@ -1,6 +1,6 @@
 <script setup>
 import { inject, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { emitter } from '@/assets/js/emitter'
 import { Timer } from '@/assets/js/Timer'
 
@@ -9,7 +9,6 @@ import InfoBox from '@/components/info/InfoBox.vue'
 import Button from '@/components/button/Button.vue'
 
 const tetris = inject('tetris')
-const route = useRoute()
 const router = useRouter()
 const finalScore = computed(() => tetris.value.sumScore())
 const spins = computed(
@@ -30,10 +29,6 @@ function replayGame() {
 function goToHome() {
   router.push({ name: 'home' })
 }
-
-function checkGameMode(mode) {
-  return route.params.mode === mode
-}
 </script>
 
 <template>
@@ -41,12 +36,11 @@ function checkGameMode(mode) {
     <div class="flex flex-col gap-4 w-72">
       <!-- 显示行数 -->
       <InfoBox label="Lines:" type="horizontal">
-        <p v-if="checkGameMode('sprint')">{{ tetris.lines }}</p>
-        <p v-else>{{ tetris.lines }}</p>
+        <p>{{ tetris.lines }}</p>
       </InfoBox>
 
       <!-- 竞速模式显示 -->
-      <InfoBox label="Time:" type="horizontal" v-if="checkGameMode('sprint')">
+      <InfoBox label="Time:" type="horizontal" v-if="tetris.mode === 'sprint'">
         <p>
           <span>
             {{ Timer.formatMinutesSeconds(tetris.timer.elapsedTime) }}
@@ -59,7 +53,7 @@ function checkGameMode(mode) {
       </InfoBox>
 
       <!-- 马拉松模式和限时打分模式显示 -->
-      <div class="flex flex-col gap-4 w-72" v-if="!checkGameMode('sprint')">
+      <div class="flex flex-col gap-4 w-72" v-if="tetris.mode !== 'sprint'">
         <InfoBox label="Level:" type="horizontal">
           <p>{{ tetris.level }}</p>
         </InfoBox>

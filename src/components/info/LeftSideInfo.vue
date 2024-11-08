@@ -1,26 +1,21 @@
 <script setup>
 import { inject, computed } from 'vue'
-import { useRoute } from 'vue-router'
 import { Timer } from '@/assets/js/Timer'
 
 import InfoBox from './InfoBox.vue'
 import HoldTetrominoCanvas from '@/components/canvas/HoldTetrominoCanvas.vue'
 
-const route = useRoute()
 const tetris = inject('tetris')
-const mode = route.params.mode
 const minutesSeconds = computed(() =>
-  formatTimeByMode(mode, Timer.formatMinutesSeconds),
+  formatTimeByMode(Timer.formatMinutesSeconds),
 )
-const milliseconds = computed(() =>
-  formatTimeByMode(mode, Timer.formatMilliseconds),
-)
+const milliseconds = computed(() => formatTimeByMode(Timer.formatMilliseconds))
 
-function formatTimeByMode(mode, formatFn) {
-  if (mode === 'marathon') return
+function formatTimeByMode(formatFn) {
+  if (tetris.value.mode === 'marathon') return
 
   const time =
-    mode === 'sprint'
+    tetris.value.mode === 'sprint'
       ? tetris.value.timer.elapsedTime
       : tetris.value.timer.countdownTime
   return formatFn(time)
@@ -35,7 +30,7 @@ function formatTimeByMode(mode, formatFn) {
 
     <div class="flex flex-col gap-6">
       <!-- 竞速模式不显示 -->
-      <div class="flex flex-col gap-6" v-if="mode !== 'sprint'">
+      <div class="flex flex-col gap-6" v-if="tetris.mode !== 'sprint'">
         <InfoBox label="LEVEL">
           <p>{{ tetris.level }}</p>
         </InfoBox>
@@ -58,7 +53,7 @@ function formatTimeByMode(mode, formatFn) {
       </div>
 
       <!-- 马拉松模式不显示 -->
-      <InfoBox label="TIMER" v-if="mode !== 'marathon'">
+      <InfoBox label="TIMER" v-if="tetris.mode !== 'marathon'">
         <div class="flex flex-col justify-center items-end gap-1">
           <p>{{ minutesSeconds }}</p>
           <p>{{ milliseconds }}</p>

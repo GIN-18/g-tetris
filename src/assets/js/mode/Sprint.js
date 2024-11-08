@@ -4,7 +4,8 @@ import { Timer } from '@/assets/js/Timer'
 export class Sprint extends Tetris {
   constructor() {
     super()
-    this.lines = 40
+    this.mode = 'sprint'
+    this.targetLines = 40
     this.timer = new Timer()
     this.gameOverTitle = 'GAME OVER'
   }
@@ -35,19 +36,21 @@ export class Sprint extends Tetris {
    */
   resetGame() {
     super.resetGame()
-    this.lines = 40
+    this.mode = 'sprint'
+    this.targetLines = 40
     this.timer = new Timer()
     this.gameOverTitle = 'GAME OVER'
   }
 
   /**
-   * @override 减少行数
+   * @override 更新行数，减少目标行数
    */
   updateLines() {
-    this.lines -= this.getLines()
+    this.lines += this.getLines()
+    this.targetLines -= this.getLines()
 
-    if (this.lines <= 0) {
-      this.lines = 0
+    if (this.targetLines <= 0) {
+      this.targetLines = 0
     }
   }
 
@@ -55,7 +58,7 @@ export class Sprint extends Tetris {
    * @override 消除满40行游戏结束
    */
   checkGameOver() {
-    if (this.lines <= 0) {
+    if (this.targetLines <= 0) {
       this.gameOverTitle = 'FINISHED'
       return true
     }

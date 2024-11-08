@@ -13,7 +13,8 @@ const tetris = inject('tetris')
     </InfoBox>
 
     <InfoBox label="LINES">
-      <p>{{ tetris.lines }}</p>
+      <p v-if="tetris.mode === 'sprint'">{{ tetris.targetLines }}</p>
+      <p v-else>{{ tetris.lines }}</p>
     </InfoBox>
   </div>
 </template>
