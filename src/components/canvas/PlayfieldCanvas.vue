@@ -10,6 +10,8 @@ const ctx = computed(() => canvas.value.getContext('2d'))
 const tetris = inject('tetris')
 const { isDrawGhostPiece } = storeToRefs(useGameStore())
 
+let countdownTimerId = null
+
 watch(
   [
     () => tetris.value.matrix,
@@ -30,9 +32,17 @@ onMounted(() => {
   canvas.value.height = tetris.value.blockSize * 20
 
   // 在页面加载时,启动计时器以游戏开始
-  // countdownToPlay(3000, () => {
-  //   emitter.emit('play')
-  // })
+  countdownToPlay(3000, () => {
+    emitter.emit('play')
+  })
+
+  // 退出页面的时候清除计时器
+  emitter.on('clearCountdownTimer', () => {
+    if (countdownTimerId) {
+      clearInterval(countdownTimerId)
+      countdownTimerId = null
+    }
+  })
 })
 
 function drawPlayfield() {
@@ -82,7 +92,7 @@ function countdownToPlay(duration, callback) {
     clearCanvas()
     tetris.value.drawText(ctx.value, mins, '32px')
 
-    setTimeout(update, interval)
+    countdownTimerId = setTimeout(update, interval)
   }
 
   update()

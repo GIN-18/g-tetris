@@ -47,6 +47,7 @@ onUnmounted(() => {
 })
 
 onBeforeRouteLeave((to, from, next) => {
+  emitter.emit('clearCountdownTimer') // 清除开始游戏的计时器
   resetGame()
   next()
 })

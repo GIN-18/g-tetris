@@ -2,9 +2,8 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { emitter } from '@/assets/js/emitter'
 
-// TODO: 删除开始操作
 const keys = ref({
-  play: 'i',
+  play: 'i', // NOTE: 发布时需要删除开始操作
   hard_drop: ' ',
   soft_drop: 'ArrowDown',
   left: 'ArrowLeft',
@@ -27,6 +26,7 @@ onUnmounted(() => {
 
 function handleKeyDown(e) {
   switch (e.key) {
+    // NOTE: 发布时需要删除开始操作
     case keys.value.play:
       emitter.emit('play')
       break
