@@ -431,7 +431,7 @@ export class Tetris {
     this.maxComboCount = 0
     this.backToBackCount = 0
 
-    this.TSpingCount = 0
+    this.TSpinCount = 0
     this.TSpinType = ''
 
     this.miniTSpinCount = 0
@@ -474,7 +474,12 @@ export class Tetris {
     this.maxComboCount = 0
     this.backToBackCount = 0
 
-    this.oldLines = 0
+    this.TSpinCount = 0
+    this.TSpinType = ''
+
+    this.miniTSpinCount = 0
+    this.miniTSpinType = ''
+
     this.gameLoopTimerId = null
 
     this.tetrominoLockTimer = null
@@ -862,7 +867,7 @@ export class Tetris {
       return
     }
 
-    this.TSpingCount += 1
+    this.TSpinCount += 1
 
     if (!this.getLines()) {
       this.TSpinType = 'T-Spin'

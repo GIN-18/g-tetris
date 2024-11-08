@@ -11,8 +11,10 @@ import Button from '@/components/button/Button.vue'
 const tetris = inject('tetris')
 const route = useRoute()
 const router = useRouter()
-const sprintLines = tetris.value.lines
 const finalScore = computed(() => tetris.value.sumScore())
+const spins = computed(
+  () => tetris.value.TSpinCount + tetris.value.miniTSpinCount,
+)
 
 const props = defineProps({
   title: {
@@ -39,7 +41,7 @@ function checkGameMode(mode) {
     <div class="flex flex-col gap-4 w-72">
       <!-- 显示行数 -->
       <InfoBox label="Lines:" type="horizontal">
-        <p v-if="checkGameMode('sprint')">{{ sprintLines }}</p>
+        <p v-if="checkGameMode('sprint')">{{ tetris.lines }}</p>
         <p v-else>{{ tetris.lines }}</p>
       </InfoBox>
 
@@ -70,6 +72,10 @@ function checkGameMode(mode) {
 
       <InfoBox label="Tetris:" type="horizontal">
         <p>{{ tetris.tetrisCount }}</p>
+      </InfoBox>
+
+      <InfoBox label="Spins:" type="horizontal">
+        <p>{{ spins }}</p>
       </InfoBox>
 
       <InfoBox label="Maximun Combo:" type="horizontal">
