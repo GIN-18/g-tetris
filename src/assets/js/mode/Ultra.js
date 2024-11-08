@@ -33,7 +33,7 @@ export class Ultra extends Marathon {
    */
   checkGameOver() {
     if (this.timer.countdownTime <= 0) {
-      this.gameOverTitle = 'COMPLETION'
+      this.gameOverTitle = 'FINISHED'
       return true
     }
 

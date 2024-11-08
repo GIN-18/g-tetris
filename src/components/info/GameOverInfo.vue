@@ -11,12 +11,12 @@ import Button from '@/components/button/Button.vue'
 const tetris = inject('tetris')
 const route = useRoute()
 const router = useRouter()
+const sprintLines = tetris.value.lines
 const finalScore = computed(() => tetris.value.sumScore())
 
 const props = defineProps({
   title: {
     type: String,
-    required: true,
     default: 'GAME OVER',
   },
 })
@@ -25,7 +25,7 @@ function replayGame() {
   emitter.emit('replay')
 }
 
-function navigateToHome() {
+function goToHome() {
   router.push({ name: 'home' })
 }
 
@@ -37,30 +37,27 @@ function checkGameMode(mode) {
 <template>
   <DialogsBox :title="title" :is-show="tetris.gameOver">
     <div class="flex flex-col gap-4 w-72">
+      <!-- 显示行数 -->
+      <InfoBox label="Lines:" type="horizontal">
+        <p v-if="checkGameMode('sprint')">{{ sprintLines }}</p>
+        <p v-else>{{ tetris.lines }}</p>
+      </InfoBox>
+
       <!-- 竞速模式显示 -->
-      <div v-if="checkGameMode('sprint')">
-        <InfoBox label="Time:" type="horizontal">
-          <p>
-            <span>
-              {{ Timer.formatMinutesSeconds(tetris.timer.elapsedTime) }}
-            </span>
-            <span>.</span>
-            <span>
-              {{ Timer.formatMilliseconds(tetris.timer.elapsedTime) }}
-            </span>
-          </p>
-        </InfoBox>
-      </div>
+      <InfoBox label="Time:" type="horizontal" v-if="checkGameMode('sprint')">
+        <p>
+          <span>
+            {{ Timer.formatMinutesSeconds(tetris.timer.elapsedTime) }}
+          </span>
+          <span>.</span>
+          <span>
+            {{ Timer.formatMilliseconds(tetris.timer.elapsedTime) }}
+          </span>
+        </p>
+      </InfoBox>
 
       <!-- 马拉松模式和限时打分模式显示 -->
-      <div
-        class="flex flex-col gap-4"
-        v-if="checkGameMode('marathon') || checkGameMode('ultra')"
-      >
-        <InfoBox label="Lines:" type="horizontal">
-          <p>{{ tetris.lines }}</p>
-        </InfoBox>
-
+      <div class="flex flex-col gap-4 w-72" v-if="!checkGameMode('sprint')">
         <InfoBox label="Level:" type="horizontal">
           <p>{{ tetris.level }}</p>
         </InfoBox>
@@ -70,6 +67,10 @@ function checkGameMode(mode) {
           <p>{{ finalScore }}</p>
         </InfoBox>
       </div>
+
+      <InfoBox label="Tetris:" type="horizontal">
+        <p>{{ tetris.tetrisCount }}</p>
+      </InfoBox>
     </div>
 
     <div class="flex gap-12">
@@ -82,9 +83,9 @@ function checkGameMode(mode) {
 
       <Button
         color="yellow"
-        text="Quit"
-        @click.prevent="navigateToHome"
-        @touchstart.prevent="navigateToHome"
+        text="QUIT"
+        @click.prevent="goToHome"
+        @touchstart.prevent="goToHome"
       />
     </div>
   </DialogsBox>

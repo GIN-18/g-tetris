@@ -56,7 +56,7 @@ export class Sprint extends Tetris {
    */
   checkGameOver() {
     if (this.lines <= 0) {
-      this.gameOverTitle = 'COMPLETION'
+      this.gameOverTitle = 'FINISHED'
       return true
     }
 
