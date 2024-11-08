@@ -428,6 +428,7 @@ export class Tetris {
 
     this.tetrisCount = 0
     this.comboCount = 0
+    this.maxComboCount = 0
     this.backToBackCount = 0
 
     this.TSpingCount = 0
@@ -470,6 +471,7 @@ export class Tetris {
 
     this.tetrisCount = 0
     this.comboCount = 0
+    this.maxComboCount = 0
     this.backToBackCount = 0
 
     this.oldLines = 0
@@ -555,6 +557,8 @@ export class Tetris {
       this.handleGameOver()
       return
     }
+
+    this.updateMaxComboCount()
 
     this.activeTetromino = this.currentBag[0] // 在当前背包中获取第一个方块作为当前方块
     this.updateBag() // 更新背包
@@ -799,6 +803,12 @@ export class Tetris {
       } else {
         this.addMessage('TETRIS')
       }
+    }
+  }
+
+  updateMaxComboCount() {
+    if (this.comboCount > this.maxComboCount) {
+      this.maxComboCount = this.comboCount - 1
     }
   }
 

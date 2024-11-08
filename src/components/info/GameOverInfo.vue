@@ -71,6 +71,10 @@ function checkGameMode(mode) {
       <InfoBox label="Tetris:" type="horizontal">
         <p>{{ tetris.tetrisCount }}</p>
       </InfoBox>
+
+      <InfoBox label="Maximun Combo:" type="horizontal">
+        <p>{{ tetris.maxComboCount }}</p>
+      </InfoBox>
     </div>
 
     <div class="flex gap-12">
