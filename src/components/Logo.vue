@@ -18,9 +18,9 @@ const props = defineProps({
       :class="props.fontSize"
       :to="props.link"
     >
-      <p class="text-nes-deep-blue">VUE</p>
-      <p class="text-nes-deep-red">TR</p>
-      <p class="text-nes-deep-yellow">IS</p>
+      <span class="text-nes-deep-blue">VUE</span>
+      <span class="text-nes-deep-red">TR</span>
+      <span class="text-nes-deep-yellow">IS</span>
     </RouterLink>
   </h1>
 </template>

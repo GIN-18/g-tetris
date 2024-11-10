@@ -16,7 +16,6 @@ watch(
   [
     () => tetris.value.matrix,
     () => tetris.value.activeTetromino,
-    () => isDrawGhostPiece.value,
     () => tetris.value.messageDuration,
   ],
   () => {

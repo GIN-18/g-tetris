@@ -5,7 +5,6 @@ import { emitter } from '@/assets/js/emitter'
 import { factory } from '@/assets/js/factory'
 
 import Header from '@/components/Header.vue'
-import Menu from '@/components/menu/Menu.vue'
 import PlayfieldCanvas from '@/components/canvas/PlayfieldCanvas.vue'
 import LeftSideInfo from '@/components/info/LeftSideInfo.vue'
 import RightSideInfo from '@/components/info/RightSideInfo.vue'
@@ -98,9 +97,7 @@ function holdTetromino() {
 </script>
 
 <template>
-  <Header>
-    <Menu />
-  </Header>
+  <Header />
 
   <main class="flex justify-between items-center w-full">
     <LeftSideInfo />
