@@ -11,7 +11,6 @@ import LeftSideInfo from '@/components/info/LeftSideInfo.vue'
 import RightSideInfo from '@/components/info/RightSideInfo.vue'
 import GameOverInfo from '@/components/info/GameOverInfo.vue'
 import ButtonOperation from '@/components/operation/ButtonOperation.vue'
-import KeyOperation from '@/components/operation/KeyOperation.vue'
 
 const route = useRoute()
 const mode = route.params.mode
@@ -110,7 +109,6 @@ function holdTetromino() {
   </main>
 
   <ButtonOperation />
-  <KeyOperation />
 
   <GameOverInfo :title="tetris.gameOverTitle" />
 </template>

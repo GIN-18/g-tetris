@@ -90,7 +90,7 @@ function countdownToPlay(duration, callback) {
     const mins = Math.ceil(remainingTime / 1000)
 
     clearCanvas()
-    tetris.value.drawText(ctx.value, mins, '32px')
+    tetris.value.drawText(ctx.value, mins, '28px')
 
     countdownTimerId = setTimeout(update, interval)
   }
