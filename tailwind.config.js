@@ -22,6 +22,8 @@ export default {
       animation: {
         'fade-in': 'fade-in 0.4s ease both',
         'fade-out': 'fade-out 0.4s ease both',
+        'scale-in-center': 'scale-in-center 0.4s ease both',
+        'scale-out-center': 'scale-out-center 0.4s ease both',
       },
       keyframes: {
         'fade-in': {
@@ -38,6 +40,26 @@ export default {
           },
           to: {
             opacity: '0',
+          },
+        },
+        'scale-in-center': {
+          '0%': {
+            transform: 'scale(0)',
+            opacity: '1',
+          },
+          to: {
+            transform: 'scale(1)',
+            opacity: '1',
+          },
+        },
+        'scale-out-center': {
+          '0%': {
+            transform: 'scale(1)',
+            opacity: '1',
+          },
+          to: {
+            transform: 'scale(0)',
+            opacity: '1',
           },
         },
       },
