@@ -16,9 +16,9 @@ const description = computed(() => {
       Here, players clear as many lines and get the highest score possible.
       If the player stacks pieces to the top, the game ends. `,
     sprint: `Sprint (also called 40 lines) is a game mode where you play the game until you clear 40 or more lines.
-      On this mode,score does not have any effect on this mode's ranking.
+      Score does not have any effect on this mode's ranking.
       Instead, time is most important element in this mode. `,
-    ultra: `Ultra (also called Time Trial, Ultra2min, etc) is a game mode where one plays the game until the given time limit (usually 3 or 2 minutes).
+    ultra: `Ultra (also called Time Trial, Ultra2min, etc) is a game mode where one plays the game until the given time limit.
       The objective of this mode is simple: Score as many points as possible.
       If the player blocks out before the time limit, the game ends instantly.`,
   }
@@ -40,7 +40,7 @@ function goToHome() {
 
   <main class="flex flex-col justify-between items-center h-full">
     <div class="grow flex flex-col justify-center items-center gap-8">
-      <h2 class="self-start text-xl text-nes-blue">{{ title }}</h2>
+      <h2 class="self-start text-xl text-nes-deep-yellow">{{ title }}</h2>
       <p class="text-sm leading-8">{{ description }}</p>
     </div>
 

@@ -16,6 +16,10 @@ const selection = [
     text: 'Ultra',
     link: '/detail/ultra',
   },
+  {
+    text: 'Setting',
+    link: '/setting',
+  },
 ]
 </script>
 
