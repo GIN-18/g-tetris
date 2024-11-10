@@ -3,7 +3,7 @@ import Logo from '@/components/Logo.vue'
 import Selection from '@/components/Selection.vue'
 import Footer from '@/components/Footer.vue'
 
-const selection = [
+const selections = [
   {
     text: 'MARATHON',
     link: '/detail/marathon',
@@ -24,16 +24,10 @@ const selection = [
 </script>
 
 <template>
-  <main class="flex flex-col justify-center items-center gap-36 h-full">
-    <Logo fontSize="text-4xl" />
+  <Logo class="pt-16" fontSize="text-4xl" />
 
-    <div class="flex flex-col gap-8">
-      <Selection
-        v-for="item in selection"
-        :text="item.text"
-        :link="item.link"
-      />
-    </div>
+  <main class="flex flex-col gap-8">
+    <Selection v-for="item in selections" :text="item.text" :link="item.link" />
   </main>
 
   <Footer />

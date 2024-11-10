@@ -17,7 +17,7 @@ function goToHome() {
 <template>
   <Header />
 
-  <main class="flex flex-col justify-between items-center w-full h-full">
+  <main class="grow flex flex-col justify-between items-center w-full">
     <h2 class="self-start pt-16 pb-8 text-lg text-nes-deep-yellow">
       {{ title }}
     </h2>

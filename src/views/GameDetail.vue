@@ -38,11 +38,12 @@ function goToHome() {
 <template>
   <Header />
 
-  <main class="flex flex-col justify-between items-center h-full">
-    <div class="grow flex flex-col justify-center items-center gap-8">
-      <h2 class="self-start text-xl text-nes-deep-yellow">{{ title }}</h2>
-      <p class="text-sm leading-8">{{ description }}</p>
-    </div>
+  <main class="grow flex flex-col justify-between items-center w-full">
+    <h2 class="self-start pt-16 pb-8 text-lg text-nes-deep-yellow">
+      {{ title }}
+    </h2>
+
+    <p class="grow text-md leading-8">{{ description }}</p>
 
     <div class="flex justify-around w-full">
       <Button
