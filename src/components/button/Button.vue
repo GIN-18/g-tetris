@@ -21,6 +21,6 @@ const classList = computed(() => ({
 <template>
   <button :class="classList" type="button">
     <span :class="props.icon" v-if="props.icon"></span>
-    <p class="!mb-0" v-if="props.text">{{ props.text }}</p>
+    <p class="text-sm" v-if="props.text">{{ props.text }}</p>
   </button>
 </template>

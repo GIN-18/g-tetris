@@ -1,9 +1,11 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import Header from '@/components/Header.vue'
 import Button from '@/components/button/Button.vue'
+import Tabs from '@/components/common/Tabs.vue'
+import Tab from '@/components/common/Tab.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -39,13 +41,22 @@ function goToHome() {
   <Header />
 
   <main class="grow flex flex-col justify-between items-center w-full">
-    <h2 class="self-start pt-16 pb-8 text-lg text-nes-deep-yellow">
+    <h2 class="self-start py-6 text-lg text-nes-deep-yellow">
       {{ title }}
     </h2>
 
-    <p class="grow text-md leading-8">{{ description }}</p>
+    <div class="grow basis-0 shrink-0 w-full overflow-y-scroll hide-scrollbar">
+      <Tabs active="records">
+        <Tab name="records" label="Records">
+          <p>records</p>
+        </Tab>
+        <Tab name="rule" label="Rule">
+          <p>{{ description }}</p>
+        </Tab>
+      </Tabs>
+    </div>
 
-    <div class="flex justify-around w-full">
+    <div class="flex justify-around w-full pt-4">
       <Button
         color="green"
         text="PLAY"
@@ -61,3 +72,9 @@ function goToHome() {
     </div>
   </main>
 </template>
+
+<style scoped>
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+</style>
