@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGameStore } from '@/stores/game'
 import { useRoute, useRouter } from 'vue-router'
@@ -36,9 +36,13 @@ const description = computed(() => {
 onMounted(() => {
   indexedDB.value.open().then(() => {
     indexedDB.value.getDataByMode(mode).then((res) => {
-      records.value = res
+      records.value = Object.keys(res).length ? res : null
     })
   })
+})
+
+onUnmounted(() => {
+  indexedDB.value.close()
 })
 
 function goToGame() {

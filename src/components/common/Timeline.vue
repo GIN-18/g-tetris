@@ -8,8 +8,8 @@ const props = defineProps({
 
 function formatTime(timestamp) {
   const date = new Date(Number(timestamp))
-  const hours = date.getHours()
-  const minutes = date.getMinutes()
+  const hours = date.getHours().toString().padStart(2, '0')
+  const minutes = date.getMinutes().toString().padStart(2, '0')
 
   return `${hours}:${minutes}`
 }
@@ -18,7 +18,7 @@ function formatDate(timestamp) {
   const date = new Date(Number(timestamp))
   const year = date.getFullYear()
   const month = remapMonth(date.getMonth())
-  const day = date.getDate()
+  const day = date.getDate().toString().padStart(2, '0')
 
   return `${month} ${day}, ${year}`
 }

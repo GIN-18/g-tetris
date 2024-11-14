@@ -18,7 +18,7 @@ export class Timer {
     this.startTime = null
     this.intervalId = null
     this.elapsedTime = 0
-    this.countdownTime = 180000 // TODO: 传参设置倒计时时间
+    this.countdownTime = 120000 // TODO: 传参设置倒计时时间
   }
 
   startSequential() {
