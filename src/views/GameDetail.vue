@@ -36,21 +36,7 @@ const description = computed(() => {
 onMounted(() => {
   indexedDB.value.open().then(() => {
     indexedDB.value.getDataByMode(mode).then((res) => {
-      const result = res.reduce((acc, curr) => {
-        const day = Math.floor(curr.timestamp / 86400000) * 86400000
-
-        if (!acc[day]) {
-          acc[day] = []
-        }
-
-        acc[day].push(curr)
-
-        return acc
-      }, {})
-
-      records.value = result
-
-      // console.log(result)
+      records.value = res
     })
   })
 })

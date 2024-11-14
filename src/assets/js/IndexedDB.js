@@ -81,7 +81,19 @@ export class IndexedDB {
           }
           cursor.continue()
         } else {
-          resolve(data)
+          const result = data.reduce((acc, curr) => {
+            const day = Math.floor(curr.timestamp / 86400000) * 86400000
+
+            if (!acc[day]) {
+              acc[day] = []
+            }
+
+            acc[day].push(curr)
+
+            return acc
+          }, {})
+
+          resolve(result)
         }
       }
 
