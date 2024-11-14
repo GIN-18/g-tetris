@@ -1,5 +1,7 @@
 <script setup>
-import { ref, provide, onMounted, onUnmounted } from 'vue'
+import { ref, provide, watch, onMounted, onUnmounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useGameStore } from '@/stores/game'
 import { useRoute, onBeforeRouteLeave } from 'vue-router'
 import { emitter } from '@/assets/js/emitter'
 import { factory } from '@/assets/js/factory'
@@ -11,10 +13,26 @@ import RightSideInfo from '@/components/info/RightSideInfo.vue'
 import GameOverInfo from '@/components/info/GameOverInfo.vue'
 import ButtonOperation from '@/components/operation/ButtonOperation.vue'
 
+const { indexedDB } = storeToRefs(useGameStore())
 const route = useRoute()
 const mode = route.params.mode
 const tetris = ref(factory(mode))
 provide('tetris', tetris)
+
+watch(
+  () => tetris.value.gameOver,
+  (newValue) => {
+    if (newValue) {
+      const timestamp = Date.now()
+
+      indexedDB.value.add({
+        mode: mode,
+        timestamp,
+        record: tetris.value.lines,
+      })
+    }
+  },
+)
 
 onMounted(() => {
   emitter.on('play', playGame)

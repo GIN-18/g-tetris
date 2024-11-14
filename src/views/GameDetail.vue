@@ -1,5 +1,7 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useGameStore } from '@/stores/game'
 import { useRoute, useRouter } from 'vue-router'
 
 import Header from '@/components/Header.vue'
@@ -8,6 +10,7 @@ import Tabs from '@/components/common/Tabs.vue'
 import Tab from '@/components/common/Tab.vue'
 import Timeline from '@/components/common/Timeline.vue'
 
+const { indexedDB } = storeToRefs(useGameStore())
 const router = useRouter()
 const route = useRoute()
 const mode = route.params.mode
@@ -28,6 +31,28 @@ const description = computed(() => {
   }
 
   return descriptions[mode]
+})
+
+onMounted(() => {
+  indexedDB.value.open().then(() => {
+    indexedDB.value.getDataByMode(mode).then((res) => {
+      const result = res.reduce((acc, curr) => {
+        const day = Math.floor(curr.timestamp / 86400000) * 86400000
+
+        if (!acc[day]) {
+          acc[day] = []
+        }
+
+        acc[day].push(curr)
+
+        return acc
+      }, {})
+
+      records.value = result
+
+      // console.log(result)
+    })
+  })
 })
 
 function goToGame() {
@@ -52,7 +77,7 @@ function goToHome() {
         <Tab name="records" label="Records">
           <div>
             <p class="text-base text-nes-gray" v-if="!records">No Records</p>
-            <Timeline v-else />
+            <Timeline :data="records" v-else />
           </div>
         </Tab>
         <Tab name="rule" label="Rule">
