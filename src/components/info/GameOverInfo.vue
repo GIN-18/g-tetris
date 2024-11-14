@@ -72,8 +72,12 @@ function goToHome() {
         <p>{{ spins }}</p>
       </InfoBox>
 
-      <InfoBox label="Maximun Combo:" type="horizontal">
+      <InfoBox label="Max Combo:" type="horizontal">
         <p>{{ tetris.maxComboCount }}</p>
+      </InfoBox>
+
+      <InfoBox label="Max B2B Chain:" type="horizontal">
+        <p>{{ tetris.maxBackToBackCount }}</p>
       </InfoBox>
     </div>
 

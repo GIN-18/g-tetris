@@ -398,6 +398,7 @@ export class Tetris {
     this.comboCount = 0
     this.maxComboCount = 0
     this.backToBackCount = 0
+    this.maxBackToBackCount = 0
 
     this.TSpinCount = 0
     this.TSpinType = ''
@@ -441,6 +442,7 @@ export class Tetris {
     this.comboCount = 0
     this.maxComboCount = 0
     this.backToBackCount = 0
+    this.maxBackToBackCount = 0
 
     this.TSpinCount = 0
     this.TSpinType = ''
@@ -1116,6 +1118,9 @@ export class Tetris {
       !this.checkTSpin() &&
       !this.checkMiniTSpin()
     ) {
+      if (this.backToBackCount > this.maxBackToBackCount) {
+        this.maxBackToBackCount = this.backToBackCount - 1
+      }
       this.backToBackCount = 0
     }
   }

@@ -52,7 +52,9 @@ function remapMonth(month) {
     >
       <div class="absolute -left-2 w-3 h-3 rounded-full bg-nes-blue"></div>
       <time class="text-sm">{{ formatDate(key) }}</time>
-      <ol class="p-4 rounded-md text-xs leading-6 bg-nes-gray">
+      <ol
+        class="flex flex-col gap-2 p-4 rounded-md text-xs leading-6 bg-nes-gray"
+      >
         <li class="flex justify-between items-center" v-for="(v, k) in value">
           <p>{{ v.record }}</p>
           <p>{{ formatTime(v.timestamp) }}</p>
