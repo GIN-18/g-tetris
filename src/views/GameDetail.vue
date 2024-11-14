@@ -6,11 +6,13 @@ import Header from '@/components/Header.vue'
 import Button from '@/components/button/Button.vue'
 import Tabs from '@/components/common/Tabs.vue'
 import Tab from '@/components/common/Tab.vue'
+import Timeline from '@/components/common/Timeline.vue'
 
 const router = useRouter()
 const route = useRoute()
 const mode = route.params.mode
 
+const records = ref(null) // TODO: 获取历史记录
 const title = computed(() => `${mode.toUpperCase()}`)
 const description = computed(() => {
   const descriptions = {
@@ -48,7 +50,10 @@ function goToHome() {
     <div class="grow basis-0 shrink-0 w-full overflow-y-scroll hide-scrollbar">
       <Tabs active="records">
         <Tab name="records" label="Records">
-          <p>records</p>
+          <div>
+            <p class="text-base text-nes-gray" v-if="!records">No Records</p>
+            <Timeline v-else />
+          </div>
         </Tab>
         <Tab name="rule" label="Rule">
           <p>{{ description }}</p>

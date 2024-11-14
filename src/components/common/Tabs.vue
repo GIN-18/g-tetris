@@ -14,7 +14,7 @@ function renderTab(name, label, index) {
     {
       class: {
         'text-sm': true,
-        'border-b-4 border-nes-green text-nes-deep-green':
+        'border-b-4 border-nes-deep-blue text-nes-deep-blue':
           activeTab.value === name || (index === 0 && !activeTab.value),
       },
     },
@@ -35,7 +35,7 @@ function renderTabs() {
   return h(
     'div',
     {
-      class: 'sticky top-0 flex gap-3 bg-nes-white overflow-x-scroll',
+      class: 'z-10 sticky top-0 flex gap-3 bg-nes-white overflow-x-scroll',
     },
     slots.default &&
       slots
