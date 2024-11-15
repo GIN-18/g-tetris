@@ -1,3 +1,4 @@
+import PlayfieldCanvas from '@/components/canvas/PlayfieldCanvas.vue'
 import { Marathon } from './Marathon'
 import { Timer } from '@/assets/js/Timer'
 
@@ -7,6 +8,18 @@ export class Ultra extends Marathon {
     this.mode = 'ultra'
     this.timer = new Timer()
     this.gameOverTitle = 'GAME OVER'
+  }
+
+  /**
+   * @override 时间到了就游戏结束
+   */
+  gameLoop(timestamp) {
+    if (this.checkGameOver()) {
+      this.handleGameOver()
+      return
+    }
+
+    super.gameLoop(timestamp)
   }
 
   /**
