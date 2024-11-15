@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { emitter } from '@/assets/js/emitter'
 import { Timer } from '@/assets/js/Timer'
 
-import DialogsBox from '@/components/DialogsBox.vue'
+import Dialog from '@/components/common/Dialog.vue'
 import InfoBox from '@/components/info/InfoBox.vue'
 import Button from '@/components/button/Button.vue'
 
@@ -32,7 +32,7 @@ function goToHome() {
 </script>
 
 <template>
-  <DialogsBox :title="title" :is-show="tetris.gameOver">
+  <Dialog :title="title" :is-show="tetris.gameOver">
     <div class="flex flex-col gap-4 w-72">
       <!-- 显示行数 -->
       <InfoBox label="Lines:" type="horizontal">
@@ -72,8 +72,12 @@ function goToHome() {
         <p>{{ spins }}</p>
       </InfoBox>
 
-      <InfoBox label="Maximun Combo:" type="horizontal">
+      <InfoBox label="Max Combo:" type="horizontal">
         <p>{{ tetris.maxComboCount }}</p>
+      </InfoBox>
+
+      <InfoBox label="Max B2B Chain:" type="horizontal">
+        <p>{{ tetris.maxBackToBackCount }}</p>
       </InfoBox>
     </div>
 
@@ -92,5 +96,5 @@ function goToHome() {
         @touchstart.prevent="goToHome"
       />
     </div>
-  </DialogsBox>
+  </Dialog>
 </template>

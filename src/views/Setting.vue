@@ -29,7 +29,7 @@ function goToHome() {
     </ul>
 
     <Button
-      color="yellow"
+      color="green"
       text="BACK TO HOME"
       @click="goToHome"
       @touchstart="goToHome"

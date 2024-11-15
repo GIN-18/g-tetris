@@ -10,6 +10,18 @@ export class Ultra extends Marathon {
   }
 
   /**
+   * @override 时间到了就游戏结束
+   */
+  gameLoop(timestamp) {
+    if (this.checkGameOver()) {
+      this.handleGameOver()
+      return
+    }
+
+    super.gameLoop(timestamp)
+  }
+
+  /**
    * @override 开始游戏时，启动倒计时
    */
   playGame() {

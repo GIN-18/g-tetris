@@ -1,8 +1,11 @@
 <script setup>
-import { ref, provide, onMounted, onUnmounted } from 'vue'
+import { ref, provide, watch, onMounted, onUnmounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useGameStore } from '@/stores/game'
 import { useRoute, onBeforeRouteLeave } from 'vue-router'
 import { emitter } from '@/assets/js/emitter'
 import { factory } from '@/assets/js/factory'
+import { Timer } from '@/assets/js/Timer'
 
 import Header from '@/components/Header.vue'
 import PlayfieldCanvas from '@/components/canvas/PlayfieldCanvas.vue'
@@ -11,10 +14,57 @@ import RightSideInfo from '@/components/info/RightSideInfo.vue'
 import GameOverInfo from '@/components/info/GameOverInfo.vue'
 import ButtonOperation from '@/components/operation/ButtonOperation.vue'
 
+const { indexedDB } = storeToRefs(useGameStore())
 const route = useRoute()
 const mode = route.params.mode
 const tetris = ref(factory(mode))
 provide('tetris', tetris)
+
+// HACK: 游戏结束的时候保存数据(是否写在这里？)
+watch(
+  () => tetris.value.gameOver,
+  (newValue) => {
+    if (newValue) {
+      const timestamp = Date.now()
+
+      if (tetris.value.gameOverTitle === 'FINISHED') {
+        let record
+
+        if (mode === 'sprint') {
+          const minutesSeconds = Timer.formatMinutesSeconds(
+            tetris.value.timer.elapsedTime,
+          )
+          const milliseconds = Timer.formatMilliseconds(
+            tetris.value.timer.elapsedTime,
+          )
+          record = `${minutesSeconds}.${milliseconds}`
+        } else if (mode === 'ultra') {
+          record = `${tetris.value.sumScore()} points`
+        }
+
+        indexedDB.value.open().then(() => {
+          indexedDB.value.add({
+            mode,
+            timestamp,
+            record,
+          })
+        })
+
+        return
+      }
+
+      if (mode === 'marathon') {
+        indexedDB.value.open().then(() => {
+          indexedDB.value.add({
+            mode,
+            timestamp,
+            record: `${tetris.value.sumScore()} points`,
+          })
+        })
+      }
+    }
+  },
+)
 
 onMounted(() => {
   emitter.on('play', playGame)
@@ -31,6 +81,8 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  indexedDB.value.close()
+
   emitter.off('play', playGame)
   emitter.off('reset', resetGame)
   emitter.off('replay', replayGame)
