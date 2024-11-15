@@ -1,4 +1,3 @@
-import PlayfieldCanvas from '@/components/canvas/PlayfieldCanvas.vue'
 import { Marathon } from './Marathon'
 import { Timer } from '@/assets/js/Timer'
 
