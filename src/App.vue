@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted } from 'vue'
 import { preventDoubleTap } from '@/assets/js/utils'
-import { SpeedInsights } from '@vercel/speed-insights/vue'
 
 onMounted(() => {
   preventDoubleTap()
@@ -10,5 +9,4 @@ onMounted(() => {
 
 <template>
   <RouterView />
-  <SpeedInsights />
 </template>
