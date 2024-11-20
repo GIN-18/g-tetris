@@ -220,11 +220,13 @@ export class Marathon extends Tetris {
     this.mode = 'marathon'
     this.level = 1
     this.score = 0
+    this.oldLines = 0
     this.coinCount = 0
     this.starCount = 0
     this.coinIncrement = 99
     this.scoreIncrement = 100000
     this.dropDelay = this.updateDropDelay()
+    this.isSoftDrop = false
   }
 
   /**
