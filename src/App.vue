@@ -10,7 +10,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <RouterView />
   <Analytics />
   <SpeedInsights />
+  <RouterView />
 </template>
