@@ -115,12 +115,12 @@ function resetGame() {
   tetris.value.resetGame()
 }
 
-function moveLeft() {
-  tetris.value.moveLeft()
+function moveLeft(enable) {
+  tetris.value.moveLeft(enable)
 }
 
-function moveRight() {
-  tetris.value.moveRight()
+function moveRight(enable) {
+  tetris.value.moveRight(enable)
 }
 
 function hardDrop() {

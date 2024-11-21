@@ -415,6 +415,13 @@ export class Tetris {
 
     this.dropDelay = 1000 // 下落间隔
 
+    this.DAS_ID = null
+    this.ARR_List = [0, 10, 50, 100, 150]
+    this.ARR_Index = 2
+    this.DAS_List = [0, 50, 100, 200, 300, 500]
+    this.DAS_Index = 3
+    this.DAS_Counter = 0
+
     this.lastTimestamp = performance.now()
 
     this.messageList = []
@@ -458,6 +465,13 @@ export class Tetris {
     this.maneuver = ''
 
     this.dropDelay = 1000
+
+    this.DAS_ID = null
+    this.ARR_List = [0, 10, 50, 100, 150]
+    this.ARR_Index = 2
+    this.DAS_List = [0, 50, 100, 200, 300, 500]
+    this.DAS_Index = 3
+    this.DAS_Counter = 0
 
     this.lastTimestamp = performance.now()
 
@@ -534,6 +548,7 @@ export class Tetris {
     }
 
     this.updateMaxComboCount()
+    this.DAS_Counter = 0
 
     this.activeTetromino = this.currentBag[0] // 在当前背包中获取第一个方块作为当前方块
     this.updateBag() // 更新背包
@@ -544,14 +559,14 @@ export class Tetris {
     this.gameOver = true
   }
 
-  moveLeft() {
+  moveLeft(enable) {
     this.setManeuver('left')
-    this.moveHorizontal(-1)
+    this.moveHorizontal(-1, enable)
   }
 
-  moveRight() {
+  moveRight(enable) {
     this.setManeuver('right')
-    this.moveHorizontal(1)
+    this.moveHorizontal(1, enable)
   }
 
   hardDrop() {
@@ -597,8 +612,8 @@ export class Tetris {
     this.rotateTetromino(2)
   }
 
-  moveHorizontal(direction) {
-    if (this.activeTetromino && this.checkCanMove(direction, 0)) {
+  moveHorizontal(direction, enable) {
+    if (this.activeTetromino && this.checkCanMove(direction, 0) && enable) {
       this.activeTetromino.x += direction
 
       if (this.tetrominoLockTimer) {
@@ -606,6 +621,27 @@ export class Tetris {
         this.resetTetrominoLock()
         this.gameLoop()
       }
+    }
+
+    if (enable) {
+      this.DAS_ID = setInterval(() => {
+        this.DAS_Counter += this.ARR_List[this.ARR_Index] || 10
+
+        if (this.DAS_Counter >= this.DAS_List[this.DAS_Index]) {
+          if (this.activeTetromino && this.checkCanMove(direction, 0)) {
+            this.activeTetromino.x += direction
+
+            if (this.tetrominoLockTimer) {
+              this.stopGameLoop()
+              this.resetTetrominoLock()
+              this.gameLoop()
+            }
+          }
+        }
+      }, this.ARR_List[this.ARR_Index])
+    } else {
+      clearInterval(this.DAS_ID)
+      this.DAS_Counter = 0
     }
   }
 
