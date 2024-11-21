@@ -2,8 +2,8 @@ import { Tetris } from './Tetris'
 import { Timer } from '@/assets/js/Timer'
 
 export class Sprint extends Tetris {
-  constructor() {
-    super()
+  constructor(DAS, ARR) {
+    super(DAS, ARR)
     this.mode = 'sprint'
     this.targetLines = 40
     this.timer = new Timer()

@@ -1,8 +1,8 @@
 import { Tetris } from './Tetris'
 
 export class Marathon extends Tetris {
-  constructor() {
-    super()
+  constructor(DAS, ARR) {
+    super(DAS, ARR)
 
     this.mode = 'marathon'
     this.level = 1

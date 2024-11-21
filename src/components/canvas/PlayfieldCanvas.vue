@@ -1,5 +1,5 @@
 <script setup>
-import { ref, inject, computed, watch, onMounted } from 'vue'
+import { ref, inject, computed, watch, onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGameStore } from '@/stores/game'
 import { emitter } from '@/assets/js/emitter'
@@ -36,12 +36,11 @@ onMounted(() => {
   })
 
   // 退出页面的时候清除计时器
-  emitter.on('clearCountdownTimer', () => {
-    if (countdownTimerId) {
-      clearInterval(countdownTimerId)
-      countdownTimerId = null
-    }
-  })
+  emitter.on('clearCountdownTimer', clearCountdownTimer)
+})
+
+onUnmounted(() => {
+  emitter.off('clearCountdownTimer', clearCountdownTimer)
 })
 
 function drawPlayfield() {
@@ -95,6 +94,13 @@ function countdownToPlay(duration, callback) {
   }
 
   update()
+}
+
+function clearCountdownTimer() {
+  if (countdownTimerId) {
+    clearTimeout(countdownTimerId)
+    countdownTimerId = null
+  }
 }
 </script>
 

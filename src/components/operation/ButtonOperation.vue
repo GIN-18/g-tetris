@@ -11,7 +11,6 @@ import ArrowButton from '@/components/button/ArrowButton.vue'
       <!-- 硬降按钮 -->
       <ArrowButton
         type="hard-drop"
-        @click.prevent="emitter.emit('hardDrop')"
         @touchstart.prevent="emitter.emit('hardDrop')"
       />
 
@@ -19,14 +18,14 @@ import ArrowButton from '@/components/button/ArrowButton.vue'
         <!-- 左移按钮 -->
         <ArrowButton
           type="left"
-          @click.prevent="emitter.emit('left')"
-          @touchstart.prevent="emitter.emit('left')"
+          @touchstart.prevent="emitter.emit('left', true)"
+          @touchend.prevent="emitter.emit('left', false)"
         />
         <!-- 右移按钮 -->
         <ArrowButton
           type="right"
-          @click.prevent="emitter.emit('right')"
-          @touchstart.prevent="emitter.emit('right')"
+          @touchstart.prevent="emitter.emit('right', true)"
+          @touchend.prevent="emitter.emit('right', false)"
         />
       </div>
 
@@ -44,7 +43,6 @@ import ArrowButton from '@/components/button/ArrowButton.vue'
         <Button
           color="blue"
           icon="icon-[pixelarticons--repeat]"
-          @click.prevent="emitter.emit('rotateReverse')"
           @touchstart.prevent="emitter.emit('rotateReverse')"
         />
 
@@ -52,7 +50,6 @@ import ArrowButton from '@/components/button/ArrowButton.vue'
         <Button
           color="blue"
           icon="icon-[pixelarticons--sync]"
-          @click.prevent="emitter.emit('hold')"
           @touchstart.prevent="emitter.emit('hold')"
         />
       </div>
@@ -61,14 +58,12 @@ import ArrowButton from '@/components/button/ArrowButton.vue'
         <!-- 右旋按钮 -->
         <ArrowButton
           type="rotate-right"
-          @click.prevent="emitter.emit('rotateRight')"
           @touchstart.prevent="emitter.emit('rotateRight')"
         />
 
         <!-- 左旋按钮 -->
         <ArrowButton
           type="rotate-left"
-          @click.prevent="emitter.emit('rotateLeft')"
           @touchstart.prevent="emitter.emit('rotateLeft')"
         />
       </div>
