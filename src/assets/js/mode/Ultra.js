@@ -2,8 +2,8 @@ import { Marathon } from './Marathon'
 import { Timer } from '@/assets/js/Timer'
 
 export class Ultra extends Marathon {
-  constructor() {
-    super()
+  constructor(DAS, ARR) {
+    super(DAS, ARR)
     this.mode = 'ultra'
     this.timer = new Timer()
     this.gameOverTitle = 'GAME OVER'

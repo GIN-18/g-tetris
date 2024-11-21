@@ -9,7 +9,7 @@ const props = defineProps({
 })
 
 const classList = computed(() => ({
-  'text-2xl': true,
+  'text-4xl': true,
   'icon-[pixelarticons--toggle-right] text-nes-deep-green': JSON.parse(
     game[props.option],
   ),

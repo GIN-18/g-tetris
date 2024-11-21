@@ -1,4 +1,7 @@
 export class Tetris {
+  static ARR_List = [0, 10, 50, 100, 150]
+  static DAS_List = [0, 50, 100, 200, 300, 500]
+
   static palette = {
     ghostPieceColor: '#7c7c7c',
     tetrominoColor: [
@@ -379,7 +382,7 @@ export class Tetris {
     return new Array(22).fill(0).map(() => new Array(10).fill(0))
   }
 
-  constructor() {
+  constructor(DAR = 200, ARR = 50) {
     this.matrix = Tetris.initMatrix()
 
     this.blockSize = 16
@@ -416,10 +419,8 @@ export class Tetris {
     this.dropDelay = 1000 // 下落间隔
 
     this.DAS_ID = null
-    this.ARR_List = [0, 10, 50, 100, 150]
-    this.ARR_Index = 2
-    this.DAS_List = [0, 50, 100, 200, 300, 500]
-    this.DAS_Index = 3
+    this.DAS = DAR
+    this.ARR = ARR
     this.DAS_Counter = 0
 
     this.lastTimestamp = performance.now()
@@ -430,6 +431,7 @@ export class Tetris {
 
   resetGame() {
     this.stopGameLoop()
+    this.resetTetrominoLocation()
 
     this.matrix = Tetris.initMatrix()
 
@@ -467,10 +469,6 @@ export class Tetris {
     this.dropDelay = 1000
 
     this.DAS_ID = null
-    this.ARR_List = [0, 10, 50, 100, 150]
-    this.ARR_Index = 2
-    this.DAS_List = [0, 50, 100, 200, 300, 500]
-    this.DAS_Index = 3
     this.DAS_Counter = 0
 
     this.lastTimestamp = performance.now()
@@ -625,9 +623,9 @@ export class Tetris {
 
     if (enable) {
       this.DAS_ID = setInterval(() => {
-        this.DAS_Counter += this.ARR_List[this.ARR_Index] || 10
+        this.DAS_Counter += this.ARR || 10
 
-        if (this.DAS_Counter >= this.DAS_List[this.DAS_Index]) {
+        if (this.DAS_Counter >= this.DAS) {
           if (this.activeTetromino && this.checkCanMove(direction, 0)) {
             this.activeTetromino.x += direction
 
@@ -638,7 +636,7 @@ export class Tetris {
             }
           }
         }
-      }, this.ARR_List[this.ARR_Index])
+      }, this.ARR)
     } else {
       clearInterval(this.DAS_ID)
       this.DAS_Counter = 0
@@ -1141,9 +1139,11 @@ export class Tetris {
   }
 
   resetTetrominoLocation() {
-    this.activeTetromino.x = 4
-    this.activeTetromino.y = 1
-    this.activeTetromino.rotation = 0
+    if (this.activeTetromino) {
+      this.activeTetromino.x = 4
+      this.activeTetromino.y = 1
+      this.activeTetromino.rotation = 0
+    }
   }
 
   resetBackToBackCount() {

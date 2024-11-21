@@ -14,10 +14,10 @@ import RightSideInfo from '@/components/info/RightSideInfo.vue'
 import GameOverInfo from '@/components/info/GameOverInfo.vue'
 import ButtonOperation from '@/components/operation/ButtonOperation.vue'
 
-const { indexedDB } = storeToRefs(useGameStore())
+const { indexedDB, DAS, ARR } = storeToRefs(useGameStore())
 const route = useRoute()
 const mode = route.params.mode
-const tetris = ref(factory(mode))
+const tetris = ref(factory(mode, DAS.value, ARR.value))
 provide('tetris', tetris)
 
 // HACK: 游戏结束的时候保存数据(是否写在这里？)
