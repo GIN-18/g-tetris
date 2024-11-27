@@ -24,7 +24,7 @@ const selections = [
 </script>
 
 <template>
-  <Logo class="pt-16" fontSize="text-4xl" />
+  <Logo class="pt-16 md:pt-32" fontSize="text-4xl md:text-5xl" />
 
   <main class="flex flex-col gap-8">
     <Selection v-for="item in selections" :text="item.text" :link="item.link" />

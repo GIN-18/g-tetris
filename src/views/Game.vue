@@ -13,6 +13,8 @@ import LeftSideInfo from '@/components/info/LeftSideInfo.vue'
 import RightSideInfo from '@/components/info/RightSideInfo.vue'
 import GameOverInfo from '@/components/info/GameOverInfo.vue'
 import ButtonOperation from '@/components/operation/ButtonOperation.vue'
+import KeyOperation from '@/components/operation/KeyOperation.vue'
+import Footer from '@/components/Footer.vue'
 
 const { indexedDB, DAS, ARR } = storeToRefs(useGameStore())
 const route = useRoute()
@@ -151,13 +153,18 @@ function holdTetromino() {
 <template>
   <Header />
 
-  <main class="flex justify-between items-center w-full">
+  <main
+    class="flex justify-between items-center w-full md:flex md:justify-center md:gap-8"
+  >
     <LeftSideInfo />
     <PlayfieldCanvas />
     <RightSideInfo />
   </main>
 
   <ButtonOperation />
+  <KeyOperation />
 
   <GameOverInfo :title="tetris.gameOverTitle" />
+
+  <Footer />
 </template>

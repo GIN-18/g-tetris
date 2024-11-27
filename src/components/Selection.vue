@@ -1,4 +1,5 @@
 <script setup>
+import Button from '@/components/button/Button.vue'
 const props = defineProps({
   link: String,
   text: String,
@@ -6,7 +7,11 @@ const props = defineProps({
 </script>
 
 <template>
-  <RouterLink class="nes-badge" :to="props.link">
-    <span class="is-warning">{{ props.text }}</span>
+  <RouterLink class="nes-badge !no-underline md:!hidden" :to="props.link">
+    <span class="is-primary">{{ props.text }}</span>
+  </RouterLink>
+
+  <RouterLink class="!hidden !no-underline md:!block" :to="props.link">
+    <Button class="w-full" color="blue" :text="text" />
   </RouterLink>
 </template>

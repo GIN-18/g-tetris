@@ -21,8 +21,8 @@ const footerList = [
       :key="item.text"
       :href="item.url"
     >
-      <span class="text-md" :class="item.icon"></span>
-      <p class="pt-1 text-xs">{{ item.text }}</p>
+      <span class="text-md md:!text-xl" :class="item.icon"></span>
+      <p class="pt-1 text-xs md:text-base">{{ item.text }}</p>
     </a>
   </footer>
 </template>
