@@ -5,7 +5,8 @@
 @tailwind utilities;
 
 html,
-body {
+body,
+#app {
   @apply w-full h-full bg-nes-white;
 }
 
@@ -20,5 +21,9 @@ p {
 }
 
 #app {
-  @apply flex flex-col justify-between items-center w-full h-full p-4 bg-nes-white;
+  @apply flex flex-col justify-between items-center;
+}
+
+main {
+  @apply p-4;
 }

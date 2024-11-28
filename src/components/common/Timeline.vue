@@ -50,10 +50,10 @@ function remapMonth(month) {
       v-for="(value, key) in props.data"
       :key="key"
     >
-      <div class="absolute -left-2 w-3 h-3 rounded-full bg-nes-blue"></div>
-      <time class="text-sm">{{ formatDate(key) }}</time>
+      <div class="absolute -left-2 w-3 h-3 bg-nes-blue"></div>
+      <time class="text-sm md:text-base">{{ formatDate(key) }}</time>
       <ol
-        class="flex flex-col gap-2 p-4 rounded-md text-xs leading-6 bg-nes-gray md:text-md"
+        class="nes-container is-rounded is-dark flex flex-col gap-4 p-4 leading-6 text-xs md:text-sm"
       >
         <li class="flex justify-between items-center" v-for="(v, k) in value">
           <p>{{ v.record }}</p>

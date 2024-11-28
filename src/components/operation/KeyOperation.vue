@@ -1,17 +1,10 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useGameStore } from '@/stores/game'
 import { emitter } from '@/assets/js/emitter'
 
-const keys = ref({
-  hard_drop: ' ',
-  soft_drop: 'ArrowDown',
-  left: 'ArrowLeft',
-  right: 'ArrowRight',
-  rotate_right: 'ArrowUp',
-  rotate_left: 'z',
-  rotate_reverse: 'a',
-  hold: 'c',
-})
+const { keys } = storeToRefs(useGameStore())
 
 onMounted(() => {
   document.addEventListener('keydown', handleKeyDown)

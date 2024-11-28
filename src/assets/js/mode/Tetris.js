@@ -568,7 +568,7 @@ export class Tetris {
   }
 
   hardDrop() {
-    if (!this.activeTetromino) return
+    if (!this.activeTetromino || this.gameOver) return
 
     this.setManeuver('hardDrop')
 
@@ -584,7 +584,7 @@ export class Tetris {
   }
 
   softDrop(enable) {
-    if (!this.activeTetromino) return
+    if (!this.activeTetromino || this.gameOver) return
 
     if (enable && this.checkCanMove(0, 1)) {
       this.setManeuver('softDrop')
@@ -611,7 +611,12 @@ export class Tetris {
   }
 
   moveHorizontal(direction, enable) {
-    if (this.activeTetromino && this.checkCanMove(direction, 0) && enable) {
+    if (
+      this.activeTetromino &&
+      this.checkCanMove(direction, 0) &&
+      enable &&
+      !this.gameOver
+    ) {
       this.activeTetromino.x += direction
 
       if (this.tetrominoLockTimer) {
@@ -646,7 +651,7 @@ export class Tetris {
   }
 
   rotateTetromino(rotationStep) {
-    if (!this.activeTetromino) return
+    if (!this.activeTetromino || this.gameOver) return
 
     const rotationInfo = this.checkRotation(rotationStep, 0)
 
@@ -750,7 +755,7 @@ export class Tetris {
   }
 
   updateHoldTetromino() {
-    if (!this.activeTetromino) return
+    if (!this.activeTetromino || this.gameOver) return
 
     let tempTetromino = null
 

@@ -235,7 +235,7 @@ export class Marathon extends Tetris {
    * @param {boolean} enable 是否启用软降
    */
   softDrop(enable) {
-    if (!this.activeTetromino) return
+    if (!this.activeTetromino || this.gameOver) return
 
     if (enable && this.checkCanMove(0, 1)) {
       this.setManeuver('softDrop')
@@ -257,7 +257,7 @@ export class Marathon extends Tetris {
    * 硬降时更新分数
    */
   hardDrop() {
-    if (!this.activeTetromino) return
+    if (!this.activeTetromino || this.gameOver) return
 
     // 设置当前的操作为硬降
     this.setManeuver('hardDrop')

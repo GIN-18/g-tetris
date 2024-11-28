@@ -57,8 +57,8 @@ function goToHome() {
 <template>
   <Header />
 
-  <main class="grow flex flex-col justify-between items-center w-full md:w-1/2">
-    <h2 class="self-start py-6 text-lg text-nes-deep-blue md:text-2xl">
+  <main class="grow flex flex-col items-center w-full md:w-2/3">
+    <h2 class="self-start py-6 text-nes-deep-blue text-lg md:text-2xl">
       {{ title }}
     </h2>
 
@@ -76,7 +76,9 @@ function goToHome() {
       </Tabs>
     </div>
 
-    <div class="flex justify-around w-full pt-4">
+    <div
+      class="flex justify-around w-full py-4 md:justify-end md:gap-8 md:pt-8"
+    >
       <Button
         color="green"
         text="PLAY"

@@ -15,3 +15,15 @@ export function preventDoubleTap() {
     },
   )
 }
+
+export function remapKeys(value) {
+  const keys = {
+    ' ': 'Space',
+    ArrowLeft: '←',
+    ArrowRight: '→',
+    ArrowDown: '↓',
+    ArrowUp: '↑',
+  }
+
+  return keys[value] || value
+}

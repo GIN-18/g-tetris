@@ -33,7 +33,7 @@ function goToHome() {
 
 <template>
   <Dialog :title="title" :is-show="tetris.gameOver">
-    <div class="flex flex-col gap-4 w-72">
+    <div class="flex flex-col gap-4 w-72 text-sm md:text-base">
       <!-- 显示行数 -->
       <InfoBox label="Lines:" type="horizontal">
         <p>{{ tetris.lines }}</p>
