@@ -112,7 +112,7 @@ function checkKey(key) {
       </InfoBox>
     </div>
 
-    <div class="pt-16 pb-8 md:self-end">
+    <div class="pt-4 md:self-end md:pt-16 md:pb-8">
       <Button
         color="green"
         text="BACK TO HOME"

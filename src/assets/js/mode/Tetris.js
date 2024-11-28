@@ -1,6 +1,6 @@
 export class Tetris {
-  static ARR_List = [0, 10, 50, 100, 150]
-  static DAS_List = [0, 50, 100, 200, 300, 500]
+  static ARR_List = [0, 10, 20, 30, 50, 60, 100, 150]
+  static DAS_List = [0, 10, 20, 30, 50, 60, 100, 200, 300]
 
   static palette = {
     ghostPieceColor: '#7c7c7c',
