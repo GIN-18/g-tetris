@@ -621,6 +621,11 @@ export class Tetris {
       }
     }
 
+    if (this.DAS_ID) {
+      clearInterval(this.DAS_ID)
+      this.DAS_Counter = 0
+    }
+
     if (enable) {
       this.DAS_ID = setInterval(() => {
         this.DAS_Counter += this.ARR || 10
@@ -637,9 +642,6 @@ export class Tetris {
           }
         }
       }, this.ARR)
-    } else {
-      clearInterval(this.DAS_ID)
-      this.DAS_Counter = 0
     }
   }
 
