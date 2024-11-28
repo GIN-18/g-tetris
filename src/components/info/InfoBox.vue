@@ -10,12 +10,19 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  title: {
+    type: String,
+    default: 'center',
+  },
 })
 
 const layout = computed(() => ({
-  'flex items-center w-full text-sm': true,
+  'flex w-full text-sm md:text-base': true,
   'justify-between': props.type === 'horizontal',
-  'flex-col justify-center gap-2': props.type === 'vertical',
+  'flex-col  gap-2': props.type === 'vertical',
+  'items-start': props.title === 'left',
+  'items-center': props.title === 'center',
+  'items-end': props.title === 'right',
 }))
 </script>
 

@@ -1,18 +1,10 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useGameStore } from '@/stores/game'
 import { emitter } from '@/assets/js/emitter'
 
-const keys = ref({
-  play: 'i', // NOTE: 发布时需要删除开始操作
-  hard_drop: ' ',
-  soft_drop: 'ArrowDown',
-  left: 'ArrowLeft',
-  right: 'ArrowRight',
-  rotate_right: 'ArrowUp',
-  rotate_left: 'z',
-  rotate_reverse: 'a',
-  hold: 'c',
-})
+const { keys } = storeToRefs(useGameStore())
 
 onMounted(() => {
   document.addEventListener('keydown', handleKeyDown)
@@ -26,15 +18,11 @@ onUnmounted(() => {
 
 function handleKeyDown(e) {
   switch (e.key) {
-    // NOTE: 发布时需要删除开始操作
-    case keys.value.play:
-      emitter.emit('play')
-      break
     case keys.value.left:
-      emitter.emit('left')
+      emitter.emit('left', true)
       break
     case keys.value.right:
-      emitter.emit('right')
+      emitter.emit('right', true)
       break
     case keys.value.hard_drop:
       emitter.emit('hardDrop')
@@ -58,8 +46,16 @@ function handleKeyDown(e) {
 }
 
 function handleKeyUp(e) {
-  if (e.key === keys.value.soft_drop) {
-    emitter.emit('softDrop', false)
+  switch (e.key) {
+    case keys.value.left:
+      emitter.emit('left', false)
+      break
+    case keys.value.right:
+      emitter.emit('right', false)
+      break
+    case keys.value.soft_drop:
+      emitter.emit('softDrop', false)
+      break
   }
 }
 </script>

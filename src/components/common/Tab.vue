@@ -6,7 +6,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="pt-3 text-sm leading-6">
+  <div class="pt-3 leading-8 text-sm md:text-base">
     <slot></slot>
   </div>
 </template>

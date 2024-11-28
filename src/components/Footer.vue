@@ -14,15 +14,15 @@ const footerList = [
 </script>
 
 <template>
-  <footer class="flex justify-center items-center gap-8 pt-2">
+  <footer class="flex justify-center items-center gap-8 p-4">
     <a
       class="flex justify-center items-center gap-3 !no-underline"
       v-for="item in footerList"
       :key="item.text"
       :href="item.url"
     >
-      <span class="text-md" :class="item.icon"></span>
-      <p class="pt-1 text-xs">{{ item.text }}</p>
+      <span class="text-xl md:!text-2xl" :class="item.icon"></span>
+      <p class="pt-1 text-sm md:text-base">{{ item.text }}</p>
     </a>
   </footer>
 </template>

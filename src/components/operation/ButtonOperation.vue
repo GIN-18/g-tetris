@@ -6,7 +6,7 @@ import ArrowButton from '@/components/button/ArrowButton.vue'
 </script>
 
 <template>
-  <div class="flex justify-between w-full">
+  <div class="flex justify-between w-full p-4 md:hidden">
     <div class="flex flex-col justify-between items-center w-1/2">
       <!-- 硬降按钮 -->
       <ArrowButton

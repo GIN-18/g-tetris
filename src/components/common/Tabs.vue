@@ -13,7 +13,7 @@ function renderTab(name, label, index) {
     'label',
     {
       class: {
-        'text-sm': true,
+        'text-sm md:text-base': true,
         'border-b-4 border-nes-deep-blue text-nes-deep-blue':
           activeTab.value === name || (index === 0 && !activeTab.value),
       },
